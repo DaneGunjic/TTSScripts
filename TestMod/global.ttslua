@@ -1,3 +1,7 @@
-function DoStuff()
+function onLoad(save_state)
+  DoStuff()
+end
 
+function DoStuff()
+  print("Hello")
 end
