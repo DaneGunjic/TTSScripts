@@ -1,8 +1,8 @@
 -- Main game file that includes all other components
 
 -- First include globals and utilities
-#include !\7Wonders\globals.ttsttslua
-#include !\7Wonders\utils\helpers.ttsttslua
+#include !\7Wonders\globals.ttslua
+#include !\7Wonders\utils\helpers.ttslua
 #include !\7Wonders\utils\rotation.ttslua
 
 -- Then include player systems
@@ -23,8 +23,60 @@
 #include !\7Wonders\game\draft.ttslua
 
 function onLoad()
-    -- Initialize all systems
-    InitializeGlobals()
-    SetupButtons()
-    -- Other initialization as needed
+    -- Initialize all deck zones
+    DeckZones.Age[1] = getObjectFromGUID("56d221")
+    DeckZones.Age[2] = getObjectFromGUID("306db0")
+    DeckZones.Age[3] = getObjectFromGUID("a0fe65")
+    DeckZones.Leaders = getObjectFromGUID("d679f4")
+    DeckZones.Cities.Age1 = getObjectFromGUID("05d80d")
+    DeckZones.Cities.Age2 = getObjectFromGUID("f2659e")
+    DeckZones.Cities.Age3 = getObjectFromGUID("3484af")
+    DeckZones.Armada.Age1 = getObjectFromGUID("f261d9")
+    DeckZones.Armada.Age2 = getObjectFromGUID("06e74b")
+    DeckZones.Armada.Age3 = getObjectFromGUID("50d040")
+    DeckZones.Guild = getObjectFromGUID("838ee1")
+    DeckZones.Island.Level1 = getObjectFromGUID("43d444")
+    DeckZones.Island.Level2 = getObjectFromGUID("ffc10f")
+    DeckZones.Island.Level3 = getObjectFromGUID("27153d")
+
+    -- Initialize player zones
+    _WhiteLeftZone = getObjectFromGUID("13fc28")
+    _WhiteRightZone = getObjectFromGUID("c58bb3")
+    _RedLeftZone = getObjectFromGUID("78cb1b")
+    _RedRightZone = getObjectFromGUID("13fc28")
+    _YellowLeftZone = getObjectFromGUID("5c04e5")
+    _YellowRightZone = getObjectFromGUID("78cb1b")
+    _GreenLeftZone = getObjectFromGUID("a16b0b")
+    _GreenRightZone = getObjectFromGUID("5c04e5")
+    _PinkLeftZone = getObjectFromGUID("1ad522")
+    _PinkRightZone = getObjectFromGUID("a16b0b")
+    _BlueLeftZone = getObjectFromGUID("c1f197")
+    _BlueRightZone = getObjectFromGUID("1ad522")
+    _PurpleLeftZone = getObjectFromGUID("c58bb3")
+    _PurpleRightZone = getObjectFromGUID("c1f197")
+
+    -- Initialize wonder bags
+    WonderBags.BaseWonder = getObjectFromGUID("56d45b")
+    WonderBags.LeaderWonder = getObjectFromGUID("c1c61c")
+    WonderBags.CitiesWonder = getObjectFromGUID("a26264")
+    WonderBags.ArmadaWonder = getObjectFromGUID("0c6087")
+    WonderBags.CollectionWonder = getObjectFromGUID("7c6699")
+
+    -- Initialize setup board
+    SetupBoard = getObjectFromGUID("511af3")
+
+    -- Verify all critical objects loaded
+    local allZonesValid = true
+    for name, zone in pairs(DeckZones) do
+        if not zone then
+            broadcastToAll("Warning: Failed to load zone - " .. name, {1,0,0})
+            allZonesValid = false
+        end
+    end
+
+    if allZonesValid then
+        printToAll("All game components loaded successfully!", {0,1,0})
+    else
+        printToAll("Some components failed to load - check console", {1,0.5,0})
+    end
 end

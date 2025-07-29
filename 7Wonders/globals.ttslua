@@ -61,7 +61,7 @@ CurrentPasses = 0
 MaximumPasses = 0
 GameState = "Setup"
 
---[[ TOKEN POSITIONS ]]
+--[[ TOKEN BAGS POSITIONS ]]
 TokenBagsPositions = {
   CoinBag1Position             = Vector(-14.00, 0.46, -4.00)
   CoinBag3Position             = Vector(-10.00, 0.46, -4.00)
@@ -282,46 +282,115 @@ _PurpleDraftWonderObj = {}
 --[[ DECK ZONE REFERENCES ]]
 -- These will be initialized in onLoad()
 DeckZones = {
-  Age1 = nil,
-  Age2 = nil,
-  Age3 = nil,
+  Age = {
+    [1] = nil,
+    [2] = nil,
+    [3] = nil
+  },
+  Cities = {
+    Age1 = nil,
+    Age2 = nil,
+    Age3 = nil
+  },
+  Armada = {
+    Age1 = nil,
+    Age2 = nil,
+    Age3 = nil
+  },
+
   Leaders = nil,
-  CitiesAge1 = nil,
-  CitiesAge2 = nil,
-  CitiesAge3 = nil,
-  ArmadaAge1 = nil,
-  ArmadaAge2 = nil,
-  ArmadaAge3 = nil,
   Guild = nil,
-  IslandLevel1 = nil,
-  IslandLevel2 = nil,
-  IslandLevel3 = nil
+
+  Island = {
+    Level1 = nil,
+    Level2 = nil,
+    Level3 = nil
+  }
 }
 
 -- Final zones are zones to which the decks will be sent after setup
 FinalDeckZones = {
+  Age = {
+    [1] = nil,
+    [2] = nil,
+    [3] = nil
+  },
+  Cities = {
     Age1 = nil,
     Age2 = nil,
-    Age3 = nil,
-    Leaders = nil,
-    CitiesAge1 = nil,
-    CitiesAge2 = nil,
-    CitiesAge3 = nil,
-    ArmadaAge1 = nil,
-    ArmadaAge2 = nil,
-    ArmadaAge3 = nil,
-    Guild = nil,
-    IslandLevel1 = nil,
-    IslandLevel2 = nil,
-    IslandLevel3 = nil
+    Age3 = nil
+  },
+  Armada = {
+    Age1 = nil,
+    Age2 = nil,
+    Age3 = nil
+  },
+
+  Leaders = nil,
+  Guild = nil,
+
+  Island = {
+    Level1 = nil,
+    Level2 = nil,
+    Level3 = nil
+  }
 }
 
 --[[ BAG REFERENCES ]]
 -- These will be initialized in onLoad()
 WonderBags = {
-  BaseWonderBag = nil
-  LeaderWonderBag = nil
-  CitiesWonderBag = nil
-  ArmadaWonderBag = nil
-  CollectionWonderBag = nil
+  BaseWonder = nil
+  LeaderWonder = nil
+  CitiesWonder = nil
+  ArmadaWonder = nil
+  CollectionWonder = nil
 }
+
+ShipBags = {
+  RedShip = nil
+  BlueShip = nil
+  YellowShip = nil
+  GreenShip = nil
+}
+
+DockyardBag = nil
+
+IslandBags = {
+  IslandLevel1 = nil
+  IslandLevel2 = nil
+  IslandLevel3 = nil
+}
+
+CoinBags = {
+  Coin1 = nil
+  Coin3 = nil
+  Coin6 = nil
+}
+
+ConflictTokenBags = {
+  VictoryToken1 = nil
+  VictoryToken3 = nil
+  VictoryToken5 = nil
+  VictoryToken7 = nil
+  DefeatToken = nil
+}
+
+BoardingTokenBag = nil
+DiplomacyTokenBag = nil
+
+NavalTokenBags = {
+  VictoryToken1 = nil
+  VictoryToken3 = nil
+  VictoryToken5 = nil
+  VictoryToken7 = nil
+  DefeatToken1 = nil
+  DefeatToken2 = nil
+  DefeatToken3 = nil
+}
+
+DebtBags = {
+  DebtToken1 = nil
+  DebtToken5 = nil
+}
+
+FrontiersBag = nil
