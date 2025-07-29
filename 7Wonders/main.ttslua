@@ -1,0 +1,30 @@
+-- Main game file that includes all other components
+
+-- First include globals and utilities
+#include !\7Wonders\globals.ttsttslua
+#include !\7Wonders\utils\helpers.ttsttslua
+#include !\7Wonders\utils\rotation.ttslua
+
+-- Then include player systems
+#include !\7Wonders\players\player_data.ttslua
+#include !\7Wonders\players\ready_system.ttslua
+
+-- Include UI components
+#include !\7Wonders\ui\buttons.ttslua
+#include !\7Wonders\ui\coin_ui.ttslua
+#include !\7Wonders\ui\military_ui.ttslua
+#include !\7Wonders\ui\naval_ui.ttslua
+
+-- Include game systems
+#include !\7Wonders\game\setup.ttslua
+#include !\7Wonders\game\phases.ttslua
+#include !\7Wonders\game\wonders.ttslua
+#include !\7Wonders\game\armada.ttslua
+#include !\7Wonders\game\draft.ttslua
+
+function onLoad()
+    -- Initialize all systems
+    InitializeGlobals()
+    SetupButtons()
+    -- Other initialization as needed
+end
