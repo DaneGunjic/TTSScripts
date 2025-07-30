@@ -13,12 +13,17 @@ DefaultButtonParams = {
 
 -------------------[[ EXPANSION SETTINGS ]]-------------------
 ExpansionsUsed = {
-  Leaders = false,
+  Leaders = {
+    Base = false,
+    Expert = false,
+    Promo = false
+  },
   Cities = false,
   Armada = false,
   Ruins = false,
   Myths = false,
-  Frontiers = false
+  Frontiers = false,
+  PromoGuilds = false
 }
 
 WonderExpansionsUsed = {
@@ -151,7 +156,7 @@ Age3DeckBags = {
 
 -- [[BAGS | GUILDS]]
 GuildBags = {
-  Base 	= getObjectFromGUID("3cec0e"),
+  Base = getObjectFromGUID("3cec0e"),
   Promo = getObjectFromGUID("0cbeec"),
   Cities = getObjectFromGUID("3f9ca3")
 }
@@ -160,7 +165,8 @@ GuildBags = {
 LeaderBags = {
   Base = getObjectFromGUID("1ebb3d"),
   Expert = getObjectFromGUID("c7c31f"),
-  Cities = getObjectFromGUID("1dd705")
+  Cities = getObjectFromGUID("1dd705"),
+  Promo = getObjectFromGUID("a5f906")
 }
 
 -- [[BAGS | CITIES]]
@@ -202,7 +208,7 @@ DockyardBag = getObjectFromGUID("5b9a9c")
 	-- [[BAGS | WONDERS]]
 WonderBags = {
   Base = getObjectFromGUID("56d45b"),
-  Leader = getObjectFromGUID("c1c61c"),
+  Leaders = getObjectFromGUID("c1c61c"),
   Cities = getObjectFromGUID("a26264"),
   Armada = getObjectFromGUID("0c6087"),
   Collection = getObjectFromGUID("7c6699")

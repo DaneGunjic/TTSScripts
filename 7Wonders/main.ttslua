@@ -3,13 +3,14 @@
 #include !\7Wonders\utils\helpers.ttslua
 #include !\7Wonders\game\setup.ttslua
 #include !\7Wonders\ui\buttons.ttslua
+#include !\7Wonders\players\ready_system.ttslua
 
 function onLoad()
   -- Once the game loads initialize  all global variables
   #include !\7Wonders\globals_general.ttslua
   #include !\7Wonders\globals_players.ttslua
 
-  ForceLoadAllAssets()
+  -- ForceLoadAllAssets()
 
   MakeSetupButtons()
 

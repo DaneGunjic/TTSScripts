@@ -1,6 +1,6 @@
 function HandleLeadersButton() -- Button index 0
-	ExpansionsUsed[1] = not ExpansionsUsed[1]
-	if ExpansionsUsed[1] then
+	ExpansionsUsed.Leaders.Base = not ExpansionsUsed.Leaders.Base
+	if ExpansionsUsed.Leaders.Base then
 		SetupBoard.editButton({index = 0, label = "Leaders [✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 0, label = "Leaders [    ]", font_color={1,1,1}})
@@ -8,8 +8,8 @@ function HandleLeadersButton() -- Button index 0
 end
 
 function HandleCitiesButton() -- Button index 1
-	ExpansionsUsed[2] = not ExpansionsUsed[2]
-	if ExpansionsUsed[2] then
+	ExpansionsUsed.Cities = not ExpansionsUsed.Cities
+	if ExpansionsUsed.Cities then
 		SetupBoard.editButton({index = 1, label = "Cities [✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 1, label = "Cities [    ]", font_color={1,1,1}})
@@ -17,8 +17,8 @@ function HandleCitiesButton() -- Button index 1
 end
 
 function HandleArmadaButton() -- Button index 2
-	ExpansionsUsed[3] = not ExpansionsUsed[3]
-	if ExpansionsUsed[3] then
+	ExpansionsUsed.Armada = not ExpansionsUsed.Armada
+	if ExpansionsUsed.Armada then
 		SetupBoard.editButton({index = 2, label = "Armada [✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 2, label = "Armada [    ]", font_color={1,1,1}})
@@ -26,8 +26,8 @@ function HandleArmadaButton() -- Button index 2
 end
 
 function HandleRuinsButton() -- Button index 3
-	ExpansionsUsed[4] = not ExpansionsUsed[4]
-	if ExpansionsUsed[4] then
+	ExpansionsUsed.Ruins = not ExpansionsUsed.Ruins
+	if ExpansionsUsed.Ruins then
 		SetupBoard.editButton({index = 3, label = "Ruins [✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 3, label = "Ruins [    ]", font_color={1,1,1}})
@@ -35,8 +35,8 @@ function HandleRuinsButton() -- Button index 3
 end
 
 function HandleMythsButton() -- Button index 4
-	ExpansionsUsed[5] = not ExpansionsUsed[5]
-	if ExpansionsUsed[5] then
+	ExpansionsUsed.Myths = not ExpansionsUsed.Myths
+	if ExpansionsUsed.Myths then
 		SetupBoard.editButton({index = 4, label = "Myths [✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 4, label = "Myths [    ]", font_color={1,1,1}})
@@ -44,8 +44,8 @@ function HandleMythsButton() -- Button index 4
 end
 
 function HandleFrontiersButton() -- Button index 5
-	ExpansionsUsed[6] = not ExpansionsUsed[6]
-	if ExpansionsUsed[6] then
+	ExpansionsUsed.Frontiers = not ExpansionsUsed.Frontiers
+	if ExpansionsUsed.Frontiers then
 		SetupBoard.editButton({index = 5, label = "Frontiers [✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 5, label = "Frontiers [    ]", font_color={1,1,1}})
@@ -53,8 +53,8 @@ function HandleFrontiersButton() -- Button index 5
 end
 
 function HandleCollectionButton() -- Button index 6
-	WonderExpansionsUsed[1] = not WonderExpansionsUsed[1]
-	if WonderExpansionsUsed[1] then
+	WonderExpansionsUsed.Collection = not WonderExpansionsUsed.Collection
+	if WonderExpansionsUsed.Collection then
 		SetupBoard.editButton({index = 6, label = "Collection [✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 6, label = "Collection [    ]", font_color={1,1,1}})
