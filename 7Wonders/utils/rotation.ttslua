@@ -1,0 +1,51 @@
+function FindNextColor(Color, Direction)
+  -- Player array is sorted in the "Left" direction, meaning [1] is white, [2] is Red etc.
+  local tempAllPlayers = Player.getPlayers()
+  --print("Find next color called for " .. Color .. " and direction " .. Direction)
+  for i, PlayerInstance in ipairs(tempAllPlayers) do
+    --print("index " .. i .. " is " .. PlayerInstance.color)
+    if PlayerInstance.color == Color then
+      -- "Left" Direction means we look for the prevous player (to their right)
+      if Direction == "Left" then
+        if i == #tempAllPlayers then
+          return tempAllPlayers[1].color
+        end
+        return tempAllPlayers[i+1].color
+      else
+        -- "Right" Direction means we look for the next player (to their left)
+        if i == 1 then
+          return tempAllPlayers[#tempAllPlayers].color
+        end
+        return tempAllPlayers[i-1].color
+      end
+    end
+  end
+end
+
+function RotateHands(Card, Color, Direction)
+  local CardRot = {}
+  NextColor = FindNextColor(Color, Direction)
+  --print("Next color is "..NextColor)
+
+  CardRot["x"] = _G["_"..Color.."PlayerWonder"]["WonderRot"][1]
+  CardRot["y"] = _G["_"..Color.."PlayerWonder"]["WonderRot"][2]
+  CardRot["z"] = 180
+
+  Card.setRotation(CardRot)
+
+  Card.setPosition(_G["_"..Color..Direction.."Zone"].getPosition())
+end
+
+function ForceTakeCards(Direction)
+  -- If Direction is "Right" then find the next player's "Right" zone
+  -- If Direction is "Left" then find the previous player's "Left" zone
+  for i, PlayerInstance in ipairs(Player.getPlayers()) do
+    NextColor = FindNextColor(PlayerInstance.color, Direction)
+    CardsToTake = _G["_"..NextColor..Direction.."Zone"].getObjects()
+    for _, Cards in ipairs(CardsToTake) do
+      if Cards.type == "Deck" or Cards.type == "Card" then
+        Cards.deal(9, PlayerInstance.color)
+      end
+    end
+  end
+end

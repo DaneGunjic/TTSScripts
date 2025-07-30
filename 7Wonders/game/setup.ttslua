@@ -1,0 +1,26 @@
+function DealCoins()
+    local CoinAmount
+
+    if ExpansionsUsed[1] then
+        CoinAmount = 6
+    else
+        CoinAmount = 3
+    end
+
+    for _, player in ipairs(AllSeatedPlayers) do
+		local tempPost = Vector(_G["_"..player.."PlayerWonder"].WonderPos)
+		tempPost.y = 2
+        for i = 1, CoinAmount do
+			tempPost = Vector(_G["_"..player.."PlayerWonder"].WonderPos)
+			tempPost.y = 2
+			tempPost.x = tempPost.x + math.random(-100, 100) / 100
+			tempPost.z = tempPost.z + math.random(-100, 100) / 100
+			CoinBag1.takeObject(
+				{position = tempPost,
+				rotation = _G["_"..player.."PlayerWonder"].WonderRot,
+				smooth = false})
+			pause(0.1)
+        end
+    end
+		return 1
+end

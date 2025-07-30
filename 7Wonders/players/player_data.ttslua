@@ -1,0 +1,224 @@
+--[[ PLAYER WONDER POSITIONS ]]
+_WhitePlayerWonder = {
+  WonderPos = {26.78, 1.00, -24.50},
+  WonderRot = {0.00, 180, 0.00},
+  WonderFlipRot = {0, 180, 180},
+  DraftMode1Pos = {26.75, -20, -24.25},
+  DraftMode2Pos = {26.75, -21, -24.25},
+  DraftMode3Pos = {26.75, -22, -24.25}
+}
+
+_RedPlayerWonder = {
+  WonderPos = {-3.22, 1.00, -24.50},
+  WonderRot = {0.00, 180, 0.00},
+  WonderFlipRot = {0, 180, 180},
+	DraftMode1Pos = {2, -20, -22},
+  DraftMode2Pos = {2, -22, -22},
+  DraftMode3Pos = {2, -24, -22}
+}
+
+_YellowPlayerWonder = {
+  WonderPos = {-33.22, 1.00, -24.50},
+  WonderRot = {0.00, 180, 0.00},
+  WonderFlipRot = {0, 180, 180},
+  DraftMode1Pos = {-28, -20, -22},
+  DraftMode2Pos = {-28, -22, -22},
+  DraftMode3Pos = {-28, -24, -22}
+}
+
+_GreenPlayerWonder = {
+  WonderPos = {-40.50, 1.00, 3.22},
+  WonderRot = {0.00, 270, 0.00},
+  WonderFlipRot = {0, 270, 180},
+  DraftMode1Pos = {-38, -20, -22},
+  DraftMode2Pos = {-38, -22, -22},
+  DraftMode3Pos = {-38, -24, -22}
+}
+
+_PinkPlayerWonder = {
+  WonderPos = {-26.78, 1.00, 24.50},
+  WonderRot = {0.00, 0.00, 0.00},
+  WonderFlipRot = {0, 0, 180}
+  DraftMode1Pos = {-32, -20, -22},
+  DraftMode2Pos = {-32, -22, -22},
+  DraftMode3Pos = {-32, -24, -22}
+}
+
+_BluePlayerWonder = {
+  WonderPos = {3.22, 1.00, 24.50},
+  WonderRot = {0.00, 0.00, 0.00},
+  WonderFlipRot = {0, 0, 180},
+  DraftMode1Pos = {-2, -20, -22},
+  DraftMode2Pos = {-2, -22, -22},
+  DraftMode3Pos = {-2, -24, -22}
+}
+
+_PurplePlayerWonder = {
+  WonderPos = {33.22, 1.00, 24.50},
+  WonderRot = {0.00, 0.00, 0.00},
+  WonderFlipRot = {0, 0, 180},
+  DraftMode1Pos = {28, -20, -22},
+  DraftMode2Pos = {28, -22, -22},
+  DraftMode3Pos = {28, -24, -22}
+}
+
+--[[ PLAYER ARMADA POSITIONS ]]
+_WhitePlayerArmada = {
+  DockyardPos = {34.70, 1.00, -21.92},
+  DockyardRot = {0.00, 180.00, 0.00},
+  RedShipPos = {32.77, 1.58, -26.04},
+  RedShipRot = {0.00, 180.00, 0.00},
+  YellowShipPos = {33.87, 1.58, -25.99},
+  YellowShipRot = {0.00, 180.00, 0.00},
+  BlueShipPos = {35.06, 1.58, -26.00},
+  BlueShipRot = {0.00, 180.00, 0.00},
+  GreenShipPos = {36.29, 1.58, -25.98},
+  GreenShipRot = {0.00, 180.00, 0.00}
+}
+
+_RedPlayerArmada = {
+  DockyardPos = {4.70, 1.00, -21.92},
+  DockyardRot = {0.00, 180.00, 0.00},
+  RedShipPos = {2.72, 1.58, -26.05},
+  RedShipRot = {0.00, 180.00, 0.00},
+  YellowShipPos = {3.82, 1.58, -26.01},
+  YellowShipRot = {0.00, 180.00, 0.00},
+  BlueShipPos = {5.01, 1.58, -26.01},
+  BlueShipRot = {0.00, 180.00, 0.00},
+  GreenShipPos = {6.24, 1.58, -25.99},
+  GreenShipRot = {0.00, 180.00, 0.00}
+}
+
+_YellowPlayerArmada = {
+  DockyardPos = {-25.30, 1.00, -21.92},
+  DockyardRot = {0.00, 180.00, 0.00},
+  RedShipPos = {-27.26, 1.58, -26.06},
+  RedShipRot = {0.00, 180.00, 0.00},
+  YellowShipPos = {-26.16, 1.58, -26.01},
+  YellowShipRot = {0.00, 180.00, 0.00},
+  BlueShipPos = {-24.97, 1.58, -26.02},
+  BlueShipRot = {0.00, 180.00, 0.00},
+  GreenShipPos = {-23.74, 1.58, -26.00},
+  GreenShipRot = {0.00, 180.00, 0.00}
+}
+
+_GreenPlayerArmada = {
+  DockyardPos = {-37.92, 1.00, -4.70},
+  DockyardRot = {0.00, 270.00, 0.00},
+  RedShipPos = {-42.06, 1.58, -2.74},
+  RedShipRot = {0.00, 270.00, 0.00},
+  YellowShipPos = {-42.01, 1.58, -3.84},
+  YellowShipRot = {0.00, 270.00, 0.00},
+  BlueShipPos = {-42.02, 1.58, -5.03},
+  BlueShipRot = {0.00, 270.00, 0.00},
+  GreenShipPos = {-42.00, 1.58, -6.26},
+  GreenShipRot = {0.00, 270.00, 0.00}
+}
+
+_PinkPlayerArmada = {
+  DockyardPos = {-34.70, 1.00, 21.92},
+  DockyardRot = {0.00, 0.00, 0.00},
+  RedShipPos = {-32.73, 1.58, 26.03},
+  RedShipRot = {0.00, 0.00, 0.00},
+  YellowShipPos = {-33.83, 1.58, 25.98},
+  YellowShipRot = {0.00, 0.00, 0.00},
+  BlueShipPos = {-35.02, 1.58, 25.99},
+  BlueShipRot = {0.00, 0.00, 0.00},
+  GreenShipPos = {-36.25, 1.58, 25.97},
+  GreenShipRot = {0.00, 0.00, 0.00}
+}
+
+_BluePlayerArmada = {
+  DockyardPos = {-4.70, 1.00, 21.92},
+  DockyardRot = {0.00, 0.00, 0.00},
+  RedShipPos = {-8.04, 2, 24.12},
+  RedShipRot = {0.00, 0.00, 0.00},
+  YellowShipPos = {-9.14, 2, 24.07},
+  YellowShipRot = {0.00, 0.00, 0.00},
+  BlueShipPos = {-10.33, 2, 24.08},
+  BlueShipRot = {0.00, 0.00, 0.00},
+  GreenShipPos = {-11.56, 2, 24.06},
+  GreenShipRot = {0.00, 0.00, 0.00}
+}
+
+_PurplePlayerArmada = {
+  DockyardPos = {25.30, 1.00, 21.92},
+  DockyardRot = {0.00, 0.00, 0.00},
+  RedShipPos = {21.96, 2, 24.10},
+  RedShipRot = {0.00, 0.00, 0.00},
+  YellowShipPos = {20.87, 2, 24.06},
+  YellowShipRot = {0.00, 0.00, 0.00},
+  BlueShipPos = {19.68, 2, 24.07},
+  BlueShipRot = {0.00, 0.00, 0.00},
+  GreenShipPos = {18.45, 2, 24.05},
+  GreenShipRot = {0.00, 0.00, 0.00}
+}
+
+--------------[[SCRIPTING ZONES | WONDERS]]--------------
+WonderZones = {
+  WhiteWonderZone = getObjectFromGUID("139f96")
+  RedWonderZone = getObjectFromGUID("59ebcd")
+  YellowWonderZone = getObjectFromGUID("988c12")
+  GreenWonderZone = getObjectFromGUID("797e59")
+  PinkWonderZone = getObjectFromGUID("84634f")
+  BlueWonderZone = getObjectFromGUID("a6380a")
+  PurpleWonderZone = getObjectFromGUID("7896c6")
+}
+
+--------------[[SCRIPTING ZONES | ARMADA BOARDS]]--------------
+ArmadaBoardZones = {
+  WhiteArmadaBoardZone = getObjectFromGUID("e424ca")
+  RedArmadaBoardZone = getObjectFromGUID("df01b8")
+  YellowArmadaBoardZone = getObjectFromGUID("ed7dec")
+  GreenArmadaBoardZone = getObjectFromGUID("ff74f6")
+  PinkArmadaBoardZone = getObjectFromGUID("36feea")
+  BlueArmadaBoardZone = getObjectFromGUID("352aeb")
+  PurpleArmadaBoardZone = getObjectFromGUID("13c916")
+}
+
+--[[ PLAYER CAMERA SETTINGS ]]
+_WhitePlayerCamera = {pitch =70 , yaw = 0, distance = 20}
+_RedPlayerCamera = {pitch =70 , yaw = 0, distance = 20}
+_YellowPlayerCamera = {pitch =70 , yaw = 0, distance = 20}
+_GreenPlayerCamera = {pitch =70 , yaw = 90, distance = 20}
+_PinkPlayerCamera = {pitch =70 , yaw = 180, distance = 20}
+_BluePlayerCamera = {pitch =70 , yaw = 180, distance = 20}
+_PurplePlayerCamera = {pitch =70 , yaw = 180, distance = 20}
+
+--[[ PLAYER ZONE REFERENCES ]]
+_WhiteLeftZone = getObjectFromGUID("13fc28")
+_WhiteRightZone = getObjectFromGUID("c58bb3")
+_RedLeftZone = getObjectFromGUID("78cb1b")
+_RedRightZone = getObjectFromGUID("13fc28")
+_YellowLeftZone = getObjectFromGUID("5c04e5")
+_YellowRightZone = getObjectFromGUID("78cb1b")
+_GreenLeftZone = getObjectFromGUID("a16b0b")
+_GreenRightZone = getObjectFromGUID("5c04e5")
+_PinkLeftZone = getObjectFromGUID("1ad522")
+_PinkRightZone = getObjectFromGUID("a16b0b")
+_BlueLeftZone = getObjectFromGUID("c1f197")
+_BlueRightZone = getObjectFromGUID("1ad522")
+_PurpleLeftZone = getObjectFromGUID("c58bb3")
+_PurpleRightZone = getObjectFromGUID("c1f197")
+
+--[[ DRAFT WONDER OBJECTS ]]
+RandomWonderObj = {} -- Used only if RandomWonders = true
+
+--[[TABLES THAT HOLD ALL 'DRAFT' MODE WONDERS]]
+_WhiteDraftWonderObj = {}
+_RedDraftWonderObj = {}
+_YellowDraftWonderObj = {}
+_GreenDraftWonderObj = {}
+_PinkDraftWonderObj = {}
+_BlueDraftWonderObj = {}
+_PurpleDraftWonderObj = {}
+
+PlayerCurrentlyChosenWonder = {
+  ["White"] = 1,
+  ["Red"] = 1,
+  ["Yellow"] = 1,
+  ["Green"] = 1,
+  ["Pink"] = 1,
+  ["Blue"] = 1,
+  ["Purple"] = 1
+}

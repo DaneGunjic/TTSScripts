@@ -1,0 +1,11 @@
+function UnreadyAllPlayers()
+	for i, j in pairs(ReadyList) do
+		for m, n in pairs(AllSeatedPlayers) do
+			if i == n then
+				ReadyList[i] = false
+			end
+		end
+	end
+
+	NumberOfReadyPlayers = 0
+end

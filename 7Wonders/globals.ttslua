@@ -46,12 +46,12 @@ PlayerCurrentlyChosenWonder = {
 }
 
 ReadyList = {
-  ["White"]  = true,
-  ["Red"]    = true,
+  ["White"] = true,
+  ["Red"] = true,
   ["Yellow"] = true,
-  ["Green"]  = true,
-  ["Pink"]   = true,
-  ["Blue"]   = true,
+  ["Green"] = true,
+  ["Pink"] = true,
+  ["Blue"] = true,
   ["Purple"] = true
 }
 
@@ -63,271 +63,76 @@ GameState = "Setup"
 
 --[[ TOKEN BAGS POSITIONS ]]
 TokenBagsPositions = {
-  CoinBag1Position             = Vector(-14.00, 0.46, -4.00)
-  CoinBag3Position             = Vector(-10.00, 0.46, -4.00)
-  CoinBag6Position             = Vector(-6.00, 0.46, -4.00)
-  ConflictToken1Position       = Vector(-2.00, 0.46, -4.00)
-  ConflictToken3Position       = Vector(2.00, 0.46, -4.00)
-  ConflictToken5Position       = Vector(6.00, 0.46, -4.00)
-  ConflictToken7Position       = Vector(10.00, 0.46, -4.00)
-  ConflictTokenDefeatPosition  = Vector(14.00, 0.46, -4.00)
-  BoardingTokenPosition        = Vector(-17.00, 0.46, 0.00)
-  DiplomacyTokenPosition       = Vector(14.00, 0.46, 0.00)
-  NavalVictoryToken1Position   = Vector(-14.00, 0.46, 4.00)
-  NavalVictoryToken3Position   = Vector(-10.00, 0.46, 4.00)
-  NavalVictoryToken5Position   = Vector(-6.00, 0.46, 4.00)
-  NavalVictoryToken7Position   = Vector(-2.00, 0.46, 4.00)
-  NavalDefeatToken1Position    = Vector(2.00, 0.46, 4.00)
-  NavalDefeatToken2Position    = Vector(6.00, 0.46, 4.00)
-  NavalDefeatToken3Position    = Vector(10.00, 0.46, 4.00)
-  Debt1TokenPosition           = Vector(-17.00, 0.46, 4.00)
-  Debt5TokenPosition           = Vector(-17.00, 0.46, -4.00)
+  CoinBag1Position = Vector(-14.00, 0.46, -4.00)
+  CoinBag3Position = Vector(-10.00, 0.46, -4.00)
+  CoinBag6Position = Vector(-6.00, 0.46, -4.00)
+  ConflictToken1Position = Vector(-2.00, 0.46, -4.00)
+  ConflictToken3Position = Vector(2.00, 0.46, -4.00)
+  ConflictToken5Position = Vector(6.00, 0.46, -4.00)
+  ConflictToken7Position = Vector(10.00, 0.46, -4.00)
+  ConflictTokenDefeatPosition = Vector(14.00, 0.46, -4.00)
+  BoardingTokenPosition = Vector(-17.00, 0.46, 0.00)
+  DiplomacyTokenPosition = Vector(14.00, 0.46, 0.00)
+  NavalVictoryToken1Position = Vector(-14.00, 0.46, 4.00)
+  NavalVictoryToken3Position = Vector(-10.00, 0.46, 4.00)
+  NavalVictoryToken5Position = Vector(-6.00, 0.46, 4.00)
+  NavalVictoryToken7Position = Vector(-2.00, 0.46, 4.00)
+  NavalDefeatToken1Position = Vector(2.00, 0.46, 4.00)
+  NavalDefeatToken2Position = Vector(6.00, 0.46, 4.00)
+  NavalDefeatToken3Position = Vector(10.00, 0.46, 4.00)
+  Debt1TokenPosition = Vector(-17.00, 0.46, 4.00)
+  Debt5TokenPosition = Vector(-17.00, 0.46, -4.00)
 }
-
---[[ PLAYER WONDER POSITIONS ]]
--- (These would be better in a player_data.ttslua file, but keeping here for now)
-_WhitePlayerWonder = {
-  WonderPos = {26.78, 1.00, -24.50},
-  WonderRot = {0.00, 180, 0.00},
-  WonderFlipRot = {0, 180, 180},
-  DraftMode1Pos = {26.75, -20, -24.25},
-  DraftMode2Pos = {26.75, -21, -24.25},
-  DraftMode3Pos = {26.75, -22, -24.25}
-}
-
-_RedPlayerWonder = {
-  WonderPos = {-3.22, 1.00, -24.50},
-  WonderRot = {0.00, 180, 0.00},
-  WonderFlipRot = {0, 180, 180},
-	DraftMode1Pos = {2, -20, -22},
-  DraftMode2Pos = {2, -22, -22},
-  DraftMode3Pos = {2, -24, -22}
-}
-
-_YellowPlayerWonder = {
-  WonderPos = {-33.22, 1.00, -24.50},
-  WonderRot = {0.00, 180, 0.00},
-  WonderFlipRot = {0, 180, 180},
-  DraftMode1Pos = {-28, -20, -22},
-  DraftMode2Pos = {-28, -22, -22},
-  DraftMode3Pos = {-28, -24, -22}
-}
-
-_GreenPlayerWonder = {
-  WonderPos = {-40.50, 1.00, 3.22},
-  WonderRot = {0.00, 270, 0.00},
-  WonderFlipRot = {0, 270, 180},
-  DraftMode1Pos = {-38, -20, -22},
-  DraftMode2Pos = {-38, -22, -22},
-  DraftMode3Pos = {-38, -24, -22}
-}
-
-_PinkPlayerWonder = {
-  WonderPos = {-26.78, 1.00, 24.50},
-  WonderRot = {0.00, 0.00, 0.00},
-  WonderFlipRot = {0, 0, 180}
-  DraftMode1Pos = {-32, -20, -22},
-  DraftMode2Pos = {-32, -22, -22},
-  DraftMode3Pos = {-32, -24, -22}
-}
-
-_BluePlayerWonder = {
-  WonderPos = {3.22, 1.00, 24.50},
-  WonderRot = {0.00, 0.00, 0.00},
-  WonderFlipRot = {0, 0, 180},
-  DraftMode1Pos = {-2, -20, -22},
-  DraftMode2Pos = {-2, -22, -22},
-  DraftMode3Pos = {-2, -24, -22}
-}
-
-_PurplePlayerWonder = {
-  WonderPos = {33.22, 1.00, 24.50},
-  WonderRot = {0.00, 0.00, 0.00},
-  WonderFlipRot = {0, 0, 180},
-  DraftMode1Pos = {28, -20, -22},
-  DraftMode2Pos = {28, -22, -22},
-  DraftMode3Pos = {28, -24, -22}
-}
-
---[[ PLAYER ARMADA POSITIONS ]]
-_WhitePlayerArmada = {
-  DockyardPos = {34.70, 1.00, -21.92},
-  DockyardRot = {0.00, 180.00, 0.00},
-  RedShipPos = {32.77, 1.58, -26.04},
-  RedShipRot = {0.00, 180.00, 0.00},
-  YellowShipPos = {33.87, 1.58, -25.99},
-  YellowShipRot = {0.00, 180.00, 0.00},
-  BlueShipPos = {35.06, 1.58, -26.00},
-  BlueShipRot = {0.00, 180.00, 0.00},
-  GreenShipPos = {36.29, 1.58, -25.98},
-  GreenShipRot = {0.00, 180.00, 0.00}
-}
-
-_RedPlayerArmada = {
-  DockyardPos = {4.70, 1.00, -21.92},
-  DockyardRot = {0.00, 180.00, 0.00},
-  RedShipPos = {2.72, 1.58, -26.05},
-  RedShipRot = {0.00, 180.00, 0.00},
-  YellowShipPos = {3.82, 1.58, -26.01},
-  YellowShipRot = {0.00, 180.00, 0.00},
-  BlueShipPos = {5.01, 1.58, -26.01},
-  BlueShipRot = {0.00, 180.00, 0.00},
-  GreenShipPos = {6.24, 1.58, -25.99},
-  GreenShipRot = {0.00, 180.00, 0.00}
-}
-
-_YellowPlayerArmada = {
-  DockyardPos = {-25.30, 1.00, -21.92},
-  DockyardRot = {0.00, 180.00, 0.00},
-  RedShipPos = {-27.26, 1.58, -26.06},
-  RedShipRot = {0.00, 180.00, 0.00},
-  YellowShipPos = {-26.16, 1.58, -26.01},
-  YellowShipRot = {0.00, 180.00, 0.00},
-  BlueShipPos = {-24.97, 1.58, -26.02},
-  BlueShipRot = {0.00, 180.00, 0.00},
-  GreenShipPos = {-23.74, 1.58, -26.00},
-  GreenShipRot = {0.00, 180.00, 0.00}
-}
-
-_GreenPlayerArmada = {
-  DockyardPos = {-37.92, 1.00, -4.70},
-  DockyardRot = {0.00, 270.00, 0.00},
-  RedShipPos = {-42.06, 1.58, -2.74},
-  RedShipRot = {0.00, 270.00, 0.00},
-  YellowShipPos = {-42.01, 1.58, -3.84},
-  YellowShipRot = {0.00, 270.00, 0.00},
-  BlueShipPos = {-42.02, 1.58, -5.03},
-  BlueShipRot = {0.00, 270.00, 0.00},
-  GreenShipPos = {-42.00, 1.58, -6.26},
-  GreenShipRot = {0.00, 270.00, 0.00}
-}
-
-_PinkPlayerArmada = {
-  DockyardPos = {-34.70, 1.00, 21.92},
-  DockyardRot = {0.00, 0.00, 0.00},
-  RedShipPos = {-32.73, 1.58, 26.03},
-  RedShipRot = {0.00, 0.00, 0.00},
-  YellowShipPos = {-33.83, 1.58, 25.98},
-  YellowShipRot = {0.00, 0.00, 0.00},
-  BlueShipPos = {-35.02, 1.58, 25.99},
-  BlueShipRot = {0.00, 0.00, 0.00},
-  GreenShipPos = {-36.25, 1.58, 25.97},
-  GreenShipRot = {0.00, 0.00, 0.00}
-}
-
-_BluePlayerArmada = {
-  DockyardPos = {-4.70, 1.00, 21.92},
-  DockyardRot = {0.00, 0.00, 0.00},
-  RedShipPos = {-8.04, 2, 24.12},
-  RedShipRot = {0.00, 0.00, 0.00},
-  YellowShipPos = {-9.14, 2, 24.07},
-  YellowShipRot = {0.00, 0.00, 0.00},
-  BlueShipPos = {-10.33, 2, 24.08},
-  BlueShipRot = {0.00, 0.00, 0.00},
-  GreenShipPos = {-11.56, 2, 24.06},
-  GreenShipRot = {0.00, 0.00, 0.00}
-}
-
-_PurplePlayerArmada = {
-  DockyardPos = {25.30, 1.00, 21.92},
-  DockyardRot = {0.00, 0.00, 0.00},
-  RedShipPos = {21.96, 2, 24.10},
-  RedShipRot = {0.00, 0.00, 0.00},
-  YellowShipPos = {20.87, 2, 24.06},
-  YellowShipRot = {0.00, 0.00, 0.00},
-  BlueShipPos = {19.68, 2, 24.07},
-  BlueShipRot = {0.00, 0.00, 0.00},
-  GreenShipPos = {18.45, 2, 24.05},
-  GreenShipRot = {0.00, 0.00, 0.00}
-}
-
---[[ PLAYER CAMERA SETTINGS ]]
-_WhitePlayerCamera = {pitch =70 , yaw = 0, distance = 20}
-_RedPlayerCamera = {pitch =70 , yaw = 0, distance = 20}
-_YellowPlayerCamera = {pitch =70 , yaw = 0, distance = 20}
-_GreenPlayerCamera = {pitch =70 , yaw = 90, distance = 20}
-_PinkPlayerCamera = {pitch =70 , yaw = 180, distance = 20}
-_BluePlayerCamera = {pitch =70 , yaw = 180, distance = 20}
-_PurplePlayerCamera = {pitch =70 , yaw = 180, distance = 20}
-
---[[ ZONE REFERENCES ]]
--- These will be initialized in onLoad()
-_WhiteLeftZone = nil
-_WhiteRightZone = nil
-_WhiteLeftZone = nil
-_WhiteRightZone = nil
-_RedLeftZone = nil
-_RedRightZone = nil
-_YellowLeftZone = nil
-_YellowRightZone = nil
-_GreenLeftZone = nil
-_GreenRightZone = nil
-_PinkLeftZone = nil
-_PinkRightZone = nil
-_BlueLeftZone = nil
-_BlueRightZone = nil
-_PurpleLeftZone =nil
-_PurpleRightZone = nil
-
---[[ DRAFT WONDER OBJECTS ]]
-RandomWonderObj = {} -- Used only if RandomWonders = true
-_WhiteDraftWonderObj = {}
-_RedDraftWonderObj = {}
-_YellowDraftWonderObj = {}
-_GreenDraftWonderObj = {}
-_PinkDraftWonderObj = {}
-_BlueDraftWonderObj = {}
-_PurpleDraftWonderObj = {}
 
 --[[ DECK ZONE REFERENCES ]]
--- These will be initialized in onLoad()
 DeckZones = {
   Age = {
-    [1] = nil,
-    [2] = nil,
-    [3] = nil
+    Age1 = getObjectFromGUID("56d221"),
+    Age2 = getObjectFromGUID("306db0"),
+    Age3 = getObjectFromGUID("a0fe65")
   },
   Cities = {
-    Age1 = nil,
-    Age2 = nil,
-    Age3 = nil
+    Age1 = getObjectFromGUID("05d80d"),
+    Age2 = getObjectFromGUID("f2659e"),
+    Age3 = getObjectFromGUID("3484af")
   },
   Armada = {
-    Age1 = nil,
-    Age2 = nil,
-    Age3 = nil
+    Age1 = getObjectFromGUID("f261d9"),
+    Age2 = getObjectFromGUID("06e74b"),
+    Age3 = getObjectFromGUID("50d040")
   },
 
-  Leaders = nil,
-  Guild = nil,
+  Leaders = getObjectFromGUID("d679f4"),
+  Guild = getObjectFromGUID("838ee1"),
 
   Island = {
-    Level1 = nil,
-    Level2 = nil,
-    Level3 = nil
+    Level1 = getObjectFromGUID("43d444"),
+    Level2 = getObjectFromGUID("ffc10f"),
+    Level3 = getObjectFromGUID("27153d")
   }
 }
 
+--[[ FINAL DECK ZONE REFERENCES ]]
 -- Final zones are zones to which the decks will be sent after setup
 FinalDeckZones = {
   Age = {
-    [1] = nil,
-    [2] = nil,
-    [3] = nil
+    Age1 = nil,
+    Age2 = nil,
+    Age3 = nil
   },
   Cities = {
-    Age1 = nil,
-    Age2 = nil,
-    Age3 = nil
+    Age1 = getObjectFromGUID("6047cd"),
+    Age2 = getObjectFromGUID("00cc17"),
+    Age3 = getObjectFromGUID("e32431")
   },
   Armada = {
-    Age1 = nil,
-    Age2 = nil,
-    Age3 = nil
+    Age1 = getObjectFromGUID("2d751f"),
+    Age2 = getObjectFromGUID("389ff8"),
+    Age3 = getObjectFromGUID("48509b")
   },
 
   Leaders = nil,
-  Guild = nil,
+  Guild = getObjectFromGUID("189e24"),
 
   Island = {
     Level1 = nil,
@@ -337,60 +142,62 @@ FinalDeckZones = {
 }
 
 --[[ BAG REFERENCES ]]
--- These will be initialized in onLoad()
 WonderBags = {
-  BaseWonder = nil
-  LeaderWonder = nil
-  CitiesWonder = nil
-  ArmadaWonder = nil
-  CollectionWonder = nil
+  BaseWonder = getObjectFromGUID("56d45b")
+  LeaderWonder = getObjectFromGUID("c1c61c")
+  CitiesWonder = getObjectFromGUID("a26264")
+  ArmadaWonder = getObjectFromGUID("0c6087")
+  CollectionWonder = getObjectFromGUID("7c6699")
 }
 
 ShipBags = {
-  RedShip = nil
-  BlueShip = nil
-  YellowShip = nil
-  GreenShip = nil
+  Red = getObjectFromGUID("0eef1f")
+  Blue = getObjectFromGUID("e75093")
+  Yellow = getObjectFromGUID("10eb0f")
+  Green = getObjectFromGUID("b230fd")
 }
 
-DockyardBag = nil
+DockyardBag = getObjectFromGUID("5b9a9c")
 
 IslandBags = {
-  IslandLevel1 = nil
-  IslandLevel2 = nil
-  IslandLevel3 = nil
+  Level1 = getObjectFromGUID("bef882")
+  Level2 = getObjectFromGUID("3b2a20")
+  Level3 = getObjectFromGUID("df39ee")
 }
 
 CoinBags = {
-  Coin1 = nil
-  Coin3 = nil
-  Coin6 = nil
+  Coin1 = getObjectFromGUID("3f95a5")
+  Coin3 = getObjectFromGUID("3cad45")
+  Coin6 = getObjectFromGUID("9e60c9")
 }
 
 ConflictTokenBags = {
-  VictoryToken1 = nil
-  VictoryToken3 = nil
-  VictoryToken5 = nil
-  VictoryToken7 = nil
-  DefeatToken = nil
+  VictoryToken1 = getObjectFromGUID("c56b5a")
+  VictoryToken3 = getObjectFromGUID("5411ef")
+  VictoryToken5 = getObjectFromGUID("c8fc52")
+  VictoryToken7 = getObjectFromGUID("c99037")
+  DefeatToken = getObjectFromGUID("d6e612")
 }
 
-BoardingTokenBag = nil
-DiplomacyTokenBag = nil
+BoardingTokenBag = getObjectFromGUID("511867")
+DiplomacyTokenBag = getObjectFromGUID("ff17ba")
 
 NavalTokenBags = {
-  VictoryToken1 = nil
-  VictoryToken3 = nil
-  VictoryToken5 = nil
-  VictoryToken7 = nil
-  DefeatToken1 = nil
-  DefeatToken2 = nil
-  DefeatToken3 = nil
+  VictoryToken1 = getObjectFromGUID("a30549")
+  VictoryToken3 = getObjectFromGUID("1a1373")
+  VictoryToken5 = getObjectFromGUID("8dcae9")
+  VictoryToken7 = getObjectFromGUID("82878d")
+  DefeatToken1 = getObjectFromGUID("4cb023")
+  DefeatToken2 = getObjectFromGUID("9ca312")
+  DefeatToken3 = getObjectFromGUID("dd7fca")
 }
 
 DebtBags = {
-  DebtToken1 = nil
-  DebtToken5 = nil
+  DebtToken1 = getObjectFromGUID("b1f5a1")
+  DebtToken5 = getObjectFromGUID("ed2335")
 }
 
-FrontiersBag = nil
+FrontiersBag = getObjectFromGUID("f46e91")
+
+-- Get Setup Board that's in the center of the table
+SetupBoard = getObjectFromGUID("511af3")
