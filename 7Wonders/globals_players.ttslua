@@ -38,7 +38,7 @@ _GreenPlayerWonder = {
 _PinkPlayerWonder = {
   WonderPos = {-26.78, 1.00, 24.50},
   WonderRot = {0.00, 0.00, 0.00},
-  WonderFlipRot = {0, 0, 180}
+  WonderFlipRot = {0, 0, 180},
   DraftMode1Pos = {-32, -20, -22},
   DraftMode2Pos = {-32, -22, -22},
   DraftMode3Pos = {-32, -24, -22}
@@ -154,55 +154,7 @@ _PurplePlayerArmada = {
   GreenShipRot = {0.00, 0.00, 0.00}
 }
 
---------------[[SCRIPTING ZONES | WONDERS]]--------------
-WonderZones = {
-  WhiteWonderZone = getObjectFromGUID("139f96")
-  RedWonderZone = getObjectFromGUID("59ebcd")
-  YellowWonderZone = getObjectFromGUID("988c12")
-  GreenWonderZone = getObjectFromGUID("797e59")
-  PinkWonderZone = getObjectFromGUID("84634f")
-  BlueWonderZone = getObjectFromGUID("a6380a")
-  PurpleWonderZone = getObjectFromGUID("7896c6")
-}
-
---------------[[SCRIPTING ZONES | ARMADA BOARDS]]--------------
-ArmadaBoardZones = {
-  WhiteArmadaBoardZone = getObjectFromGUID("e424ca")
-  RedArmadaBoardZone = getObjectFromGUID("df01b8")
-  YellowArmadaBoardZone = getObjectFromGUID("ed7dec")
-  GreenArmadaBoardZone = getObjectFromGUID("ff74f6")
-  PinkArmadaBoardZone = getObjectFromGUID("36feea")
-  BlueArmadaBoardZone = getObjectFromGUID("352aeb")
-  PurpleArmadaBoardZone = getObjectFromGUID("13c916")
-}
-
---[[ PLAYER CAMERA SETTINGS ]]
-_WhitePlayerCamera = {pitch =70 , yaw = 0, distance = 20}
-_RedPlayerCamera = {pitch =70 , yaw = 0, distance = 20}
-_YellowPlayerCamera = {pitch =70 , yaw = 0, distance = 20}
-_GreenPlayerCamera = {pitch =70 , yaw = 90, distance = 20}
-_PinkPlayerCamera = {pitch =70 , yaw = 180, distance = 20}
-_BluePlayerCamera = {pitch =70 , yaw = 180, distance = 20}
-_PurplePlayerCamera = {pitch =70 , yaw = 180, distance = 20}
-
---[[ PLAYER ZONE REFERENCES ]]
-_WhiteLeftZone = getObjectFromGUID("13fc28")
-_WhiteRightZone = getObjectFromGUID("c58bb3")
-_RedLeftZone = getObjectFromGUID("78cb1b")
-_RedRightZone = getObjectFromGUID("13fc28")
-_YellowLeftZone = getObjectFromGUID("5c04e5")
-_YellowRightZone = getObjectFromGUID("78cb1b")
-_GreenLeftZone = getObjectFromGUID("a16b0b")
-_GreenRightZone = getObjectFromGUID("5c04e5")
-_PinkLeftZone = getObjectFromGUID("1ad522")
-_PinkRightZone = getObjectFromGUID("a16b0b")
-_BlueLeftZone = getObjectFromGUID("c1f197")
-_BlueRightZone = getObjectFromGUID("1ad522")
-_PurpleLeftZone = getObjectFromGUID("c58bb3")
-_PurpleRightZone = getObjectFromGUID("c1f197")
-
---[[ DRAFT WONDER OBJECTS ]]
-RandomWonderObj = {} -- Used only if RandomWonders = true
+RandomWonderObj = {} --Used only if RandomWonders = true
 
 --[[TABLES THAT HOLD ALL 'DRAFT' MODE WONDERS]]
 _WhiteDraftWonderObj = {}
@@ -222,3 +174,62 @@ PlayerCurrentlyChosenWonder = {
   ["Blue"] = 1,
   ["Purple"] = 1
 }
+
+ReadyList = {
+  ["White"] = true,
+  ["Red"] = true,
+  ["Yellow"] = true,
+  ["Green"] = true,
+  ["Pink"] = true,
+  ["Blue"] = true,
+  ["Purple"] = true
+}
+
+--------------[[SCRIPTING ZONES | WONDERS]]--------------
+WonderZones = {
+  WhiteWonderZone = getObjectFromGUID("139f96"),
+  RedWonderZone = getObjectFromGUID("59ebcd"),
+  YellowWonderZone = getObjectFromGUID("988c12"),
+  GreenWonderZone = getObjectFromGUID("797e59"),
+  PinkWonderZone = getObjectFromGUID("84634f"),
+  BlueWonderZone = getObjectFromGUID("a6380a"),
+  PurpleWonderZone = getObjectFromGUID("7896c6")
+}
+
+--------------[[SCRIPTING ZONES | ARMADA BOARDS]]--------------
+ArmadaBoardZones = {
+  WhiteArmadaBoardZone = getObjectFromGUID("e424ca"),
+  RedArmadaBoardZone = getObjectFromGUID("df01b8"),
+  YellowArmadaBoardZone = getObjectFromGUID("ed7dec"),
+  GreenArmadaBoardZone = getObjectFromGUID("ff74f6"),
+  PinkArmadaBoardZone = getObjectFromGUID("36feea"),
+  BlueArmadaBoardZone = getObjectFromGUID("352aeb"),
+  PurpleArmadaBoardZone = getObjectFromGUID("13c916")
+}
+
+--[[ PLAYER CAMERA SETTINGS ]]
+CameraSettings = {
+  _White = {pitch =70 , yaw = 0, distance = 20},
+  _Red = {pitch =70 , yaw = 0, distance = 20},
+  _Yellow = {pitch =70 , yaw = 0, distance = 20},
+  _Green = {pitch =70 , yaw = 90, distance = 20},
+  _Pink = {pitch =70 , yaw = 180, distance = 20},
+  _Blue = {pitch =70 , yaw = 180, distance = 20},
+  _Purple = {pitch =70 , yaw = 180, distance = 20}
+}
+
+--[[ PLAYER ZONE REFERENCES ]]
+_WhiteLeftZone = getObjectFromGUID("13fc28") -- Red-White
+_WhiteRightZone = getObjectFromGUID("c58bb3") -- White-Purple
+_RedLeftZone = getObjectFromGUID("78cb1b") -- Yellow-Red
+_RedRightZone = getObjectFromGUID("13fc28") -- Red-White
+_YellowLeftZone = getObjectFromGUID("5c04e5") -- Green-Yellow
+_YellowRightZone = getObjectFromGUID("78cb1b") -- Yellow-Red
+_GreenLeftZone = getObjectFromGUID("a16b0b") -- Green-Pink
+_GreenRightZone = getObjectFromGUID("5c04e5") -- Green-Yellow
+_PinkLeftZone = getObjectFromGUID("1ad522") -- Pink-Blue
+_PinkRightZone = getObjectFromGUID("a16b0b") -- Green-Pink
+_BlueLeftZone = getObjectFromGUID("c1f197") -- Blue-Purple
+_BlueRightZone = getObjectFromGUID("1ad522") -- Pink-Blue
+_PurpleLeftZone = getObjectFromGUID("c58bb3") -- White-Purple
+_PurpleRightZone = getObjectFromGUID("c1f197") -- Blue-Purple

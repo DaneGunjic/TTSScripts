@@ -1,3 +1,333 @@
+function HandleStartGameButtonCo()
+	UI.setValue("CurrentPhase", "Please Wait")
+	UI.setValue("PhaseDesc", "Settings things up")
+
+	-- Get a list of seated players
+	AllSeatedPlayers = getSeatedPlayers()	-- [1] = "White", [2] = "Red" ...
+	NumberOfPlayers = #AllSeatedPlayers
+
+	UnreadyAllPlayers()
+
+	if NumberOfPlayers < 3 then
+    -- For now we allow starting the game even with less than 3 players
+		NumberOfPlayers = 3
+	end
+
+	-- Destroy Setup Board
+	SetupBoard.destruct()
+
+	-- [[AGE 1 DECKS]]
+	for i, bags in ipairs(Age1DeckBags) do
+		if i < NumberOfPlayers-1 then
+			bags.takeObject({position = DeckZones.Age.Age1.getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+	end
+
+	-- [[AGE 2 DECKS]]
+	for i, bags in ipairs(Age2DeckBags) do
+		if i < NumberOfPlayers-1 then
+			bags.takeObject({position = DeckZones.Age.Age2.getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+	end
+
+	-- [[AGE 3 DECKS]]
+	for i, bags in ipairs(Age3DeckBags) do
+		if i < NumberOfPlayers-1 then
+			bags.takeObject({position = DeckZones.Age.Age3.getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+	end
+
+	--[[LEADER DECKS SETUP]]
+	if ExpansionsUsed[1] then
+		for i, bags in ipairs(LeaderBags) do
+			if i == 3 and ExpansionsUsed[2] then
+				bags.takeObject({position = DeckZones.Leaders.getPosition(), rotation = {180, 0, 0}, smooth = false})
+			elseif i < 3 then
+				bags.takeObject({position = DeckZones.Leaders.getPosition(), rotation = {180, 0, 0}, smooth = false})
+			end
+		end
+	end
+
+	--[[CITIES DECKS SETUP]]
+	for i, bags in ipairs(CitiesBags) do
+		if ExpansionsUsed[2] == true then
+			bags.takeObject({position = DeckZones.Cities[i].getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+	end
+
+	--[[ARMADA DECKS SETUP]]
+	for i, bags in ipairs(ArmadaBags) do
+		if ExpansionsUsed[3] == true then
+			bags.takeObject({position = DeckZones.Armada[i].getPosition(), rotation = {180, 0, 0}, smooth = false})
+			if NumberOfPlayers > 3 then
+				ArmadaBags_4P[i].takeObject({position = DeckZones.Armada[i].getPosition(), rotation = {180, 0, 0}, smooth = false})
+			end
+		end
+	end
+
+	--[[GUILD DECKS SETUP]]
+	for i, bags in ipairs(GuildBags) do
+		-- Checks if "Cities" is used, it adds 1 guild card
+		if i == 3 and ExpansionsUsed[2] == true then
+			bags.takeObject({position = GuildDeckZone.getPosition(), rotation = {180, 0, 0}, smooth = false})
+		elseif i < 3 then
+			bags.takeObject({position = GuildDeckZone.getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+	end
+
+	--[[ISLAND DECKS SETUP]]
+	for i, bags in ipairs(IslandBags) do
+		if ExpansionsUsed[3] == true then
+			bags.takeObject({position = IslandZones[i].getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+	end
+
+	for i = 0, 200 do
+		coroutine.yield(0)
+	end
+
+	--[[SHUFFLE CITIES]]
+	local cities1deck = CitiesAge1Zone.getObjects()
+	for i, items in ipairs(cities1deck) do
+				items.randomize()
+	end
+
+	local cities2deck = CitiesAge2Zone.getObjects()
+	for i, items in ipairs(cities2deck) do
+				items.randomize()
+	end
+
+	local cities3deck = CitiesAge3Zone.getObjects()
+	for i, items in ipairs(cities3deck) do
+				items.randomize()
+	end
+
+	--[[SHUFFLE ARMADA]]
+	local armada1deck = ArmadaAge1Zone.getObjects()
+	for i, items in ipairs(armada1deck) do
+				items.randomize()
+	end
+
+	local armada2deck = ArmadaAge2Zone.getObjects()
+	for i, items in ipairs(armada2deck) do
+				items.randomize()
+	end
+
+	local armada3deck = ArmadaAge3Zone.getObjects()
+	for i, items in ipairs(armada3deck) do
+				items.randomize()
+	end
+
+	--[[SHUFFLE GUILDS]]
+	local guilddeck = GuildDeckZone.getObjects()
+	for i, items in ipairs(guilddeck) do
+				items.randomize()
+	end
+
+	for i = 0, 200 do
+		coroutine.yield(0)
+	end
+
+	--[[INSERT ARMADA CARDS]]
+	local armada1deck = ArmadaAge1Zone.getObjects()
+	for i, items in ipairs(armada1deck) do
+		for i=1, NumberOfPlayers do
+			items.takeObject({position = Age1DeckZone.getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+	end
+
+	local armada2deck = ArmadaAge2Zone.getObjects()
+	for i, items in ipairs(armada2deck) do
+		for i=1, NumberOfPlayers do
+			items.takeObject({position = Age2DeckZone.getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+	end
+
+	local armada3deck = ArmadaAge3Zone.getObjects()
+	for i, items in ipairs(armada3deck) do
+		for i=1, NumberOfPlayers do
+			items.takeObject({position = Age3DeckZone.getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+	end
+
+	--[[INSERT CITIES CARDS]]
+	local cities1deck = CitiesAge1Zone.getObjects()
+	for i, items in ipairs(cities1deck) do
+		for i=1, NumberOfPlayers do
+			items.takeObject({position = Age1DeckZone.getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+
+	end
+
+	local cities2deck = CitiesAge2Zone.getObjects()
+	for i, items in ipairs(cities2deck) do
+		for i=1, NumberOfPlayers do
+			items.takeObject({position = Age2DeckZone.getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+
+	end
+
+	local cities3deck = CitiesAge3Zone.getObjects()
+	for i, items in ipairs(cities3deck) do
+		for i=1, NumberOfPlayers do
+			items.takeObject({position = Age3DeckZone.getPosition(), rotation = {180, 0, 0}, smooth = false})
+		end
+
+	end
+
+	--[[INSERT GUILD CARDS]]
+	local guilddeck = GuildDeckZone.getObjects()
+	for i, items in ipairs(guilddeck) do
+			for i = 1, NumberOfPlayers+2 do
+				items.takeObject({position = Age3DeckZone.getPosition(), smooth = false, rotation = {180, 0, 0}})
+			end
+	end
+
+	--[[WONDER BAG SETUP]]
+	if ExpansionsUsed[1] then
+		while LeaderWonderBag.getQuantity() ~= 0 do
+			LeaderWonderBag.takeObject({position = BaseWonderBag.getPosition() + Vector(0, 2, 0), smooth = false})
+		end
+	end
+	if ExpansionsUsed[2] then
+		while CitiesWonderBag.getQuantity() ~= 0 do
+			CitiesWonderBag.takeObject({position = BaseWonderBag.getPosition() + Vector(0, 2, 0), smooth = false})
+		end
+	end
+	if ExpansionsUsed[3] then
+		while ArmadaWonderBag.getQuantity() ~= 0 do
+			ArmadaWonderBag.takeObject({position = BaseWonderBag.getPosition() + Vector(0, 2, 0), smooth = false})
+		end
+	end
+	if WonderExpansionsUsed[1] then
+		while CollectionWonderBag.getQuantity() ~= 0 do
+			CollectionWonderBag.takeObject({position = BaseWonderBag.getPosition() + Vector(0, 2, 0), smooth = false})
+		end
+	end
+
+	for i = 0, 200 do
+		coroutine.yield(0)
+	end
+
+	--[[FINAL SHUFFLE BEFORE GAME START]]
+	local age1deck = Age1DeckZone.getObjects()
+	for i, items in ipairs(age1deck) do
+		items.randomize()
+	end
+
+	local age2deck = Age2DeckZone.getObjects()
+	for i, items in ipairs(age2deck) do
+		items.randomize()
+	end
+
+	local age3deck = Age3DeckZone.getObjects()
+	for i, items in ipairs(age3deck) do
+		items.randomize()
+	end
+
+	local leaderdeck = LeadersDeckZone.getObjects()
+	for i, items in ipairs(leaderdeck) do
+		items.randomize()
+	end
+
+	local island1deck = IslandLevel1Zone.getObjects()
+	for i, items in ipairs(island1deck) do
+		items.randomize()
+	end
+
+	local island2deck = IslandLevel2Zone.getObjects()
+	for i, items in ipairs(island2deck) do
+		items.randomize()
+	end
+
+	local island3deck = IslandLevel3Zone.getObjects()
+	for i, items in ipairs(island3deck) do
+		items.randomize()
+	end
+
+	BaseWonderBag.randomize()
+
+	--[[MOVE ALL UNUSED CARDS TO THE SIDE]]
+	local cities1deck = CitiesAge1Zone.getObjects()
+	for i, items in ipairs(cities1deck) do
+		items.setPositionSmooth(CitiesAge1FinalZone.getPosition(), false, false)
+		items.rotate({0, 90, 0})
+	end
+
+	local cities2deck = CitiesAge2Zone.getObjects()
+	for i, items in ipairs(cities2deck) do
+		items.setPositionSmooth(CitiesAge2FinalZone.getPosition(), false, false)
+		items.rotate({0, 90, 0})
+	end
+
+	local cities3deck = CitiesAge3Zone.getObjects()
+	for i, items in ipairs(cities3deck) do
+		items.setPositionSmooth(CitiesAge3FinalZone.getPosition(), false, false)
+		items.rotate({0, 90, 0})
+	end
+
+	local armada1deck = ArmadaAge1Zone.getObjects()
+	for i, items in ipairs(armada1deck) do
+		items.setPositionSmooth(ArmadaAge1FinalZone.getPosition(), false, false)
+		items.rotate({0, 90, 0})
+	end
+
+	local armada2deck = ArmadaAge2Zone.getObjects()
+	for i, items in ipairs(armada2deck) do
+		items.setPositionSmooth(ArmadaAge2FinalZone.getPosition(), false, false)
+		items.rotate({0, 90, 0})
+	end
+
+	local armada3deck = ArmadaAge3Zone.getObjects()
+	for i, items in ipairs(armada3deck) do
+		items.setPositionSmooth(ArmadaAge3FinalZone.getPosition(), false, false)
+		items.rotate({0, 90, 0})
+	end
+
+	local guilddeckmove = GuildDeckZone.getObjects()
+	for i, items in ipairs(guilddeckmove) do
+		items.setPositionSmooth(GuildsFinalZone.getPosition(), false, false)
+		items.rotate({0, 90, 0})
+	end
+
+	for i = 0, 200 do
+		coroutine.yield(0)
+	end
+
+	--[[DEAL WONDERS]]
+	DealWonders()
+
+	--[[DEAL RANDOM ARMADA BOARDS AND SHIPS]]
+	DealArmada()
+
+	-- Move all the bags into position
+	-- CoinBag1.setPosition(CoinBag1Position)
+	-- CoinBag3.setPosition(CoinBag3Position)
+	-- CoinBag6.setPosition(CoinBag6Position)
+	-- ConflictToken1.setPosition(ConflictToken1Position)
+	-- ConflictToken3.setPosition(ConflictToken3Position)
+	-- ConflictToken5.setPosition(ConflictToken5Position)
+	-- ConflictToken7.setPosition(ConflictToken7Position)
+	-- ConflictTokenDefeat.setPosition(ConflictTokenDefeatPosition)
+	-- BoardingToken.setPosition(BoardingTokenPosition)
+	-- DiplomacyToken.setPosition(DiplomacyTokenPosition)
+	-- NavalVictoryToken1.setPosition(NavalVictoryToken1Position)
+	-- NavalVictoryToken3.setPosition(NavalVictoryToken3Position)
+	-- NavalVictoryToken5.setPosition(NavalVictoryToken5Position)
+	-- NavalVictoryToken7.setPosition(NavalVictoryToken7Position)
+	-- NavalDefeatToken1.setPosition(NavalDefeatToken1Position)
+	-- NavalDefeatToken2.setPosition(NavalDefeatToken2Position)
+	-- NavalDefeatToken3.setPosition(NavalDefeatToken3Position)
+	-- Debt1Token.setPosition(Debt1TokenPosition)
+	-- Debt5Token.setPosition(Debt5TokenPosition)
+
+	-- Play a sound
+	MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
+	MusicPlayer.pause() -- Doesn't work
+
+	return 1
+end
+
 function DealCoins()
     local CoinAmount
 
@@ -23,4 +353,77 @@ function DealCoins()
         end
     end
 		return 1
+end
+
+function MakeSetupButtons()
+  -- Change default parameters of "LEADERS" BUTTON
+  DefaultButtonParams.position = {-0.55, 0.2, -0.2}
+  DefaultButtonParams.click_function = "HandleLeadersButton"
+  DefaultButtonParams.label = "Leaders [    ]"
+  SetupBoard.createButton(DefaultButtonParams)
+
+  -- Change default parameters of "CITIES" BUTTON
+  DefaultButtonParams.position = {-0.55, 0.2, -0.05}
+  DefaultButtonParams.click_function = "HandleCitiesButton"
+  DefaultButtonParams.label = "Cities [    ]"
+  SetupBoard.createButton(DefaultButtonParams)
+
+  -- Change default parameters of "ARMADA" BUTTON
+  DefaultButtonParams.position = {-0.55, 0.2, 0.10}
+  DefaultButtonParams.click_function = "HandleArmadaButton"
+  DefaultButtonParams.label = "Armada [    ]"
+  SetupBoard.createButton(DefaultButtonParams)
+
+  -- Change default parameters of "RUINS" BUTTON
+  DefaultButtonParams.position = {-0.55, 0.2, 0.25}
+  DefaultButtonParams.click_function = "HandleRuinsButton"
+  DefaultButtonParams.label = "Ruins [    ]"
+  SetupBoard.createButton(DefaultButtonParams)
+
+  -- Change default parameters of "MYTHS" BUTTON
+  DefaultButtonParams.position = {-0.55, 0.2, 0.40}
+  DefaultButtonParams.click_function = "HandleMythsButton"
+  DefaultButtonParams.label = "Myths [    ]"
+  SetupBoard.createButton(DefaultButtonParams)
+
+  -- Change default parameters of "FRONTIERS" BUTTON
+  DefaultButtonParams.position = {-0.55, 0.2, 0.55}
+  DefaultButtonParams.click_function = "HandleFrontiersButton"
+  DefaultButtonParams.label = "Frontiers [    ]"
+  SetupBoard.createButton(DefaultButtonParams)
+
+  -- Change default parameters of "COLLECTION" BUTTON
+  DefaultButtonParams.position = {0.55, 0.2, -0.05}
+  DefaultButtonParams.click_function = "HandleCollectionButton"
+  DefaultButtonParams.label = "Collection [    ]"
+  SetupBoard.createButton(DefaultButtonParams)
+
+  -- Change default parameters of "PROMO" BUTTON
+  DefaultButtonParams.position = {0.55, 0.2, 0.1}
+  DefaultButtonParams.click_function = "HandlePromoButton"
+  DefaultButtonParams.label = "Promo       [    ]"
+  SetupBoard.createButton(DefaultButtonParams)
+
+  -- Change default parameters of "RANDOM" BUTTON
+  DefaultButtonParams.position = {0.55, 0.2, 0.4}
+  DefaultButtonParams.click_function = "HandleRandomButton"
+  DefaultButtonParams.label = "Random [✓]"
+  DefaultButtonParams.font_color={0,1,0}
+  SetupBoard.createButton(DefaultButtonParams)
+
+  -- Change default parameters of "DRAFT" BUTTON
+  DefaultButtonParams.position = {0.55, 0.2, 0.55}
+  DefaultButtonParams.click_function = "HandleDraftButton"
+  DefaultButtonParams.label = "Draft [    ]"
+  DefaultButtonParams.font_color={1,0,0}
+  SetupBoard.createButton(DefaultButtonParams)
+
+  -- Change default parameters of "Start Game" BUTTON
+  DefaultButtonParams.label = "Start Game"
+  DefaultButtonParams.font_color = {1,1,1}
+  DefaultButtonParams.position = {0, 0.2, 0.8}
+  DefaultButtonParams.font_size = 250
+  DefaultButtonParams.height = 300
+  DefaultButtonParams.click_function = "HandleStartGameButton"
+  SetupBoard.createButton(DefaultButtonParams)
 end

@@ -1,0 +1,243 @@
+-------------------[[ DEFAULT BUTTON PARAMETERS ]]-------------------
+DefaultButtonParams = {
+  width            = 1250,
+  height           = 250,
+  font_color       = {1,1,1},
+  color            = {0.05,0.05,0.05,1},
+  font_size        = 200,
+  scale            = {x=0.3,y=0.3,z=0.3},
+  click_function   = "OnUpdate", -- Should always be replaced
+  label            = "X",
+  position         = {0, 0, 0},
+}
+
+-------------------[[ EXPANSION SETTINGS ]]-------------------
+ExpansionsUsed = {
+  Leaders = false,
+  Cities = false,
+  Armada = false,
+  Ruins = false,
+  Myths = false,
+  Frontiers = false
+}
+
+WonderExpansionsUsed = {
+    Collection = false,
+    Promo = false
+}
+
+-------------------[[ GAME MODE SETTINGS ]]-------------------
+RandomWonders = true
+DraftMode = false
+DraftModeNumber = 3 -- Used but not ever changed
+
+-------------------[[ GAME STATE ]]-------------------
+NumberOfReadyPlayers = 0
+CurrentPasses = 0
+MaximumPasses = 0
+GameState = "Setup"
+
+-- Get Setup Board that's in the center of the table
+SetupBoard = getObjectFromGUID("511af3")
+
+-------------------[[ TOKEN BAGS POSITIONS ]]-------------------
+TokenBagsPositions = {
+  CoinBag1Position = Vector(-14.00, 0.46, -4.00),
+  CoinBag3Position = Vector(-10.00, 0.46, -4.00),
+  CoinBag6Position = Vector(-6.00, 0.46, -4.00),
+  ConflictToken1Position = Vector(-2.00, 0.46, -4.00),
+  ConflictToken3Position = Vector(2.00, 0.46, -4.00),
+  ConflictToken5Position = Vector(6.00, 0.46, -4.00),
+  ConflictToken7Position = Vector(10.00, 0.46, -4.00),
+  ConflictTokenDefeatPosition = Vector(14.00, 0.46, -4.00),
+  BoardingTokenPosition = Vector(-17.00, 0.46, 0.00),
+  DiplomacyTokenPosition = Vector(14.00, 0.46, 0.00),
+  NavalVictoryToken1Position = Vector(-14.00, 0.46, 4.00),
+  NavalVictoryToken3Position = Vector(-10.00, 0.46, 4.00),
+  NavalVictoryToken5Position = Vector(-6.00, 0.46, 4.00),
+  NavalVictoryToken7Position = Vector(-2.00, 0.46, 4.00),
+  NavalDefeatToken1Position = Vector(2.00, 0.46, 4.00),
+  NavalDefeatToken2Position = Vector(6.00, 0.46, 4.00),
+  NavalDefeatToken3Position = Vector(10.00, 0.46, 4.00),
+  Debt1TokenPosition = Vector(-17.00, 0.46, 4.00),
+  Debt5TokenPosition = Vector(-17.00, 0.46, -4.00)
+}
+
+-------------------[[ DECK ZONE REFERENCES ]]-------------------
+DeckZones = {
+  Age = {
+    Age1 = getObjectFromGUID("56d221"),
+    Age2 = getObjectFromGUID("306db0"),
+    Age3 = getObjectFromGUID("a0fe65")
+  },
+  Cities = {
+    Age1 = getObjectFromGUID("05d80d"),
+    Age2 = getObjectFromGUID("f2659e"),
+    Age3 = getObjectFromGUID("3484af")
+  },
+  Armada = {
+    Age1 = getObjectFromGUID("f261d9"),
+    Age2 = getObjectFromGUID("06e74b"),
+    Age3 = getObjectFromGUID("50d040")
+  },
+
+  Leaders = getObjectFromGUID("d679f4"),
+  Guild = getObjectFromGUID("838ee1"),
+
+  Island = {
+    Level1 = getObjectFromGUID("43d444"),
+    Level2 = getObjectFromGUID("ffc10f"),
+    Level3 = getObjectFromGUID("27153d")
+  }
+}
+
+-------------------[[ FINAL DECK ZONE REFERENCES ]]-------------------
+-- These are the destination zones where decks will be placed once setup is complete
+-- nil variables are present but those decks are not moved after setup
+FinalDeckZones = {
+  Age = {
+    Age1 = nil,
+    Age2 = nil,
+    Age3 = nil
+  },
+  Cities = {
+    Age1 = getObjectFromGUID("6047cd"),
+    Age2 = getObjectFromGUID("00cc17"),
+    Age3 = getObjectFromGUID("e32431")
+  },
+  Armada = {
+    Age1 = getObjectFromGUID("2d751f"),
+    Age2 = getObjectFromGUID("389ff8"),
+    Age3 = getObjectFromGUID("48509b")
+  },
+
+  Leaders = nil,
+  Guild = getObjectFromGUID("189e24"),
+
+  Island = {
+    Level1 = nil,
+    Level2 = nil,
+    Level3 = nil
+  }
+}
+
+-------------------[[ BAG REFERENCES ]]-------------------
+-- [[BAGS | AGE 1]]
+Age1DeckBags = {
+  Age1_3p = getObjectFromGUID("569cf4"),
+  Age1_4p = getObjectFromGUID("e49b5b"),
+  Age1_5p = getObjectFromGUID("0f1373"),
+  Age1_6p = getObjectFromGUID("4f6d2d"),
+  Age1_7p = getObjectFromGUID("b3b7ad")
+}
+
+-- [[BAGS | AGE 2]]
+Age2DeckBags = {
+  Age2_3p = getObjectFromGUID("f05c32"),
+  Age2_4p = getObjectFromGUID("8aa8b7"),
+  Age2_5p = getObjectFromGUID("98784f"),
+  Age2_6p = getObjectFromGUID("e77147"),
+  Age2_7p = getObjectFromGUID("a6e0b0")
+}
+
+-- [[BAGS | AGE 3]]
+Age3DeckBags = {
+  Age3_3p = getObjectFromGUID("493654"),
+  Age3_4p = getObjectFromGUID("63d3ad"),
+  Age3_5p = getObjectFromGUID("e2b94c"),
+  Age3_6p = getObjectFromGUID("6940e3"),
+  Age3_7p = getObjectFromGUID("c97981")
+}
+
+-- [[BAGS | GUILDS]]
+GuildBags = {
+  Base 	= getObjectFromGUID("3cec0e"),
+  Promo = getObjectFromGUID("0cbeec"),
+  Cities = getObjectFromGUID("3f9ca3")
+}
+
+-- [[BAGS | LEADERS]]
+LeaderBags = {
+  Base = getObjectFromGUID("1ebb3d"),
+  Expert = getObjectFromGUID("c7c31f"),
+  Cities = getObjectFromGUID("1dd705")
+}
+
+-- [[BAGS | CITIES]]
+CitiesBags = {
+  Age1 = getObjectFromGUID("e4136a"),
+  Age2 = getObjectFromGUID("33eacd"),
+  Age3 = getObjectFromGUID("6af278")
+}
+
+-- [[BAGS | ARMADA]]
+ArmadaBags = {
+  Age1 = getObjectFromGUID("1b953a"),
+  Age2 = getObjectFromGUID("92d9b9"),
+  Age3 = getObjectFromGUID("77cfbd")
+}
+
+-- [[BAGS | ARMADA 4 PLAYERS]]
+ArmadaBags_4P = {
+  Age1 = getObjectFromGUID("e4ba62"),
+  Age2 = getObjectFromGUID("3e4eb3"),
+  Age3 = getObjectFromGUID("75d02b")
+}
+
+ShipBags = {
+  Red = getObjectFromGUID("0eef1f"),
+  Blue = getObjectFromGUID("e75093"),
+  Yellow = getObjectFromGUID("10eb0f"),
+  Green = getObjectFromGUID("b230fd")
+}
+
+IslandBags = {
+  Level1 = getObjectFromGUID("bef882"),
+  Level2 = getObjectFromGUID("3b2a20"),
+  Level3 = getObjectFromGUID("df39ee")
+}
+
+DockyardBag = getObjectFromGUID("5b9a9c")
+
+	-- [[BAGS | WONDERS]]
+WonderBags = {
+  Base = getObjectFromGUID("56d45b"),
+  Leader = getObjectFromGUID("c1c61c"),
+  Cities = getObjectFromGUID("a26264"),
+  Armada = getObjectFromGUID("0c6087"),
+  Collection = getObjectFromGUID("7c6699")
+}
+
+CoinBags = {
+  Coin1 = getObjectFromGUID("3f95a5"),
+  Coin3 = getObjectFromGUID("3cad45"),
+  Coin6 = getObjectFromGUID("9e60c9")
+}
+
+ConflictTokenBags = {
+  VictoryToken1 = getObjectFromGUID("c56b5a"),
+  VictoryToken3 = getObjectFromGUID("5411ef"),
+  VictoryToken5 = getObjectFromGUID("c8fc52"),
+  VictoryToken7 = getObjectFromGUID("c99037"),
+  DefeatToken = getObjectFromGUID("d6e612")
+}
+
+BoardingTokenBag = getObjectFromGUID("511867")
+DiplomacyTokenBag = getObjectFromGUID("ff17ba")
+
+NavalTokenBags = {
+  VictoryToken1 = getObjectFromGUID("a30549"),
+  VictoryToken3 = getObjectFromGUID("1a1373"),
+  VictoryToken5 = getObjectFromGUID("8dcae9"),
+  VictoryToken7 = getObjectFromGUID("82878d"),
+  DefeatToken1 = getObjectFromGUID("4cb023"),
+  DefeatToken2 = getObjectFromGUID("9ca312"),
+  DefeatToken3 = getObjectFromGUID("dd7fca")
+}
+
+DebtBags = {
+  DebtToken1 = getObjectFromGUID("b1f5a1"),
+  DebtToken5 = getObjectFromGUID("ed2335")
+}
+
+FrontiersBag = getObjectFromGUID("f46e91")

@@ -1,0 +1,33 @@
+function ForceLoadAllAssets()
+  -- Add any bags that should have their contents pre-loaded
+  AllBagsToLoad = {
+    WonderBags.Collection,
+    WonderBags.Base,
+    WonderBags.Leader,
+    WonderBags.Cities,
+    WonderBags.Armada,
+    DockyardBag,
+    FrontiersBag
+  }
+
+  for _, BagToLoad in ipairs(AllBagsToLoad) do
+    if BagToLoad and BagToLoad.getObjects then
+      for _, Board in ipairs(BagToLoad.getObjects()) do
+        BagToLoad.takeObject(
+        {
+          position = {0, -20, 0},
+          smooth = false,
+          callback_function = function(spawnedObject)
+          Wait.time(function()
+          BagToLoad.putObject(spawnedObject)
+          end, 2)
+          end
+        })
+      end
+    else
+      print("Warning: Bag not found or invalid - " .. tostring(BagToLoad))
+    end
+  end
+
+  return 1
+end

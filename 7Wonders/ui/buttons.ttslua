@@ -1,0 +1,118 @@
+function HandleLeadersButton() -- Button index 0
+	ExpansionsUsed[1] = not ExpansionsUsed[1]
+	if ExpansionsUsed[1] then
+		SetupBoard.editButton({index = 0, label = "Leaders [✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 0, label = "Leaders [    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleCitiesButton() -- Button index 1
+	ExpansionsUsed[2] = not ExpansionsUsed[2]
+	if ExpansionsUsed[2] then
+		SetupBoard.editButton({index = 1, label = "Cities [✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 1, label = "Cities [    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleArmadaButton() -- Button index 2
+	ExpansionsUsed[3] = not ExpansionsUsed[3]
+	if ExpansionsUsed[3] then
+		SetupBoard.editButton({index = 2, label = "Armada [✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 2, label = "Armada [    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleRuinsButton() -- Button index 3
+	ExpansionsUsed[4] = not ExpansionsUsed[4]
+	if ExpansionsUsed[4] then
+		SetupBoard.editButton({index = 3, label = "Ruins [✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 3, label = "Ruins [    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleMythsButton() -- Button index 4
+	ExpansionsUsed[5] = not ExpansionsUsed[5]
+	if ExpansionsUsed[5] then
+		SetupBoard.editButton({index = 4, label = "Myths [✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 4, label = "Myths [    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleFrontiersButton() -- Button index 5
+	ExpansionsUsed[6] = not ExpansionsUsed[6]
+	if ExpansionsUsed[6] then
+		SetupBoard.editButton({index = 5, label = "Frontiers [✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 5, label = "Frontiers [    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleCollectionButton() -- Button index 6
+	WonderExpansionsUsed[1] = not WonderExpansionsUsed[1]
+	if WonderExpansionsUsed[1] then
+		SetupBoard.editButton({index = 6, label = "Collection [✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 6, label = "Collection [    ]", font_color={1,1,1}})
+
+		-- If Collection is off but Draft is on, disable Draft
+		if DraftMode then
+			HandleDraftButton()
+		end
+	end
+end
+
+function HandlePromoButton() -- Button index 7
+	WonderExpansionsUsed[2] = not WonderExpansionsUsed[2]
+	if WonderExpansionsUsed[2] then
+		SetupBoard.editButton({index = 7, label = "Promo       [✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 7, label = "Promo       [    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleRandomButton() -- Button index 8
+	RandomWonders = not RandomWonders
+	-- If both are true then disable Draft
+	if RandomWonders and DraftMode then
+		DraftMode = not DraftMode
+		SetupBoard.editButton({index = 8, label = "Random [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 9, label = "Draft [    ]", font_color={1,1,1}})
+	elseif RandomWonders and not DraftMode  then
+		SetupBoard.editButton({index = 8, label = "Random [✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 8, label = "Random [    ]", font_color={1,1,1}})
+		DraftMode = not DraftMode
+		SetupBoard.editButton({index = 9, label = "Draft [✓]", font_color={0,1,0}})
+	end
+end
+
+function HandleDraftButton() -- Button index 9
+	DraftMode = not DraftMode
+
+	if DraftMode and not WonderExpansionsUsed[1] then
+		broadcastToAll("Using Draft Mode without Collection Wonders is not possible. Toggling Collection.")
+		HandleCollectionButton()
+	end
+
+	if DraftMode and not RandomWonders then
+		SetupBoard.editButton({index = 9, label = "Draft [✓]", font_color={0,1,0}})
+	elseif DraftMode and RandomWonders then
+		RandomWonders = not RandomWonders
+		SetupBoard.editButton({index = 8, label = "Random [    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 9, label = "Draft [✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 9, label = "Draft [    ]", font_color={1,1,1}})
+		RandomWonders = not RandomWonders
+		SetupBoard.editButton({index = 8, label = "Random [✓]", font_color={0,1,0}})
+	end
+end
+
+--[[CALL WHEN 'START GAME' BUTTON IS PRESSED]]
+function HandleStartGameButton()
+	startLuaCoroutine(Global, "HandleStartGameButtonCo")
+end
