@@ -32,28 +32,64 @@ function ForceLoadAllAssets()
   return 1
 end
 
-function printDeckZones()
-    print("----- Printing All Deck Zones -----")
+function LockSpawnedObject(object)
+	object.setLock(true)
+	--object.interactable = false
+end
 
-    -- Helper function to handle nested printing
-    local function printTable(tbl, indent)
-        indent = indent or 0
-        local spacing = string.rep("  ", indent)
+function equals(o1, o2, ignore_mt)
+    if o1 == o2 then return true end
+    local o1Type = type(o1)
+    local o2Type = type(o2)
+    if o1Type ~= o2Type then return false end
+    if o1Type ~= 'table' then return false end
 
-        for key, value in pairs(tbl) do
-            if type(value) == "table" then
-                print(spacing .. key .. ":")
-                printTable(value, indent + 1)
-            else
-                if value ~= nil and value.getGUID then
-                    print(spacing .. key .. " = " .. value.getGUID())
-                else
-                    print(spacing .. key .. " = " .. tostring(value))
-                end
-            end
+    if not ignore_mt then
+        local mt1 = getmetatable(o1)
+        if mt1 and mt1.__eq then
+            --compare using built in method
+            return o1 == o2
         end
     end
 
-    printTable(DeckZones)
-    print("----- Finished Printing -----")
+    local keySet = {}
+
+    for key1, value1 in pairs(o1) do
+        local value2 = o2[key1]
+        if value2 == nil or equals(value1, value2, ignore_mt) == false then
+            return false
+        end
+        keySet[key1] = true
+    end
+
+    for key2, _ in pairs(o2) do
+        if not keySet[key2] then return false end
+    end
+    return true
+end
+
+function printDeckZones()
+  print("----- Printing All Deck Zones -----")
+
+  -- Helper function to handle nested printing
+  local function printTable(tbl, indent)
+    indent = indent or 0
+    local spacing = string.rep("  ", indent)
+
+    for key, value in pairs(tbl) do
+      if type(value) == "table" then
+        print(spacing .. key .. ":")
+        printTable(value, indent + 1)
+      else
+        if value ~= nil and value.getGUID then
+          print(spacing .. key .. " = " .. value.getGUID())
+        else
+          print(spacing .. key .. " = " .. tostring(value))
+        end
+      end
+    end
+  end
+
+  printTable(DeckZones)
+  print("----- Finished Printing -----")
 end

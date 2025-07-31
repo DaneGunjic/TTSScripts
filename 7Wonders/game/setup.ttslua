@@ -385,6 +385,7 @@ function HandleStartGameButtonCo()
 	end
 
 	WonderBags.Base.randomize()
+	DockyardBag.randomize()
 
 	-------------------[[ MOVE ALL UNUSED CARDS TO THE SIDE]]-------------------
 	-- [[MOVE CITIES]]
@@ -488,10 +489,10 @@ function DealWonders()
 	GameState = "WonderStage"
 	UI.setValue("CurrentPhase", "Phase: Wonder Selection")
 	UI.setValue("PhaseDesc", "Choose your wonder")
+
 	-- Random Wonders
 	if RandomWonders then
 		for _, player in ipairs(AllSeatedPlayers) do
-			-- WonderBags.Base.randomize()
 			RandomWonderObj[player] = WonderBags.Base.takeObject({
 				--											_WhitePlayerWonder.WonderPos
 				position = _G["_"..player.."PlayerWonder"].WonderPos,
@@ -517,10 +518,9 @@ function DealWonders()
 	-- Draft Wonders
 	elseif DraftMode then
 		for _, player in ipairs(AllSeatedPlayers) do
-			BaseWonderBag.randomize()
 			-- DraftMode1Pos
 			for i = 1, DraftModeNumber do
-				_G["_"..player.."DraftWonderObj"][i] = BaseWonderBag.takeObject({
+				_G["_"..player.."DraftWonderObj"][i] = WonderBags.Base.takeObject({
 					smooth = false,
 					position = _G["_"..player.."PlayerWonder"]["DraftMode"..i.."Pos"],
 					rotation = _G["_"..player.."PlayerWonder"].WonderRot,
@@ -553,8 +553,8 @@ function DealWonders()
 			end
 
 			_G["_"..player.."DraftWonderObj"][1].setPosition(_G["_"..player.."PlayerWonder"].WonderPos)
-			RandomWonderObj[player] = _G["_"..player.."DraftWonderObj"][1]
-			CameraSettings.
+			--RandomWonderObj[player] = _G["_"..player.."DraftWonderObj"][1]
+			--print(RandomWonderObj[player].getName())
 		end
 	end
 
@@ -578,6 +578,32 @@ function DealWonders()
           distance = CameraSettings[playerColor].distance
       })
     end
+	end
+end
+
+function DealArmada()
+	for _, player in ipairs(AllSeatedPlayers) do
+		DockyardBag.takeObject({
+			position = _G["_"..player.."PlayerArmada"].DockyardPos,
+			rotation = _G["_"..player.."PlayerArmada"].DockyardRot,
+			smooth = false,
+			callback_function = LockSpawnedObject})
+		ShipBags.Red.takeObject({
+			position = _G["_"..player.."PlayerArmada"].RedShipPos,
+			rotation = _G["_"..player.."PlayerArmada"].RedShipRot,
+			smooth = false})
+		ShipBags.Yellow.takeObject({
+			position = _G["_"..player.."PlayerArmada"].YellowShipPos,
+			rotation = _G["_"..player.."PlayerArmada"].YellowShipRot,
+			smooth = false})
+		ShipBags.Blue.takeObject({
+			position = _G["_"..player.."PlayerArmada"].BlueShipPos,
+			rotation = _G["_"..player.."PlayerArmada"].BlueShipRot,
+			smooth = false})
+		ShipBags.Green.takeObject({
+			position = _G["_"..player.."PlayerArmada"].GreenShipPos,
+			rotation = _G["_"..player.."PlayerArmada"].GreenShipRot,
+			smooth = false})
 	end
 end
 

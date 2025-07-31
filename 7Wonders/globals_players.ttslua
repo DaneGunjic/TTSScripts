@@ -1,4 +1,4 @@
---[[ PLAYER WONDER POSITIONS ]]
+-- [[ PLAYER WONDER POSITIONS ]]
 _WhitePlayerWonder = {
   WonderPos = {26.78, 1.00, -24.50},
   WonderRot = {0.00, 180, 0.00},
@@ -62,7 +62,7 @@ _PurplePlayerWonder = {
   DraftMode3Pos = {28, -24, -22}
 }
 
---[[ PLAYER ARMADA POSITIONS ]]
+-- [[ PLAYER ARMADA POSITIONS ]]
 _WhitePlayerArmada = {
   DockyardPos = {34.70, 1.00, -21.92},
   DockyardRot = {0.00, 180.00, 0.00},
@@ -156,7 +156,7 @@ _PurplePlayerArmada = {
 
 RandomWonderObj = {} --Used only if RandomWonders = true
 
---[[TABLES THAT HOLD ALL 'DRAFT' MODE WONDERS]]
+-- [[TABLES THAT HOLD ALL 'DRAFT' MODE WONDERS]]
 _WhiteDraftWonderObj = {}
 _RedDraftWonderObj = {}
 _YellowDraftWonderObj = {}
@@ -207,7 +207,7 @@ ArmadaBoardZones = {
   PurpleArmadaBoardZone = getObjectFromGUID("13c916")
 }
 
---[[ PLAYER CAMERA SETTINGS ]]
+-- [[ PLAYER CAMERA SETTINGS ]]
 CameraSettings = {
   _White = {pitch =70 , yaw = 0, distance = 20},
   _Red = {pitch =70 , yaw = 0, distance = 20},
@@ -218,7 +218,7 @@ CameraSettings = {
   _Purple = {pitch =70 , yaw = 180, distance = 20}
 }
 
---[[ PLAYER ZONE REFERENCES ]]
+-- [[ PLAYER ZONE REFERENCES ]]
 _WhiteLeftZone = getObjectFromGUID("13fc28") -- Red-White
 _WhiteRightZone = getObjectFromGUID("c58bb3") -- White-Purple
 _RedLeftZone = getObjectFromGUID("78cb1b") -- Yellow-Red

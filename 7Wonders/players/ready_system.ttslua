@@ -9,3 +9,16 @@ function UnreadyAllPlayers()
 
 	NumberOfReadyPlayers = 0
 end
+
+-- Called when a player pressed the "Ready" button
+function ReadyUp(player, _, id)
+    ReadyList[player.color] = not ReadyList[player.color]
+
+    broadcastToAll(player.steam_name .. " is " .. (ReadyList[player.color] and "Ready" or "Not Ready"))
+
+	if ReadyList[player.color] then
+		NumberOfReadyPlayers = NumberOfReadyPlayers + 1
+	else
+		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
+	end
+end
