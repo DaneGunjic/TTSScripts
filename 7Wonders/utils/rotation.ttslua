@@ -1,27 +1,3 @@
-function FindNextColor(Color, Direction)
-  -- Player array is sorted in the "Left" direction, meaning [1] is white, [2] is Red etc.
-  local tempAllPlayers = Player.getPlayers()
-  --print("Find next color called for " .. Color .. " and direction " .. Direction)
-  for i, PlayerInstance in ipairs(tempAllPlayers) do
-    --print("index " .. i .. " is " .. PlayerInstance.color)
-    if PlayerInstance.color == Color then
-      -- "Left" Direction means we look for the prevous player (to their right)
-      if Direction == "Left" then
-        if i == #tempAllPlayers then
-          return tempAllPlayers[1].color
-        end
-        return tempAllPlayers[i+1].color
-      else
-        -- "Right" Direction means we look for the next player (to their left)
-        if i == 1 then
-          return tempAllPlayers[#tempAllPlayers].color
-        end
-        return tempAllPlayers[i-1].color
-      end
-    end
-  end
-end
-
 function RotateHands(Card, Color, Direction)
   local CardRot = {}
   NextColor = FindNextColor(Color, Direction)

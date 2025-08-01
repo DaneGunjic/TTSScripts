@@ -1,0 +1,6 @@
+function DoWonderStage()
+	-- Everybody selected their wonders and is ready
+	-- Deal coins and show the "Ready" button
+	startLuaCoroutine(Global, "DealCoins")
+	-- UI.setAttribute("ReadyButton", "active", true)
+end

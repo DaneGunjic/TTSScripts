@@ -451,10 +451,10 @@ function HandleStartGameButtonCo()
 		coroutine.yield(0)
 	end
 
-	--[[DEAL WONDERS]]
+	-- [[DEAL WONDERS]]
 	DealWonders()
 
-	--[[DEAL RANDOM ARMADA BOARDS AND SHIPS]]
+	-- [[DEAL RANDOM ARMADA BOARDS AND SHIPS]]
 	DealArmada()
 
 	-- Move all the bags into position
@@ -553,8 +553,8 @@ function DealWonders()
 			end
 
 			_G["_"..player.."DraftWonderObj"][1].setPosition(_G["_"..player.."PlayerWonder"].WonderPos)
-			--RandomWonderObj[player] = _G["_"..player.."DraftWonderObj"][1]
-			--print(RandomWonderObj[player].getName())
+			-- RandomWonderObj[player] = _G["_"..player.."DraftWonderObj"][1]
+			-- print(RandomWonderObj[player].getName())
 		end
 	end
 
@@ -608,92 +608,113 @@ function DealArmada()
 end
 
 function DealCoins()
-    local CoinAmount
+  local CoinAmount = ExpansionsUsed.Leaders.Base and 6 or 3
 
-    if ExpansionsUsed[1] then
-        CoinAmount = 6
-    else
-        CoinAmount = 3
-    end
-
-    for _, player in ipairs(AllSeatedPlayers) do
+  for _, player in ipairs(AllSeatedPlayers) do
 		local tempPost = Vector(_G["_"..player.."PlayerWonder"].WonderPos)
 		tempPost.y = 2
-        for i = 1, CoinAmount do
+
+    for i = 1, CoinAmount do
 			tempPost = Vector(_G["_"..player.."PlayerWonder"].WonderPos)
 			tempPost.y = 2
 			tempPost.x = tempPost.x + math.random(-100, 100) / 100
 			tempPost.z = tempPost.z + math.random(-100, 100) / 100
-			CoinBag1.takeObject(
-				{position = tempPost,
+			CoinBags.Coin1.takeObject({
+				position = tempPost,
 				rotation = _G["_"..player.."PlayerWonder"].WonderRot,
-				smooth = false})
+				smooth = false
+			})
 			pause(0.1)
-        end
     end
-		return 1
+  end
+
+	return 1
 end
 
 function MakeSetupButtons()
   -- Change default parameters of "LEADERS" BUTTON
-  DefaultButtonParams.position = {-0.55, 0.2, -0.2}
+  DefaultButtonParams.position = {-0.35, 0.1, -0.02}
   DefaultButtonParams.click_function = "HandleLeadersButton"
-  DefaultButtonParams.label = "Leaders [    ]"
+  DefaultButtonParams.label = "[    ]"
+  SetupBoard.createButton(DefaultButtonParams)
+
+	-- Change default parameters of "PROMO" BUTTON
+  DefaultButtonParams.position = {-0.35, 0.2, 0.08}
+  DefaultButtonParams.click_function = "HandlePromoButton"
+  DefaultButtonParams.label = "[    ]"
+  SetupBoard.createButton(DefaultButtonParams)
+
+	-- Change default parameters of "EXPERT" BUTTON
+  DefaultButtonParams.position = {-0.35, 0.2, 0.18}
+  DefaultButtonParams.click_function = "HandleExpertButton"
+  DefaultButtonParams.label = "[    ]"
   SetupBoard.createButton(DefaultButtonParams)
 
   -- Change default parameters of "CITIES" BUTTON
-  DefaultButtonParams.position = {-0.55, 0.2, -0.05}
+  DefaultButtonParams.position = {-0.35, 0.2, 0.28}
   DefaultButtonParams.click_function = "HandleCitiesButton"
-  DefaultButtonParams.label = "Cities [    ]"
+  DefaultButtonParams.label = "[    ]"
   SetupBoard.createButton(DefaultButtonParams)
 
 	-- Change default parameters of "ARMADA" BUTTON
-	DefaultButtonParams.position = {-0.55, 0.2, 0.10}
+	DefaultButtonParams.position = {-0.35, 0.2, 0.38}
 	DefaultButtonParams.click_function = "HandleArmadaButton"
-	DefaultButtonParams.label = "Armada [    ]"
+	DefaultButtonParams.label = "[    ]"
 	SetupBoard.createButton(DefaultButtonParams)
 
+  -- Change default parameters of "EDIFICE" BUTTON
+  DefaultButtonParams.position = {-0.35, 0.2, 0.48}
+  DefaultButtonParams.click_function = "HandleEdificeButton"
+  DefaultButtonParams.label = "[    ]"
+  SetupBoard.createButton(DefaultButtonParams)
+
   -- Change default parameters of "RUINS" BUTTON
-  DefaultButtonParams.position = {-0.55, 0.2, 0.25}
+  DefaultButtonParams.position = {-0.35, 0.2, 0.58}
   DefaultButtonParams.click_function = "HandleRuinsButton"
-  DefaultButtonParams.label = "Ruins [    ]"
+  DefaultButtonParams.label = "[    ]"
   SetupBoard.createButton(DefaultButtonParams)
 
   -- Change default parameters of "MYTHS" BUTTON
-  DefaultButtonParams.position = {-0.55, 0.2, 0.40}
+  DefaultButtonParams.position = {-0.35, 0.2, 0.68}
   DefaultButtonParams.click_function = "HandleMythsButton"
-  DefaultButtonParams.label = "Myths [    ]"
+  DefaultButtonParams.label = "[    ]"
   SetupBoard.createButton(DefaultButtonParams)
 
   -- Change default parameters of "FRONTIERS" BUTTON
-  DefaultButtonParams.position = {-0.55, 0.2, 0.55}
+  DefaultButtonParams.position = {-0.35, 0.2, 0.78}
   DefaultButtonParams.click_function = "HandleFrontiersButton"
-  DefaultButtonParams.label = "Frontiers [    ]"
+  DefaultButtonParams.label = "[    ]"
   SetupBoard.createButton(DefaultButtonParams)
 
-  -- Change default parameters of "COLLECTION" BUTTON
-  DefaultButtonParams.position = {0.55, 0.2, -0.05}
-  DefaultButtonParams.click_function = "HandleCollectionButton"
-  DefaultButtonParams.label = "Collection [    ]"
+  -- Change default parameters of "PROMO GUILDS" BUTTON
+  DefaultButtonParams.position = {-0.35, 0.2, 0.88}
+  DefaultButtonParams.click_function = "HandlePromoGuildsButton"
+  DefaultButtonParams.label = "[    ]"
   SetupBoard.createButton(DefaultButtonParams)
 
-  -- Change default parameters of "PROMO" BUTTON
-  DefaultButtonParams.position = {0.55, 0.2, 0.1}
-  DefaultButtonParams.click_function = "HandlePromoButton"
-  DefaultButtonParams.label = "Promo       [    ]"
-  SetupBoard.createButton(DefaultButtonParams)
+	-- Change default parameters of "COLLECTION" BUTTON
+	DefaultButtonParams.position = {0.35, 0.1, -0.02}
+	DefaultButtonParams.click_function = "HandleCollectionButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
+
+	-- Change default parameters of "PROMO WONDERS" BUTTON
+	DefaultButtonParams.position = {0.35, 0.2, 0.08}
+	DefaultButtonParams.click_function = "HandlePromoWondersButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
 
   -- Change default parameters of "RANDOM" BUTTON
-  DefaultButtonParams.position = {0.55, 0.2, 0.4}
+  DefaultButtonParams.position = {0.35, 0.2, 0.58}
   DefaultButtonParams.click_function = "HandleRandomButton"
-  DefaultButtonParams.label = "Random [✓]"
+  DefaultButtonParams.label = "[✓]"
   DefaultButtonParams.font_color={0,1,0}
   SetupBoard.createButton(DefaultButtonParams)
 
   -- Change default parameters of "DRAFT" BUTTON
-  DefaultButtonParams.position = {0.55, 0.2, 0.55}
+  DefaultButtonParams.position = {0.35, 0.2, 0.68}
   DefaultButtonParams.click_function = "HandleDraftButton"
-  DefaultButtonParams.label = "Draft [    ]"
+  DefaultButtonParams.label = "[    ]"
   DefaultButtonParams.font_color={1,0,0}
   SetupBoard.createButton(DefaultButtonParams)
 
@@ -705,4 +726,208 @@ function MakeSetupButtons()
   DefaultButtonParams.height = 300
   DefaultButtonParams.click_function = "HandleStartGameButton"
   SetupBoard.createButton(DefaultButtonParams)
+end
+
+function MakeSetupBoardText()
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x - 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z + 3
+	}
+
+	TextOnSetupBoard = {}
+	local text = spawnObject(DefaultTextParams)
+	text.TextTool.setValue("STANDARD\nEXPANSIONS")
+	text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x - 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z + 0.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("LEADERS")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x - 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 0.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("       ↪PROMO")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x - 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 1.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("       ↪EXPERT")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x - 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 2.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("CITIES")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x - 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 3.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("ARMADA")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x - 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 4.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("EDIFICE")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x - 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 5.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("RUINS")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x - 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 6.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("MYTHS")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x - 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 7.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("FRONTIERS")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x - 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 8.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("PROMO GUILDS")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x + 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z + 3
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("WONDER\nEXPANSIONS")
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x + 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z + 0.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("COLLECTION")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x + 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 0.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("PROMO")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x + 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 2.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("SELECTION\nMODE")
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x + 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 5.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("RANDOM")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x + 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 6.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+  text.TextTool.setValue("DRAFT")
+	text.TextTool.setFontSize(50)
+  text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
 end

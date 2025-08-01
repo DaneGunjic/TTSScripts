@@ -1,16 +1,21 @@
 -------------------[[ DEFAULT BUTTON PARAMETERS ]]-------------------
 DefaultButtonParams = {
-  width            = 1250,
-  height           = 250,
+  width            = 200,
+  height           = 200,
   font_color       = {1,1,1},
   color            = {0.05,0.05,0.05,1},
   font_size        = 200,
-  scale            = {x=0.3,y=0.3,z=0.3},
+  scale            = {x=0.2,y=0.2,z=0.2},
   click_function   = "OnUpdate", -- Should always be replaced
   label            = "X",
   position         = {0, 0, 0},
 }
 
+-------------------[[ DEFAULT BUTTON PARAMETERS ]]-------------------
+DefaultTextParams = {
+  type = "3DText",
+  rotation = {90, 0, 0}
+}
 -------------------[[ EXPANSION SETTINGS ]]-------------------
 ExpansionsUsed = {
   Leaders = {
@@ -20,6 +25,7 @@ ExpansionsUsed = {
   },
   Cities = false,
   Armada = false,
+  Edifice = false,
   Ruins = false,
   Myths = false,
   Frontiers = false,
@@ -205,7 +211,7 @@ IslandBags = {
 
 DockyardBag = getObjectFromGUID("5b9a9c")
 
-	-- [[BAGS | WONDERS]]
+-- [[BAGS | WONDERS]]
 WonderBags = {
   Base = getObjectFromGUID("56d45b"),
   Leaders = getObjectFromGUID("c1c61c"),
@@ -214,12 +220,14 @@ WonderBags = {
   Collection = getObjectFromGUID("7c6699")
 }
 
+-- [[BAGS | COINS]]
 CoinBags = {
   Coin1 = getObjectFromGUID("3f95a5"),
   Coin3 = getObjectFromGUID("3cad45"),
   Coin6 = getObjectFromGUID("9e60c9")
 }
 
+-- [[BAGS | CONFLICT]]
 ConflictTokenBags = {
   VictoryToken1 = getObjectFromGUID("c56b5a"),
   VictoryToken3 = getObjectFromGUID("5411ef"),
@@ -227,10 +235,11 @@ ConflictTokenBags = {
   VictoryToken7 = getObjectFromGUID("c99037"),
   DefeatToken = getObjectFromGUID("d6e612")
 }
-
+-- [[BAGS | BOARDING & DIPLOMACY]]
 BoardingTokenBag = getObjectFromGUID("511867")
 DiplomacyTokenBag = getObjectFromGUID("ff17ba")
 
+-- [[BAGS | NAVAL]]
 NavalTokenBags = {
   VictoryToken1 = getObjectFromGUID("a30549"),
   VictoryToken3 = getObjectFromGUID("1a1373"),
@@ -241,9 +250,11 @@ NavalTokenBags = {
   DefeatToken3 = getObjectFromGUID("dd7fca")
 }
 
+-- [[BAGS | DEBT]]
 DebtBags = {
   DebtToken1 = getObjectFromGUID("b1f5a1"),
   DebtToken5 = getObjectFromGUID("ed2335")
 }
 
+-- [[BAGS | FRONTIERS]]
 FrontiersBag = getObjectFromGUID("f46e91")

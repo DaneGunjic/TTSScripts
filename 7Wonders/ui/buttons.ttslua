@@ -1,63 +1,111 @@
 function HandleLeadersButton() -- Button index 0
 	ExpansionsUsed.Leaders.Base = not ExpansionsUsed.Leaders.Base
 	if ExpansionsUsed.Leaders.Base then
-		SetupBoard.editButton({index = 0, label = "Leaders [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 0, label = "[✓]", font_color={0,1,0}})
 	else
-		SetupBoard.editButton({index = 0, label = "Leaders [    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 0, label = "[    ]", font_color={1,1,1}})
+		if ExpansionsUsed.Leaders.Promo then
+			HandlePromoButton()
+		end
+		if ExpansionsUsed.Leaders.Expert then
+			HandleExpertButton()
+		end
 	end
 end
 
-function HandleCitiesButton() -- Button index 1
+function HandlePromoButton() -- Button index 1
+	ExpansionsUsed.Leaders.Promo = not ExpansionsUsed.Leaders.Promo
+	if ExpansionsUsed.Leaders.Promo then
+		SetupBoard.editButton({index = 1, label = "[✓]", font_color={0,1,0}})
+		if not ExpansionsUsed.Leaders.Base then
+			HandleLeadersButton()
+		end
+	else
+		SetupBoard.editButton({index = 1, label = "[    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleExpertButton() -- Button index 2
+	ExpansionsUsed.Leaders.Expert = not ExpansionsUsed.Leaders.Expert
+	if ExpansionsUsed.Leaders.Expert then
+		SetupBoard.editButton({index = 2, label = "[✓]", font_color={0,1,0}})
+		if not ExpansionsUsed.Leaders.Base then
+			HandleLeadersButton()
+		end
+	else
+		SetupBoard.editButton({index = 2, label = "[    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleCitiesButton() -- Button index 3
 	ExpansionsUsed.Cities = not ExpansionsUsed.Cities
 	if ExpansionsUsed.Cities then
-		SetupBoard.editButton({index = 1, label = "Cities [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 3, label = "[✓]", font_color={0,1,0}})
 	else
-		SetupBoard.editButton({index = 1, label = "Cities [    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 3, label = "[    ]", font_color={1,1,1}})
 	end
 end
 
-function HandleArmadaButton() -- Button index 2
+function HandleArmadaButton() -- Button index 4
 	ExpansionsUsed.Armada = not ExpansionsUsed.Armada
 	if ExpansionsUsed.Armada then
-		SetupBoard.editButton({index = 2, label = "Armada [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 4, label = "[✓]", font_color={0,1,0}})
 	else
-		SetupBoard.editButton({index = 2, label = "Armada [    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 4, label = "[    ]", font_color={1,1,1}})
 	end
 end
 
-function HandleRuinsButton() -- Button index 3
+function HandleEdificeButton() -- Button index 5
+	ExpansionsUsed.Edifice = not ExpansionsUsed.Edifice
+	if ExpansionsUsed.Edifice then
+		SetupBoard.editButton({index = 5, label = "[✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 5, label = "[    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleRuinsButton() -- Button index 6
 	ExpansionsUsed.Ruins = not ExpansionsUsed.Ruins
 	if ExpansionsUsed.Ruins then
-		SetupBoard.editButton({index = 3, label = "Ruins [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 6, label = "[✓]", font_color={0,1,0}})
 	else
-		SetupBoard.editButton({index = 3, label = "Ruins [    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 6, label = "[    ]", font_color={1,1,1}})
 	end
 end
 
-function HandleMythsButton() -- Button index 4
+function HandleMythsButton() -- Button index 7
 	ExpansionsUsed.Myths = not ExpansionsUsed.Myths
 	if ExpansionsUsed.Myths then
-		SetupBoard.editButton({index = 4, label = "Myths [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 7, label = "[✓]", font_color={0,1,0}})
 	else
-		SetupBoard.editButton({index = 4, label = "Myths [    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 7, label = "[    ]", font_color={1,1,1}})
 	end
 end
 
-function HandleFrontiersButton() -- Button index 5
+function HandleFrontiersButton() -- Button index 8
 	ExpansionsUsed.Frontiers = not ExpansionsUsed.Frontiers
 	if ExpansionsUsed.Frontiers then
-		SetupBoard.editButton({index = 5, label = "Frontiers [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 8, label = "[✓]", font_color={0,1,0}})
 	else
-		SetupBoard.editButton({index = 5, label = "Frontiers [    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 8, label = "[    ]", font_color={1,1,1}})
 	end
 end
 
-function HandleCollectionButton() -- Button index 6
+function HandlePromoGuildsButton() -- Button index 9
+	ExpansionsUsed.PromoGuilds = not ExpansionsUsed.PromoGuilds
+	if ExpansionsUsed.PromoGuilds then
+		SetupBoard.editButton({index = 9, label = "[✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 9, label = "[    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleCollectionButton() -- Button index 10
 	WonderExpansionsUsed.Collection = not WonderExpansionsUsed.Collection
 	if WonderExpansionsUsed.Collection then
-		SetupBoard.editButton({index = 6, label = "Collection [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 10, label = "[✓]", font_color={0,1,0}})
 	else
-		SetupBoard.editButton({index = 6, label = "Collection [    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 10, label = "[    ]", font_color={1,1,1}})
 
 		-- If Collection is off but Draft is on, disable Draft
 		if DraftMode then
@@ -66,49 +114,53 @@ function HandleCollectionButton() -- Button index 6
 	end
 end
 
-function HandlePromoButton() -- Button index 7
-	WonderExpansionsUsed[2] = not WonderExpansionsUsed[2]
-	if WonderExpansionsUsed[2] then
-		SetupBoard.editButton({index = 7, label = "Promo       [✓]", font_color={0,1,0}})
+function HandlePromoWondersButton() -- Button index 11
+	WonderExpansionsUsed.Promo = not WonderExpansionsUsed.Promo
+	if WonderExpansionsUsed.Promo then
+		SetupBoard.editButton({index = 11, label = "[✓]", font_color={0,1,0}})
 	else
-		SetupBoard.editButton({index = 7, label = "Promo       [    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 11, label = "[    ]", font_color={1,1,1}})
+
+		-- If Collection is off but Draft is on, disable Draft
+		if DraftMode then
+			HandleDraftButton()
+		end
 	end
 end
 
-function HandleRandomButton() -- Button index 8
+function HandleRandomButton() -- Button index 12
 	RandomWonders = not RandomWonders
 	-- If both are true then disable Draft
 	if RandomWonders and DraftMode then
-		DraftMode = not DraftMode
-		SetupBoard.editButton({index = 8, label = "Random [✓]", font_color={0,1,0}})
-		SetupBoard.editButton({index = 9, label = "Draft [    ]", font_color={1,1,1}})
-	elseif RandomWonders and not DraftMode  then
-		SetupBoard.editButton({index = 8, label = "Random [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 12, label = "[✓]", font_color={0,1,0}})
+		if DraftMode then
+			HandleDraftButton()
+		end
 	else
-		SetupBoard.editButton({index = 8, label = "Random [    ]", font_color={1,1,1}})
-		DraftMode = not DraftMode
-		SetupBoard.editButton({index = 9, label = "Draft [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 12, label = "[    ]", font_color={1,1,1}})
+		HandleDraftButton()
+		--SetupBoard.editButton({index = 13, label = "[✓]", font_color={0,1,0}})
 	end
 end
 
-function HandleDraftButton() -- Button index 9
+function HandleDraftButton() -- Button index 13
 	DraftMode = not DraftMode
 
-	if DraftMode and not WonderExpansionsUsed[1] then
+	if DraftMode and not WonderExpansionsUsed.Collection then
 		broadcastToAll("Using Draft Mode without Collection Wonders is not possible. Toggling Collection.")
 		HandleCollectionButton()
 	end
 
 	if DraftMode and not RandomWonders then
-		SetupBoard.editButton({index = 9, label = "Draft [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 13, label = "[✓]", font_color={0,1,0}})
 	elseif DraftMode and RandomWonders then
 		RandomWonders = not RandomWonders
-		SetupBoard.editButton({index = 8, label = "Random [    ]", font_color={1,1,1}})
-		SetupBoard.editButton({index = 9, label = "Draft [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 12, label = "[    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 13, label = "[✓]", font_color={0,1,0}})
 	else
-		SetupBoard.editButton({index = 9, label = "Draft [    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 13, label = "[    ]", font_color={1,1,1}})
 		RandomWonders = not RandomWonders
-		SetupBoard.editButton({index = 8, label = "Random [✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 12, label = "[✓]", font_color={0,1,0}})
 	end
 end
 

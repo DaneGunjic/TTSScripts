@@ -13,19 +13,20 @@ function onLoad()
   -- ForceLoadAllAssets()
 
   MakeSetupButtons()
+  MakeSetupBoardText()
 
   -- Verify all critical objects loaded
   local allZonesValid = true
   for name, zone in pairs(DeckZones) do
-      if not zone then
-          broadcastToAll("Warning: Failed to load zone - " .. name, {1,0,0})
-          allZonesValid = false
-      end
+    if not zone then
+      broadcastToAll("Warning: Failed to load zone - " .. name, {1,0,0})
+      allZonesValid = false
+    end
   end
 
   if allZonesValid then
-      printToAll("All game components loaded successfully!", {0,1,0})
+    printToAll("All game components loaded successfully!", {0,1,0})
   else
-      printToAll("Some components failed to load - check console", {1,0.5,0})
+    printToAll("Some components failed to load - check console", {1,0.5,0})
   end
 end
