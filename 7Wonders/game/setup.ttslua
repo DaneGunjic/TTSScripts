@@ -522,7 +522,7 @@ function DealWonders()
 			for i = 1, DraftModeNumber do
 				_G["_"..player.."DraftWonderObj"][i] = WonderBags.Base.takeObject({
 					smooth = false,
-					position = _G["_"..player.."PlayerWonder"]["DraftMode"..i.."Pos"],
+					position = _G["_"..player.."PlayerWonder"]["DraftModePos"],
 					rotation = _G["_"..player.."PlayerWonder"].WonderRot,
 					callback_function = LockSpawnedObject})
 
@@ -699,31 +699,40 @@ function MakeSetupButtons()
 	SetupBoard.createButton(DefaultButtonParams)
 
 	-- Change default parameters of "PROMO WONDERS" BUTTON
-	DefaultButtonParams.position = {0.35, 0.2, 0.08}
+	DefaultButtonParams.position = {0.35, 0.1, 0.08}
 	DefaultButtonParams.click_function = "HandlePromoWondersButton"
 	DefaultButtonParams.label = "[    ]"
 	SetupBoard.createButton(DefaultButtonParams)
 
   -- Change default parameters of "RANDOM" BUTTON
-  DefaultButtonParams.position = {0.35, 0.2, 0.58}
+  DefaultButtonParams.position = {0.35, 0.1, 0.58}
   DefaultButtonParams.click_function = "HandleRandomButton"
   DefaultButtonParams.label = "[✓]"
   DefaultButtonParams.font_color={0,1,0}
   SetupBoard.createButton(DefaultButtonParams)
 
   -- Change default parameters of "DRAFT" BUTTON
-  DefaultButtonParams.position = {0.35, 0.2, 0.68}
+  DefaultButtonParams.position = {0.35, 0.1, 0.68}
   DefaultButtonParams.click_function = "HandleDraftButton"
   DefaultButtonParams.label = "[    ]"
-  DefaultButtonParams.font_color={1,0,0}
+  DefaultButtonParams.font_color={1,1,1}
+  SetupBoard.createButton(DefaultButtonParams)
+
+	-- Change default parameters of "DRAFT" BUTTON
+  DefaultButtonParams.position = {0.20, 0.1, 0.68}
+  DefaultButtonParams.click_function = "AdjustDraftNumber"
+  DefaultButtonParams.label = "[" .. DraftModeNumber .. "]"
+  DefaultButtonParams.font_color={1,1,1}
   SetupBoard.createButton(DefaultButtonParams)
 
   -- Change default parameters of "Start Game" BUTTON
-  DefaultButtonParams.label = "Start Game"
+  DefaultButtonParams.label = "PLAY"
   DefaultButtonParams.font_color = {1,1,1}
-  DefaultButtonParams.position = {0, 0.2, 0.8}
+  DefaultButtonParams.position = {0.8, 0.1, 0.9}
   DefaultButtonParams.font_size = 250
   DefaultButtonParams.height = 300
+	DefaultButtonParams.width = 800
+	DefaultButtonParams.font_color={1,0,1}
   DefaultButtonParams.click_function = "HandleStartGameButton"
   SetupBoard.createButton(DefaultButtonParams)
 end

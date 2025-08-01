@@ -131,15 +131,16 @@ end
 function HandleRandomButton() -- Button index 12
 	RandomWonders = not RandomWonders
 	-- If both are true then disable Draft
-	if RandomWonders and DraftMode then
+	if RandomWonders then
 		SetupBoard.editButton({index = 12, label = "[✓]", font_color={0,1,0}})
 		if DraftMode then
 			HandleDraftButton()
 		end
 	else
 		SetupBoard.editButton({index = 12, label = "[    ]", font_color={1,1,1}})
-		HandleDraftButton()
-		--SetupBoard.editButton({index = 13, label = "[✓]", font_color={0,1,0}})
+		if not DraftMode then
+			HandleDraftButton()
+		end
 	end
 end
 
@@ -151,21 +152,48 @@ function HandleDraftButton() -- Button index 13
 		HandleCollectionButton()
 	end
 
-	if DraftMode and not RandomWonders then
+	if DraftMode then
 		SetupBoard.editButton({index = 13, label = "[✓]", font_color={0,1,0}})
-	elseif DraftMode and RandomWonders then
-		RandomWonders = not RandomWonders
-		SetupBoard.editButton({index = 12, label = "[    ]", font_color={1,1,1}})
-		SetupBoard.editButton({index = 13, label = "[✓]", font_color={0,1,0}})
+		if RandomWonders then
+			HandleRandomButton()
+		end
 	else
 		SetupBoard.editButton({index = 13, label = "[    ]", font_color={1,1,1}})
-		RandomWonders = not RandomWonders
-		SetupBoard.editButton({index = 12, label = "[✓]", font_color={0,1,0}})
+		if not RandomWonders then
+			HandleRandomButton()
+		end
 	end
+end
+
+function AdjustDraftNumber(obj, color, alt) -- Button index 14
+	if alt then
+		DraftModeNumber = DraftModeNumber - 1
+		if DraftModeNumber == 2 then
+			DraftModeNumber = 9
+		end
+	else
+		DraftModeNumber = DraftModeNumber + 1
+		if DraftModeNumber == 10 then
+			DraftModeNumber = 3
+		end
+	end
+
+	SetupBoard.editButton({
+            index = 14,
+            label = "[" .. DraftModeNumber .. "]"
+					})
 end
 
 -- [[CALL WHEN 'START GAME' BUTTON IS PRESSED]]
 function HandleStartGameButton()
+	for i, textObj in ipairs(TextOnSetupBoard) do
+	  if textObj and textObj.destroy then
+	      textObj.destroy()  -- Remove all text
+	  end
+	end
+
+	TextOnSetupBoard = {}
+
 	startLuaCoroutine(Global, "HandleStartGameButtonCo")
 end
 
@@ -321,7 +349,7 @@ function HandleCycleLeftButton(obj, color, alt)
 	local CurrentWonderPos = _G["_"..color.."DraftWonderObj"][tempNum].getPosition()
 
 	-- Move the current Wonder below the table
-	_G["_"..color.."DraftWonderObj"][tempNum].setPosition(_G["_"..color.."PlayerWonder"]["DraftMode"..tempNum.."Pos"])
+	_G["_"..color.."DraftWonderObj"][tempNum].setPosition(_G["_"..color.."PlayerWonder"]["DraftModePos"])
 
 	-- Find the previous (left) index
 	PlayerCurrentlyChosenWonder[color] = PlayerCurrentlyChosenWonder[color] - 1
@@ -340,7 +368,7 @@ function HandleCycleRightButton(obj, color, alt)
 	local CurrentWonderPos = _G["_"..color.."DraftWonderObj"][tempNum].getPosition()
 
 	-- Move the current Wonder below the table
-	_G["_"..color.."DraftWonderObj"][tempNum].setPosition(_G["_"..color.."PlayerWonder"]["DraftMode"..tempNum.."Pos"])
+	_G["_"..color.."DraftWonderObj"][tempNum].setPosition(_G["_"..color.."PlayerWonder"]["DraftModePos"])
 
 	-- Find the next (right) index
 	PlayerCurrentlyChosenWonder[color] = PlayerCurrentlyChosenWonder[color] + 1

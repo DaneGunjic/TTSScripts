@@ -3,63 +3,49 @@ _WhitePlayerWonder = {
   WonderPos = {26.78, 1.00, -24.50},
   WonderRot = {0.00, 180, 0.00},
   WonderFlipRot = {0, 180, 180},
-  DraftMode1Pos = {26.75, -20, -24.25},
-  DraftMode2Pos = {26.75, -21, -24.25},
-  DraftMode3Pos = {26.75, -22, -24.25}
+  DraftModePos = {26.75, -20, -24.25}
 }
 
 _RedPlayerWonder = {
   WonderPos = {-3.22, 1.00, -24.50},
   WonderRot = {0.00, 180, 0.00},
   WonderFlipRot = {0, 180, 180},
-	DraftMode1Pos = {2, -20, -22},
-  DraftMode2Pos = {2, -22, -22},
-  DraftMode3Pos = {2, -24, -22}
+	DraftModePos = {2, -20, -22}
 }
 
 _YellowPlayerWonder = {
   WonderPos = {-33.22, 1.00, -24.50},
   WonderRot = {0.00, 180, 0.00},
   WonderFlipRot = {0, 180, 180},
-  DraftMode1Pos = {-28, -20, -22},
-  DraftMode2Pos = {-28, -22, -22},
-  DraftMode3Pos = {-28, -24, -22}
+  DraftModePos = {-28, -20, -22}
 }
 
 _GreenPlayerWonder = {
   WonderPos = {-40.50, 1.00, 3.22},
   WonderRot = {0.00, 270, 0.00},
   WonderFlipRot = {0, 270, 180},
-  DraftMode1Pos = {-38, -20, -22},
-  DraftMode2Pos = {-38, -22, -22},
-  DraftMode3Pos = {-38, -24, -22}
+  DraftModePos = {-38, -20, -22}
 }
 
 _PinkPlayerWonder = {
   WonderPos = {-26.78, 1.00, 24.50},
   WonderRot = {0.00, 0.00, 0.00},
   WonderFlipRot = {0, 0, 180},
-  DraftMode1Pos = {-32, -20, -22},
-  DraftMode2Pos = {-32, -22, -22},
-  DraftMode3Pos = {-32, -24, -22}
+  DraftModePos = {-32, -20, -22}
 }
 
 _BluePlayerWonder = {
   WonderPos = {3.22, 1.00, 24.50},
   WonderRot = {0.00, 0.00, 0.00},
   WonderFlipRot = {0, 0, 180},
-  DraftMode1Pos = {-2, -20, -22},
-  DraftMode2Pos = {-2, -22, -22},
-  DraftMode3Pos = {-2, -24, -22}
+  DraftModePos = {-2, -20, -22}
 }
 
 _PurplePlayerWonder = {
   WonderPos = {33.22, 1.00, 24.50},
   WonderRot = {0.00, 0.00, 0.00},
   WonderFlipRot = {0, 0, 180},
-  DraftMode1Pos = {28, -20, -22},
-  DraftMode2Pos = {28, -22, -22},
-  DraftMode3Pos = {28, -24, -22}
+  DraftModePos = {28, -20, -22}
 }
 
 -- [[ PLAYER ARMADA POSITIONS ]]
