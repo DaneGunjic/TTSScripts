@@ -11,7 +11,7 @@ DefaultButtonParams = {
   position         = {0, 0, 0},
 }
 
--------------------[[ DEFAULT BUTTON PARAMETERS ]]-------------------
+-------------------[[ DEFAULT BUTTON TEXT PARAMETERS ]]-------------------
 DefaultTextParams = {
   type = "3DText",
   rotation = {90, 0, 0}
@@ -53,25 +53,25 @@ SetupBoard = getObjectFromGUID("511af3")
 
 -------------------[[ TOKEN BAGS POSITIONS ]]-------------------
 TokenBagsPositions = {
-  CoinBag1Position = Vector(-14.00, 0.46, -4.00),
-  CoinBag3Position = Vector(-10.00, 0.46, -4.00),
-  CoinBag6Position = Vector(-6.00, 0.46, -4.00),
-  ConflictToken1Position = Vector(-2.00, 0.46, -4.00),
-  ConflictToken3Position = Vector(2.00, 0.46, -4.00),
-  ConflictToken5Position = Vector(6.00, 0.46, -4.00),
-  ConflictToken7Position = Vector(10.00, 0.46, -4.00),
-  ConflictTokenDefeatPosition = Vector(14.00, 0.46, -4.00),
-  BoardingTokenPosition = Vector(-17.00, 0.46, 0.00),
+  CoinBag1 = Vector(-14.00, 0.46, -4.00),
+  CoinBag3 = Vector(-10.00, 0.46, -4.00),
+  CoinBag6 = Vector(-6.00, 0.46, -4.00),
+  ConflictToken1 = Vector(-2.00, 0.46, -4.00),
+  ConflictToken3 = Vector(2.00, 0.46, -4.00),
+  ConflictToken5 = Vector(6.00, 0.46, -4.00),
+  ConflictToken7 = Vector(10.00, 0.46, -4.00),
+  ConflictTokenDefeat = Vector(14.00, 0.46, -4.00),
+  BoardingToken = Vector(-17.00, 0.46, 0.00),
   DiplomacyTokenPosition = Vector(14.00, 0.46, 0.00),
-  NavalVictoryToken1Position = Vector(-14.00, 0.46, 4.00),
-  NavalVictoryToken3Position = Vector(-10.00, 0.46, 4.00),
-  NavalVictoryToken5Position = Vector(-6.00, 0.46, 4.00),
-  NavalVictoryToken7Position = Vector(-2.00, 0.46, 4.00),
-  NavalDefeatToken1Position = Vector(2.00, 0.46, 4.00),
-  NavalDefeatToken2Position = Vector(6.00, 0.46, 4.00),
-  NavalDefeatToken3Position = Vector(10.00, 0.46, 4.00),
-  Debt1TokenPosition = Vector(-17.00, 0.46, 4.00),
-  Debt5TokenPosition = Vector(-17.00, 0.46, -4.00)
+  NavalVictory = Vector(-14.00, 0.46, 4.00),
+  NavalVictory = Vector(-10.00, 0.46, 4.00),
+  NavalVictory = Vector(-6.00, 0.46, 4.00),
+  NavalVictoryn = Vector(-2.00, 0.46, 4.00),
+  NavalDefeat = Vector(2.00, 0.46, 4.00),
+  NavalDefeat = Vector(6.00, 0.46, 4.00),
+  NavalDefeat = Vector(10.00, 0.46, 4.00),
+  Debt1 = Vector(-17.00, 0.46, 4.00),
+  Debt5 = Vector(-17.00, 0.46, -4.00)
 }
 
 -------------------[[ DECK ZONE REFERENCES ]]-------------------

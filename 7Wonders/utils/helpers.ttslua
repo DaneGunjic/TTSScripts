@@ -22,6 +22,22 @@ function FindNextColor(Color, Direction)
   end
 end
 
+function onChat(message, player)
+  if message == "debug" then
+    printToAll("Debug mode activated!", {1,1,0})
+
+    for i, textObj in ipairs(TextOnSetupBoard) do
+  	  if textObj and textObj.destroy then
+	      textObj.destroy()
+  	  end
+  	end
+
+  	TextOnSetupBoard = {}
+    SetupBoard.destruct()
+    return false
+  end
+end
+
 function ForceLoadAllAssets()
   -- Add any bags that should have their contents pre-loaded
   AllBagsToLoad = {

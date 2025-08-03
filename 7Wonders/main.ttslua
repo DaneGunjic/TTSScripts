@@ -13,6 +13,14 @@ function onLoad()
   -- ForceLoadAllAssets()
 
   MakeSetupButtons()
+
+  -- Clear text first, in case we saved the game after loading
+  for _, guid in ipairs(TextOnSetupBoardGUIDs or {}) do
+    local obj = getObjectFromGUID(guid)
+    if obj then obj.destroy() end
+  end
+  TextOnSetupBoardGUIDs = {} -- Reset the table
+
   MakeSetupBoardText()
 
   -- Verify all critical objects loaded

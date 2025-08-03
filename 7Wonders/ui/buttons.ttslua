@@ -186,13 +186,13 @@ end
 
 -- [[CALL WHEN 'START GAME' BUTTON IS PRESSED]]
 function HandleStartGameButton()
-	for i, textObj in ipairs(TextOnSetupBoard) do
-	  if textObj and textObj.destroy then
-	      textObj.destroy()  -- Remove all text
+
+	for _, textObject in ipairs(TextOnSetupBoard) do
+	  if textObject and textObject.destroy then  -- Check if object exists and has destroy()
+	      textObject.destroy()  -- Remove the text object
 	  end
 	end
-
-	TextOnSetupBoard = {}
+	TextOnSetupBoard = {}  -- Clear the table afterward
 
 	startLuaCoroutine(Global, "HandleStartGameButtonCo")
 end
@@ -200,14 +200,19 @@ end
 function HandleFlipButton(obj, color, alt)
 	-- Random Mode
 	if not DraftMode then
-		local tempDefaultRot = _G["_"..color.."PlayerWonder"].WonderRot
+		local tempDefaultRot = _G["_"..color.."PlayerInfo"].ComponentRotation
 		local tempCurrentRot = {RandomWonderObj[color].getRotation().x, RandomWonderObj[color].getRotation().y, RandomWonderObj[color].getRotation().z}
 		-- Flipped object have the same height in-game, but actually offset according to their pivot point, so we add 0.2 so the Wonder keeps its position-
 		local tempFlippedPos = {RandomWonderObj[color].getPosition().x, RandomWonderObj[color].getPosition().y + 0.2, RandomWonderObj[color].getPosition().z}
 
 		if equals(tempDefaultRot, tempCurrentRot, true) then
 			-- Flip to Night Side (B)
-			RandomWonderObj[color].setRotation(_G["_"..color.."PlayerWonder"].WonderFlipRot)
+			RandomWonderObj[color].setRotation({
+			  x = tempCurrentRot[1],
+			  y = tempCurrentRot[2],
+			  z = tempCurrentRot[3] + 180
+			})
+
 			RandomWonderObj[color].setPosition(tempFlippedPos)
 			RandomWonderObj[color].editButton({
 				index          = 0,
@@ -240,11 +245,12 @@ function HandleFlipButton(obj, color, alt)
 	-- Draft Mode
 	else
 		local CurrentWonderObj = _G["_"..color.."DraftWonderObj"][PlayerCurrentlyChosenWonder[color]]
-		local tempDefaultRot = _G["_"..color.."PlayerWonder"].WonderRot
+		local tempDefaultRot = _G["_"..color.."PlayerInfo"].ComponentRotation
 		local tempCurrentRot = {
 			CurrentWonderObj.getRotation().x,
 			CurrentWonderObj.getRotation().y,
-			CurrentWonderObj.getRotation().z}
+			CurrentWonderObj.getRotation().z
+		}
 		-- Flipped object have the same height in-game, but actually offset according to their pivot point, so we add 0.2 so the Wonder keeps its position
 		local tempFlippedPos = {
 			CurrentWonderObj.getPosition().x,
@@ -254,9 +260,16 @@ function HandleFlipButton(obj, color, alt)
 		local tempNum = PlayerCurrentlyChosenWonder[color]
 
 		if equals(tempDefaultRot, tempCurrentRot, true) then
-			local playerWonderTable = _G["_"..color.."PlayerWonder"]
+			local playerWonderTable = _G["_"..color.."PlayerInfo"]
+			local componentRot = playerWonderTable.ComponentRotation
 
-		  CurrentWonderObj.setRotation(playerWonderTable.WonderFlipRot)
+			-- Add 180 to Z-axis only
+			CurrentWonderObj.setRotation({
+			  x = tempCurrentRot[1],               -- Keep original X
+			  y = tempCurrentRot[2],               -- Keep original Y
+			  z = tempCurrentRot[3] + 180          -- Add 180 to Z
+			})
+
 			CurrentWonderObj.setPosition(tempFlippedPos)
 
 			for i, wonder in ipairs(_G["_"..color.."DraftWonderObj"]) do
@@ -314,7 +327,7 @@ end
 
 function HandleKeepButton(obj, color, alt)
 	-- Based on rotation we know if it's Day or Night
-	local tempDefaultRot = _G["_"..color.."PlayerWonder"].WonderRot
+	local tempDefaultRot = _G["_"..color.."PlayerInfo"].ComponentRotation
 	local CurrentWonderObj = nil
 
 	if DraftMode then
@@ -349,7 +362,7 @@ function HandleCycleLeftButton(obj, color, alt)
 	local CurrentWonderPos = _G["_"..color.."DraftWonderObj"][tempNum].getPosition()
 
 	-- Move the current Wonder below the table
-	_G["_"..color.."DraftWonderObj"][tempNum].setPosition(_G["_"..color.."PlayerWonder"]["DraftModePos"])
+	_G["_"..color.."DraftWonderObj"][tempNum].setPosition(_G["_"..color.."PlayerInfo"]["DraftModePos"])
 
 	-- Find the previous (left) index
 	PlayerCurrentlyChosenWonder[color] = PlayerCurrentlyChosenWonder[color] - 1
@@ -368,7 +381,7 @@ function HandleCycleRightButton(obj, color, alt)
 	local CurrentWonderPos = _G["_"..color.."DraftWonderObj"][tempNum].getPosition()
 
 	-- Move the current Wonder below the table
-	_G["_"..color.."DraftWonderObj"][tempNum].setPosition(_G["_"..color.."PlayerWonder"]["DraftModePos"])
+	_G["_"..color.."DraftWonderObj"][tempNum].setPosition(_G["_"..color.."PlayerInfo"]["DraftModePos"])
 
 	-- Find the next (right) index
 	PlayerCurrentlyChosenWonder[color] = PlayerCurrentlyChosenWonder[color] + 1

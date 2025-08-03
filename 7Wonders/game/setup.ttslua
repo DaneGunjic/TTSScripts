@@ -250,7 +250,7 @@ function HandleStartGameButtonCo()
 		end
 	end
 
-	--[[INSERT CITIES CARDS]]
+	-- [[INSERT CITIES CARDS]]
 	local AgeDecks = {
     {
       sourceZone = DeckZones.Cities.Age1,
@@ -340,7 +340,7 @@ function HandleStartGameButtonCo()
 		coroutine.yield(0)
 	end
 
-	-------------------[[ FINAL SHUFFLE BEFORE GAME START]]-------------------
+	-------------------[[ FINAL SHUFFLE BEFORE GAME START ]]-------------------
 	-- [[SHUFFLE AGE DECKS]]
 	local ageDecksToShuffle = {
     DeckZones.Age.Age1,
@@ -359,6 +359,7 @@ function HandleStartGameButtonCo()
     end
 	end
 
+	print("AAAAA")
 	-- [[SHUFFLE LEADER DECK]]
 	for _, items in ipairs(DeckZones.Leaders.getObjects()) do
 		if items.randomize then
@@ -494,9 +495,8 @@ function DealWonders()
 	if RandomWonders then
 		for _, player in ipairs(AllSeatedPlayers) do
 			RandomWonderObj[player] = WonderBags.Base.takeObject({
-				--											_WhitePlayerWonder.WonderPos
-				position = _G["_"..player.."PlayerWonder"].WonderPos,
-				rotation = _G["_"..player.."PlayerWonder"].WonderRot,
+				position = _G["_"..player.."PlayerInfo"].WonderPos,
+				rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
 				smooth = false,
 				callback_function = LockSpawnedObject})
 
@@ -522,8 +522,8 @@ function DealWonders()
 			for i = 1, DraftModeNumber do
 				_G["_"..player.."DraftWonderObj"][i] = WonderBags.Base.takeObject({
 					smooth = false,
-					position = _G["_"..player.."PlayerWonder"]["DraftModePos"],
-					rotation = _G["_"..player.."PlayerWonder"].WonderRot,
+					position = _G["_"..player.."PlayerInfo"]["DraftModePos"],
+					rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
 					callback_function = LockSpawnedObject})
 
 				DefaultButtonParams.width = 600
@@ -552,9 +552,7 @@ function DealWonders()
 				_G["_"..player.."DraftWonderObj"][i].createButton(DefaultButtonParams)
 			end
 
-			_G["_"..player.."DraftWonderObj"][1].setPosition(_G["_"..player.."PlayerWonder"].WonderPos)
-			-- RandomWonderObj[player] = _G["_"..player.."DraftWonderObj"][1]
-			-- print(RandomWonderObj[player].getName())
+			_G["_"..player.."DraftWonderObj"][1].setPosition(_G["_"..player.."PlayerInfo"].WonderPos)
 		end
 	end
 
@@ -584,25 +582,25 @@ end
 function DealArmada()
 	for _, player in ipairs(AllSeatedPlayers) do
 		DockyardBag.takeObject({
-			position = _G["_"..player.."PlayerArmada"].DockyardPos,
-			rotation = _G["_"..player.."PlayerArmada"].DockyardRot,
+			position = _G["_"..player.."PlayerInfo"].DockyardPos,
+			rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
 			smooth = false,
 			callback_function = LockSpawnedObject})
 		ShipBags.Red.takeObject({
-			position = _G["_"..player.."PlayerArmada"].RedShipPos,
-			rotation = _G["_"..player.."PlayerArmada"].RedShipRot,
+			position = _G["_"..player.."PlayerInfo"].RedShipPos,
+			rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
 			smooth = false})
 		ShipBags.Yellow.takeObject({
-			position = _G["_"..player.."PlayerArmada"].YellowShipPos,
-			rotation = _G["_"..player.."PlayerArmada"].YellowShipRot,
+			position = _G["_"..player.."PlayerInfo"].YellowShipPos,
+			rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
 			smooth = false})
 		ShipBags.Blue.takeObject({
-			position = _G["_"..player.."PlayerArmada"].BlueShipPos,
-			rotation = _G["_"..player.."PlayerArmada"].BlueShipRot,
+			position = _G["_"..player.."PlayerInfo"].BlueShipPos,
+			rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
 			smooth = false})
 		ShipBags.Green.takeObject({
-			position = _G["_"..player.."PlayerArmada"].GreenShipPos,
-			rotation = _G["_"..player.."PlayerArmada"].GreenShipRot,
+			position = _G["_"..player.."PlayerInfo"].GreenShipPos,
+			rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
 			smooth = false})
 	end
 end
@@ -611,17 +609,17 @@ function DealCoins()
   local CoinAmount = ExpansionsUsed.Leaders.Base and 6 or 3
 
   for _, player in ipairs(AllSeatedPlayers) do
-		local tempPost = Vector(_G["_"..player.."PlayerWonder"].WonderPos)
+		local tempPost = Vector(_G["_"..player.."PlayerInfo"].WonderPos)
 		tempPost.y = 2
 
     for i = 1, CoinAmount do
-			tempPost = Vector(_G["_"..player.."PlayerWonder"].WonderPos)
+			tempPost = Vector(_G["_"..player.."PlayerInfo"].WonderPos)
 			tempPost.y = 2
 			tempPost.x = tempPost.x + math.random(-100, 100) / 100
 			tempPost.z = tempPost.z + math.random(-100, 100) / 100
 			CoinBags.Coin1.takeObject({
 				position = tempPost,
-				rotation = _G["_"..player.."PlayerWonder"].WonderRot,
+				rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
 				smooth = false
 			})
 			pause(0.1)
@@ -718,20 +716,33 @@ function MakeSetupButtons()
   DefaultButtonParams.font_color={1,1,1}
   SetupBoard.createButton(DefaultButtonParams)
 
-	-- Change default parameters of "DRAFT" BUTTON
+	-- Change default parameters of draft number button
   DefaultButtonParams.position = {0.20, 0.1, 0.68}
   DefaultButtonParams.click_function = "AdjustDraftNumber"
   DefaultButtonParams.label = "[" .. DraftModeNumber .. "]"
   DefaultButtonParams.font_color={1,1,1}
   SetupBoard.createButton(DefaultButtonParams)
 
+	-- Change default parameters of "FORCE LOAD" button
+	DefaultButtonParams.position = {0, 0.1, -0.2}
+	DefaultButtonParams.click_function = "ForceLoadAllAssets"
+	DefaultButtonParams.label = "FORCE LOAD"
+	DefaultButtonParams.color = {0.1,0,0,1}
+	DefaultButtonParams.font_size = 400
+	DefaultButtonParams.scale = {x=0.1,y=0.1,z=0.1}
+	DefaultButtonParams.font_color={1,1,0}
+	DefaultButtonParams.height = 500
+	DefaultButtonParams.width = 2500
+	SetupBoard.createButton(DefaultButtonParams)
+
   -- Change default parameters of "Start Game" BUTTON
   DefaultButtonParams.label = "PLAY"
   DefaultButtonParams.font_color = {1,1,1}
-  DefaultButtonParams.position = {0.8, 0.1, 0.9}
-  DefaultButtonParams.font_size = 250
-  DefaultButtonParams.height = 300
-	DefaultButtonParams.width = 800
+  DefaultButtonParams.position = {0.84, 0.1, 0.9}
+  DefaultButtonParams.font_size = 500
+	DefaultButtonParams.scale = {x=0.1,y=0.1,z=0.1}
+  DefaultButtonParams.height = 600
+	DefaultButtonParams.width = 1200
 	DefaultButtonParams.font_color={1,0,1}
   DefaultButtonParams.click_function = "HandleStartGameButton"
   SetupBoard.createButton(DefaultButtonParams)
