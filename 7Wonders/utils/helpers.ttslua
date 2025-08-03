@@ -77,6 +77,24 @@ function LockSpawnedObject(object)
 	--object.interactable = false
 end
 
+function normalizeRotation(rot)
+  if rot.x then -- If it's a key-value table (from getRotation)
+    return {rot.x, rot.y, rot.z}
+  else -- If it's already an array
+    return rot
+  end
+end
+
+function rotationEquals(rot1, rot2, tolerance)
+  tolerance = tolerance or 0.01
+  if rot1.x then rot1 = {rot1.x, rot1.y, rot1.z} end
+  if rot2.x then rot2 = {rot2.x, rot2.y, rot2.z} end
+
+  return math.abs(rot1[1] - rot2[1]) < tolerance
+   and math.abs(rot1[2] - rot2[2]) < tolerance
+   and math.abs(rot1[3] - rot2[3]) < tolerance
+end
+
 function equals(o1, o2, ignore_mt)
   if o1 == o2 then return true end
   local o1Type = type(o1)

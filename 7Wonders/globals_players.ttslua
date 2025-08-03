@@ -11,32 +11,32 @@ _WhitePlayerInfo = {
 }
 
 _RedPlayerInfo = {
-  WonderPos = {-3.22, 1.00, -24.50},
+  WonderPos = {0.00, 1.00, -45.00},
   ComponentRotation = {0.00, 180, 0.00},
 	DraftModePos = {2, -20, -22},
-  DockyardPos = {4.70, 1.00, -21.92},
-  RedShipPos = {2.72, 1.58, -26.05},
-  YellowShipPos = {3.82, 1.58, -26.01},
-  BlueShipPos = {5.01, 1.58, -26.01},
-  GreenShipPos = {6.24, 1.58, -25.99}
+  DockyardPos = {8.00, 1.00, -42.35},
+  RedShipPos = {6.04, 1.58, -46.49},
+  YellowShipPos = {7.14, 1.58, -46.44},
+  BlueShipPos = {8.33, 1.58, -46.45},
+  GreenShipPos = {9.56, 1.58, -46.43}
 }
 
 _YellowPlayerInfo = {
-  WonderPos = {-33.22, 1.00, -24.50},
-  ComponentRotation = {0.00, 180, 0.00},
+  WonderPos = {-31.82, 1.00, -31.82},
+  ComponentRotation = {0.00, 225.00, 0.00},
   DraftModePos = {-28, -20, -22},
-  DockyardPos = {-25.30, 1.00, -21.92},
-  RedShipPos = {-27.26, 1.58, -26.06},
-  YellowShipPos = {-26.16, 1.58, -26.01},
-  BlueShipPos = {-24.97, 1.58, -26.02},
-  GreenShipPos = {-23.74, 1.58, -26.00}
+  DockyardPos = {-24.52, 1.00, -35.58},
+  RedShipPos = {-28.84, 1.58, -37.10},
+  YellowShipPos = {-28.03, 1.58, -37.85},
+  BlueShipPos = {-27.19, 1.58, -38.69},
+  GreenShipPos = {-26.31, 1.58, -39.55}
 }
 
 _GreenPlayerInfo = {
-  WonderPos = {-40.50, 1.00, 3.22},
+  WonderPos = {-45.00, 1.00, 0.00},
   ComponentRotation = {0.00, 270, 0.00},
   DraftModePos = {-38, -20, -22},
-  DockyardPos = {-37.92, 1.00, -4.70},
+  DockyardPos = {-42.50, 1.00, -7.75},
   RedShipPos = {-42.06, 1.58, -2.74},
   YellowShipPos = {-42.01, 1.58, -3.84},
   BlueShipPos = {-42.02, 1.58, -5.03},
@@ -44,10 +44,10 @@ _GreenPlayerInfo = {
 }
 
 _PinkPlayerInfo = {
-  WonderPos = {-26.78, 1.00, 24.50},
-  ComponentRotation = {0.00, 0.00, 0.00},
+  WonderPos = {-31.82, 1.00, 31.82},
+  ComponentRotation = {0.00, 135.00, 0.00},
   DraftModePos = {-32, -20, -22},
-  DockyardPos = {-34.70, 1.00, 21.92},
+  DockyardPos = {-35.48, 1.00, 24.38},
   RedShipPos = {-32.73, 1.58, 26.03},
   YellowShipPos = {-33.83, 1.58, 25.98},
   BlueShipPos = {-35.02, 1.58, 25.99},
@@ -55,14 +55,14 @@ _PinkPlayerInfo = {
 }
 
 _BluePlayerInfo = {
-  WonderPos = {3.22, 1.00, 24.50},
+  WonderPos = {0.00, 1.00, 45.00},
   ComponentRotation = {0.00, 0.00, 0.00},
   DraftModePos = {-2, -20, -22},
-  DockyardPos = {-4.70, 1.00, 21.92},
-  RedShipPos = {-8.04, 2, 24.12},
-  YellowShipPos = {-9.14, 2, 24.07},
-  BlueShipPos = {-10.33, 2, 24.08},
-  GreenShipPos = {-11.56, 2, 24.06}
+  DockyardPos = {-7.75, 1.00, 42.50},
+  RedShipPos = {-5.79, 1.58, 46.62},
+  YellowShipPos = {-6.89, 1.58, 46.57},
+  BlueShipPos = {-8.08, 1.58, 46.58},
+  GreenShipPos = {-9.31, 1.58, 46.56}
 }
 
 _PurplePlayerInfo = {

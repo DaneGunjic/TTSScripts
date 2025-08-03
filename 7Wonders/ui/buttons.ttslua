@@ -200,12 +200,17 @@ end
 function HandleFlipButton(obj, color, alt)
 	-- Random Mode
 	if not DraftMode then
-		local tempDefaultRot = _G["_"..color.."PlayerInfo"].ComponentRotation
-		local tempCurrentRot = {RandomWonderObj[color].getRotation().x, RandomWonderObj[color].getRotation().y, RandomWonderObj[color].getRotation().z}
-		-- Flipped object have the same height in-game, but actually offset according to their pivot point, so we add 0.2 so the Wonder keeps its position-
-		local tempFlippedPos = {RandomWonderObj[color].getPosition().x, RandomWonderObj[color].getPosition().y + 0.2, RandomWonderObj[color].getPosition().z}
+		local tempDefaultRot = {table.unpack(_G["_"..color.."PlayerInfo"].ComponentRotation)}
+		local tempCurrentRot = RandomWonderObj[color].getRotation()
 
-		if equals(tempDefaultRot, tempCurrentRot, true) then
+		-- Flipped object have the same height in-game, but actually offset according to their pivot point, so we add 0.2 so the Wonder keeps its position-
+		local tempFlippedPos = {
+			RandomWonderObj[color].getPosition().x,
+			RandomWonderObj[color].getPosition().y + 0.2,
+			RandomWonderObj[color].getPosition().z
+		}
+
+		if rotationEquals(tempDefaultRot, tempCurrentRot) then
 			-- Flip to Night Side (B)
 			RandomWonderObj[color].setRotation({
 			  x = tempCurrentRot[1],
@@ -246,11 +251,8 @@ function HandleFlipButton(obj, color, alt)
 	else
 		local CurrentWonderObj = _G["_"..color.."DraftWonderObj"][PlayerCurrentlyChosenWonder[color]]
 		local tempDefaultRot = _G["_"..color.."PlayerInfo"].ComponentRotation
-		local tempCurrentRot = {
-			CurrentWonderObj.getRotation().x,
-			CurrentWonderObj.getRotation().y,
-			CurrentWonderObj.getRotation().z
-		}
+		local tempCurrentRot = 	CurrentWonderObj.getRotation()
+
 		-- Flipped object have the same height in-game, but actually offset according to their pivot point, so we add 0.2 so the Wonder keeps its position
 		local tempFlippedPos = {
 			CurrentWonderObj.getPosition().x,
@@ -259,7 +261,7 @@ function HandleFlipButton(obj, color, alt)
 
 		local tempNum = PlayerCurrentlyChosenWonder[color]
 
-		if equals(tempDefaultRot, tempCurrentRot, true) then
+		if rotationEquals(tempDefaultRot, tempCurrentRot) then
 			local playerWonderTable = _G["_"..color.."PlayerInfo"]
 			local componentRot = playerWonderTable.ComponentRotation
 

@@ -564,8 +564,8 @@ function DealWonders()
     if CameraSettings[playerColor] then
       -- Safely get the wonder position (assuming it exists in _G)
       local wonderPos = nil
-      if _G[playerColor.."PlayerWonder"] then
-          wonderPos = _G[playerColor.."PlayerWonder"].WonderPos
+      if _G[playerColor.."PlayerInfo"] then
+          wonderPos = _G[playerColor.."PlayerInfo"].WonderPos
       end
 
       -- Apply camera lookAt with settings from CameraSettings
