@@ -10,31 +10,7 @@ function onLoad()
   #include !\7Wonders\globals_general.ttslua
   #include !\7Wonders\globals_players.ttslua
 
-  -- ForceLoadAllAssets()
-
   MakeSetupButtons()
-
-  -- Clear text first, in case we saved the game after loading
-  for _, guid in ipairs(TextOnSetupBoardGUIDs or {}) do
-    local obj = getObjectFromGUID(guid)
-    if obj then obj.destroy() end
-  end
-  TextOnSetupBoardGUIDs = {} -- Reset the table
-
   MakeSetupBoardText()
-
-  -- Verify all critical objects loaded
-  local allZonesValid = true
-  for name, zone in pairs(DeckZones) do
-    if not zone then
-      broadcastToAll("Warning: Failed to load zone - " .. name, {1,0,0})
-      allZonesValid = false
-    end
-  end
-
-  if allZonesValid then
-    printToAll("All game components loaded successfully!", {0,1,0})
-  else
-    printToAll("Some components failed to load - check console", {1,0.5,0})
-  end
+  disableAllTiles()
 end

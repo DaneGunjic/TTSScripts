@@ -394,3 +394,54 @@ function HandleCycleRightButton(obj, color, alt)
 	_G["_"..color.."DraftWonderObj"][PlayerCurrentlyChosenWonder[color]].setPosition(CurrentWonderPos)
 	_G["_"..color.."DraftWonderObj"][PlayerCurrentlyChosenWonder[color]].setRotation(CurrentWonderRot)
 end
+
+function HandleBuyCard(obj, color, alt)
+	-- Get the color of the tile's owner (from your PlayerCardHolder table)
+  local tileColor
+  for color, data in pairs(PlayerCardHolder) do
+    if data.Tile and data.Tile.guid == obj.guid then
+      tileColor = color
+      break
+    end
+  end
+
+  -- Verify permission
+  if color:lower() ~= tileColor:lower() then
+    broadcastToColor("This isn't your tile!", player_clicker_color, {1,0,0})
+    return  -- Exit function if wrong player
+  end
+end
+
+function HandleSellCard(obj, color, alt)
+	-- Get the color of the tile's owner (from your PlayerCardHolder table)
+	local tileColor
+	for color, data in pairs(PlayerCardHolder) do
+		if data.Tile and data.Tile.guid == obj.guid then
+			tileColor = color
+			break
+		end
+	end
+
+	-- Verify permission
+	if color:lower() ~= tileColor:lower() then
+		broadcastToColor("This isn't your tile!", player_clicker_color, {1,0,0})
+		return  -- Exit function if wrong player
+	end
+end
+
+function HandleBuildWonder(obj, color, alt)
+	-- Get the color of the tile's owner (from your PlayerCardHolder table)
+	local tileColor
+	for color, data in pairs(PlayerCardHolder) do
+		if data.Tile and data.Tile.guid == obj.guid then
+			tileColor = color
+			break
+		end
+	end
+
+	-- Verify permission
+	if color:lower() ~= tileColor:lower() then
+		broadcastToColor("This isn't your tile!", player_clicker_color, {1,0,0})
+		return  -- Exit function if wrong player
+	end
+end

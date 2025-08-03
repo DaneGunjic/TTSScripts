@@ -45,3 +45,38 @@ function ReadyUp(player, _, id)
 		end
 	end
 end
+
+function CreateActionButtons(tile)
+  tile.createButton({
+    click_function = "HandleBuyCard",
+    label = "Buy",
+    position = {-0.95, 0.1, -0.5},
+    rotation = {0, 0 ,0},
+    width = 1000,
+    height = 1000,
+    scale = {x=0.2,y=0.2,z=0.2},
+    font_size = 500,
+  })
+
+  tile.createButton({
+    click_function = "HandleSellCard",
+    label = "Sell",
+    position = {-0.95, 0.1, 0},
+    rotation = {0, 0 ,0},
+    width = 1000,
+    height = 1000,
+    scale = {x=0.2,y=0.2,z=0.2},
+    font_size = 500,
+  })
+
+  tile.createButton({
+    click_function = "HandleBuildWonder",
+    label = "Wonder",
+    position = {-0.95, 0.1, 0.5},
+    rotation = {0, 0 ,0},
+    width = 1350,
+    height = 1000,
+    scale = {x=0.2,y=0.2,z=0.2},
+    font_size = 350,
+  })
+end

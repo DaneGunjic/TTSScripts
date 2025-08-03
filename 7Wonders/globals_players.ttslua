@@ -97,6 +97,37 @@ PlayerCurrentlyChosenWonder = {
   ["Purple"] = 1
 }
 
+PlayerCardHolder = {
+  White = {
+    Tile = getObjectFromGUID("348b41"),
+    Zone = getObjectFromGUID("50a360")
+  },
+  Red = {
+    Tile = getObjectFromGUID("daee75"),
+    Zone = getObjectFromGUID("d74960")
+  },
+  Yellow = {
+    Tile = getObjectFromGUID("1e9b11"),
+    Zone = getObjectFromGUID("f4c902")
+  },
+  Green = {
+    Tile = getObjectFromGUID("febaac"),
+    Zone = getObjectFromGUID("42b333")
+  },
+  Pink = {
+    Tile = getObjectFromGUID("896cf6"),
+    Zone = getObjectFromGUID("fe05cb")
+  },
+  Blue = {
+    Tile = getObjectFromGUID("85c98e"),
+    Zone = getObjectFromGUID("c72796")
+  },
+  Purple = {
+    tile = getObjectFromGUID("da702a"),
+    Zone = getObjectFromGUID("8b99be")
+  }
+}
+
 ReadyList = {
   ["White"] = true,
   ["Red"] = true,
