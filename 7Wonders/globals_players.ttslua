@@ -76,7 +76,8 @@ _PurplePlayerInfo = {
   GreenShipPos = {18.45, 2, 24.05}
 }
 
-RandomWonderObj = {} --Used only if RandomWonders = true
+-- Used only if RandomWonders = true
+RandomWonderObj = {}
 
 -- [[TABLES THAT HOLD ALL 'DRAFT' MODE WONDERS]]
 _WhiteDraftWonderObj = {}

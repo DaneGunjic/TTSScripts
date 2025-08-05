@@ -1,0 +1,4 @@
+function updatePhaseUI(phaseName, phaseDescription)
+    UI.setValue("CurrentPhase", phaseName)
+  	UI.setValue("PhaseDesc", phaseDescription)
+end

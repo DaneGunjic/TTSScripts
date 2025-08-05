@@ -346,7 +346,7 @@ function HandleKeepButton(obj, color, alt)
 	}
 	local Side = "Day / A"
 
-	if not equals(tempDefaultRot, tempCurrentRot, true) then
+	if not rotationEquals(tempDefaultRot, tempCurrentRot) then
 		Side = "Night / B"
 	end
 
@@ -354,7 +354,7 @@ function HandleKeepButton(obj, color, alt)
 
 	obj.clearButtons()
 
-	ReadyUp(Player[color], _, _)
+	ReadyUp(Player[color])
 end
 
 function HandleCycleLeftButton(obj, color, alt)

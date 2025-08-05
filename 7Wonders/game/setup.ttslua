@@ -2,8 +2,6 @@ function HandleStartGameButtonCo()
 	UI.setValue("CurrentPhase", "Please Wait")
 	UI.setValue("PhaseDesc", "Settings things up")
 
-	-- printDeckZones()
-
 	-- Get a list of seated players
 	AllSeatedPlayers = getSeatedPlayers() -- [1] = "White", [2] = "Red" ...
 	NumberOfPlayers = #AllSeatedPlayers
@@ -93,8 +91,6 @@ function HandleStartGameButtonCo()
 	-- [[LEADER DECKS SETUP]]
 	if ExpansionsUsed.Leaders.Base then
 		for bagKey, bagObject in pairs(LeaderBags) do
-			print(bagKey)
-
 			if bagKey == "Base" then
 				bagObject.takeObject({
 					position = DeckZones.Leaders.getPosition(),
@@ -359,7 +355,6 @@ function HandleStartGameButtonCo()
     end
 	end
 
-	print("AAAAA")
 	-- [[SHUFFLE LEADER DECK]]
 	for _, items in ipairs(DeckZones.Leaders.getObjects()) do
 		if items.randomize then

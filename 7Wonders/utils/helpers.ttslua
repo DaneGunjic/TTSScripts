@@ -36,6 +36,23 @@ function onChat(message, player)
     SetupBoard.destruct()
     return false
   end
+
+  if message:lower() == "card" then
+
+    for _, PlayerInstance in ipairs(Player.getPlayers()) do
+      local handObjects = PlayerInstance.getHandObjects()
+      for _, Card in ipairs(handObjects) do
+		     RotateHands(Card, PlayerInstance.color, "Right")
+      end
+    end
+
+    --[[local handObjects = player.getHandObjects()
+    for i, card in ipairs(handObjects) do
+      card.setPosition(_G["_WhiteRightZone"].getPosition())
+    end]]
+
+    return false
+    end
 end
 
 function disableAllTiles()
@@ -52,16 +69,17 @@ function onObjectEnterScriptingZone(zone, enter_object)
   -- Check which player's zone was entered
   for color, data in pairs(PlayerCardHolder) do
     if data.Zone and zone.guid == data.Zone.guid then
-      -- Card entered this player's zone
-      broadcastToColor("Choose your action!", color, color)
-
       data.Tile.highlightOn(color, 100)
 
-      CreateActionButtons(data.Tile)
+      if GameState == "LeaderDrafting" then
+        ReadyUp(Player[color])
+    	elseif GameState == "Age1" or GameState == "Age2" or GameState == "Age2" then
+        CreateActionButtons(data.Tile)
+        broadcastToColor("Choose your action!", color, color)
+      end
 
       -- Store which tile was highlighted
       enter_object.setVar("highlightedTile", data.Tile)
-
       break
     end
   end
@@ -72,28 +90,15 @@ function onObjectLeaveScriptingZone(zone, leave_object)
 
   -- Get the tile that was highlighted for this card
   local highlightedTile = leave_object.getVar("highlightedTile")
+  if not highlightedTile then return end
 
   -- Remove the highlight if it exists
   if highlightedTile then
     highlightedTile.highlightOff()
     leave_object.setVar("highlightedTile", nil)
   end
-end
 
-function onObjectDropped(player_color, dropped_object)
-    -- Check if the object was dropped on your placement object
-    local position = dropped_object.getPosition()
-    local placementObj = getObjectFromGUID('GUID')
-
-    if placementObj ~= nil and placementObj.getBounds().contains(position) then
-        -- Card was dropped on the placement object
-        broadcastToAll("Card placed correctly!", {1,1,1})
-
-        -- Do something with the card
-        -- Example: Move it to exact position
-        dropped_object.setPosition(placementObj.getPosition())
-        dropped_object.setRotation(placementObj.getRotation())
-    end
+  highlightedTile.clearButtons()
 end
 
 function ForceLoadAllAssets()

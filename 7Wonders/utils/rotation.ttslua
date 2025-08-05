@@ -1,14 +1,11 @@
 function RotateHands(Card, Color, Direction)
-  local CardRot = {}
-  NextColor = FindNextColor(Color, Direction)
-  --print("Next color is "..NextColor)
-
-  CardRot["x"] = _G["_"..Color.."PlayerWonder"]["WonderRot"][1]
-  CardRot["y"] = _G["_"..Color.."PlayerWonder"]["WonderRot"][2]
-  CardRot["z"] = 180
-
-  Card.setRotation(CardRot)
-
+  --local NextColor = FindNextColor(Color, Direction)
+  --print("Passing card from "..Color.." to "..NextColor.." ("..Direction..")")
+  Card.setRotation({
+    x = _G["_"..Color..Direction.."Zone"].getRotation().x,
+    y = _G["_"..Color..Direction.."Zone"].getRotation().y,
+    z = 180
+  })
   Card.setPosition(_G["_"..Color..Direction.."Zone"].getPosition())
 end
 
@@ -16,11 +13,14 @@ function ForceTakeCards(Direction)
   -- If Direction is "Right" then find the next player's "Right" zone
   -- If Direction is "Left" then find the previous player's "Left" zone
   for i, PlayerInstance in ipairs(Player.getPlayers()) do
-    NextColor = FindNextColor(PlayerInstance.color, Direction)
-    CardsToTake = _G["_"..NextColor..Direction.."Zone"].getObjects()
+    local NextColor = FindNextColor(PlayerInstance.color, Direction)
+    local CardsToTake = _G["_"..NextColor..Direction.."Zone"].getObjects()
+
     for _, Cards in ipairs(CardsToTake) do
-      if Cards.type == "Deck" or Cards.type == "Card" then
-        Cards.deal(9, PlayerInstance.color)
+      if Cards.type == 'Deck' then
+        Cards.deal(#Cards.getObjects(), PlayerInstance.color)
+      elseif Cards.type == 'Card' then
+        Cards.deal(1, PlayerInstance.color)
       end
     end
   end

@@ -1,8 +1,14 @@
 -- Main game file that includes all other components
 
-#include !\7Wonders\utils\helpers.ttslua
+#include !\7Wonders\game\phases.ttslua
 #include !\7Wonders\game\setup.ttslua
+
 #include !\7Wonders\ui\buttons.ttslua
+#include !\7Wonders\ui\xml.ttslua
+
+#include !\7Wonders\utils\rotation.ttslua
+#include !\7Wonders\utils\helpers.ttslua
+
 #include !\7Wonders\players\ready_system.ttslua
 
 function onLoad()

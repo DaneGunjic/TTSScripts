@@ -11,7 +11,7 @@ function UnreadyAllPlayers()
 end
 
 -- Called when a player pressed the "Ready" button
-function ReadyUp(player, _, id)
+function ReadyUp(player)
 	ReadyList[player.color] = not ReadyList[player.color]
 
 	broadcastToAll(player.steam_name .. " is " .. (ReadyList[player.color] and "Ready" or "Not Ready"))
@@ -27,22 +27,23 @@ function ReadyUp(player, _, id)
 
 		MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
 
-		-- _G["Do"..GameState]()
-
 		if GameState == "WonderStage" then
-			startLuaCoroutine(Global, "DealCoins")
-
-			-- Toggle the visibility of "Ready" button
-			-- UI.setAttribute("ReadyButton", "active", true)
-
-			GameState = (ExpansionsUsed.Leaders and "LeaderDrafting" or "Age1")
+			print("FinishWonderStage")
+			FinishWonderStage()
 
 			if ExpansionsUsed.Leaders.Base then
-		     MaximumPasses = 3
-		     local tempDeck = DeckZones.Leaders.getObjects()
-		     tempDeck[1].deal(4)
+				print("PrepareLeaderStage")
+				PrepareLeaderStage()
+			else
+				print("PrepareAge1Stage")
+				PrepareAge1Stage()
 			end
+		elseif GameState == "LeaderDrafting" then
+			print("DoLeaderStage")
+			DoLeaderStage()
 		end
+	else
+		-- Update UI that shows who is ready
 	end
 end
 
