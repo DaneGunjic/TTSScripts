@@ -124,7 +124,7 @@ PlayerCardHolder = {
     Zone = getObjectFromGUID("c72796")
   },
   Purple = {
-    tile = getObjectFromGUID("da702a"),
+    Tile = getObjectFromGUID("da702a"),
     Zone = getObjectFromGUID("8b99be")
   }
 }

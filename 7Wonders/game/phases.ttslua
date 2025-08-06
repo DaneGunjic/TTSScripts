@@ -32,6 +32,29 @@ function PrepareLeaderStage()
 
 	local tempDeck = DeckZones.Leaders.getObjects()
 	tempDeck[1].deal(4)
+
+	 local newTopImage = "https://i.imgur.com/oEisU1I.jpeg"
+
+	-- Loop through all player tiles and update the image
+  for color, data in pairs(PlayerCardHolder) do
+    local tile = data.Tile
+
+    if tile and tile.getCustomObject then
+      tile.setCustomObject({
+				image = newTopImage,
+				image_bottom = newTopImage
+			})
+
+			-- It has a new GUID
+      PlayerCardHolder[color].Tile = tile.reload()
+
+    else
+      print("Tile not found or invalid for color: " .. color)
+    end
+  end
+
+	-- They are now new objects, lock them again
+	disableAllTiles()
 end
 
 function DoAge1Stage()

@@ -58,6 +58,7 @@ end
 function disableAllTiles()
   for color, data in pairs(PlayerCardHolder) do
     if data.Tile then
+      data.Tile.setLock(true)
       data.Tile.interactable = false
     end
   end
@@ -114,23 +115,34 @@ function ForceLoadAllAssets()
   }
 
   for _, BagToLoad in ipairs(AllBagsToLoad) do
-    if BagToLoad and BagToLoad.getObjects then
-      for _, Board in ipairs(BagToLoad.getObjects()) do
-        BagToLoad.takeObject(
-        {
-          position = {0, -20, 0},
-          smooth = false,
-          callback_function = function(spawnedObject)
-          Wait.time(function()
-          BagToLoad.putObject(spawnedObject)
-          end, 2)
+  if BagToLoad and BagToLoad.getObjects then
+    for _, Board in ipairs(BagToLoad.getObjects()) do
+      BagToLoad.takeObject({
+        position = {68.00, -10, 19.00},
+        smooth = false,
+        callback_function = function(spawnedObject)
+          spawnedObject.setLock(true)
+
+          -- Define recursive wait function
+          local function checkAndReturn()
+            if not spawnedObject.loading_custom then
+              spawnedObject.setLock(false)
+              BagToLoad.putObject(spawnedObject)
+            else
+              -- Still loading, check again in 2 seconds
+              Wait.time(checkAndReturn, 2)
+            end
           end
-        })
-      end
-    else
-      print("Warning: Bag not found or invalid - " .. tostring(BagToLoad))
+
+          -- Start the first check after 2 seconds
+          Wait.time(checkAndReturn, 2)
+        end
+      })
     end
+  else
+    print("Warning: Bag not found or invalid - " .. tostring(BagToLoad))
   end
+end
 
   return 1
 end
