@@ -1,150 +1,182 @@
 function FindNextColor(Color, Direction)
-  -- Player array is sorted in the "Left" direction, meaning [1] is white, [2] is Red etc.
-  local tempAllPlayers = Player.getPlayers()
-  --print("Find next color called for " .. Color .. " and direction " .. Direction)
-  for i, PlayerInstance in ipairs(tempAllPlayers) do
-    --print("index " .. i .. " is " .. PlayerInstance.color)
-    if PlayerInstance.color == Color then
-      -- "Left" Direction means we look for the prevous player (to their right)
-      if Direction == "Left" then
-        if i == #tempAllPlayers then
-          return tempAllPlayers[1].color
-        end
-        return tempAllPlayers[i+1].color
-      else
-        -- "Right" Direction means we look for the next player (to their left)
-        if i == 1 then
-          return tempAllPlayers[#tempAllPlayers].color
-        end
-        return tempAllPlayers[i-1].color
-      end
-    end
-  end
+	-- Player array is sorted in the "Left" direction, meaning [1] is white, [2] is Red etc.
+	local tempAllPlayers = Player.getPlayers()
+	--print("Find next color called for " .. Color .. " and direction " .. Direction)
+	for i, PlayerInstance in ipairs(tempAllPlayers) do
+		--print("index " .. i .. " is " .. PlayerInstance.color)
+		if PlayerInstance.color == Color then
+			-- "Left" Direction means we look for the prevous player (to their right)
+			if Direction == "Left" then
+				if i == #tempAllPlayers then
+					return tempAllPlayers[1].color
+				end
+				return tempAllPlayers[i+1].color
+			else
+				-- "Right" Direction means we look for the next player (to their left)
+				if i == 1 then
+					return tempAllPlayers[#tempAllPlayers].color
+				end
+				return tempAllPlayers[i-1].color
+			end
+		end
+	end
 end
 
 function onChat(message, player)
-  if message == "debug" then
-    printToAll("Debug mode activated!", {1,1,0})
+	if message == "debug" then
+		printToAll("Debug mode activated!", {1,1,0})
 
-    for i, textObj in ipairs(TextOnSetupBoard) do
-  	  if textObj and textObj.destroy then
-	      textObj.destroy()
-  	  end
-  	end
+		for i, textObj in ipairs(TextOnSetupBoard) do
+			if textObj and textObj.destroy then
+				textObj.destroy()
+			end
+		end
 
-  	TextOnSetupBoard = {}
-    SetupBoard.destruct()
-    return false
-  end
+		TextOnSetupBoard = {}
+		SetupBoard.destruct()
+		return false
+	end
 
-  if message:lower() == "card" then
+	if message:lower() == "card" then
 
-    for _, PlayerInstance in ipairs(Player.getPlayers()) do
-      local handObjects = PlayerInstance.getHandObjects()
-      for _, Card in ipairs(handObjects) do
-		     RotateHands(Card, PlayerInstance.color, "Right")
-      end
-    end
+		for _, PlayerInstance in ipairs(Player.getPlayers()) do
+			local handObjects = PlayerInstance.getHandObjects()
+			for _, Card in ipairs(handObjects) do
+				 RotateHands(Card, PlayerInstance.color, "Right")
+			end
+		end
 
-    --[[local handObjects = player.getHandObjects()
-    for i, card in ipairs(handObjects) do
-      card.setPosition(_G["_WhiteRightZone"].getPosition())
-    end]]
-
-    return false
-    end
+		return false
+		end
 end
 
 function disableAllTiles()
-  for color, data in pairs(PlayerCardHolder) do
-    if data.Tile then
-      data.Tile.setLock(true)
-      data.Tile.interactable = false
+	for color, data in pairs(PlayerCardHolder) do
+		if data.Tile then
+			data.Tile.setLock(true)
+			data.Tile.interactable = false
+		end
+	end
+end
+
+function CountCardsInZone(zone)
+  local count = 0
+  local objects = zone.getObjects()
+
+  for _, obj in ipairs(objects) do
+    if obj.tag == "Card" then
+      count = count + 1
+    elseif obj.tag == "Deck" then
+      count = count + obj.getQuantity()
     end
   end
+
+  return count
 end
 
 function onObjectEnterScriptingZone(zone, enter_object)
-  if enter_object.type ~= 'Card' then return end
+	if enter_object.type ~= 'Card' and enter_object.type ~= 'Deck' then return end
 
-  -- Check which player's zone was entered
-  for color, data in pairs(PlayerCardHolder) do
-    if data.Zone and zone.guid == data.Zone.guid then
-      data.Tile.highlightOn(color, 100)
+	-- Check which player's zone was entered
+	for color, data in pairs(PlayerCardHolder) do
+		if data.Zone and zone.guid == data.Zone.guid then
+			local cardCount = CountCardsInZone(zone)
+			--print(cardCount .. " " .. CurrentPasses)
+			--print("Adding highlight")
 
-      if GameState == "LeaderDrafting" then
-        ReadyUp(Player[color])
-    	elseif GameState == "Age1" or GameState == "Age2" or GameState == "Age2" then
-        CreateActionButtons(data.Tile)
-        broadcastToColor("Choose your action!", color, color)
-      end
+			data.Tile.highlightOn(color, 100)
 
-      -- Store which tile was highlighted
-      enter_object.setVar("highlightedTile", data.Tile)
-      break
-    end
-  end
+			if GameState == "LeaderDrafting" and cardCount == CurrentPasses + 1 then
+				ReadyUp(Player[color])
+			elseif GameState == "Age1" or
+				GameState == "Age2" or
+				GameState == "Age3" or
+				GameState == "LeaderSelectionStage" then
+				CreateActionButtons(data.Tile)
+				broadcastToColor("Choose your action!", color, color)
+			end
+
+			-- Store which tile was highlighted
+			enter_object.setVar("highlightedTile", data.Tile)
+			break
+		end
+	end
 end
 
 function onObjectLeaveScriptingZone(zone, leave_object)
-  if leave_object.type ~= 'Card' then return end
+	if leave_object.type ~= 'Card' and leave_object.type ~= 'Deck' then return end
 
-  -- Get the tile that was highlighted for this card
-  local highlightedTile = leave_object.getVar("highlightedTile")
-  if not highlightedTile then return end
+	--print(leave_object.getGUID() .. " " .. leave_object.getName())
+	for color, data in pairs(PlayerCardHolder) do
+		if data.Zone and zone.guid == data.Zone.guid then
+			if CountCardsInZone(zone) <= CurrentPasses  then
+				--print(CountCardsInZone(zone) .. " " .. CurrentPasses)
+				if ReadyList[color] then
+					ReadyList[color] = not ReadyList[color]
+				end
 
-  -- Remove the highlight if it exists
-  if highlightedTile then
-    highlightedTile.highlightOff()
-    leave_object.setVar("highlightedTile", nil)
-  end
+				-- Get the tile that was highlighted for this card
+				local highlightedTile = leave_object.getVar("highlightedTile")
+				if not highlightedTile then return end
 
-  highlightedTile.clearButtons()
+				-- Remove the highlight if it exists
+				if highlightedTile then
+					highlightedTile.highlightOff()
+					leave_object.setVar("highlightedTile", nil)
+				end
+
+				highlightedTile.clearButtons()
+			end
+
+			break
+		end
+	end
+
 end
 
 function ForceLoadAllAssets()
-  -- Add any bags that should have their contents pre-loaded
-  AllBagsToLoad = {
-    WonderBags.Collection,
-    WonderBags.Base,
-    WonderBags.Leader,
-    WonderBags.Cities,
-    WonderBags.Armada,
-    DockyardBag,
-    FrontiersBag
-  }
+	-- Add any bags that should have their contents pre-loaded
+	AllBagsToLoad = {
+		WonderBags.Collection,
+		WonderBags.Base,
+		WonderBags.Leader,
+		WonderBags.Cities,
+		WonderBags.Armada,
+		DockyardBag,
+		FrontiersBag
+	}
 
-  for _, BagToLoad in ipairs(AllBagsToLoad) do
-  if BagToLoad and BagToLoad.getObjects then
-    for _, Board in ipairs(BagToLoad.getObjects()) do
-      BagToLoad.takeObject({
-        position = {68.00, -10, 19.00},
-        smooth = false,
-        callback_function = function(spawnedObject)
-          spawnedObject.setLock(true)
+	for _, BagToLoad in ipairs(AllBagsToLoad) do
+	if BagToLoad and BagToLoad.getObjects then
+		for _, Board in ipairs(BagToLoad.getObjects()) do
+			BagToLoad.takeObject({
+				position = {68.00, -10, 19.00},
+				smooth = false,
+				callback_function = function(spawnedObject)
+					spawnedObject.setLock(true)
 
-          -- Define recursive wait function
-          local function checkAndReturn()
-            if not spawnedObject.loading_custom then
-              spawnedObject.setLock(false)
-              BagToLoad.putObject(spawnedObject)
-            else
-              -- Still loading, check again in 2 seconds
-              Wait.time(checkAndReturn, 2)
-            end
-          end
+					-- Define recursive wait function
+					local function checkAndReturn()
+						if not spawnedObject.loading_custom then
+							spawnedObject.setLock(false)
+							BagToLoad.putObject(spawnedObject)
+						else
+							-- Still loading, check again in 2 seconds
+							Wait.time(checkAndReturn, 2)
+						end
+					end
 
-          -- Start the first check after 2 seconds
-          Wait.time(checkAndReturn, 2)
-        end
-      })
-    end
-  else
-    print("Warning: Bag not found or invalid - " .. tostring(BagToLoad))
-  end
+					-- Start the first check after 2 seconds
+					Wait.time(checkAndReturn, 2)
+				end
+			})
+		end
+	else
+		print("Warning: Bag not found or invalid - " .. tostring(BagToLoad))
+	end
 end
 
-  return 1
+	return 1
 end
 
 function LockSpawnedObject(object)
@@ -153,96 +185,96 @@ function LockSpawnedObject(object)
 end
 
 function normalizeRotation(rot)
-  if rot.x then -- If it's a key-value table (from getRotation)
-    return {rot.x, rot.y, rot.z}
-  else -- If it's already an array
-    return rot
-  end
+	if rot.x then -- If it's a key-value table (from getRotation)
+		return {rot.x, rot.y, rot.z}
+	else -- If it's already an array
+		return rot
+	end
 end
 
 function rotationEquals(rot1, rot2, tolerance)
-  tolerance = tolerance or 0.01
-  if rot1.x then rot1 = {rot1.x, rot1.y, rot1.z} end
-  if rot2.x then rot2 = {rot2.x, rot2.y, rot2.z} end
+	tolerance = tolerance or 0.01
+	if rot1.x then rot1 = {rot1.x, rot1.y, rot1.z} end
+	if rot2.x then rot2 = {rot2.x, rot2.y, rot2.z} end
 
-  return math.abs(rot1[1] - rot2[1]) < tolerance
-   and math.abs(rot1[2] - rot2[2]) < tolerance
-   and math.abs(rot1[3] - rot2[3]) < tolerance
+	return math.abs(rot1[1] - rot2[1]) < tolerance
+	 and math.abs(rot1[2] - rot2[2]) < tolerance
+	 and math.abs(rot1[3] - rot2[3]) < tolerance
 end
 
 function equals(o1, o2, ignore_mt)
-  if o1 == o2 then return true end
-  local o1Type = type(o1)
-  local o2Type = type(o2)
-  if o1Type ~= o2Type then return false end
-  if o1Type ~= 'table' then return false end
+	if o1 == o2 then return true end
+	local o1Type = type(o1)
+	local o2Type = type(o2)
+	if o1Type ~= o2Type then return false end
+	if o1Type ~= 'table' then return false end
 
-  if not ignore_mt then
-    local mt1 = getmetatable(o1)
-    if mt1 and mt1.__eq then
-      --compare using built in method
-      return o1 == o2
-    end
-  end
+	if not ignore_mt then
+		local mt1 = getmetatable(o1)
+		if mt1 and mt1.__eq then
+			--compare using built in method
+			return o1 == o2
+		end
+	end
 
-  local keySet = {}
+	local keySet = {}
 
-  for key1, value1 in pairs(o1) do
-    local value2 = o2[key1]
-    if value2 == nil or equals(value1, value2, ignore_mt) == false then
-      return false
-    end
-    keySet[key1] = true
-  end
+	for key1, value1 in pairs(o1) do
+		local value2 = o2[key1]
+		if value2 == nil or equals(value1, value2, ignore_mt) == false then
+			return false
+		end
+		keySet[key1] = true
+	end
 
-  for key2, _ in pairs(o2) do
-    if not keySet[key2] then return false end
-  end
+	for key2, _ in pairs(o2) do
+		if not keySet[key2] then return false end
+	end
 
-  return true
+	return true
 end
 
 function printDeckZones()
-  print("----- Printing All Deck Zones -----")
+	print("----- Printing All Deck Zones -----")
 
-  -- Helper function to handle nested printing
-  local function printTable(tbl, indent)
-    indent = indent or 0
-    local spacing = string.rep("  ", indent)
+	-- Helper function to handle nested printing
+	local function printTable(tbl, indent)
+		indent = indent or 0
+		local spacing = string.rep("  ", indent)
 
-    for key, value in pairs(tbl) do
-      if type(value) == "table" then
-        print(spacing .. key .. ":")
-        printTable(value, indent + 1)
-      else
-        if value ~= nil and value.getGUID then
-          print(spacing .. key .. " = " .. value.getGUID())
-        else
-          print(spacing .. key .. " = " .. tostring(value))
-        end
-      end
-    end
-  end
+		for key, value in pairs(tbl) do
+			if type(value) == "table" then
+				print(spacing .. key .. ":")
+				printTable(value, indent + 1)
+			else
+				if value ~= nil and value.getGUID then
+					print(spacing .. key .. " = " .. value.getGUID())
+				else
+					print(spacing .. key .. " = " .. tostring(value))
+				end
+			end
+		end
+	end
 
-  printTable(DeckZones)
-  print("----- Finished Printing -----")
+	printTable(DeckZones)
+	print("----- Finished Printing -----")
 end
 
 function dump(o)
-  if type(o) == 'table' then
-    local s = '{ '
-    for k,v in pairs(o) do
-      if type(k) ~= 'number' then k = '"'..k..'"' end
-        s = s .. '['..k..'] = ' .. dump(v) .. ','
-    end
+	if type(o) == 'table' then
+		local s = '{ '
+		for k,v in pairs(o) do
+			if type(k) ~= 'number' then k = '"'..k..'"' end
+				s = s .. '['..k..'] = ' .. dump(v) .. ','
+		end
 
-    return s .. '} '
-  else
-    return tostring(o)
-  end
+		return s .. '} '
+	else
+		return tostring(o)
+	end
 end
 
 function pause(waittime)
-  local time = os.clock() + waittime
-  while os.clock() < time do coroutine.yield(0) end
+	local time = os.clock() + waittime
+	while os.clock() < time do coroutine.yield(0) end
 end

@@ -28,12 +28,12 @@ function PrepareLeaderStage()
 	MaximumPasses = 3
 	CurrentPasses = 0
 
-	updatePhaseUI("Leader Drafting", "Select 1 leader to keep\n"..CurrentPasses.."/"..MaximumPasses)
+	updatePhaseUI("Phase: Leader Drafting", "Select 1 leader to keep\n"..CurrentPasses.."/"..MaximumPasses)
 
 	local tempDeck = DeckZones.Leaders.getObjects()
 	tempDeck[1].deal(4)
 
-	 local newTopImage = "https://i.imgur.com/oEisU1I.jpeg"
+	local newTopImage = "https://i.imgur.com/oEisU1I.jpeg"
 
 	-- Loop through all player tiles and update the image
   for color, data in pairs(PlayerCardHolder) do
@@ -71,20 +71,20 @@ function DoLeaderStage()
 					RotateHands(Card, PlayerInstance.color, "Right")
 	      end
 	    end
-		end , 1)
+		end , 0.5)
 
 		-- Increment how many passes we did so far
 		CurrentPasses = CurrentPasses + 1
-		updatePhaseUI("Leader Drafting", "Select 1 leader to keep\n"..CurrentPasses.."/"..MaximumPasses)
+		updatePhaseUI("Phase: Leader Drafting", "Select 1 leader to keep\n"..CurrentPasses.."/"..MaximumPasses)
 
 		if CurrentPasses == MaximumPasses then
 			-- Passed 3 times, now we have to choose 1 to play
-			-- Force draw hands here
-			updatePhaseUI("Leader Selection", "SChoose 1 Leader to play")
+			updatePhaseUI("Phase: Leader Selection", "Choose 1 Leader to play")
 			GameState = "LeaderSelectionStage"
+			Wait.time(function() DealCardsToPlayers() end, 1)
 		end
 
 		-- After 1 second pick up passed Leaders
-		Wait.time(function() ForceTakeCards("Right") end, 2)
+		Wait.time(function() ForceTakeCards("Right") end, 1)
   end
 end

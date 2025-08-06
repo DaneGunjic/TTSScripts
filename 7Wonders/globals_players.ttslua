@@ -187,3 +187,13 @@ _BlueLeftZone = getObjectFromGUID("c1f197") -- Blue-Purple
 _BlueRightZone = getObjectFromGUID("1ad522") -- Pink-Blue
 _PurpleLeftZone = getObjectFromGUID("8455bc") -- White-Purple
 _PurpleRightZone = getObjectFromGUID("c1f197") -- Blue-Purple
+
+PlayerSelectedAction = {
+  White = nil,
+  Red = nil,
+  Yellow = nil,
+  Green = nil,
+  Pink = nil,
+  Blue = nil,
+  Purple = nil
+}

@@ -1,6 +1,5 @@
 function HandleStartGameButtonCo()
-	UI.setValue("CurrentPhase", "Please Wait")
-	UI.setValue("PhaseDesc", "Settings things up")
+	updatePhaseUI("Please Wait", "Setting things up")
 
 	-- Get a list of seated players
 	AllSeatedPlayers = getSeatedPlayers() -- [1] = "White", [2] = "Red" ...
@@ -23,9 +22,11 @@ function HandleStartGameButtonCo()
 		local playersForThisBag = tonumber(string.match(bagKey, "(%d+)p$"))
 		if playersForThisBag and playersForThisBag <= NumberOfPlayers then
 			local targetPos = DeckZones.Age.Age1.getPosition()
+			local targetRot = DeckZones.Age.Age1.getRotation() + vector(0, 0, 180)
+
 			bagObject.takeObject({
 				position = targetPos,
-				rotation = {180, 0, 0},
+				rotation = targetRot,
 				smooth = false
 			})
 		end
@@ -37,9 +38,11 @@ function HandleStartGameButtonCo()
 		local playersForThisBag = tonumber(string.match(bagKey, "(%d+)p$"))
 		if playersForThisBag and playersForThisBag <= NumberOfPlayers then
 			local targetPos = DeckZones.Age.Age2.getPosition()
+			local targetRot = DeckZones.Age.Age2.getRotation() + vector(0, 0, 180)
+
 			bagObject.takeObject({
 				position = targetPos,
-				rotation = {180, 0, 0},
+				rotation = targetRot,
 				smooth = false
 			})
 		end
@@ -51,9 +54,11 @@ function HandleStartGameButtonCo()
 		local playersForThisBag = tonumber(string.match(bagKey, "(%d+)p$"))
 		if playersForThisBag and playersForThisBag <= NumberOfPlayers then
 			local targetPos = DeckZones.Age.Age3.getPosition()
+			local targetRot = DeckZones.Age.Age3.getRotation() + vector(0, 0, 180)
+
 			bagObject.takeObject({
 				position = targetPos,
-				rotation = {180, 0, 0},
+				rotation = targetRot,
 				smooth = false
 			})
 		end
@@ -64,7 +69,7 @@ function HandleStartGameButtonCo()
 		if bagKey == "Base" then
 			bagObject.takeObject({
 				position = DeckZones.Guild.getPosition(),
-				rotation = {180, 0, 0},
+				rotation = DeckZones.Guild.getRotation() + vector(0, 0, 180),
 				smooth = false
 			})
 		end
@@ -73,7 +78,7 @@ function HandleStartGameButtonCo()
 		if bagKey == "Cities" and ExpansionsUsed.Cities then
 			bagObject.takeObject({
 				position = DeckZones.Guild.getPosition(),
-				rotation = {180, 0, 0},
+				rotation = DeckZones.Guild.getRotation() + vector(0, 0, 180),
 				smooth = false
 			})
 		end
@@ -82,7 +87,7 @@ function HandleStartGameButtonCo()
 		if bagKey == "Promo" and ExpansionsUsed.PromoGuilds then
 			bagObject.takeObject({
 				position = DeckZones.Guild.getPosition(),
-				rotation = {180, 0, 0},
+				rotation = DeckZones.Guild.getRotation() + vector(0, 0, 180),
 				smooth = false
 			})
 		end
@@ -94,7 +99,7 @@ function HandleStartGameButtonCo()
 			if bagKey == "Base" then
 				bagObject.takeObject({
 					position = DeckZones.Leaders.getPosition(),
-					rotation = {180, 0, 0},
+					rotation = DeckZones.Leaders.getRotation() + vector(0, 0, 180),
 					smooth = false
 				})
 			end
@@ -103,7 +108,7 @@ function HandleStartGameButtonCo()
 			if bagKey == "Promo" and ExpansionsUsed.Leaders.Promo then
 				bagObject.takeObject({
 					position = DeckZones.Leaders.getPosition(),
-					rotation = {180, 0, 0},
+					rotation = DeckZones.Leaders.getRotation() + vector(0, 0, 180),
 					smooth = false
 				})
 			end
@@ -112,7 +117,7 @@ function HandleStartGameButtonCo()
 			if bagKey == "Expert" and ExpansionsUsed.Leaders.Expert then
 				bagObject.takeObject({
 					position = DeckZones.Leaders.getPosition(),
-					rotation = {180, 0, 0},
+					rotation = DeckZones.Leaders.getRotation() + vector(0, 0, 180),
 					smooth = false
 				})
 			end
@@ -121,7 +126,7 @@ function HandleStartGameButtonCo()
 			if bagKey == "Cities" and ExpansionsUsed.Cities then
 				bagObject.takeObject({
 					position = DeckZones.Leaders.getPosition(),
-					rotation = {180, 0, 0},
+					rotation = DeckZones.Leaders.getRotation() + vector(0, 0, 180),
 					smooth = false
 				})
 			end
@@ -133,7 +138,7 @@ function HandleStartGameButtonCo()
 		if ExpansionsUsed.Cities then
 			bagObject.takeObject({
 				position = DeckZones.Cities[bagKey].getPosition(),
-				rotation = {180, 0, 0},
+				rotation = DeckZones.Cities[bagKey].getRotation() + vector(0, 0, 180),
 				smooth = false
 			})
 		end
@@ -144,7 +149,7 @@ function HandleStartGameButtonCo()
 		if ExpansionsUsed.Armada then
 			bagObject.takeObject({
 				position = DeckZones.Armada[bagKey].getPosition(),
-				rotation = {180, 0, 0},
+				rotation = DeckZones.Armada[bagKey].getRotation() + vector(0, 0, 180),
 				smooth = false
 			})
 		end
@@ -155,7 +160,7 @@ function HandleStartGameButtonCo()
 		if ExpansionsUsed.Armada then
 			bagObject.takeObject({
 				position = DeckZones.Island[bagKey].getPosition(),
-				rotation = {180, 0, 0},
+				rotation = DeckZones.Island[bagKey].getRotation() + vector(0, 0, 180),
 				smooth = false
 			})
 		end
@@ -237,12 +242,14 @@ function HandleStartGameButtonCo()
 	        for i = 1, deckConfig.playersRequired do
 	          item.takeObject({
 	            position = deckConfig.targetZone.getPosition(),
-	            rotation = {180, 0, 0},
+	            rotation = deckConfig.targetZone.getRotation() + vector(0, 0, 180),
 	            smooth = false
 	          })
 	        end
 	      end
 	    end
+		else
+			print("sourceZone/targetZone invalid for Armada")
 		end
 	end
 
@@ -274,23 +281,25 @@ function HandleStartGameButtonCo()
 	        for i = 1, deckConfig.playersRequired do
 	          item.takeObject({
 	            position = deckConfig.targetZone.getPosition(),
-	            rotation = {180, 0, 0},
+	            rotation = deckConfig.targetZone.getRotation() + vector(0, 0, 180),
 	            smooth = false
 	          })
 	        end
 	      end
 	    end
+		else
+			print("sourceZone/targetZone invalid for Cities")
 		end
 	end
 
 	-- [[INSERT GUILD CARDS]]
 	local guilddeck = DeckZones.Guild.getObjects()
 	for _, items in ipairs(guilddeck) do
-			for i = 1, NumberOfPlayers+2 do
+			for i = 1, NumberOfPlayers + 2 do
 				items.takeObject({
 					position = DeckZones.Age.Age3.getPosition(),
-					smooth = false,
-					rotation = {180, 0, 0}
+					rotation = DeckZones.Age.Age3.getRotation() + vector(0, 0, 180),
+					smooth = false
 				})
 			end
 	end
@@ -439,8 +448,8 @@ function HandleStartGameButtonCo()
 	-- [[MOVE GUILDS]]
 	local guilddeckmove = DeckZones.Guild.getObjects()
 	for _, items in ipairs(guilddeckmove) do
-		items.setPositionSmooth(FinalDeckZones.Guild.getPosition(), false, false)
-		items.rotate({0, 90, 0})
+		--items.setPositionSmooth(FinalDeckZones.Guild.getPosition(), false, false)
+		--items.setRotation(FinalDeckZones.Guild.getRotation())
 	end
 
 	for i = 0, 200 do

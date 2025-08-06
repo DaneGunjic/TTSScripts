@@ -84,3 +84,21 @@ function CreateActionButtons(tile)
     font_size = 350,
   })
 end
+
+function DealCardsToPlayers()
+  for color, data in pairs(PlayerCardHolder) do
+    local zone = data.Zone
+    if zone ~= nil then
+      local objectsInZone = zone.getObjects()
+      for _, obj in ipairs(objectsInZone) do
+				if obj.type == 'Deck' then
+	        obj.deal(#obj.getObjects(), color)
+	      elseif obj.type == 'Card' then
+	        obj.deal(1, color)
+				end
+      end
+    else
+        print("Zone not found for player color: " .. color)
+    end
+  end
+end

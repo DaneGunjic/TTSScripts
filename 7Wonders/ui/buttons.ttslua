@@ -407,9 +407,12 @@ function HandleBuyCard(obj, color, alt)
 
   -- Verify permission
   if color:lower() ~= tileColor:lower() then
-    broadcastToColor("This isn't your tile!", player_clicker_color, {1,0,0})
-    return  -- Exit function if wrong player
+    broadcastToColor("This isn't your button!", player_clicker_color, {1,0,0})
+    return
   end
+
+	PlayerSelectedAction[tileColor] = "Buy"
+	ReadyUp(Player[tileColor])
 end
 
 function HandleSellCard(obj, color, alt)
