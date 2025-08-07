@@ -1,0 +1,150 @@
+-- General utility functions that could be reused in other projects
+
+-------------------[[ ROTATION UTILITIES ]]-------------------
+function normalizeRotation(rot)
+  if rot.x then -- If it's a key-value table (from getRotation)
+    return {rot.x, rot.y, rot.z}
+  else -- If it's already an array
+    return rot
+  end
+end
+
+function rotationEquals(rot1, rot2, tolerance)
+  tolerance = tolerance or 0.01
+  if rot1.x then rot1 = {rot1.x, rot1.y, rot1.z} end
+  if rot2.x then rot2 = {rot2.x, rot2.y, rot2.z} end
+
+  return math.abs(rot1[1] - rot2[1]) < tolerance
+   and math.abs(rot1[2] - rot2[2]) < tolerance
+   and math.abs(rot1[3] - rot2[3]) < tolerance
+end
+
+-------------------[[ TABLE COMPARISON ]]-------------------
+function equals(o1, o2, ignore_mt)
+  if o1 == o2 then return true end
+  local o1Type = type(o1)
+  local o2Type = type(o2)
+  if o1Type ~= o2Type then return false end
+  if o1Type ~= 'table' then return false end
+
+  if not ignore_mt then
+    local mt1 = getmetatable(o1)
+    if mt1 and mt1.__eq then
+      --compare using built in method
+      return o1 == o2
+    end
+  end
+
+  local keySet = {}
+
+  for key1, value1 in pairs(o1) do
+    local value2 = o2[key1]
+    if value2 == nil or equals(value1, value2, ignore_mt) == false then
+      return false
+    end
+    keySet[key1] = true
+  end
+
+  for key2, _ in pairs(o2) do
+    if not keySet[key2] then return false end
+  end
+
+  return true
+end
+
+-------------------[[ DEBUG UTILITIES ]]-------------------
+function dump(o)
+  if type(o) == 'table' then
+    local s = '{ '
+    for k,v in pairs(o) do
+      if type(k) ~= 'number' then k = '"'..k..'"' end
+        s = s .. '['..k..'] = ' .. dump(v) .. ','
+    end
+
+    return s .. '} '
+  else
+    return tostring(o)
+  end
+end
+
+function printTable(tbl, indent, name)
+  indent = indent or 0
+  name = name or "Table"
+  local spacing = string.rep("  ", indent)
+
+  if indent == 0 then
+    print("----- Printing " .. name .. " -----")
+  end
+
+  for key, value in pairs(tbl) do
+    if type(value) == "table" then
+      print(spacing .. key .. ":")
+      printTable(value, indent + 1)
+    else
+      if value ~= nil and type(value) == "userdata" and value.getGUID then
+        print(spacing .. key .. " = " .. value.getGUID())
+      else
+        print(spacing .. key .. " = " .. tostring(value))
+      end
+    end
+  end
+
+  if indent == 0 then
+    print("----- Finished Printing " .. name .. " -----")
+  end
+end
+
+-------------------[[ TIMING UTILITIES ]]-------------------
+function pause(waittime)
+  local time = os.clock() + waittime
+  while os.clock() < time do coroutine.yield(0) end
+end
+
+-------------------[[ OBJECT UTILITIES ]]-------------------
+function LockObject(object)
+  if object and object.setLock then
+    object.setLock(true)
+  end
+end
+
+function UnlockObject(object)
+  if object and object.setLock then
+    object.setLock(false)
+  end
+end
+
+-- Generic function to count cards in any zone
+function CountCardsInZone(zone)
+  if not zone or not zone.getObjects then
+    return 0
+  end
+
+  local count = 0
+  local objects = zone.getObjects()
+
+  for _, obj in ipairs(objects) do
+    if obj.tag == "Card" then
+      count = count + 1
+    elseif obj.tag == "Deck" then
+      count = count + obj.getQuantity()
+    end
+  end
+
+  return count
+end
+
+-- Generic function to find objects by tag in a zone
+function FindObjectsByTag(zone, tag)
+  if not zone or not zone.getObjects then
+    return {}
+  end
+
+  local objects = {}
+  for _, obj in ipairs(zone.getObjects()) do
+    if obj.tag == tag then
+      table.insert(objects, obj)
+    end
+  end
+
+  return objects
+end
