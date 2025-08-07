@@ -198,6 +198,11 @@ function HandleStartGameButton()
 end
 
 function HandleFlipButton(obj, color, alt)
+	if not IsObjectInPlayerWonderZone(obj, color) then
+    broadcastToColor("This isn't your wonder!", color, {1, 0, 0})
+    return
+	end
+
 	-- Random Mode
 	if not DraftMode then
 		local tempDefaultRot = {table.unpack(_G["_"..color.."PlayerInfo"].ComponentRotation)}
@@ -328,6 +333,11 @@ function HandleFlipButton(obj, color, alt)
 end
 
 function HandleKeepButton(obj, color, alt)
+	if not IsObjectInPlayerWonderZone(obj, color) then
+    broadcastToColor("This isn't your wonder!", color, {1, 0, 0})
+    return
+	end
+
 	-- Based on rotation we know if it's Day or Night
 	local tempDefaultRot = _G["_"..color.."PlayerInfo"].ComponentRotation
 	local CurrentWonderObj = nil
@@ -358,6 +368,11 @@ function HandleKeepButton(obj, color, alt)
 end
 
 function HandleCycleLeftButton(obj, color, alt)
+	if not IsObjectInPlayerWonderZone(obj, color) then
+    broadcastToColor("This isn't your wonder!", color, {1, 0, 0})
+    return
+	end
+
 	local tempNum = PlayerCurrentlyChosenWonder[color]
 	-- We might be on Night / B side, so save the location and rotation
 	local CurrentWonderRot = _G["_"..color.."DraftWonderObj"][tempNum].getRotation()
@@ -377,6 +392,11 @@ function HandleCycleLeftButton(obj, color, alt)
 end
 
 function HandleCycleRightButton(obj, color, alt)
+	if not IsObjectInPlayerWonderZone(obj, color) then
+    broadcastToColor("This isn't your wonder!", color, {1, 0, 0})
+    return
+	end
+	
 	local tempNum = PlayerCurrentlyChosenWonder[color]
 	-- We might be on Night / B side, so save the location and rotation
 	local CurrentWonderRot = _G["_"..color.."DraftWonderObj"][tempNum].getRotation()

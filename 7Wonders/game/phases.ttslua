@@ -71,7 +71,7 @@ function DoLeaderStage()
 					RotateHands(Card, PlayerInstance.color, "Right")
 	      end
 	    end
-		end , 0.5)
+		end , 0.1)
 
 		-- Increment how many passes we did so far
 		CurrentPasses = CurrentPasses + 1
@@ -80,8 +80,16 @@ function DoLeaderStage()
 		if CurrentPasses == MaximumPasses then
 			-- Passed 3 times, now we have to choose 1 to play
 			updatePhaseUI("Phase: Leader Selection", "Choose 1 Leader to play")
-			GameState = "LeaderSelectionStage"
-			Wait.time(function() DealCardsToPlayers() end, 1)
+			Wait.time(function()
+				-- After 0.1 take personal cards
+				ForceTakePersonalCards()
+				Wait.time(function()
+					-- After 0.2 seconds change the game state
+					-- This avoid buttons being created for a split second
+					-- after ForceTakePersonalCards runs
+					GameState = "LeaderSelectionStage"
+				end, 0.1)
+			end, 0.1)
 		end
 
 		-- After 1 second pick up passed Leaders

@@ -6,7 +6,7 @@ function UnreadyAllPlayers()
 			end
 		end
 	end
-
+	
 	NumberOfReadyPlayers = 0
 end
 
@@ -14,7 +14,7 @@ end
 function ReadyUp(player)
 	ReadyList[player.color] = not ReadyList[player.color]
 
-	broadcastToAll(player.steam_name .. " is " .. (ReadyList[player.color] and "Ready" or "Not Ready"))
+	broadcastToAll(player.steam_name .. " is " .. (ReadyList[player.color] and "ready" or "not ready"))
 
 	if ReadyList[player.color] then
 		NumberOfReadyPlayers = NumberOfReadyPlayers + 1
@@ -29,20 +29,16 @@ function ReadyUp(player)
 
 		-- Did we finish choosing wonders
 		if GameState == "WonderStage" then
-			print("FinishWonderStage")
 			FinishWonderStage()
 
 			if ExpansionsUsed.Leaders.Base then
-				print("PrepareLeaderStage")
 				PrepareLeaderStage()
 			else
-				print("PrepareAge1Stage")
 				PrepareAge1Stage()
 			end
 
 		-- Did we pass leaders
 		elseif GameState == "LeaderDrafting" then
-			print("DoLeaderStage")
 			DoLeaderStage()
 		end
 	else
@@ -85,7 +81,8 @@ function CreateActionButtons(tile)
   })
 end
 
-function DealCardsToPlayers()
+function ForceTakePersonalCards()
+	-- Makes all players draw all cards on their tile
   for color, data in pairs(PlayerCardHolder) do
     local zone = data.Zone
     if zone ~= nil then

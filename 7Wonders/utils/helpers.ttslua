@@ -81,8 +81,6 @@ function onObjectEnterScriptingZone(zone, enter_object)
 	for color, data in pairs(PlayerCardHolder) do
 		if data.Zone and zone.guid == data.Zone.guid then
 			local cardCount = CountCardsInZone(zone)
-			--print(cardCount .. " " .. CurrentPasses)
-			--print("Adding highlight")
 
 			data.Tile.highlightOn(color, 100)
 
@@ -106,77 +104,80 @@ end
 function onObjectLeaveScriptingZone(zone, leave_object)
 	if leave_object.type ~= 'Card' and leave_object.type ~= 'Deck' then return end
 
-	--print(leave_object.getGUID() .. " " .. leave_object.getName())
 	for color, data in pairs(PlayerCardHolder) do
 		if data.Zone and zone.guid == data.Zone.guid then
-			if CountCardsInZone(zone) <= CurrentPasses  then
-				--print(CountCardsInZone(zone) .. " " .. CurrentPasses)
+			-- Get the tile that was highlighted for this card
+			local highlightedTile = leave_object.getVar("highlightedTile")
+			if not highlightedTile then return end
+
+			if CountCardsInZone(zone) <= CurrentPasses and GameState == "LeaderDrafting" then
 				if ReadyList[color] then
 					ReadyList[color] = not ReadyList[color]
+					broadcastToAll(player.steam_name .. " is not ready")
 				end
-
-				-- Get the tile that was highlighted for this card
-				local highlightedTile = leave_object.getVar("highlightedTile")
-				if not highlightedTile then return end
-
-				-- Remove the highlight if it exists
-				if highlightedTile then
-					highlightedTile.highlightOff()
-					leave_object.setVar("highlightedTile", nil)
-				end
-
-				highlightedTile.clearButtons()
+			elseif GameState == "LeaderSelectionStage" and ReadyList[color] then
+				ReadyList[color] = not ReadyList[color]
+				broadcastToAll(player.steam_name .. " is not ready")
 			end
 
+			-- If there are no more cards left remove the highlight
+			if highlightedTile and CountCardsInZone(zone) == 0 then
+				highlightedTile.highlightOff()
+				leave_object.setVar("highlightedTile", nil)
+			end
+
+			-- For now we clear all buttons whenever anything leaves the zone
+			highlightedTile.clearButtons()
+
+			-- Early exit, we already found the matching player's tile
 			break
 		end
 	end
-
 end
 
 function ForceLoadAllAssets()
-	-- Add any bags that should have their contents pre-loaded
-	AllBagsToLoad = {
-		WonderBags.Collection,
-		WonderBags.Base,
-		WonderBags.Leader,
-		WonderBags.Cities,
-		WonderBags.Armada,
-		DockyardBag,
-		FrontiersBag
-	}
+  -- Add any bags that should have their contents pre-loaded
+  local AllBagsToLoad = {
+    WonderBags.Collection,
+    WonderBags.Base,
+    WonderBags.Leader,
+    WonderBags.Cities,
+    WonderBags.Armada,
+    DockyardBag,
+    FrontiersBag
+  }
 
-	for _, BagToLoad in ipairs(AllBagsToLoad) do
-	if BagToLoad and BagToLoad.getObjects then
-		for _, Board in ipairs(BagToLoad.getObjects()) do
-			BagToLoad.takeObject({
-				position = {68.00, -10, 19.00},
-				smooth = false,
-				callback_function = function(spawnedObject)
-					spawnedObject.setLock(true)
+  for _, BagToLoad in ipairs(AllBagsToLoad) do
+    if BagToLoad and BagToLoad.getObjects then
+      for _, Board in ipairs(BagToLoad.getObjects()) do
+        BagToLoad.takeObject({
+          position = {68.00, -10, 19.00},
+          smooth = false,
+          callback_function = function(spawnedObject)
+            spawnedObject.setLock(true)
 
-					-- Define recursive wait function
-					local function checkAndReturn()
-						if not spawnedObject.loading_custom then
-							spawnedObject.setLock(false)
-							BagToLoad.putObject(spawnedObject)
-						else
-							-- Still loading, check again in 2 seconds
-							Wait.time(checkAndReturn, 2)
-						end
-					end
+            -- Define recursive wait function
+            local function checkAndReturn()
+                if not spawnedObject.loading_custom then
+                    spawnedObject.setLock(false)
+                    BagToLoad.putObject(spawnedObject)
+                else
+                    -- Still loading, check again in 2 seconds
+                    Wait.time(checkAndReturn, 2)
+                end
+            end
 
-					-- Start the first check after 2 seconds
-					Wait.time(checkAndReturn, 2)
-				end
-			})
-		end
-	else
-		print("Warning: Bag not found or invalid - " .. tostring(BagToLoad))
-	end
-end
+            -- Start the first check after 2 seconds
+            Wait.time(checkAndReturn, 2)
+          end
+        })
+      end
+    else
+        print("Warning: Bag not found or invalid - " .. tostring(BagToLoad))
+    end
+  end
 
-	return 1
+  return 1
 end
 
 function LockSpawnedObject(object)
@@ -277,4 +278,21 @@ end
 function pause(waittime)
 	local time = os.clock() + waittime
 	while os.clock() < time do coroutine.yield(0) end
+end
+
+function IsObjectInPlayerWonderZone(obj, color)
+  local key = color:sub(1,1):upper() .. color:sub(2):lower() .. "WonderZone"
+  local zone = WonderZones[key]
+  if not zone then
+    print("Error: Wonder zone not found for color " .. color)
+    return false
+  end
+
+  for _, item in ipairs(zone.getObjects()) do
+    if item == obj then
+      return true
+    end
+  end
+
+  return false
 end
