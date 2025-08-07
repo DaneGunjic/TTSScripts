@@ -93,6 +93,7 @@ function DoLeaderStage()
 		end
 
 		-- After 1 second pick up passed Leaders
-		Wait.time(function() ForceTakeCards("Right") end, 1)
+		-- Passing right means we force take from left
+		Wait.time(function() ForceTakeCards("Left") end, 1)
   end
 end

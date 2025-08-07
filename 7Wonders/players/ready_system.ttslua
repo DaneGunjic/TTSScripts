@@ -6,7 +6,7 @@ function UnreadyAllPlayers()
 			end
 		end
 	end
-	
+
 	NumberOfReadyPlayers = 0
 end
 
@@ -98,4 +98,20 @@ function ForceTakePersonalCards()
         print("Zone not found for player color: " .. color)
     end
   end
+end
+
+function UnreadyPlayerIfNeeded(color, zone)
+	local cardCount = CountCardsInZone(zone)
+
+	if cardCount <= CurrentPasses and GameState == "LeaderDrafting" then
+		if ReadyList[color] then
+			ReadyList[color] = false
+			NumberOfReadyPlayers = NumberOfReadyPlayers - 1
+			broadcastToAll(Player[color].steam_name .. " is not ready")
+		end
+	elseif GameState == "LeaderSelectionStage" and ReadyList[color] then
+		ReadyList[color] = false
+		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
+		broadcastToAll(Player[color].steam_name .. " is not ready")
+	end
 end

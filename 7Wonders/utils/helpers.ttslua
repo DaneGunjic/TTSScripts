@@ -1,25 +1,22 @@
 function FindNextColor(Color, Direction)
-	-- Player array is sorted in the "Left" direction, meaning [1] is white, [2] is Red etc.
-	local tempAllPlayers = Player.getPlayers()
-	--print("Find next color called for " .. Color .. " and direction " .. Direction)
-	for i, PlayerInstance in ipairs(tempAllPlayers) do
-		--print("index " .. i .. " is " .. PlayerInstance.color)
-		if PlayerInstance.color == Color then
-			-- "Left" Direction means we look for the prevous player (to their right)
-			if Direction == "Left" then
-				if i == #tempAllPlayers then
-					return tempAllPlayers[1].color
-				end
-				return tempAllPlayers[i+1].color
-			else
-				-- "Right" Direction means we look for the next player (to their left)
-				if i == 1 then
-					return tempAllPlayers[#tempAllPlayers].color
-				end
-				return tempAllPlayers[i-1].color
-			end
-		end
-	end
+  local tempAllPlayers = Player.getPlayers()
+  for i, PlayerInstance in ipairs(tempAllPlayers) do
+    if PlayerInstance.color == Color then
+      if Direction == "Left" then
+        -- Move left around the table (next in array)
+        if i == #tempAllPlayers then
+          return tempAllPlayers[1].color
+        end
+        return tempAllPlayers[i+1].color
+    else -- "Right"
+        -- Move right around the table (previous in array)
+        if i == 1 then
+          return tempAllPlayers[#tempAllPlayers].color
+        end
+        return tempAllPlayers[i-1].color
+      end
+    end
+  end
 end
 
 function onChat(message, player)
@@ -77,63 +74,58 @@ end
 function onObjectEnterScriptingZone(zone, enter_object)
 	if enter_object.type ~= 'Card' and enter_object.type ~= 'Deck' then return end
 
-	-- Check which player's zone was entered
-	for color, data in pairs(PlayerCardHolder) do
-		if data.Zone and zone.guid == data.Zone.guid then
-			local cardCount = CountCardsInZone(zone)
+	local color = GetPlayerColorFromZone(zone)
+	if not color then return end
 
-			data.Tile.highlightOn(color, 100)
+	local data = PlayerCardHolder[color]
+	local cardCount = CountCardsInZone(zone)
 
-			if GameState == "LeaderDrafting" and cardCount == CurrentPasses + 1 then
-				ReadyUp(Player[color])
-			elseif GameState == "Age1" or
-				GameState == "Age2" or
-				GameState == "Age3" or
-				GameState == "LeaderSelectionStage" then
-				CreateActionButtons(data.Tile)
-				broadcastToColor("Choose your action!", color, color)
-			end
+	-- Highlight the tile
+	data.Tile.highlightOn(color, 100)
+	enter_object.setVar("highlightedTile", data.Tile)
 
-			-- Store which tile was highlighted
-			enter_object.setVar("highlightedTile", data.Tile)
-			break
-		end
+	-- Handle game state specific actions
+	if GameState == "LeaderDrafting" and cardCount == CurrentPasses + 1 then
+		ReadyUp(Player[color])
+	elseif GameState == "Age1" or GameState == "Age2" or GameState == "Age3" or GameState == "LeaderSelectionStage" then
+		CreateActionButtons(data.Tile)
+		broadcastToColor("Choose your action!", color, color)
 	end
 end
 
 function onObjectLeaveScriptingZone(zone, leave_object)
 	if leave_object.type ~= 'Card' and leave_object.type ~= 'Deck' then return end
 
+	local color = GetPlayerColorFromZone(zone)
+	if not color then return end
+
+	local highlightedTile = leave_object.getVar("highlightedTile")
+	if not highlightedTile then return end
+
+	UnreadyPlayerIfNeeded(color, zone)
+	HandleTileOnCardLeave(highlightedTile, leave_object, zone)
+end
+
+
+function HandleTileOnCardLeave(highlightedTile, leave_object, zone)
+	if highlightedTile and CountCardsInZone(zone) == 0 then
+		highlightedTile.highlightOff()
+		leave_object.setVar("highlightedTile", nil)
+	end
+
+	highlightedTile.clearButtons()
+end
+
+
+function GetPlayerColorFromZone(zone)
 	for color, data in pairs(PlayerCardHolder) do
 		if data.Zone and zone.guid == data.Zone.guid then
-			-- Get the tile that was highlighted for this card
-			local highlightedTile = leave_object.getVar("highlightedTile")
-			if not highlightedTile then return end
-
-			if CountCardsInZone(zone) <= CurrentPasses and GameState == "LeaderDrafting" then
-				if ReadyList[color] then
-					ReadyList[color] = not ReadyList[color]
-					broadcastToAll(player.steam_name .. " is not ready")
-				end
-			elseif GameState == "LeaderSelectionStage" and ReadyList[color] then
-				ReadyList[color] = not ReadyList[color]
-				broadcastToAll(player.steam_name .. " is not ready")
-			end
-
-			-- If there are no more cards left remove the highlight
-			if highlightedTile and CountCardsInZone(zone) == 0 then
-				highlightedTile.highlightOff()
-				leave_object.setVar("highlightedTile", nil)
-			end
-
-			-- For now we clear all buttons whenever anything leaves the zone
-			highlightedTile.clearButtons()
-
-			-- Early exit, we already found the matching player's tile
-			break
+			return color
 		end
 	end
+	return nil
 end
+
 
 function ForceLoadAllAssets()
   -- Add any bags that should have their contents pre-loaded

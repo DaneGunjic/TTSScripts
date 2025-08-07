@@ -396,7 +396,7 @@ function HandleCycleRightButton(obj, color, alt)
     broadcastToColor("This isn't your wonder!", color, {1, 0, 0})
     return
 	end
-	
+
 	local tempNum = PlayerCurrentlyChosenWonder[color]
 	-- We might be on Night / B side, so save the location and rotation
 	local CurrentWonderRot = _G["_"..color.."DraftWonderObj"][tempNum].getRotation()
@@ -427,7 +427,7 @@ function HandleBuyCard(obj, color, alt)
 
   -- Verify permission
   if color:lower() ~= tileColor:lower() then
-    broadcastToColor("This isn't your button!", player_clicker_color, {1,0,0})
+    broadcastToColor("This isn't your button!", color, {1,0,0})
     return
   end
 
