@@ -1,0 +1,26 @@
+TokenManager = {
+  spawnCoins = function(player, amount, position)
+    for i = 1, amount do
+      local spawnPos = position or TokenManager.getPlayerTokenPosition(player)
+      -- Add randomization to avoid stacking
+      spawnPos.x = spawnPos.x + math.random(-100, 100) / 100
+      spawnPos.z = spawnPos.z + math.random(-100, 100) / 100
+
+      Bags.Coins.One.takeObject({
+        position = spawnPos,
+        rotation = PlayerData[player].rotation,
+        smooth = false
+      })
+    end
+  end,
+
+  dealStartingCoins = function()
+    local coinAmount = ExpansionConfig.Leaders.Base and 6 or 3
+
+    for _, player in ipairs(GameState.seatedPlayers) do
+      TokenManager.spawnCoins(player, coinAmount)
+    end
+
+    Events.trigger("StartingCoinsDealt", {amount = coinAmount})
+  end
+}

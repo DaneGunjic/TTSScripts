@@ -1,0 +1,34 @@
+-- Token bag placement positions on the game board
+TokenPositions = {
+  CoinBags = {
+    One = Vector(-14.00, 0.46, -4.00),
+    Three = Vector(-10.00, 0.46, -4.00),
+    Six = Vector(-6.00, 0.46, -4.00)
+  },
+
+  ConflictTokens = {
+    Victory1 = Vector(-2.00, 0.46, -4.00),
+    Victory3 = Vector(2.00, 0.46, -4.00),
+    Victory5 = Vector(6.00, 0.46, -4.00),
+    Victory7 = Vector(10.00, 0.46, -4.00),
+    Defeat = Vector(14.00, 0.46, -4.00)
+  },
+
+  BoardingToken = Vector(-17.00, 0.46, 0.00),
+  DiplomacyToken = Vector(14.00, 0.46, 0.00),
+
+  NavalTokens = {
+    Victory1 = Vector(-14.00, 0.46, 4.00),
+    Victory3 = Vector(-10.00, 0.46, 4.00),
+    Victory5 = Vector(-6.00, 0.46, 4.00),
+    Victory7 = Vector(-2.00, 0.46, 4.00),
+    Defeat1 = Vector(2.00, 0.46, 4.00),
+    Defeat2 = Vector(6.00, 0.46, 4.00),
+    Defeat3 = Vector(10.00, 0.46, 4.00)
+  },
+
+  DebtTokens = {
+    Token1 = Vector(-17.00, 0.46, 4.00),
+    Token5 = Vector(-17.00, 0.46, -4.00)
+  }
+}

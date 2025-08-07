@@ -1,0 +1,21 @@
+-- Game States
+GameStates = {
+  SETUP = "Setup",
+  WONDER_STAGE = "WonderStage",
+  LEADER_DRAFTING = "LeaderDrafting",
+  LEADER_SELECTION = "LeaderSelectionStage",
+  AGE_1 = "Age1",
+  AGE_2 = "Age2",
+  AGE_3 = "Age3"
+}
+
+-- Player Colors (in seating order)
+PlayerColors = {
+  "White", "Red", "Yellow", "Green", "Pink", "Blue", "Purple"
+}
+
+-- Default Values
+Defaults = {
+  LEADER_DRAFT_PASSES = 3,
+  BASE_AGE_PASSES = 5
+}

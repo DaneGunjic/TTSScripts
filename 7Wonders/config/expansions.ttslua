@@ -1,0 +1,26 @@
+-- Expansion and Game Mode Configuration
+ExpansionConfig = {
+  Leaders = {
+    Base = false,
+    Expert = false,
+    Promo = false
+  },
+  Cities = false,
+  Armada = false,
+  Edifice = false,
+  Ruins = false,
+  Myths = false,
+  Frontiers = false,
+  PromoGuilds = false
+}
+
+WonderExpansionConfig = {
+  Collection = false,
+  Promo = false
+}
+
+GameModeConfig = {
+  randomWonders = true,
+  draftMode = false,
+  draftModeNumber = 3
+}

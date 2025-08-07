@@ -1,0 +1,259 @@
+-- Object References - All GUIDs and object references organized by category
+
+-- Main Board References
+Boards = {
+  Setup = getObjectFromGUID("511af3")
+}
+
+-- Deck Zone References (initial setup positions)
+DeckZones = {
+  Age = {
+    Age1 = getObjectFromGUID("56d221"),
+    Age2 = getObjectFromGUID("306db0"),
+    Age3 = getObjectFromGUID("a0fe65")
+  },
+  Cities = {
+    Age1 = getObjectFromGUID("05d80d"),
+    Age2 = getObjectFromGUID("f2659e"),
+    Age3 = getObjectFromGUID("3484af")
+  },
+  Armada = {
+    Age1 = getObjectFromGUID("f261d9"),
+    Age2 = getObjectFromGUID("06e74b"),
+    Age3 = getObjectFromGUID("50d040")
+  },
+  Leaders = getObjectFromGUID("d679f4"),
+  Guild = getObjectFromGUID("838ee1"),
+  Island = {
+    Level1 = getObjectFromGUID("43d444"),
+    Level2 = getObjectFromGUID("ffc10f"),
+    Level3 = getObjectFromGUID("27153d")
+  }
+}
+
+-- Final Deck Zones (where decks move after setup)
+FinalDeckZones = {
+  Age = {
+    Age1 = nil,
+    Age2 = nil,
+    Age3 = nil
+  },
+  Cities = {
+    Age1 = getObjectFromGUID("6047cd"),
+    Age2 = getObjectFromGUID("00cc17"),
+    Age3 = getObjectFromGUID("e32431")
+  },
+  Armada = {
+    Age1 = getObjectFromGUID("2d751f"),
+    Age2 = getObjectFromGUID("389ff8"),
+    Age3 = getObjectFromGUID("48509b")
+  },
+  Leaders = nil,
+  Guild = getObjectFromGUID("189e24"),
+  Island = {
+    Level1 = nil,
+    Level2 = nil,
+    Level3 = nil
+  }
+}
+
+-- All Bag References
+Bags = {
+  -- Age Card Bags
+  Age1 = {
+    ["3p"] = getObjectFromGUID("569cf4"),
+    ["4p"] = getObjectFromGUID("e49b5b"),
+    ["5p"] = getObjectFromGUID("0f1373"),
+    ["6p"] = getObjectFromGUID("4f6d2d"),
+    ["7p"] = getObjectFromGUID("b3b7ad")
+  },
+  Age2 = {
+    ["3p"] = getObjectFromGUID("f05c32"),
+    ["4p"] = getObjectFromGUID("8aa8b7"),
+    ["5p"] = getObjectFromGUID("98784f"),
+    ["6p"] = getObjectFromGUID("e77147"),
+    ["7p"] = getObjectFromGUID("a6e0b0")
+  },
+  Age3 = {
+    ["3p"] = getObjectFromGUID("493654"),
+    ["4p"] = getObjectFromGUID("63d3ad"),
+    ["5p"] = getObjectFromGUID("e2b94c"),
+    ["6p"] = getObjectFromGUID("6940e3"),
+    ["7p"] = getObjectFromGUID("c97981")
+  },
+
+  -- Guild Bags
+  Guilds = {
+    Base = getObjectFromGUID("3cec0e"),
+    Promo = getObjectFromGUID("0cbeec"),
+    Cities = getObjectFromGUID("3f9ca3")
+  },
+
+  -- Leader Bags
+  Leaders = {
+    Base = getObjectFromGUID("1ebb3d"),
+    Expert = getObjectFromGUID("c7c31f"),
+    Cities = getObjectFromGUID("1dd705"),
+    Promo = getObjectFromGUID("a5f906")
+  },
+
+  -- Cities Expansion Bags
+  Cities = {
+    Age1 = getObjectFromGUID("e4136a"),
+    Age2 = getObjectFromGUID("33eacd"),
+    Age3 = getObjectFromGUID("6af278")
+  },
+
+  -- Armada Expansion Bags
+  Armada = {
+    Age1 = getObjectFromGUID("1b953a"),
+    Age2 = getObjectFromGUID("92d9b9"),
+    Age3 = getObjectFromGUID("77cfbd")
+  },
+
+  -- Armada 4 Player Bags
+  Armada4P = {
+    Age1 = getObjectFromGUID("e4ba62"),
+    Age2 = getObjectFromGUID("3e4eb3"),
+    Age3 = getObjectFromGUID("75d02b")
+  },
+
+  -- Ship Bags
+  Ships = {
+    Red = getObjectFromGUID("0eef1f"),
+    Blue = getObjectFromGUID("e75093"),
+    Yellow = getObjectFromGUID("10eb0f"),
+    Green = getObjectFromGUID("b230fd")
+  },
+
+  -- Island Bags
+  Islands = {
+    Level1 = getObjectFromGUID("bef882"),
+    Level2 = getObjectFromGUID("3b2a20"),
+    Level3 = getObjectFromGUID("df39ee")
+  },
+
+  -- Dockyard Bag
+  Dockyard = getObjectFromGUID("5b9a9c"),
+
+  -- Wonder Bags
+  Wonders = {
+    Base = getObjectFromGUID("56d45b"),
+    Leaders = getObjectFromGUID("c1c61c"),
+    Cities = getObjectFromGUID("a26264"),
+    Armada = getObjectFromGUID("0c6087"),
+    Collection = getObjectFromGUID("7c6699")
+  },
+
+  -- Coin Bags
+  Coins = {
+    One = getObjectFromGUID("3f95a5"),
+    Three = getObjectFromGUID("3cad45"),
+    Six = getObjectFromGUID("9e60c9")
+  },
+
+  -- Conflict Token Bags
+  Conflict = {
+    Victory1 = getObjectFromGUID("c56b5a"),
+    Victory3 = getObjectFromGUID("5411ef"),
+    Victory5 = getObjectFromGUID("c8fc52"),
+    Victory7 = getObjectFromGUID("c99037"),
+    Defeat = getObjectFromGUID("d6e612")
+  },
+
+  -- Boarding & Diplomacy Bags
+  Boarding = getObjectFromGUID("511867"),
+  Diplomacy = getObjectFromGUID("ff17ba"),
+
+  -- Naval Token Bags
+  Naval = {
+    Victory1 = getObjectFromGUID("a30549"),
+    Victory3 = getObjectFromGUID("1a1373"),
+    Victory5 = getObjectFromGUID("8dcae9"),
+    Victory7 = getObjectFromGUID("82878d"),
+    Defeat1 = getObjectFromGUID("4cb023"),
+    Defeat2 = getObjectFromGUID("9ca312"),
+    Defeat3 = getObjectFromGUID("dd7fca")
+  },
+
+  -- Debt Token Bags
+  Debt = {
+    Token1 = getObjectFromGUID("b1f5a1"),
+    Token5 = getObjectFromGUID("ed2335")
+  },
+
+  -- Frontiers Bag
+  Frontiers = getObjectFromGUID("f46e91")
+}
+
+-- Player Zone References
+PlayerZones = {
+  Wonder = {
+    White = getObjectFromGUID("139f96"),
+    Red = getObjectFromGUID("59ebcd"),
+    Yellow = getObjectFromGUID("988c12"),
+    Green = getObjectFromGUID("797e59"),
+    Pink = getObjectFromGUID("84634f"),
+    Blue = getObjectFromGUID("a6380a"),
+    Purple = getObjectFromGUID("7896c6")
+  },
+
+  ArmadaBoard = {
+    White = getObjectFromGUID("e424ca"),
+    Red = getObjectFromGUID("df01b8"),
+    Yellow = getObjectFromGUID("ed7dec"),
+    Green = getObjectFromGUID("ff74f6"),
+    Pink = getObjectFromGUID("36feea"),
+    Blue = getObjectFromGUID("352aeb"),
+    Purple = getObjectFromGUID("13c916")
+  },
+
+  CardHolder = {
+    White = {
+      Tile = getObjectFromGUID("348b41"),
+      Zone = getObjectFromGUID("50a360")
+    },
+    Red = {
+      Tile = getObjectFromGUID("daee75"),
+      Zone = getObjectFromGUID("d74960")
+    },
+    Yellow = {
+      Tile = getObjectFromGUID("1e9b11"),
+      Zone = getObjectFromGUID("f4c902")
+    },
+    Green = {
+      Tile = getObjectFromGUID("febaac"),
+      Zone = getObjectFromGUID("42b333")
+    },
+    Pink = {
+      Tile = getObjectFromGUID("896cf6"),
+      Zone = getObjectFromGUID("fe05cb")
+    },
+    Blue = {
+      Tile = getObjectFromGUID("85c98e"),
+      Zone = getObjectFromGUID("c72796")
+    },
+    Purple = {
+      Tile = getObjectFromGUID("da702a"),
+      Zone = getObjectFromGUID("8b99be")
+    }
+  },
+
+  -- Player adjacency zones for card passing
+  Adjacent = {
+    WhiteLeft = getObjectFromGUID("13fc28"),    -- Red-White
+    WhiteRight = getObjectFromGUID("8455bc"),   -- White-Purple
+    RedLeft = getObjectFromGUID("78cb1b"),      -- Yellow-Red
+    RedRight = getObjectFromGUID("13fc28"),     -- Red-White
+    YellowLeft = getObjectFromGUID("5c04e5"),   -- Green-Yellow
+    YellowRight = getObjectFromGUID("78cb1b"),  -- Yellow-Red
+    GreenLeft = getObjectFromGUID("a16b0b"),    -- Green-Pink
+    GreenRight = getObjectFromGUID("5c04e5"),   -- Green-Yellow
+    PinkLeft = getObjectFromGUID("1ad522"),     -- Pink-Blue
+    PinkRight = getObjectFromGUID("a16b0b"),    -- Green-Pink
+    BlueLeft = getObjectFromGUID("c1f197"),     -- Blue-Purple
+    BlueRight = getObjectFromGUID("1ad522"),    -- Pink-Blue
+    PurpleLeft = getObjectFromGUID("8455bc"),   -- White-Purple
+    PurpleRight = getObjectFromGUID("c1f197")   -- Blue-Purple
+  }
+}

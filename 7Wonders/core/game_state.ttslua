@@ -1,0 +1,50 @@
+GameState = {
+  current = GameStates.SETUP,
+
+  -- Player state
+  seatedPlayers = {},
+  numberOfPlayers = 0,
+  readyPlayers = {},
+  numberOfReadyPlayers = 0,
+
+  -- Game progress
+  currentPasses = 0,
+  maximumPasses = 0,
+
+  -- Player selections and actions
+  selectedWonders = {},
+  selectedActions = {},
+  currentlyChosenWonder = {},
+
+  -- Temporary objects
+  wonderObjects = {},
+  draftWonderObjects = {},
+
+  -- State management functions
+  setCurrentPhase = function(newPhase)
+    GameState.current = newPhase
+    Events.trigger("PhaseChanged", {newPhase = newPhase})
+  end,
+
+  isPlayerReady = function(color)
+    return GameState.readyPlayers[color] or false
+  end,
+
+  setPlayerReady = function(color, isReady)
+    GameState.readyPlayers[color] = isReady
+    -- Update counter
+    GameState.numberOfReadyPlayers = 0
+    for _, ready in pairs(GameState.readyPlayers) do
+      if ready then GameState.numberOfReadyPlayers = GameState.numberOfReadyPlayers + 1 end
+    end
+  end,
+
+  reset = function()
+    GameState.current = GameStates.SETUP
+    GameState.seatedPlayers = {}
+    GameState.readyPlayers = {}
+    GameState.selectedWonders = {}
+    GameState.selectedActions = {}
+    -- etc.
+  end
+}
