@@ -1,0 +1,272 @@
+-------------------[[ GAME CONFIGURATION ]]-------------------
+GameConfig = {
+  expansions = {
+    Leaders = {
+      Base = false,
+      Expert = false,
+      Promo = false
+    },
+    Cities = false,
+    Armada = false,
+    Edifice = false,
+    Ruins = false,
+    Myths = false,
+    Frontiers = false,
+    PromoGuilds = false
+  },
+  wonderExpansions = {
+    Collection = false,
+    Promo = false
+  },
+  randomWonders = true,
+  draftMode = false,
+  draftModeNumber = 3
+}
+
+-------------------[[ GAME STATE ]]-------------------
+GameState = {
+  current = "Setup",
+  currentPasses = 0,
+  maximumPasses = 0,
+  numberOfReadyPlayers = 0
+}
+
+-------------------[[ CORE GAME OBJECTS ]]-------------------
+GameObjects = {
+  setupBoard = getObjectFromGUID("511af3"),
+
+  -- Deck Zones (where cards are built during setup)
+  deckZones = {
+    Age = {
+      Age1 = getObjectFromGUID("56d221"),
+      Age2 = getObjectFromGUID("306db0"),
+      Age3 = getObjectFromGUID("a0fe65")
+    },
+    Cities = {
+      Age1 = getObjectFromGUID("05d80d"),
+      Age2 = getObjectFromGUID("f2659e"),
+      Age3 = getObjectFromGUID("3484af")
+    },
+    Armada = {
+      Age1 = getObjectFromGUID("f261d9"),
+      Age2 = getObjectFromGUID("06e74b"),
+      Age3 = getObjectFromGUID("50d040")
+    },
+    Leaders = getObjectFromGUID("d679f4"),
+    Guild = getObjectFromGUID("838ee1"),
+    Island = {
+      Level1 = getObjectFromGUID("43d444"),
+      Level2 = getObjectFromGUID("ffc10f"),
+      Level3 = getObjectFromGUID("27153d")
+    }
+  },
+
+  -- Final Deck Zones (where decks go after setup)
+  finalDeckZones = {
+    Age = {
+      Age1 = nil, -- stays in original position
+      Age2 = nil,
+      Age3 = nil
+    },
+    Cities = {
+      Age1 = getObjectFromGUID("6047cd"),
+      Age2 = getObjectFromGUID("00cc17"),
+      Age3 = getObjectFromGUID("e32431")
+    },
+    Armada = {
+      Age1 = getObjectFromGUID("2d751f"),
+      Age2 = getObjectFromGUID("389ff8"),
+      Age3 = getObjectFromGUID("48509b")
+    },
+    Leaders = nil,
+    Guild = getObjectFromGUID("189e24"),
+    Island = {
+      Level1 = nil,
+      Level2 = nil,
+      Level3 = nil
+    }
+  },
+
+  -- Card Bags (organized by expansion and player count)
+  bags = {
+    age1 = {
+      ["3p"] = getObjectFromGUID("569cf4"),
+      ["4p"] = getObjectFromGUID("e49b5b"),
+      ["5p"] = getObjectFromGUID("0f1373"),
+      ["6p"] = getObjectFromGUID("4f6d2d"),
+      ["7p"] = getObjectFromGUID("b3b7ad")
+    },
+    age2 = {
+      ["3p"] = getObjectFromGUID("f05c32"),
+      ["4p"] = getObjectFromGUID("8aa8b7"),
+      ["5p"] = getObjectFromGUID("98784f"),
+      ["6p"] = getObjectFromGUID("e77147"),
+      ["7p"] = getObjectFromGUID("a6e0b0")
+    },
+    age3 = {
+      ["3p"] = getObjectFromGUID("493654"),
+      ["4p"] = getObjectFromGUID("63d3ad"),
+      ["5p"] = getObjectFromGUID("e2b94c"),
+      ["6p"] = getObjectFromGUID("6940e3"),
+      ["7p"] = getObjectFromGUID("c97981")
+    },
+    guilds = {
+      Base = getObjectFromGUID("3cec0e"),
+      Promo = getObjectFromGUID("0cbeec"),
+      Cities = getObjectFromGUID("3f9ca3")
+    },
+    leaders = {
+      Base = getObjectFromGUID("1ebb3d"),
+      Expert = getObjectFromGUID("c7c31f"),
+      Cities = getObjectFromGUID("1dd705"),
+      Promo = getObjectFromGUID("a5f906")
+    },
+    cities = {
+      Age1 = getObjectFromGUID("e4136a"),
+      Age2 = getObjectFromGUID("33eacd"),
+      Age3 = getObjectFromGUID("6af278")
+    },
+    armada = {
+      Age1 = getObjectFromGUID("1b953a"),
+      Age2 = getObjectFromGUID("92d9b9"),
+      Age3 = getObjectFromGUID("77cfbd")
+    },
+    armada4p = {
+      Age1 = getObjectFromGUID("e4ba62"),
+      Age2 = getObjectFromGUID("3e4eb3"),
+      Age3 = getObjectFromGUID("75d02b")
+    },
+    wonders = {
+      Base = getObjectFromGUID("56d45b"),
+      Leaders = getObjectFromGUID("c1c61c"),
+      Cities = getObjectFromGUID("a26264"),
+      Armada = getObjectFromGUID("0c6087"),
+      Collection = getObjectFromGUID("7c6699")
+    },
+    ships = {
+      Red = getObjectFromGUID("0eef1f"),
+      Blue = getObjectFromGUID("e75093"),
+      Yellow = getObjectFromGUID("10eb0f"),
+      Green = getObjectFromGUID("b230fd")
+    },
+    islands = {
+      Level1 = getObjectFromGUID("bef882"),
+      Level2 = getObjectFromGUID("3b2a20"),
+      Level3 = getObjectFromGUID("df39ee")
+    },
+    tokens = {
+      coins = {
+        Coin1 = getObjectFromGUID("3f95a5"),
+        Coin3 = getObjectFromGUID("3cad45"),
+        Coin6 = getObjectFromGUID("9e60c9")
+      },
+      conflict = {
+        VictoryToken1 = getObjectFromGUID("c56b5a"),
+        VictoryToken3 = getObjectFromGUID("5411ef"),
+        VictoryToken5 = getObjectFromGUID("c8fc52"),
+        VictoryToken7 = getObjectFromGUID("c99037"),
+        DefeatToken = getObjectFromGUID("d6e612")
+      },
+      naval = {
+        VictoryToken1 = getObjectFromGUID("a30549"),
+        VictoryToken3 = getObjectFromGUID("1a1373"),
+        VictoryToken5 = getObjectFromGUID("8dcae9"),
+        VictoryToken7 = getObjectFromGUID("82878d"),
+        DefeatToken1 = getObjectFromGUID("4cb023"),
+        DefeatToken2 = getObjectFromGUID("9ca312"),
+        DefeatToken3 = getObjectFromGUID("dd7fca")
+      },
+      debt = {
+        DebtToken1 = getObjectFromGUID("b1f5a1"),
+        DebtToken5 = getObjectFromGUID("ed2335")
+      },
+      special = {
+        boarding = getObjectFromGUID("511867"),
+        diplomacy = getObjectFromGUID("ff17ba")
+      }
+    },
+    dockyard = getObjectFromGUID("5b9a9c"),
+    frontiers = getObjectFromGUID("f46e91")
+  }
+}
+
+-------------------[[ PLAYER DATA ]]-------------------
+PlayerData = {
+  -- Player-specific object references
+  cardHolders = {
+    White = { tile = getObjectFromGUID("348b41"), zone = getObjectFromGUID("50a360") },
+    Red = { tile = getObjectFromGUID("daee75"), zone = getObjectFromGUID("d74960") },
+    Yellow = { tile = getObjectFromGUID("1e9b11"), zone = getObjectFromGUID("f4c902") },
+    Green = { tile = getObjectFromGUID("febaac"), zone = getObjectFromGUID("42b333") },
+    Pink = { tile = getObjectFromGUID("896cf6"), zone = getObjectFromGUID("fe05cb") },
+    Blue = { tile = getObjectFromGUID("85c98e"), zone = getObjectFromGUID("c72796") },
+    Purple = { tile = getObjectFromGUID("da702a"), zone = getObjectFromGUID("8b99be") }
+  },
+
+  -- Player zones
+  wonderZones = {
+    White = getObjectFromGUID("139f96"),
+    Red = getObjectFromGUID("59ebcd"),
+    Yellow = getObjectFromGUID("988c12"),
+    Green = getObjectFromGUID("797e59"),
+    Pink = getObjectFromGUID("84634f"),
+    Blue = getObjectFromGUID("a6380a"),
+    Purple = getObjectFromGUID("7896c6")
+  },
+
+  armadaBoardZones = {
+    White = getObjectFromGUID("e424ca"),
+    Red = getObjectFromGUID("df01b8"),
+    Yellow = getObjectFromGUID("ed7dec"),
+    Green = getObjectFromGUID("ff74f6"),
+    Pink = getObjectFromGUID("36feea"),
+    Blue = getObjectFromGUID("352aeb"),
+    Purple = getObjectFromGUID("13c916")
+  },
+
+  -- Conflict zones between players
+  conflictZones = {
+    WhiteLeft = getObjectFromGUID("13fc28"),   -- Red-White
+    WhiteRight = getObjectFromGUID("8455bc"),  -- White-Purple
+    RedLeft = getObjectFromGUID("78cb1b"),     -- Yellow-Red
+    RedRight = getObjectFromGUID("13fc28"),    -- Red-White
+    YellowLeft = getObjectFromGUID("5c04e5"),  -- Green-Yellow
+    YellowRight = getObjectFromGUID("78cb1b"), -- Yellow-Red
+    GreenLeft = getObjectFromGUID("a16b0b"),   -- Green-Pink
+    GreenRight = getObjectFromGUID("5c04e5"),  -- Green-Yellow
+    PinkLeft = getObjectFromGUID("1ad522"),    -- Pink-Blue
+    PinkRight = getObjectFromGUID("a16b0b"),   -- Green-Pink
+    BlueLeft = getObjectFromGUID("c1f197"),    -- Blue-Purple
+    BlueRight = getObjectFromGUID("1ad522"),   -- Pink-Blue
+    PurpleLeft = getObjectFromGUID("8455bc"),  -- White-Purple
+    PurpleRight = getObjectFromGUID("c1f197")  -- Blue-Purple
+  }
+}
+
+-------------------[[ RUNTIME STATE ]]-------------------
+RuntimeState = {
+  -- Ready status for each player
+  readyList = {
+    White = true, Red = true, Yellow = true, Green = true,
+    Pink = true, Blue = true, Purple = true
+  },
+
+  -- Current wonder selection for draft mode
+  playerCurrentlyChosenWonder = {
+    White = 1, Red = 1, Yellow = 1, Green = 1,
+    Pink = 1, Blue = 1, Purple = 1
+  },
+
+  -- Player action selections
+  playerSelectedAction = {
+    White = nil, Red = nil, Yellow = nil, Green = nil,
+    Pink = nil, Blue = nil, Purple = nil
+  },
+
+  -- Wonder objects (populated during draft)
+  randomWonderObjects = {},
+  draftWonderObjects = {
+    White = {}, Red = {}, Yellow = {}, Green = {},
+    Pink = {}, Blue = {}, Purple = {}
+  }
+}

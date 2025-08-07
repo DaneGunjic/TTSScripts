@@ -1,0 +1,10 @@
+ZoneHandlers = {
+  playerCardZone = {
+    onEnter = function(zone, object) ... end,
+    onLeave = function(zone, object) ... end
+  },
+  wonderZone = {
+    onEnter = function(zone, object) ... end,
+    onLeave = function(zone, object) ... end
+  }
+}

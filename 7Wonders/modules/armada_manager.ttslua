@@ -1,0 +1,125 @@
+ArmadaManager = {
+
+  dealComponents = function()
+    if not GameConfig.expansions.Armada then return end
+
+    for _, player in ipairs(RuntimeState.allSeatedPlayers) do
+      ArmadaManager.dealDockyardBoard(player)
+      ArmadaManager.dealShips(player)
+    end
+  end,
+
+  dealDockyardBoard = function(player)
+    local playerInfo = Constants.PLAYER_POSITIONS[player]
+
+    GameObjects.bags.dockyard.randomize()
+    GameObjects.bags.dockyard.takeObject({
+      position = playerInfo.DockyardPos,
+      rotation = playerInfo.ComponentRotation,
+      smooth = false,
+      callback_function = LockObject
+    })
+  end,
+
+  dealShips = function(player)
+    local playerInfo = Constants.PLAYER_POSITIONS[player]
+    local shipColors = {"Red", "Yellow", "Blue", "Green"}
+
+    for _, shipColor in ipairs(shipColors) do
+      local posKey = shipColor .. "ShipPos"
+      local shipBag = GameObjects.bags.ships[shipColor]
+
+      if shipBag and playerInfo[posKey] then
+        shipBag.takeObject({
+          position = playerInfo[posKey],
+          rotation = playerInfo.ComponentRotation,
+          smooth = false
+        })
+      end
+    end
+  end,
+
+  -- Calculate ship positions using offsets (alternative to hardcoded positions)
+  calculateShipPositions = function(player)
+    local playerInfo = Constants.PLAYER_POSITIONS[player]
+    local basePos = playerInfo.WonderPos
+    local positions = {}
+
+    for shipColor, offset in pairs(Constants.COMPONENT_OFFSETS.SHIPS) do
+      positions[shipColor] = {
+        basePos[1] + offset[1],
+        basePos[2] + Constants.COMPONENT_OFFSETS.SHIP_HEIGHT,
+        basePos[3] + offset[2]
+      }
+    end
+
+    return positions
+  end,
+
+  -- Setup Armada boards for players
+  setupArmadaBoards = function()
+    if not GameConfig.expansions.Armada then return end
+
+    for _, player in ipairs(RuntimeState.allSeatedPlayers) do
+      local armadaZone = PlayerData.armadaBoardZones[player]
+      if armadaZone then
+        -- Additional setup for Armada boards if needed
+        -- This could include positioning tokens, markers, etc.
+      end
+    end
+  end,
+
+  -- Handle Armada-specific game mechanics
+  processNavalCombat = function(player1, player2)
+    -- Logic for naval combat between players
+    -- This would handle ship positioning, combat resolution, etc.
+  end,
+
+  moveShip = function(player, shipColor, newPosition)
+    -- Logic for moving ships during gameplay
+    local ship = ArmadaManager.getPlayerShip(player, shipColor)
+    if ship then
+      ship.setPositionSmooth(newPosition, false, false)
+    end
+  end,
+
+  getPlayerShip = function(player, shipColor)
+    -- Find and return a specific ship for a player
+    local armadaZone = PlayerData.armadaBoardZones[player]
+    if not armadaZone then return nil end
+
+    for _, obj in ipairs(armadaZone.getObjects()) do
+      if obj.getName():find(shipColor) then
+        return obj
+      end
+    end
+    return nil
+  end,
+
+  -- Handle island mechanics
+  setupIslands = function()
+    if not GameConfig.expansions.Armada then return end
+
+    local islandLevels = {"Level1", "Level2", "Level3"}
+    for _, level in ipairs(islandLevels) do
+      local islandDeck = GameObjects.deckZones.Island[level]
+      if islandDeck then
+        -- Additional island setup logic
+      end
+    end
+  end,
+
+  dealIslandCard = function(level)
+    local islandDeck = GameObjects.deckZones.Island[level]
+    if islandDeck and islandDeck.getObjects then
+      local deck = islandDeck.getObjects()[1]
+      if deck and deck.takeObject then
+        return deck.takeObject({
+          position = {0, 2, 0}, -- Temporary position
+          smooth = false
+        })
+      end
+    end
+    return nil
+  end
+}

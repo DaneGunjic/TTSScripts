@@ -1,0 +1,15 @@
+ButtonManager = {
+  createActionButtons = function(tile, color)
+    local buttons = {
+      {label = "Buy", func = "HandleBuyCard", pos = {-0.95, 0.1, -0.5}},
+      {label = "Sell", func = "HandleSellCard", pos = {-0.95, 0.1, 0}},
+      {label = "Wonder", func = "HandleBuildWonder", pos = {-0.95, 0.1, 0.5}}
+    }
+
+    for _, btn in ipairs(buttons) do
+      tile.createButton(ButtonManager.mergeWithDefaults(btn, Constants.BUTTON_STYLES.action))
+    end
+  end,
+
+  mergeWithDefaults = function(custom, defaults) ... end
+}

@@ -1,0 +1,6 @@
+LeaderManager = {
+  startLeaderDrafting = function() ... end,
+  handleLeaderSelection = function() ... end,
+  updatePlayerTiles = function() ... end,
+  processLeaderPass = function() ... end
+}

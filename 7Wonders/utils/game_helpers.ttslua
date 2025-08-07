@@ -1,0 +1,256 @@
+-- 7 Wonders-specific helper functions
+
+-------------------[[ PLAYER MANAGEMENT ]]-------------------
+function FindNextColor(Color, Direction)
+  local tempAllPlayers = Player.getPlayers()
+  for i, PlayerInstance in ipairs(tempAllPlayers) do
+    if PlayerInstance.color == Color then
+      if Direction == "Left" then
+        -- Move left around the table (next in array)
+        if i == #tempAllPlayers then
+          return tempAllPlayers[1].color
+        end
+        return tempAllPlayers[i+1].color
+      else -- "Right"
+        -- Move right around the table (previous in array)
+        if i == 1 then
+          return tempAllPlayers[#tempAllPlayers].color
+        end
+        return tempAllPlayers[i-1].color
+      end
+    end
+  end
+end
+
+function GetPlayerColorFromZone(zone)
+  if not zone then return nil end
+
+  for color, data in pairs(PlayerData.cardHolders) do
+    if data.zone and zone.guid == data.zone.guid then
+      return color
+    end
+  end
+  return nil
+end
+
+function IsObjectInPlayerWonderZone(obj, color)
+  if not obj or not color then return false end
+
+  local zone = PlayerData.wonderZones[color]
+  if not zone then
+    print("Error: Wonder zone not found for color " .. color)
+    return false
+  end
+
+  for _, item in ipairs(zone.getObjects()) do
+    if item == obj then
+      return true
+    end
+  end
+
+  return false
+end
+
+-------------------[[ GAME STATE MANAGEMENT ]]-------------------
+function UnreadyPlayerIfNeeded(color, zone)
+  if not color or not zone then return end
+
+  -- Check if player should be unreadied based on game state and card count
+  if GameState.current == Constants.GAME_STATES.LEADER_DRAFTING then
+    local cardCount = CountCardsInZone(zone)
+    if cardCount < GameState.currentPasses + 1 then
+      RuntimeState.readyList[color] = false
+      -- Update ready counter, etc.
+    end
+  end
+end
+
+function HandleTileOnCardLeave(highlightedTile, leave_object, zone)
+  if not highlightedTile then return end
+
+  if CountCardsInZone(zone) == 0 then
+    highlightedTile.highlightOff()
+    if leave_object and leave_object.setVar then
+      leave_object.setVar("highlightedTile", nil)
+    end
+  end
+
+  highlightedTile.clearButtons()
+end
+
+-------------------[[ TILE MANAGEMENT ]]-------------------
+function disableAllTiles()
+  for color, data in pairs(PlayerData.cardHolders) do
+    if data.tile then
+      data.tile.setLock(true)
+      data.tile.interactable = false
+    end
+  end
+end
+
+function enableAllTiles()
+  for color, data in pairs(PlayerData.cardHolders) do
+    if data.tile then
+      data.tile.setLock(false)
+      data.tile.interactable = true
+    end
+  end
+end
+
+-------------------[[ ASSET LOADING ]]-------------------
+function ForceLoadAllAssets()
+  -- Add any bags that should have their contents pre-loaded
+  local AllBagsToLoad = {
+    GameObjects.bags.wonders.Collection,
+    GameObjects.bags.wonders.Base,
+    GameObjects.bags.wonders.Leaders,
+    GameObjects.bags.wonders.Cities,
+    GameObjects.bags.wonders.Armada,
+    GameObjects.bags.dockyard,
+    GameObjects.bags.frontiers
+  }
+
+  for _, BagToLoad in ipairs(AllBagsToLoad) do
+    if BagToLoad and BagToLoad.getObjects then
+      for _, Board in ipairs(BagToLoad.getObjects()) do
+        BagToLoad.takeObject({
+          position = {68.00, -10, 19.00},
+          smooth = false,
+          callback_function = function(spawnedObject)
+            spawnedObject.setLock(true)
+
+            -- Define recursive wait function
+            local function checkAndReturn()
+                if not spawnedObject.loading_custom then
+                    spawnedObject.setLock(false)
+                    BagToLoad.putObject(spawnedObject)
+                else
+                    -- Still loading, check again in 2 seconds
+                    Wait.time(checkAndReturn, 2)
+                end
+            end
+
+            -- Start the first check after 2 seconds
+            Wait.time(checkAndReturn, 2)
+          end
+        })
+      end
+    else
+        print("Warning: Bag not found or invalid - " .. tostring(BagToLoad))
+    end
+  end
+
+  return 1
+end
+
+-------------------[[ CARD MANAGEMENT ]]-------------------
+function RotateAllPlayerHands(direction)
+  direction = direction or "Right"
+
+  for _, PlayerInstance in ipairs(Player.getPlayers()) do
+    local handObjects = PlayerInstance.getHandObjects()
+    for _, Card in ipairs(handObjects) do
+      RotateHands(Card, PlayerInstance.color, direction)
+    end
+  end
+end
+
+-------------------[[ DEBUG FUNCTIONS ]]-------------------
+function printDeckZones()
+  printTable(GameObjects.deckZones, 0, "Deck Zones")
+end
+
+function printGameState()
+  print("----- Game State Debug -----")
+  print("Current State: " .. GameState.current)
+  print("Current Passes: " .. GameState.currentPasses)
+  print("Maximum Passes: " .. GameState.maximumPasses)
+  print("Ready Players: " .. GameState.numberOfReadyPlayers)
+  print("------------------------")
+end
+
+function printPlayerReadyStatus()
+  print("----- Player Ready Status -----")
+  for color, isReady in pairs(RuntimeState.readyList) do
+    print(color .. ": " .. tostring(isReady))
+  end
+  print("-----------------------------")
+end
+
+-------------------[[ EVENT HANDLERS ]]-------------------
+function onObjectEnterScriptingZone(zone, enter_object)
+  if enter_object.type ~= 'Card' and enter_object.type ~= 'Deck' then return end
+
+  local color = GetPlayerColorFromZone(zone)
+  if not color then return end
+
+  local data = PlayerData.cardHolders[color]
+  if not data then return end
+
+  local cardCount = CountCardsInZone(zone)
+
+  -- Highlight the tile
+  data.tile.highlightOn(color, 100)
+  enter_object.setVar("highlightedTile", data.tile)
+
+  -- Handle game state specific actions
+  if GameState.current == Constants.GAME_STATES.LEADER_DRAFTING and cardCount == GameState.currentPasses + 1 then
+    ReadyUp(Player[color])
+  elseif GameState.current == Constants.GAME_STATES.AGE1 or
+         GameState.current == Constants.GAME_STATES.AGE2 or
+         GameState.current == Constants.GAME_STATES.AGE3 or
+         GameState.current == Constants.GAME_STATES.LEADER_SELECTION then
+    CreateActionButtons(data.tile)
+    broadcastToColor("Choose your action!", color, color)
+  end
+end
+
+function onObjectLeaveScriptingZone(zone, leave_object)
+  if leave_object.type ~= 'Card' and leave_object.type ~= 'Deck' then return end
+
+  local color = GetPlayerColorFromZone(zone)
+  if not color then return end
+
+  local highlightedTile = leave_object.getVar("highlightedTile")
+  if not highlightedTile then return end
+
+  UnreadyPlayerIfNeeded(color, zone)
+  HandleTileOnCardLeave(highlightedTile, leave_object, zone)
+end
+
+-------------------[[ CHAT COMMANDS ]]-------------------
+function onChat(message, player)
+  if message == "debug" then
+    printToAll("Debug mode activated!", {1,1,0})
+
+    -- Clean up text objects on setup board
+    if TextOnSetupBoard then
+      for i, textObj in ipairs(TextOnSetupBoard) do
+        if textObj and textObj.destroy then
+          textObj.destroy()
+        end
+      end
+      TextOnSetupBoard = {}
+    end
+
+    if GameObjects.setupBoard then
+      GameObjects.setupBoard.destruct()
+    end
+    return false
+  end
+
+  if message:lower() == "card" then
+    RotateAllPlayerHands("Right")
+    return false
+  end
+
+  if message:lower() == "state" then
+    printGameState()
+    return false
+  end
+
+  if message:lower() == "ready" then
+    printPlayerReadyStatus()
+    return false
+  end
+end

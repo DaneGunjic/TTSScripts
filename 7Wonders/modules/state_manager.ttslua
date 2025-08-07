@@ -1,0 +1,11 @@
+StateManager = {
+  setState = function(newState)
+    local oldState = GameState.current
+    GameState.current = newState
+    StateManager.onStateChange(oldState, newState)
+  end,
+
+  onStateChange = function(oldState, newState)
+    -- Update UI, clean up old state, etc.
+  end
+}

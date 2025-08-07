@@ -1,0 +1,494 @@
+SetupManager = {
+
+  start = function()
+    SetupManager.updateUI("Please Wait", "Setting things up")
+
+    SetupManager.initializePlayers()
+    SetupManager.setupDecks()
+    SetupManager.setupWonders()
+    SetupManager.setupTokens()
+    SetupManager.dealInitialComponents()
+    SetupManager.finalizeSetup()
+  end,
+
+  initializePlayers = function()
+    -- Get a list of seated players
+    RuntimeState.allSeatedPlayers = PlayerManager.getAllSeated()
+    GameState.numberOfPlayers = #RuntimeState.allSeatedPlayers
+
+    PlayerManager.unreadyAll()
+
+    if GameState.numberOfPlayers < 3 then
+      -- For now we allow starting the game even with less than 3 players
+      GameState.numberOfPlayers = 3
+    end
+
+    -- Destroy Setup Board
+    GameObjects.setupBoard.destruct()
+  end,
+
+  setupDecks = function()
+    SetupManager.setupAgeDecks()
+    SetupManager.setupGuildDecks()
+    SetupManager.setupLeaderDecks()
+    SetupManager.setupCitiesDecks()
+    SetupManager.setupArmadaDecks()
+    SetupManager.setupIslandDecks()
+
+    -- Wait for objects to spawn
+    SetupManager.waitForSpawn(200)
+
+    SetupManager.shuffleDecks()
+    SetupManager.insertExpansionCards()
+    SetupManager.finalShuffleDecks()
+  end,
+
+  setupAgeDecks = function()
+    local ages = {"age1", "age2", "age3"}
+
+    for _, age in ipairs(ages) do
+      for bagKey, bagObject in pairs(GameObjects.bags[age]) do
+        local playersForThisBag = tonumber(string.match(bagKey, "(%d+)p$"))
+        if playersForThisBag and playersForThisBag <= GameState.numberOfPlayers then
+          local targetZone = GameObjects.deckZones.Age[age:gsub("age", "Age")]
+          local targetPos = targetZone.getPosition()
+          local targetRot = targetZone.getRotation() + vector(0, 0, 180)
+
+          bagObject.takeObject({
+            position = targetPos,
+            rotation = targetRot,
+            smooth = false
+          })
+        end
+      end
+    end
+  end,
+
+  setupGuildDecks = function()
+    for bagKey, bagObject in pairs(GameObjects.bags.guilds) do
+      local shouldInclude = false
+
+      if bagKey == "Base" then
+        shouldInclude = true
+      elseif bagKey == "Cities" and GameConfig.expansions.Cities then
+        shouldInclude = true
+      elseif bagKey == "Promo" and GameConfig.expansions.PromoGuilds then
+        shouldInclude = true
+      end
+
+      if shouldInclude then
+        bagObject.takeObject({
+          position = GameObjects.deckZones.Guild.getPosition(),
+          rotation = GameObjects.deckZones.Guild.getRotation() + vector(0, 0, 180),
+          smooth = false
+        })
+      end
+    end
+  end,
+
+  setupLeaderDecks = function()
+    if not GameConfig.expansions.Leaders.Base then return end
+
+    for bagKey, bagObject in pairs(GameObjects.bags.leaders) do
+      local shouldInclude = false
+
+      if bagKey == "Base" then
+        shouldInclude = true
+      elseif bagKey == "Promo" and GameConfig.expansions.Leaders.Promo then
+        shouldInclude = true
+      elseif bagKey == "Expert" and GameConfig.expansions.Leaders.Expert then
+        shouldInclude = true
+      elseif bagKey == "Cities" and GameConfig.expansions.Cities then
+        shouldInclude = true
+      end
+
+      if shouldInclude then
+        bagObject.takeObject({
+          position = GameObjects.deckZones.Leaders.getPosition(),
+          rotation = GameObjects.deckZones.Leaders.getRotation() + vector(0, 0, 180),
+          smooth = false
+        })
+      end
+    end
+  end,
+
+  setupCitiesDecks = function()
+    if not GameConfig.expansions.Cities then return end
+
+    for bagKey, bagObject in pairs(GameObjects.bags.cities) do
+      local targetZone = GameObjects.deckZones.Cities[bagKey]
+      bagObject.takeObject({
+        position = targetZone.getPosition(),
+        rotation = targetZone.getRotation() + vector(0, 0, 180),
+        smooth = false
+      })
+    end
+  end,
+
+  setupArmadaDecks = function()
+    if not GameConfig.expansions.Armada then return end
+
+    for bagKey, bagObject in pairs(GameObjects.bags.armada) do
+      local targetZone = GameObjects.deckZones.Armada[bagKey]
+      bagObject.takeObject({
+        position = targetZone.getPosition(),
+        rotation = targetZone.getRotation() + vector(0, 0, 180),
+        smooth = false
+      })
+    end
+  end,
+
+  setupIslandDecks = function()
+    if not GameConfig.expansions.Armada then return end
+
+    for bagKey, bagObject in pairs(GameObjects.bags.islands) do
+      local targetZone = GameObjects.deckZones.Island[bagKey]
+      bagObject.takeObject({
+        position = targetZone.getPosition(),
+        rotation = targetZone.getRotation() + vector(0, 0, 180),
+        smooth = false
+      })
+    end
+  end,
+
+  shuffleDecks = function()
+    -- Shuffle Cities decks
+    local citiesDecks = {
+      GameObjects.deckZones.Cities.Age1,
+      GameObjects.deckZones.Cities.Age2,
+      GameObjects.deckZones.Cities.Age3
+    }
+
+    for _, deck in ipairs(citiesDecks) do
+      if deck and deck.getObjects then
+        for _, item in ipairs(deck.getObjects()) do
+          if item.randomize then item.randomize() end
+        end
+      end
+    end
+
+    -- Shuffle Armada decks
+    local armadaDecks = {
+      GameObjects.deckZones.Armada.Age1,
+      GameObjects.deckZones.Armada.Age2,
+      GameObjects.deckZones.Armada.Age3
+    }
+
+    for _, deck in ipairs(armadaDecks) do
+      if deck and deck.getObjects then
+        for _, item in ipairs(deck.getObjects()) do
+          if item.randomize then item.randomize() end
+        end
+      end
+    end
+
+    -- Shuffle Guild deck
+    local guildDeck = GameObjects.deckZones.Guild.getObjects()
+    for _, item in ipairs(guildDeck) do
+      if item.randomize then item.randomize() end
+    end
+  end,
+
+  insertExpansionCards = function()
+    SetupManager.insertArmadaCards()
+    SetupManager.insertCitiesCards()
+    SetupManager.insertGuildCards()
+  end,
+
+  insertArmadaCards = function()
+    if not GameConfig.expansions.Armada then return end
+
+    local ageConfigs = {
+      {source = GameObjects.deckZones.Armada.Age1, target = GameObjects.deckZones.Age.Age1},
+      {source = GameObjects.deckZones.Armada.Age2, target = GameObjects.deckZones.Age.Age2},
+      {source = GameObjects.deckZones.Armada.Age3, target = GameObjects.deckZones.Age.Age3}
+    }
+
+    for _, config in ipairs(ageConfigs) do
+      if config.source and config.target then
+        local deckObjects = config.source.getObjects()
+        for _, item in ipairs(deckObjects) do
+          if item.takeObject then
+            for i = 1, GameState.numberOfPlayers do
+              item.takeObject({
+                position = config.target.getPosition(),
+                rotation = config.target.getRotation() + vector(0, 0, 180),
+                smooth = false
+              })
+            end
+          end
+        end
+      end
+    end
+  end,
+
+  insertCitiesCards = function()
+    if not GameConfig.expansions.Cities then return end
+
+    local ageConfigs = {
+      {source = GameObjects.deckZones.Cities.Age1, target = GameObjects.deckZones.Age.Age1},
+      {source = GameObjects.deckZones.Cities.Age2, target = GameObjects.deckZones.Age.Age2},
+      {source = GameObjects.deckZones.Cities.Age3, target = GameObjects.deckZones.Age.Age3}
+    }
+
+    for _, config in ipairs(ageConfigs) do
+      if config.source and config.target then
+        local deckObjects = config.source.getObjects()
+        for _, item in ipairs(deckObjects) do
+          if item.takeObject then
+            for i = 1, GameState.numberOfPlayers do
+              item.takeObject({
+                position = config.target.getPosition(),
+                rotation = config.target.getRotation() + vector(0, 0, 180),
+                smooth = false
+              })
+            end
+          end
+        end
+      end
+    end
+  end,
+
+  insertGuildCards = function()
+    local guildDeck = GameObjects.deckZones.Guild.getObjects()
+    for _, items in ipairs(guildDeck) do
+      for i = 1, GameState.numberOfPlayers + 2 do
+        items.takeObject({
+          position = GameObjects.deckZones.Age.Age3.getPosition(),
+          rotation = GameObjects.deckZones.Age.Age3.getRotation() + vector(0, 0, 180),
+          smooth = false
+        })
+      end
+    end
+  end,
+
+  setupWonders = function()
+    -- Combine wonder bags based on enabled expansions
+    if GameConfig.expansions.Leaders then
+      SetupManager.combineWonderBag(GameObjects.bags.wonders.Leaders)
+    end
+
+    if GameConfig.expansions.Cities then
+      SetupManager.combineWonderBag(GameObjects.bags.wonders.Cities)
+    end
+
+    if GameConfig.expansions.Armada then
+      SetupManager.combineWonderBag(GameObjects.bags.wonders.Armada)
+    end
+
+    if GameConfig.wonderExpansions.Collection then
+      SetupManager.combineWonderBag(GameObjects.bags.wonders.Collection)
+    end
+  end,
+
+  combineWonderBag = function(bag)
+    while bag.getQuantity() ~= 0 do
+      bag.takeObject({
+        position = GameObjects.bags.wonders.Base.getPosition() + Vector(0, 2, 0),
+        smooth = false
+      })
+    end
+  end,
+
+  finalShuffleDecks = function()
+    -- Shuffle age decks
+    local ageDecks = {
+      GameObjects.deckZones.Age.Age1,
+      GameObjects.deckZones.Age.Age2,
+      GameObjects.deckZones.Age.Age3
+    }
+
+    for _, zone in ipairs(ageDecks) do
+      if zone and zone.getObjects then
+        local deck = zone.getObjects()
+        for _, item in ipairs(deck) do
+          if item.randomize then item.randomize() end
+        end
+      end
+    end
+
+    -- Shuffle leader deck
+    for _, items in ipairs(GameObjects.deckZones.Leaders.getObjects()) do
+      if items.randomize then items.randomize() end
+    end
+
+    -- Shuffle island decks
+    local islandLevels = {
+      GameObjects.deckZones.Island.Level1,
+      GameObjects.deckZones.Island.Level2,
+      GameObjects.deckZones.Island.Level3
+    }
+
+    for _, zone in ipairs(islandLevels) do
+      if zone and zone.getObjects then
+        local deck = zone.getObjects()
+        for _, item in ipairs(deck) do
+          if item.randomize then item.randomize() end
+        end
+      end
+    end
+
+    GameObjects.bags.wonders.Base.randomize()
+    GameObjects.bags.dockyard.randomize()
+  end,
+
+  moveUnusedDecks = function()
+    -- Move Cities decks
+    local citiesDecks = {
+      {source = GameObjects.deckZones.Cities.Age1, destination = GameObjects.finalDeckZones.Cities.Age1},
+      {source = GameObjects.deckZones.Cities.Age2, destination = GameObjects.finalDeckZones.Cities.Age2},
+      {source = GameObjects.deckZones.Cities.Age3, destination = GameObjects.finalDeckZones.Cities.Age3}
+    }
+
+    for _, deckConfig in ipairs(citiesDecks) do
+      if deckConfig.source and deckConfig.destination then
+        local deckObjects = deckConfig.source.getObjects()
+        for _, item in ipairs(deckObjects) do
+          item.setPositionSmooth(deckConfig.destination.getPosition(), false, false)
+          item.rotate({0, 90, 0})
+        end
+      end
+    end
+
+    -- Move Armada decks
+    local armadaDecks = {
+      {source = GameObjects.deckZones.Armada.Age1, destination = GameObjects.finalDeckZones.Armada.Age1},
+      {source = GameObjects.deckZones.Armada.Age2, destination = GameObjects.finalDeckZones.Armada.Age2},
+      {source = GameObjects.deckZones.Armada.Age3, destination = GameObjects.finalDeckZones.Armada.Age3}
+    }
+
+    for _, deckConfig in ipairs(armadaDecks) do
+      if deckConfig.source and deckConfig.destination then
+        local deckObjects = deckConfig.source.getObjects()
+        for _, item in ipairs(deckObjects) do
+          item.setPositionSmooth(deckConfig.destination.getPosition(), false, false)
+          item.rotate({0, 90, 0})
+        end
+      end
+    end
+  end,
+
+  dealInitialComponents = function()
+    WonderManager.dealWonders()
+    ArmadaManager.dealComponents()
+    SetupManager.dealCoins()
+  end,
+
+  dealCoins = function()
+    local coinAmount = GameConfig.expansions.Leaders.Base and 6 or 3
+
+    for _, player in ipairs(RuntimeState.allSeatedPlayers) do
+      local playerInfo = Constants.PLAYER_POSITIONS[player]
+      local basePos = Vector(playerInfo.WonderPos)
+      basePos.y = 2
+
+      for i = 1, coinAmount do
+        local tempPos = Vector(basePos)
+        tempPos.x = tempPos.x + math.random(-100, 100) / 100
+        tempPos.z = tempPos.z + math.random(-100, 100) / 100
+
+        GameObjects.bags.tokens.coins.Coin1.takeObject({
+          position = tempPos,
+          rotation = playerInfo.ComponentRotation,
+          smooth = false
+        })
+        pause(0.1)
+      end
+    end
+  end,
+
+  setupTokens = function()
+    -- Position token bags according to layout
+    for tokenType, tokens in pairs(Constants.TOKEN_LAYOUT) do
+      if tokenType == "COIN_BAGS" then
+        for i, tokenData in ipairs(tokens) do
+          local bag = GameObjects.bags.tokens.coins["Coin" .. tokenData.value]
+          if bag then
+            bag.setPosition(tokenData.pos)
+          end
+        end
+      elseif tokenType == "CONFLICT_TOKENS" then
+        for i, tokenData in ipairs(tokens) do
+          local bagName = tokenData.type == "defeat" and "DefeatToken" or ("VictoryToken" .. tokenData.value)
+          local bag = GameObjects.bags.tokens.conflict[bagName]
+          if bag then
+            bag.setPosition(tokenData.pos)
+          end
+        end
+      end
+      -- Add similar logic for naval tokens, special tokens, etc.
+    end
+  end,
+
+  finalizeSetup = function()
+    SetupManager.moveUnusedDecks()
+    SetupManager.waitForSpawn(200)
+
+    -- Play setup complete sound
+    if MusicPlayer then
+      MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
+      MusicPlayer.pause()
+    end
+  end,
+
+  updateUI = function(phase, description)
+    UI.setValue("CurrentPhase", phase)
+    UI.setValue("PhaseDesc", description)
+  end,
+
+  waitForSpawn = function(frames)
+    for i = 0, frames do
+      coroutine.yield(0)
+    end
+  end,
+
+  -- UI Button Creation Functions
+  createSetupButtons = function()
+    local setupBoard = GameObjects.setupBoard
+    local buttonStyle = Constants.BUTTON_STYLES.DEFAULT
+
+    -- Create expansion toggle buttons
+    local expansionButtons = {
+      {pos = {-0.35, 0.1, -0.02}, func = "HandleLeadersButton", label = "[    ]"},
+      {pos = {-0.35, 0.2, 0.08}, func = "HandlePromoButton", label = "[    ]"},
+      {pos = {-0.35, 0.2, 0.18}, func = "HandleExpertButton", label = "[    ]"},
+      {pos = {-0.35, 0.2, 0.28}, func = "HandleCitiesButton", label = "[    ]"},
+      {pos = {-0.35, 0.2, 0.38}, func = "HandleArmadaButton", label = "[    ]"},
+      -- Add more expansion buttons...
+    }
+
+    for _, btn in ipairs(expansionButtons) do
+      local params = table.copy(buttonStyle)
+      params.position = btn.pos
+      params.click_function = btn.func
+      params.label = btn.label
+      setupBoard.createButton(params)
+    end
+
+    -- Create wonder mode buttons
+    local wonderButtons = {
+      {pos = {0.35, 0.1, 0.58}, func = "HandleRandomButton", label = "[✓]", color = {0,1,0}},
+      {pos = {0.35, 0.1, 0.68}, func = "HandleDraftButton", label = "[    ]", color = {1,1,1}}
+    }
+
+    for _, btn in ipairs(wonderButtons) do
+      local params = table.copy(buttonStyle)
+      params.position = btn.pos
+      params.click_function = btn.func
+      params.label = btn.label
+      params.font_color = btn.color
+      setupBoard.createButton(params)
+    end
+  end
+}
+
+-- Wrapper function for coroutine
+function HandleStartGameButtonCo()
+  SetupManager.start()
+  return 1
+end
+
+-- Keep original function for backward compatibility
+function HandleStartGameButton()
+  startLuaCoroutine(Global, "HandleStartGameButtonCo")
+end

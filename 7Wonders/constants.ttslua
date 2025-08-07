@@ -1,0 +1,145 @@
+Constants = {
+  -- Game States
+  GAME_STATES = {
+    SETUP = "Setup",
+    WONDER_STAGE = "WonderStage",
+    LEADER_DRAFTING = "LeaderDrafting",
+    LEADER_SELECTION = "LeaderSelectionStage",
+    AGE1 = "Age1",
+    AGE2 = "Age2",
+    AGE3 = "Age3"
+  },
+
+  -- UI Button Styles
+  BUTTON_STYLES = {
+    DEFAULT = {
+      width = 200,
+      height = 200,
+      font_color = {1,1,1},
+      color = {0.05,0.05,0.05,1},
+      font_size = 200,
+      scale = {x=0.2, y=0.2, z=0.2},
+      click_function = "OnUpdate",
+      label = "X",
+      position = {0, 0, 0}
+    },
+    ACTION = {
+      width = 1000,
+      height = 1000,
+      font_color = {1,1,1},
+      color = {0.2,0.2,0.2,1},
+      font_size = 300,
+      scale = {x=0.3, y=0.3, z=0.3}
+    },
+    WONDER = {
+      width = 600,
+      color = {1,1,1,1},
+      font_color = {0,0,0},
+      font_size = 250
+    }
+  },
+
+  -- Text Object Defaults
+  TEXT_DEFAULTS = {
+    type = "3DText",
+    rotation = {90, 0, 0}
+  },
+
+  -- Game Timing Constants
+  TIMINGS = {
+    CARD_ROTATION_DELAY = 0.1,
+    FORCE_TAKE_DELAY = 1.0,
+    STATE_CHANGE_DELAY = 0.1,
+    BUTTON_ANIMATION_DELAY = 0.2
+  },
+
+  -- Player Configuration
+  PLAYER_CONFIG = {
+    MAX_PLAYERS = 7,
+    MIN_PLAYERS = 3,
+    DRAFT_MODE_DEFAULT_NUMBER = 3,
+    CAMERA_SETTINGS = {
+      DEFAULT_PITCH = 70,
+      DEFAULT_DISTANCE = 20,
+      YAWS = {
+        White = 315,
+        Red = 0,
+        Yellow = 45,
+        Green = 90,
+        Pink = 135,
+        Blue = 180,
+        Purple = 225
+      }
+    }
+  },
+
+  -- Expansion Names (for consistency)
+  EXPANSIONS = {
+    LEADERS = "Leaders",
+    CITIES = "Cities",
+    ARMADA = "Armada",
+    EDIFICE = "Edifice",
+    RUINS = "Ruins",
+    MYTHS = "Myths",
+    FRONTIERS = "Frontiers",
+    PROMO_GUILDS = "PromoGuilds"
+  },
+
+  -- Wonder Expansions
+  WONDER_EXPANSIONS = {
+    COLLECTION = "Collection",
+    PROMO = "Promo"
+  },
+
+  -- Player Colors (for iteration and validation)
+  PLAYER_COLORS = {
+    "White", "Red", "Yellow", "Green", "Pink", "Blue", "Purple"
+  },
+
+  -- Token Positions Layout
+  TOKEN_LAYOUT = {
+    COIN_BAGS = {
+      {pos = {-14.00, 0.46, -4.00}, value = 1},
+      {pos = {-10.00, 0.46, -4.00}, value = 3},
+      {pos = {-6.00, 0.46, -4.00}, value = 6}
+    },
+    CONFLICT_TOKENS = {
+      {pos = {-2.00, 0.46, -4.00}, value = 1},
+      {pos = {2.00, 0.46, -4.00}, value = 3},
+      {pos = {6.00, 0.46, -4.00}, value = 5},
+      {pos = {10.00, 0.46, -4.00}, value = 7},
+      {pos = {14.00, 0.46, -4.00}, type = "defeat"}
+    },
+    NAVAL_TOKENS = {
+      VICTORY = {
+        {pos = {-14.00, 0.46, 4.00}, value = 1},
+        {pos = {-10.00, 0.46, 4.00}, value = 3},
+        {pos = {-6.00, 0.46, 4.00}, value = 5},
+        {pos = {-2.00, 0.46, 4.00}, value = 7}
+      },
+      DEFEAT = {
+        {pos = {2.00, 0.46, 4.00}, value = 1},
+        {pos = {6.00, 0.46, 4.00}, value = 2},
+        {pos = {10.00, 0.46, 4.00}, value = 3}
+      }
+    },
+    SPECIAL_TOKENS = {
+      BOARDING = {-17.00, 0.46, 0.00},
+      DIPLOMACY = {14.00, 0.46, 0.00},
+      DEBT_1 = {-17.00, 0.46, 4.00},
+      DEBT_5 = {-17.00, 0.46, -4.00}
+    }
+  },
+
+  -- Component Offsets (relative positions for ships, etc.)
+  COMPONENT_OFFSETS = {
+    SHIPS = {
+      RED = {0, 0},
+      YELLOW = {0.74, 0.81},
+      BLUE = {1.59, 1.65},
+      GREEN = {2.45, 2.53}
+    },
+    DOCKYARD_OFFSET = {3.82, 7.28}, -- relative to wonder position
+    DRAFT_MODE_Y = -20
+  }
+}

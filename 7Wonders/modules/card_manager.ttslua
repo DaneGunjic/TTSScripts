@@ -1,0 +1,260 @@
+-- card_manager.ttslua
+CardManager = {
+
+  countInZone = function(zone)
+    return CountCardsInZone(zone) -- Use utility function
+  end,
+
+  rotateAllHands = function(direction)
+    direction = direction or "Right"
+
+    for _, playerInstance in ipairs(Player.getPlayers()) do
+      local handObjects = playerInstance.getHandObjects()
+      for _, card in ipairs(handObjects) do
+        CardManager.rotate(card, playerInstance.color, direction)
+      end
+    end
+  end,
+
+  rotate = function(card, color, direction)
+    if not card or not color or not direction then return end
+
+    -- Implementation depends on your existing RotateHands function
+    -- This would handle the actual card rotation logic
+    if RotateHands then
+      RotateHands(card, color, direction)
+    end
+  end,
+
+  forceTake = function(direction)
+    for _, player in ipairs(RuntimeState.allSeatedPlayers) do
+      local neighborColor = FindNextColor(player, direction)
+
+      if neighborColor then
+        CardManager.forcePlayerTake(player, neighborColor)
+      end
+    end
+  end,
+
+  forcePlayerTake = function(fromPlayer, toPlayer)
+    local fromPlayerObj = Player[fromPlayer]
+    local toPlayerObj = Player[toPlayer]
+
+    if fromPlayerObj and toPlayerObj then
+      local handObjects = fromPlayerObj.getHandObjects()
+
+      for _, card in ipairs(handObjects) do
+        toPlayerObj.getHandObjects().takeObject({
+          guid = card.getGUID(),
+          smooth = false
+        })
+      end
+    end
+  end,
+
+  forcePersonalTake = function()
+    -- Force all players to take their remaining cards to their personal zones
+    for _, player in ipairs(RuntimeState.allSeatedPlayers) do
+      CardManager.moveHandToZone(player)
+    end
+  end,
+
+  moveHandToZone = function(playerColor)
+    local playerObj = Player[playerColor]
+    local cardHolder = PlayerData.cardHolders[playerColor]
+
+    if playerObj and cardHolder and cardHolder.zone then
+      local handObjects = playerObj.getHandObjects()
+
+      for _, card in ipairs(handObjects) do
+        card.setPosition(cardHolder.zone.getPosition())
+      end
+    end
+  end,
+
+  dealCards = function(deck, cardsPerPlayer)
+    if not deck or not deck.deal then return false end
+
+    deck.deal(cardsPerPlayer)
+    return true
+  end,
+
+  shuffleDeck = function(deck)
+    if deck and deck.randomize then
+      deck.randomize()
+      return true
+    end
+    return false
+  end,
+
+  -- Card action handling
+  handleBuyCard = function(tile, color)
+    local cardZone = PlayerData.cardHolders[color].zone
+    if not cardZone then return end
+
+    local cards = cardZone.getObjects()
+    if #cards > 0 then
+      local card = cards[1] -- Take the top card
+
+      -- Logic for buying a card (checking resources, paying costs, etc.)
+      if CardManager.canAffordCard(color, card) then
+        CardManager.buyCard(color, card)
+        PlayerManager.ready(Player[color])
+      else
+        PlayerManager.broadcastToPlayer(color, "Cannot afford this card!", {1, 0, 0})
+      end
+    end
+  end,
+
+  handleSellCard = function(tile, color)
+    local cardZone = PlayerData.cardHolders[color].zone
+    if not cardZone then return end
+
+    local cards = cardZone.getObjects()
+    if #cards > 0 then
+      local card = cards[1]
+      CardManager.sellCard(color, card)
+      PlayerManager.ready(Player[color])
+    end
+  end,
+
+  handleBuildWonder = function(tile, color)
+    local cardZone = PlayerData.cardHolders[color].zone
+    local wonderZone = PlayerData.wonderZones[color]
+
+    if not cardZone or not wonderZone then return end
+
+    local cards = cardZone.getObjects()
+    if #cards > 0 then
+      local card = cards[1]
+
+      if CardManager.canBuildWonderStage(color) then
+        CardManager.buildWonderStage(color, card)
+        PlayerManager.ready(Player[color])
+      else
+        PlayerManager.broadcastToPlayer(color, "Cannot build wonder stage!", {1, 0, 0})
+      end
+    end
+  end,
+
+  -- Card mechanics implementation
+  canAffordCard = function(color, card)
+    -- Implementation would check player resources vs card costs
+    -- This is a simplified version - real implementation would be more complex
+    return true -- Placeholder
+  end,
+
+  buyCard = function(color, card)
+    -- Move card to player's played cards area
+    -- Deduct resources/coins
+    -- Apply card effects
+    local playerWonderZone = PlayerData.wonderZones[color]
+    if playerWonderZone then
+      card.setPosition(playerWonderZone.getPosition() + Vector(2, 0, 0))
+    end
+  end,
+
+  sellCard = function(color, card)
+    -- Give player 3 coins for selling the card
+    local playerWonderPos = Constants.PLAYER_POSITIONS[color].WonderPos
+
+    -- Spawn 3 coins
+    for i = 1, 3 do
+      GameObjects.bags.tokens.coins.Coin1.takeObject({
+        position = {
+          playerWonderPos[1] + math.random(-1, 1),
+          playerWonderPos[2] + 1,
+          playerWonderPos[3] + math.random(-1, 1)
+        },
+        smooth = false
+      })
+    end
+
+    -- Remove the card
+    -- card.destruct()
+  end,
+
+  canBuildWonderStage = function(color)
+    -- Check if player can build the next wonder stage
+    -- This would involve checking resources and wonder stage requirements
+    return true -- Placeholder
+  end,
+
+  buildWonderStage = function(color, card)
+    -- Use the card to build a wonder stage
+    -- The card goes under the wonder board and the stage is activated
+    local wonderZone = PlayerData.wonderZones[color]
+    if wonderZone then
+      card.setPosition(wonderZone.getPosition() + Vector(0, -0.1, 0))
+      card.setLock(true)
+    end
+  end,
+
+  -- Utility functions
+  getTopCardFromZone = function(zone)
+    if not zone or not zone.getObjects then return nil end
+
+    local objects = zone.getObjects()
+    for _, obj in ipairs(objects) do
+      if obj.tag == "Card" then
+        return obj
+      elseif obj.tag == "Deck" then
+        return obj.takeObject({
+          position = zone.getPosition() + Vector(0, 1, 0),
+          smooth = false
+        })
+      end
+    end
+    return nil
+  end,
+
+  getDeckFromZone = function(zone)
+    if not zone or not zone.getObjects then return nil end
+
+    local objects = zone.getObjects()
+    for _, obj in ipairs(objects) do
+      if obj.tag == "Deck" then
+        return obj
+      end
+    end
+    return nil
+  end,
+
+  countCardsInHand = function(playerColor)
+    local player = Player[playerColor]
+    if player then
+      return #player.getHandObjects()
+    end
+    return 0
+  end,
+
+  hasCardsInHand = function(playerColor)
+    return CardManager.countCardsInHand(playerColor) > 0
+  end
+}
+
+-- Global button handler functions (required for TTS button callbacks)
+function HandleBuyCard(tile, color, alt_click)
+  CardManager.handleBuyCard(tile, color)
+end
+
+function HandleSellCard(tile, color, alt_click)
+  CardManager.handleSellCard(tile, color)
+end
+
+function HandleBuildWonder(tile, color, alt_click)
+  CardManager.handleBuildWonder(tile, color)
+end
+
+-- Legacy function wrappers
+function ForceTakeCards(direction)
+  CardManager.forceTake(direction)
+end
+
+function ForceTakePersonalCards()
+  CardManager.forcePersonalTake()
+end
+
+function RotateHands(card, color, direction)
+  CardManager.rotate(card, color, direction)
+end

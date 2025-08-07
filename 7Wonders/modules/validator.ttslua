@@ -1,0 +1,13 @@
+Validator = {
+  validatePlayer = function(color)
+    if not Player[color] then
+      error("Invalid player color: " .. tostring(color))
+    end
+  end,
+
+  validateZone = function(zone)
+    if not zone or not zone.getObjects then
+      error("Invalid zone object")
+    end
+  end
+}

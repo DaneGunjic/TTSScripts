@@ -1,0 +1,235 @@
+WonderManager = {
+
+  dealWonders = function()
+    StateManager.setState(Constants.GAME_STATES.WONDER_STAGE)
+    SetupManager.updateUI("Phase: Wonder Selection", "Choose your wonder")
+
+    if GameConfig.randomWonders then
+      WonderManager.dealRandomWonders()
+    elseif GameConfig.draftMode then
+      WonderManager.dealDraftWonders()
+    end
+
+    WonderManager.setCameraPositions()
+  end,
+
+  dealRandomWonders = function()
+    for _, player in ipairs(RuntimeState.allSeatedPlayers) do
+      local playerInfo = Constants.PLAYER_POSITIONS[player]
+
+      RuntimeState.randomWonderObjects[player] = GameObjects.bags.wonders.Base.takeObject({
+        position = playerInfo.WonderPos,
+        rotation = playerInfo.ComponentRotation,
+        smooth = false,
+        callback_function = LockObject
+      })
+
+      WonderManager.createWonderButtons(RuntimeState.randomWonderObjects[player], "random")
+    end
+  end,
+
+  dealDraftWonders = function()
+    for _, player in ipairs(RuntimeState.allSeatedPlayers) do
+      local playerInfo = Constants.PLAYER_POSITIONS[player]
+      RuntimeState.draftWonderObjects[player] = {}
+
+      -- Deal multiple wonders for drafting
+      for i = 1, GameConfig.draftModeNumber do
+        RuntimeState.draftWonderObjects[player][i] = GameObjects.bags.wonders.Base.takeObject({
+          smooth = false,
+          position = playerInfo.DraftModePos,
+          rotation = playerInfo.ComponentRotation,
+          callback_function = LockObject
+        })
+
+        WonderManager.createWonderButtons(RuntimeState.draftWonderObjects[player][i], "draft")
+      end
+
+      -- Position the first wonder at the main position
+      RuntimeState.draftWonderObjects[player][1].setPosition(playerInfo.WonderPos)
+    end
+  end,
+
+  createWonderButtons = function(wonderObj, mode)
+    local buttonStyle = Constants.BUTTON_STYLES.WONDER
+
+    if mode == "random" then
+      -- Flip and Keep buttons for random mode
+      local buttons = {
+        {label = "Flip", func = "HandleFlipButton", pos = {0, 1, -0.5}},
+        {label = "Keep", func = "HandleKeepButton", pos = {0, 1, 0}}
+      }
+
+      for _, btn in ipairs(buttons) do
+        local params = table.copy(buttonStyle)
+        params.label = btn.label
+        params.click_function = btn.func
+        params.position = btn.pos
+        wonderObj.createButton(params)
+      end
+
+    elseif mode == "draft" then
+      -- Navigation and selection buttons for draft mode
+      local buttons = {
+        {label = "Flip", func = "HandleFlipButton", pos = {0, 1, -0.5}},
+        {label = "Keep", func = "HandleKeepButton", pos = {0, 1, 0}},
+        {label = "<", func = "HandleCycleLeftButton", pos = {-1, 1, 0}},
+        {label = ">", func = "HandleCycleRightButton", pos = {1, 1, 0}}
+      }
+
+      for _, btn in ipairs(buttons) do
+        local params = table.copy(buttonStyle)
+        params.label = btn.label
+        params.click_function = btn.func
+        params.position = btn.pos
+        wonderObj.createButton(params)
+      end
+    end
+  end,
+
+  setCameraPositions = function()
+    for _, player in ipairs(RuntimeState.allSeatedPlayers) do
+      local playerInfo = Constants.PLAYER_POSITIONS[player]
+      local cameraSettings = Constants.PLAYER_CONFIG.CAMERA_SETTINGS
+
+      Player[player].lookAt({
+        position = playerInfo.WonderPos or {0, 0, 0},
+        pitch = cameraSettings.DEFAULT_PITCH,
+        yaw = cameraSettings.YAWS[player],
+        distance = cameraSettings.DEFAULT_DISTANCE
+      })
+    end
+  end,
+
+  -- Button Handlers
+  handleFlipButton = function(obj, color, alt_click)
+    if obj and obj.flip then
+      obj.flip()
+    end
+  end,
+
+  handleKeepButton = function(obj, color, alt_click)
+    if GameConfig.randomWonders then
+      WonderManager.keepRandomWonder(obj, color)
+    elseif GameConfig.draftMode then
+      WonderManager.keepDraftWonder(obj, color)
+    end
+  end,
+
+  handleCycleLeftButton = function(obj, color, alt_click)
+    if not GameConfig.draftMode then return end
+    WonderManager.cycleWonder(color, -1)
+  end,
+
+  handleCycleRightButton = function(obj, color, alt_click)
+    if not GameConfig.draftMode then return end
+    WonderManager.cycleWonder(color, 1)
+  end,
+
+  keepRandomWonder = function(obj, color)
+    -- Clear buttons and lock the wonder
+    obj.clearButtons()
+    obj.setLock(true)
+
+    -- Mark player as ready
+    PlayerManager.ready(Player[color])
+
+    -- Check if all players are ready
+    if PlayerManager.allReady() then
+      GamePhases.finishWonderStage()
+    end
+  end,
+
+  keepDraftWonder = function(obj, color)
+    local currentIndex = RuntimeState.playerCurrentlyChosenWonder[color]
+    local chosenWonder = RuntimeState.draftWonderObjects[color][currentIndex]
+
+    if chosenWonder == obj then
+      -- Clear buttons from chosen wonder
+      chosenWonder.clearButtons()
+      chosenWonder.setLock(true)
+
+      -- Destroy other draft wonders for this player
+      for i, wonder in ipairs(RuntimeState.draftWonderObjects[color]) do
+        if i ~= currentIndex and wonder then
+          wonder.destruct()
+        end
+      end
+
+      -- Mark player as ready
+      PlayerManager.ready(Player[color])
+
+      -- Check if all players are ready
+      if PlayerManager.allReady() then
+        GamePhases.finishWonderStage()
+      end
+    end
+  end,
+
+  cycleWonder = function(color, direction)
+    local currentIndex = RuntimeState.playerCurrentlyChosenWonder[color]
+    local wonderArray = RuntimeState.draftWonderObjects[color]
+    local newIndex = currentIndex + direction
+
+    -- Wrap around
+    if newIndex > #wonderArray then
+      newIndex = 1
+    elseif newIndex < 1 then
+      newIndex = #wonderArray
+    end
+
+    -- Hide current wonder
+    local playerInfo = Constants.PLAYER_POSITIONS[color]
+    wonderArray[currentIndex].setPosition(playerInfo.DraftModePos)
+
+    -- Show new wonder
+    wonderArray[newIndex].setPosition(playerInfo.WonderPos)
+
+    -- Update current index
+    RuntimeState.playerCurrentlyChosenWonder[color] = newIndex
+  end,
+
+  -- Utility function to check if wonder selection is complete
+  isSelectionComplete = function()
+    for _, player in ipairs(RuntimeState.allSeatedPlayers) do
+      if not RuntimeState.readyList[player] then
+        return false
+      end
+    end
+    return true
+  end,
+
+  -- Clean up wonder selection objects
+  cleanup = function()
+    for color, wonderObj in pairs(RuntimeState.randomWonderObjects) do
+      if wonderObj and wonderObj.clearButtons then
+        wonderObj.clearButtons()
+      end
+    end
+
+    for color, wonderArray in pairs(RuntimeState.draftWonderObjects) do
+      for _, wonderObj in ipairs(wonderArray) do
+        if wonderObj and wonderObj.clearButtons then
+          wonderObj.clearButtons()
+        end
+      end
+    end
+  end
+}
+
+-- Global button handler functions (required for TTS button callbacks)
+function HandleFlipButton(obj, color, alt_click)
+  WonderManager.handleFlipButton(obj, color, alt_click)
+end
+
+function HandleKeepButton(obj, color, alt_click)
+  WonderManager.handleKeepButton(obj, color, alt_click)
+end
+
+function HandleCycleLeftButton(obj, color, alt_click)
+  WonderManager.handleCycleLeftButton(obj, color, alt_click)
+end
+
+function HandleCycleRightButton(obj, color, alt_click)
+  WonderManager.handleCycleRightButton(obj, color, alt_click)
+end

@@ -1,0 +1,7 @@
+AgeManager = {
+  startAge = function(ageNumber) ... end,
+  dealAgeCards = function(ageNumber) ... end,
+  processAgePass = function(ageNumber) ... end,
+  resolveConflicts = function() ... end,
+  calculateAgeScores = function() ... end
+}

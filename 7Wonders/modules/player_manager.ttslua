@@ -1,0 +1,213 @@
+-- player_manager.ttslua
+PlayerManager = {
+
+  getAllSeated = function()
+    local seatedPlayers = {}
+    local allPlayers = Player.getPlayers()
+
+    for _, player in ipairs(allPlayers) do
+      if player.seated then
+        table.insert(seatedPlayers, player.color)
+      end
+    end
+
+    return seatedPlayers
+  end,
+
+  getColorFromZone = function(zone)
+    if not zone then return nil end
+
+    for color, data in pairs(PlayerData.cardHolders) do
+      if data.zone and zone.guid == data.zone.guid then
+        return color
+      end
+    end
+    return nil
+  end,
+
+  ready = function(player)
+    local color = type(player) == "string" and player or player.color
+    Validator.validatePlayer(color)
+
+    RuntimeState.readyList[color] = true
+    GameState.numberOfReadyPlayers = GameState.numberOfReadyPlayers + 1
+
+    PlayerManager.updateReadyStatus()
+  end,
+
+  unready = function(player)
+    local color = type(player) == "string" and player or player.color
+    Validator.validatePlayer(color)
+
+    if RuntimeState.readyList[color] then
+      RuntimeState.readyList[color] = false
+      GameState.numberOfReadyPlayers = math.max(0, GameState.numberOfReadyPlayers - 1)
+    end
+
+    PlayerManager.updateReadyStatus()
+  end,
+
+  unreadyAll = function()
+    for color in pairs(RuntimeState.readyList) do
+      RuntimeState.readyList[color] = false
+    end
+    GameState.numberOfReadyPlayers = 0
+  end,
+
+  allReady = function()
+    local expectedPlayers = #RuntimeState.allSeatedPlayers
+    return GameState.numberOfReadyPlayers >= expectedPlayers
+  end,
+
+  updateReadyStatus = function()
+    -- Update UI or broadcast ready status
+    local readyCount = GameState.numberOfReadyPlayers
+    local totalCount = #RuntimeState.allSeatedPlayers
+
+    if readyCount == totalCount then
+      -- All players ready - proceed to next phase
+      PlayerManager.handleAllPlayersReady()
+    end
+  end,
+
+  handleAllPlayersReady = function()
+    local currentState = GameState.current
+
+    if currentState == Constants.GAME_STATES.WONDER_STAGE then
+      GamePhases.finishWonderStage()
+    elseif currentState == Constants.GAME_STATES.LEADER_DRAFTING then
+      GamePhases.doLeaderPass()
+    elseif currentState == Constants.GAME_STATES.AGE1 then
+      GamePhases.doAgePass(1)
+    elseif currentState == Constants.GAME_STATES.AGE2 then
+      GamePhases.doAgePass(2)
+    elseif currentState == Constants.GAME_STATES.AGE3 then
+      GamePhases.doAgePass(3)
+    end
+  end,
+
+  getPlayerCount = function()
+    return #RuntimeState.allSeatedPlayers
+  end,
+
+  isPlayerSeated = function(color)
+    for _, seatedColor in ipairs(RuntimeState.allSeatedPlayers) do
+      if seatedColor == color then
+        return true
+      end
+    end
+    return false
+  end,
+
+  getNeighbors = function(color)
+    local leftNeighbor = FindNextColor(color, "Left")
+    local rightNeighbor = FindNextColor(color, "Right")
+
+    return {
+      left = leftNeighbor,
+      right = rightNeighbor
+    }
+  end,
+
+  getPlayerZone = function(color, zoneType)
+    if zoneType == "wonder" then
+      return PlayerData.wonderZones[color]
+    elseif zoneType == "armada" then
+      return PlayerData.armadaBoardZones[color]
+    elseif zoneType == "card" then
+      return PlayerData.cardHolders[color].zone
+    end
+    return nil
+  end,
+
+  getPlayerTile = function(color)
+    local cardHolder = PlayerData.cardHolders[color]
+    return cardHolder and cardHolder.tile
+  end,
+
+  hasPlayerAction = function(color)
+    return RuntimeState.playerSelectedAction[color] ~= nil
+  end,
+
+  setPlayerAction = function(color, action)
+    Validator.validatePlayer(color)
+    RuntimeState.playerSelectedAction[color] = action
+  end,
+
+  clearPlayerAction = function(color)
+    RuntimeState.playerSelectedAction[color] = nil
+  end,
+
+  clearAllPlayerActions = function()
+    for color in pairs(RuntimeState.playerSelectedAction) do
+      RuntimeState.playerSelectedAction[color] = nil
+    end
+  end,
+
+  -- Wonder selection specific functions
+  getPlayerWonder = function(color)
+    if GameConfig.randomWonders then
+      return RuntimeState.randomWonderObjects[color]
+    elseif GameConfig.draftMode then
+      local currentIndex = RuntimeState.playerCurrentlyChosenWonder[color]
+      return RuntimeState.draftWonderObjects[color][currentIndex]
+    end
+    return nil
+  end,
+
+  setPlayerWonderChoice = function(color, index)
+    if GameConfig.draftMode then
+      RuntimeState.playerCurrentlyChosenWonder[color] = index
+    end
+  end,
+
+  -- Helper functions for player interactions
+  broadcastToPlayer = function(color, message, messageColor)
+    messageColor = messageColor or color
+    broadcastToColor(message, color, messageColor)
+  end,
+
+  broadcastToAllPlayers = function(message, messageColor)
+    messageColor = messageColor or {1, 1, 1}
+    for _, color in ipairs(RuntimeState.allSeatedPlayers) do
+      broadcastToColor(message, color, messageColor)
+    end
+  end,
+
+  getReadyPlayerCount = function()
+    return GameState.numberOfReadyPlayers
+  end,
+
+  getReadyPlayerList = function()
+    local readyPlayers = {}
+    for color, isReady in pairs(RuntimeState.readyList) do
+      if isReady and PlayerManager.isPlayerSeated(color) then
+        table.insert(readyPlayers, color)
+      end
+    end
+    return readyPlayers
+  end,
+
+  getUnreadyPlayerList = function()
+    local unreadyPlayers = {}
+    for _, color in ipairs(RuntimeState.allSeatedPlayers) do
+      if not RuntimeState.readyList[color] then
+        table.insert(unreadyPlayers, color)
+      end
+    end
+    return unreadyPlayers
+  end
+}
+
+-- Legacy function wrappers
+function getSeatedPlayers()
+  return PlayerManager.getAllSeated()
+end
+
+function UnreadyAllPlayers()
+  PlayerManager.unreadyAll()
+end
+
+function ReadyUp(player)
+  PlayerManager.ready(player)
+end

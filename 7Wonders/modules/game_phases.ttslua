@@ -1,0 +1,255 @@
+-- game_phases.ttslua
+GamePhases = {
+
+  finishWonderStage = function()
+    -- All players selected their wonders and are ready
+    StateManager.setState("CoinsDealing")
+    startLuaCoroutine(Global, "DealCoins")
+
+    -- Show ready button and proceed to next phase
+    Wait.time(function()
+      if GameConfig.expansions.Leaders.Base then
+        GamePhases.startLeaderStage()
+      else
+        GamePhases.startAge(1)
+      end
+    end, 2.0)
+  end,
+
+  startLeaderStage = function()
+    StateManager.setState(Constants.GAME_STATES.LEADER_DRAFTING)
+
+    GameState.maximumPasses = 3
+    GameState.currentPasses = 0
+
+    SetupManager.updateUI("Phase: Leader Drafting", "Select 1 leader to keep\n" .. GameState.currentPasses .. "/" .. GameState.maximumPasses)
+
+    -- Deal 4 leaders to each player
+    local leaderDeck = GameObjects.deckZones.Leaders.getObjects()[1]
+    if leaderDeck then
+      leaderDeck.deal(4)
+    end
+
+    -- Update player tiles with leader graphics
+    GamePhases.updatePlayerTilesForLeaders()
+
+    -- Disable tiles until cards are dealt
+    disableAllTiles()
+  end,
+
+  updatePlayerTilesForLeaders = function()
+    local newTopImage = "https://i.imgur.com/oEisU1I.jpeg"
+
+    for color, data in pairs(PlayerData.cardHolders) do
+      local tile = data.tile
+
+      if tile and tile.getCustomObject then
+        tile.setCustomObject({
+          image = newTopImage,
+          image_bottom = newTopImage
+        })
+
+        -- Reload the tile (it gets a new GUID)
+        PlayerData.cardHolders[color].tile = tile.reload()
+      else
+        print("Tile not found or invalid for color: " .. color)
+      end
+    end
+
+    -- Re-disable tiles after reload
+    disableAllTiles()
+  end,
+
+  doLeaderPass = function()
+    if GameState.currentPasses < GameState.maximumPasses then
+      -- Rotate hands
+      Wait.time(function()
+        CardManager.rotateAllHands("Right")
+      end, Constants.TIMINGS.CARD_ROTATION_DELAY)
+
+      -- Increment passes
+      GameState.currentPasses = GameState.currentPasses + 1
+      SetupManager.updateUI("Phase: Leader Drafting", "Select 1 leader to keep\n" .. GameState.currentPasses .. "/" .. GameState.maximumPasses)
+
+      if GameState.currentPasses == GameState.maximumPasses then
+        -- Final pass - switch to selection stage
+        SetupManager.updateUI("Phase: Leader Selection", "Choose 1 Leader to play")
+
+        Wait.time(function()
+          CardManager.forcePersonalTake()
+          Wait.time(function()
+            StateManager.setState(Constants.GAME_STATES.LEADER_SELECTION)
+          end, Constants.TIMINGS.STATE_CHANGE_DELAY)
+        end, Constants.TIMINGS.CARD_ROTATION_DELAY)
+      end
+
+      -- Force take cards from the left (passing right)
+      Wait.time(function()
+        CardManager.forceTake("Left")
+      end, Constants.TIMINGS.FORCE_TAKE_DELAY)
+    end
+  end,
+
+  startAge = function(ageNumber)
+    local ageState = "Age" .. ageNumber
+    StateManager.setState(ageState)
+
+    SetupManager.updateUI("Age " .. ageNumber, "Select a card to play")
+
+    -- Calculate maximum passes for this age
+    GameState.maximumPasses = 5
+    if GameConfig.expansions.Cities then
+      GameState.maximumPasses = GameState.maximumPasses + 1
+    end
+    if GameConfig.expansions.Armada then
+      GameState.maximumPasses = GameState.maximumPasses + 1
+    end
+
+    GameState.currentPasses = 0
+
+    -- Deal cards for the age
+    local ageDeck = GameObjects.deckZones.Age["Age" .. ageNumber].getObjects()[1]
+    if ageDeck then
+      local cardsPerPlayer = math.floor(ageDeck.getQuantity() / GameState.numberOfPlayers)
+      ageDeck.deal(cardsPerPlayer)
+    end
+  end,
+
+  doAgePass = function(ageNumber)
+    if GameState.currentPasses < GameState.maximumPasses then
+      -- Rotate hands based on age
+      local direction = (ageNumber == 2) and "Left" or "Right"
+
+      Wait.time(function()
+        CardManager.rotateAllHands(direction)
+      end, Constants.TIMINGS.CARD_ROTATION_DELAY)
+
+      GameState.currentPasses = GameState.currentPasses + 1
+
+      -- Force take cards
+      local takeDirection = (direction == "Right") and "Left" or "Right"
+      Wait.time(function()
+        CardManager.forceTake(takeDirection)
+      end, Constants.TIMINGS.FORCE_TAKE_DELAY)
+
+      -- Check if age is complete
+      if GameState.currentPasses >= GameState.maximumPasses then
+        GamePhases.finishAge(ageNumber)
+      end
+    end
+  end,
+
+  finishAge = function(ageNumber)
+    -- Handle end of age logic
+    GamePhases.resolveConflicts()
+
+    -- Move to next age or end game
+    if ageNumber < 3 then
+      Wait.time(function()
+        GamePhases.startAge(ageNumber + 1)
+      end, 2.0)
+    else
+      GamePhases.endGame()
+    end
+  end,
+
+  resolveConflicts = function()
+    -- Handle military conflicts between neighboring players
+    for _, player in ipairs(RuntimeState.allSeatedPlayers) do
+      local leftNeighbor = FindNextColor(player, "Left")
+      local rightNeighbor = FindNextColor(player, "Right")
+
+      -- Logic for calculating military strength and awarding tokens
+      -- This would be implemented based on 7 Wonders rules
+    end
+  end,
+
+  endGame = function()
+    StateManager.setState("GameEnd")
+    SetupManager.updateUI("Game Complete", "Calculating final scores...")
+
+    -- Calculate final scores
+    GamePhases.calculateFinalScores()
+  end,
+
+  calculateFinalScores = function()
+    local scores = {}
+
+    for _, player in ipairs(RuntimeState.allSeatedPlayers) do
+      scores[player] = {
+        military = 0,
+        coins = 0,
+        wonders = 0,
+        civic = 0,
+        commercial = 0,
+        scientific = 0,
+        guilds = 0,
+        total = 0
+      }
+
+      -- Calculate each scoring category
+      -- This would involve checking cards, wonder stages, tokens, etc.
+    end
+
+    GamePhases.displayFinalScores(scores)
+  end,
+
+  displayFinalScores = function(scores)
+    -- Display final scores to all players
+    local scoreText = "Final Scores:\n"
+    local sortedPlayers = {}
+
+    -- Sort players by total score
+    for player, score in pairs(scores) do
+      table.insert(sortedPlayers, {player = player, total = score.total})
+    end
+
+    table.sort(sortedPlayers, function(a, b) return a.total > b.total end)
+
+    for i, playerData in ipairs(sortedPlayers) do
+      scoreText = scoreText .. i .. ". " .. playerData.player .. ": " .. playerData.total .. " points\n"
+    end
+
+    printToAll(scoreText, {1, 1, 1})
+    SetupManager.updateUI("Game Complete", scoreText)
+  end,
+
+  -- Utility functions
+  isAgeComplete = function()
+    return GameState.currentPasses >= GameState.maximumPasses
+  end,
+
+  getCurrentAge = function()
+    local state = GameState.current
+    if state == Constants.GAME_STATES.AGE1 then return 1
+    elseif state == Constants.GAME_STATES.AGE2 then return 2
+    elseif state == Constants.GAME_STATES.AGE3 then return 3
+    else return 0 end
+  end,
+
+  isLeaderPhase = function()
+    return GameState.current == Constants.GAME_STATES.LEADER_DRAFTING or
+           GameState.current == Constants.GAME_STATES.LEADER_SELECTION
+  end
+}
+
+-- Legacy function wrappers for backward compatibility
+function FinishWonderStage()
+  GamePhases.finishWonderStage()
+end
+
+function PrepareAge1Stage()
+  GamePhases.startAge(1)
+end
+
+function PrepareLeaderStage()
+  GamePhases.startLeaderStage()
+end
+
+function DoAge1Stage()
+  GamePhases.doAgePass(1)
+end
+
+function DoLeaderStage()
+  GamePhases.doLeaderPass()
+end
