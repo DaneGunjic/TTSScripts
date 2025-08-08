@@ -4,23 +4,6 @@ function FinishWonderStage()
 	startLuaCoroutine(Global, "DealCoins")
 end
 
-function PrepareAge1Stage()
-	-- Runs only once per game
-	GameState = "Age1"
-	updatePhaseUI("Age 1", "Select a card to play")
-
-	MaximumPasses = 5
-	if ExpansionsUsed.Cities then
-		MaximumPasses = MaximumPasses + 1
-	end
-	if ExpansionsUsed.Armada then
-		MaximumPasses = MaximumPasses + 1
-	end
-
-	local tempDeck = DeckZones.Age.Age1.getObjects()
-	tempDeck[1].deal(#tempDeck[1].getObjects()/NumberOfPlayers)
-end
-
 function PrepareLeaderStage()
 	-- Runs only once per game
 	GameState = "LeaderDrafting"
@@ -55,10 +38,6 @@ function PrepareLeaderStage()
 
 	-- They are now new objects, lock them again
 	disableAllTiles()
-end
-
-function DoAge1Stage()
-
 end
 
 function DoLeaderStage()
@@ -96,4 +75,26 @@ function DoLeaderStage()
 		-- Passing right means we force take from left
 		Wait.time(function() ForceTakeCards("Left") end, 1)
   end
+end
+
+function PrepareAge1Stage()
+	-- Runs only once per game
+	GameState = "Age1"
+	updatePhaseUI("Age 1", "Select a card to play")
+
+	MaximumPasses = 5
+	if ExpansionConfig.Cities then
+		MaximumPasses = MaximumPasses + 1
+	end
+	if ExpansionConfig.Armada then
+		MaximumPasses = MaximumPasses + 1
+	end
+
+	local tempDeck = DeckZones.Age.Age1.getObjects()
+	tempDeck[1].deal(#tempDeck[1].getObjects()/NumberOfPlayers)
+end
+
+
+function DoAge1Stage()
+	--
 end

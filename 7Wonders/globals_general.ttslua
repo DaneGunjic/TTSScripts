@@ -16,31 +16,11 @@ DefaultTextParams = {
   type = "3DText",
   rotation = {90, 0, 0}
 }
--------------------[[ EXPANSION SETTINGS ]]-------------------
-ExpansionsUsed = {
-  Leaders = {
-    Base = false,
-    Expert = false,
-    Promo = false
-  },
-  Cities = false,
-  Armada = false,
-  Edifice = false,
-  Ruins = false,
-  Myths = false,
-  Frontiers = false,
-  PromoGuilds = false
-}
-
-WonderExpansionsUsed = {
-    Collection = false,
-    Promo = false
-}
 
 -------------------[[ GAME MODE SETTINGS ]]-------------------
 RandomWonders = true
 DraftMode = false
-DraftModeNumber = 3 -- Used but not ever changed
+DraftModeNumber = 3
 
 -------------------[[ GAME STATE ]]-------------------
 NumberOfReadyPlayers = 0
@@ -63,13 +43,13 @@ TokenBagsPositions = {
   ConflictTokenDefeat = Vector(14.00, 0.46, -4.00),
   BoardingToken = Vector(-17.00, 0.46, 0.00),
   DiplomacyTokenPosition = Vector(14.00, 0.46, 0.00),
-  NavalVictory = Vector(-14.00, 0.46, 4.00),
-  NavalVictory = Vector(-10.00, 0.46, 4.00),
-  NavalVictory = Vector(-6.00, 0.46, 4.00),
-  NavalVictoryn = Vector(-2.00, 0.46, 4.00),
-  NavalDefeat = Vector(2.00, 0.46, 4.00),
-  NavalDefeat = Vector(6.00, 0.46, 4.00),
-  NavalDefeat = Vector(10.00, 0.46, 4.00),
+  NavalVictory1 = Vector(-14.00, 0.46, 4.00),
+  NavalVictory3 = Vector(-10.00, 0.46, 4.00),
+  NavalVictory5 = Vector(-6.00, 0.46, 4.00),
+  NavalVictory7 = Vector(-2.00, 0.46, 4.00),
+  NavalDefeat1 = Vector(2.00, 0.46, 4.00),
+  NavalDefeat2 = Vector(6.00, 0.46, 4.00),
+  NavalDefeat3 = Vector(10.00, 0.46, 4.00),
   Debt1 = Vector(-17.00, 0.46, 4.00),
   Debt5 = Vector(-17.00, 0.46, -4.00)
 }

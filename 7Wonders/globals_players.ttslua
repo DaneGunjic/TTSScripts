@@ -1,199 +1,164 @@
+-- Player Colors (in seating order)
+Players = {"White", "Red", "Yellow", "Green", "Pink", "Blue", "Purple"}
+
 -- [[ PLAYER COMPONENT INFORMATION ]]
-_WhitePlayerInfo = {
-  WonderPos = {31.82, 1.00, -31.82},
-  ComponentRotation = {0.00, 135.00, 0.00},
-  DraftModePos = {26.75, -20, -24.25},
-  DockyardPos = {35.64, 1.00, -24.54},
-  RedShipPos = {37.17, 1.58, -28.84},
-  YellowShipPos = {37.91, 1.58, -28.03},
-  BlueShipPos = {38.76, 1.58, -27.19},
-  GreenShipPos = {39.62, 1.58, -26.31}
-}
-
-_RedPlayerInfo = {
-  WonderPos = {0.00, 1.00, -45.00},
-  ComponentRotation = {0.00, 180, 0.00},
-	DraftModePos = {2, -20, -22},
-  DockyardPos = {8.00, 1.00, -42.35},
-  RedShipPos = {6.04, 1.58, -46.49},
-  YellowShipPos = {7.14, 1.58, -46.44},
-  BlueShipPos = {8.33, 1.58, -46.45},
-  GreenShipPos = {9.56, 1.58, -46.43}
-}
-
-_YellowPlayerInfo = {
-  WonderPos = {-31.82, 1.00, -31.82},
-  ComponentRotation = {0.00, 225.00, 0.00},
-  DraftModePos = {-28, -20, -22},
-  DockyardPos = {-24.52, 1.00, -35.58},
-  RedShipPos = {-28.84, 1.58, -37.10},
-  YellowShipPos = {-28.03, 1.58, -37.85},
-  BlueShipPos = {-27.19, 1.58, -38.69},
-  GreenShipPos = {-26.31, 1.58, -39.55}
-}
-
-_GreenPlayerInfo = {
-  WonderPos = {-45.00, 1.00, 0.00},
-  ComponentRotation = {0.00, 270, 0.00},
-  DraftModePos = {-38, -20, -22},
-  DockyardPos = {-42.50, 1.00, -7.75},
-  RedShipPos = {-42.06, 1.58, -2.74},
-  YellowShipPos = {-42.01, 1.58, -3.84},
-  BlueShipPos = {-42.02, 1.58, -5.03},
-  GreenShipPos = {-42.00, 1.58, -6.26}
-}
-
-_PinkPlayerInfo = {
-  WonderPos = {-31.82, 1.00, 31.82},
-  ComponentRotation = {0.00, 135.00, 0.00},
-  DraftModePos = {-32, -20, -22},
-  DockyardPos = {-35.48, 1.00, 24.38},
-  RedShipPos = {-32.73, 1.58, 26.03},
-  YellowShipPos = {-33.83, 1.58, 25.98},
-  BlueShipPos = {-35.02, 1.58, 25.99},
-  GreenShipPos = {-36.25, 1.58, 25.97},
-}
-
-_BluePlayerInfo = {
-  WonderPos = {0.00, 1.00, 45.00},
-  ComponentRotation = {0.00, 0.00, 0.00},
-  DraftModePos = {-2, -20, -22},
-  DockyardPos = {-7.75, 1.00, 42.50},
-  RedShipPos = {-5.79, 1.58, 46.62},
-  YellowShipPos = {-6.89, 1.58, 46.57},
-  BlueShipPos = {-8.08, 1.58, 46.58},
-  GreenShipPos = {-9.31, 1.58, 46.56}
-}
-
-_PurplePlayerInfo = {
-  WonderPos = {33.22, 1.00, 24.50},
-  ComponentRotation = {0.00, 0.00, 0.00},
-  DraftModePos = {28, -20, -22},
-  DockyardPos = {25.30, 1.00, 21.92},
-  RedShipPos = {21.96, 2, 24.10},
-  YellowShipPos = {20.87, 2, 24.06},
-  BlueShipPos = {19.68, 2, 24.07},
-  GreenShipPos = {18.45, 2, 24.05}
-}
-
--- Used only if RandomWonders = true
-RandomWonderObj = {}
-
--- [[TABLES THAT HOLD ALL 'DRAFT' MODE WONDERS]]
-_WhiteDraftWonderObj = {}
-_RedDraftWonderObj = {}
-_YellowDraftWonderObj = {}
-_GreenDraftWonderObj = {}
-_PinkDraftWonderObj = {}
-_BlueDraftWonderObj = {}
-_PurpleDraftWonderObj = {}
-
-PlayerCurrentlyChosenWonder = {
-  ["White"] = 1,
-  ["Red"] = 1,
-  ["Yellow"] = 1,
-  ["Green"] = 1,
-  ["Pink"] = 1,
-  ["Blue"] = 1,
-  ["Purple"] = 1
-}
-
-PlayerCardHolder = {
+PlayerInfo = {
   White = {
-    Tile = getObjectFromGUID("348b41"),
-    Zone = getObjectFromGUID("50a360")
+    WonderPos = {31.82, 1.00, -31.82},
+    ComponentRotation = {0.00, 135.00, 0.00},
+    DraftModePos = {26.75, -20, -24.25},
+    DockyardPos = {35.64, 1.00, -24.54},
+    ShipPositions = {
+      Red = {37.17, 1.58, -28.84},
+      Yellow = {37.91, 1.58, -28.03},
+      Blue = {38.76, 1.58, -27.19},
+      Green = {39.62, 1.58, -26.31}
+    }
   },
   Red = {
-    Tile = getObjectFromGUID("daee75"),
-    Zone = getObjectFromGUID("d74960")
+    WonderPos = {0.00, 1.00, -45.00},
+    ComponentRotation = {0.00, 180.00, 0.00},
+    DraftModePos = {2, -20, -22},
+    DockyardPos = {8.00, 1.00, -42.35},
+    ShipPositions = {
+      Red = {6.04, 1.58, -46.49},
+      Yellow = {7.14, 1.58, -46.44},
+      Blue = {8.33, 1.58, -46.45},
+      Green = {9.56, 1.58, -46.43}
+    }
   },
   Yellow = {
-    Tile = getObjectFromGUID("1e9b11"),
-    Zone = getObjectFromGUID("f4c902")
+    WonderPos = {-31.82, 1.00, -31.82},
+    ComponentRotation = {0.00, 225.00, 0.00},
+    DraftModePos = {-28, -20, -22},
+    DockyardPos = {-24.52, 1.00, -35.58},
+    ShipPositions = {
+      Red = {-28.84, 1.58, -37.10},
+      Yellow = {-28.03, 1.58, -37.85},
+      Blue = {-27.19, 1.58, -38.69},
+      Green = {-26.31, 1.58, -39.55}
+    }
   },
   Green = {
-    Tile = getObjectFromGUID("febaac"),
-    Zone = getObjectFromGUID("42b333")
+    WonderPos = {-45.00, 1.00, 0.00},
+    ComponentRotation = {0.00, 270.00, 0.00},
+    DraftModePos = {-38, -20, -22},
+    DockyardPos = {-42.50, 1.00, -7.75},
+    ShipPositions = {
+      Red = {-42.06, 1.58, -2.74},
+      Yellow = {-42.01, 1.58, -3.84},
+      Blue = {-42.02, 1.58, -5.03},
+      Green = {-42.00, 1.58, -6.26}
+    }
   },
   Pink = {
-    Tile = getObjectFromGUID("896cf6"),
-    Zone = getObjectFromGUID("fe05cb")
+    WonderPos = {-31.82, 1.00, 31.82},
+    ComponentRotation = {0.00, 135.00, 0.00},
+    DraftModePos = {-32, -20, -22},
+    DockyardPos = {-35.48, 1.00, 24.38},
+    ShipPositions = {
+      Red = {-32.73, 1.58, 26.03},
+      Yellow = {-33.83, 1.58, 25.98},
+      Blue = {-35.02, 1.58, 25.99},
+      Green = {-36.25, 1.58, 25.97}
+    }
   },
   Blue = {
-    Tile = getObjectFromGUID("85c98e"),
-    Zone = getObjectFromGUID("c72796")
+    WonderPos = {0.00, 1.00, 45.00},
+    ComponentRotation = {0.00, 0.00, 0.00},
+    DraftModePos = {-2, -20, -22},
+    DockyardPos = {-7.75, 1.00, 42.50},
+    ShipPositions = {
+      Red = {-5.79, 1.58, 46.62},
+      Yellow = {-6.89, 1.58, 46.57},
+      Blue = {-8.08, 1.58, 46.58},
+      Green = {-9.31, 1.58, 46.56}
+    }
   },
   Purple = {
-    Tile = getObjectFromGUID("da702a"),
-    Zone = getObjectFromGUID("8b99be")
+    WonderPos = {33.22, 1.00, 24.50},
+    ComponentRotation = {0.00, 0.00, 0.00},
+    DraftModePos = {28, -20, -22},
+    DockyardPos = {25.30, 1.00, 21.92},
+    ShipPositions = {
+      Red = {21.96, 2.00, 24.10},
+      Yellow = {20.87, 2.00, 24.06},
+      Blue = {19.68, 2.00, 24.07},
+      Green = {18.45, 2.00, 24.05}
+    }
   }
 }
 
-ReadyList = {
-  ["White"] = true,
-  ["Red"] = true,
-  ["Yellow"] = true,
-  ["Green"] = true,
-  ["Pink"] = true,
-  ["Blue"] = true,
-  ["Purple"] = true
+-- [[ RANDOM WONDER / DRAFTING ]]
+RandomWonderObj = {}
+DraftWonders = {}
+PlayerCurrentlyChosenWonder = {}
+PlayerSelectedAction = {}
+ReadyList = {}
+
+for _, color in ipairs(Players) do
+  DraftWonders[color] = {}
+  PlayerCurrentlyChosenWonder[color] = 1
+  PlayerSelectedAction[color] = nil
+  ReadyList[color] = true
+end
+
+PlayerCardHolder = {
+  White = { Tile = getObjectFromGUID("348b41"), Zone = getObjectFromGUID("50a360") },
+  Red = { Tile = getObjectFromGUID("daee75"), Zone = getObjectFromGUID("d74960") },
+  Yellow = { Tile = getObjectFromGUID("1e9b11"), Zone = getObjectFromGUID("f4c902") },
+  Green = { Tile = getObjectFromGUID("febaac"), Zone = getObjectFromGUID("42b333") },
+  Pink = { Tile = getObjectFromGUID("896cf6"), Zone = getObjectFromGUID("fe05cb") },
+  Blue = { Tile = getObjectFromGUID("85c98e"), Zone = getObjectFromGUID("c72796") },
+  Purple = { Tile = getObjectFromGUID("da702a"), Zone = getObjectFromGUID("8b99be") },
 }
 
 --------------[[ SCRIPTING ZONES | WONDERS ]]--------------
 WonderZones = {
-  WhiteWonderZone = getObjectFromGUID("139f96"),
-  RedWonderZone = getObjectFromGUID("59ebcd"),
-  YellowWonderZone = getObjectFromGUID("988c12"),
-  GreenWonderZone = getObjectFromGUID("797e59"),
-  PinkWonderZone = getObjectFromGUID("84634f"),
-  BlueWonderZone = getObjectFromGUID("a6380a"),
-  PurpleWonderZone = getObjectFromGUID("7896c6")
+  White = getObjectFromGUID("139f96"),
+  Red = getObjectFromGUID("59ebcd"),
+  Yellow = getObjectFromGUID("988c12"),
+  Green = getObjectFromGUID("797e59"),
+  Pink = getObjectFromGUID("84634f"),
+  Blue = getObjectFromGUID("a6380a"),
+  Purple = getObjectFromGUID("7896c6")
 }
 
 --------------[[ SCRIPTING ZONES | ARMADA BOARDS ]]--------------
 ArmadaBoardZones = {
-  WhiteArmadaBoardZone = getObjectFromGUID("e424ca"),
-  RedArmadaBoardZone = getObjectFromGUID("df01b8"),
-  YellowArmadaBoardZone = getObjectFromGUID("ed7dec"),
-  GreenArmadaBoardZone = getObjectFromGUID("ff74f6"),
-  PinkArmadaBoardZone = getObjectFromGUID("36feea"),
-  BlueArmadaBoardZone = getObjectFromGUID("352aeb"),
-  PurpleArmadaBoardZone = getObjectFromGUID("13c916")
+  White = getObjectFromGUID("e424ca"),
+  Red = getObjectFromGUID("df01b8"),
+  Yellow = getObjectFromGUID("ed7dec"),
+  Green = getObjectFromGUID("ff74f6"),
+  Pink = getObjectFromGUID("36feea"),
+  Blue = getObjectFromGUID("352aeb"),
+  Purple = getObjectFromGUID("13c916")
 }
 
 -- [[ PLAYER CAMERA SETTINGS ]]
-CameraSettings = {
-  _White = {pitch =70 , yaw = 315, distance = 20},
-  _Red = {pitch =70 , yaw = 0, distance = 20},
-  _Yellow = {pitch =70 , yaw = 45, distance = 20},
-  _Green = {pitch =70 , yaw = 90, distance = 20},
-  _Pink = {pitch =70 , yaw = 135, distance = 20},
-  _Blue = {pitch =70 , yaw = 180, distance = 20},
-  _Purple = {pitch =70 , yaw = 225, distance = 20}
-}
+CameraSettings = {}
+for i, color in ipairs(Players) do
+  local yaw_angle = 0
+  if color == "White" then
+    yaw_angle = 315
+  else
+    yaw_angle = (i - 1) * 45
+  end
 
--- [[ PLAYER ZONE REFERENCES ]]
-_WhiteLeftZone = getObjectFromGUID("13fc28") -- Red-White
-_WhiteRightZone = getObjectFromGUID("8455bc") -- White-Purple
-_RedLeftZone = getObjectFromGUID("78cb1b") -- Yellow-Red
-_RedRightZone = getObjectFromGUID("13fc28") -- Red-White
-_YellowLeftZone = getObjectFromGUID("5c04e5") -- Green-Yellow
-_YellowRightZone = getObjectFromGUID("78cb1b") -- Yellow-Red
-_GreenLeftZone = getObjectFromGUID("a16b0b") -- Green-Pink
-_GreenRightZone = getObjectFromGUID("5c04e5") -- Green-Yellow
-_PinkLeftZone = getObjectFromGUID("1ad522") -- Pink-Blue
-_PinkRightZone = getObjectFromGUID("a16b0b") -- Green-Pink
-_BlueLeftZone = getObjectFromGUID("c1f197") -- Blue-Purple
-_BlueRightZone = getObjectFromGUID("1ad522") -- Pink-Blue
-_PurpleLeftZone = getObjectFromGUID("8455bc") -- White-Purple
-_PurpleRightZone = getObjectFromGUID("c1f197") -- Blue-Purple
+  CameraSettings[color] = {
+    pitch = 70,
+    yaw = yaw_angle,
+    distance = 20
+  }
+end
 
-PlayerSelectedAction = {
-  White = nil,
-  Red = nil,
-  Yellow = nil,
-  Green = nil,
-  Pink = nil,
-  Blue = nil,
-  Purple = nil
+-- [[ PLAYER LEFT/RIGHT ZONES ]]
+PlayerZones = {
+  White = { Left = getObjectFromGUID("13fc28"), Right = getObjectFromGUID("8455bc") },
+  Red = { Left = getObjectFromGUID("78cb1b"), Right = getObjectFromGUID("13fc28") },
+  Yellow = { Left = getObjectFromGUID("5c04e5"), Right = getObjectFromGUID("78cb1b") },
+  Green = { Left = getObjectFromGUID("a16b0b"), Right = getObjectFromGUID("5c04e5") },
+  Pink = { Left = getObjectFromGUID("1ad522"), Right = getObjectFromGUID("a16b0b") },
+  Blue = { Left = getObjectFromGUID("c1f197"), Right = getObjectFromGUID("1ad522") },
+  Purple = { Left = getObjectFromGUID("8455bc"), Right = getObjectFromGUID("c1f197") },
 }

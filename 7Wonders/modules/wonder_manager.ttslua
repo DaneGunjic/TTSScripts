@@ -1,0 +1,89 @@
+function DealWonders()
+	GameState = "WonderStage"
+	UI.setValue("CurrentPhase", "Phase: Wonder Selection")
+	UI.setValue("PhaseDesc", "Choose your wonder")
+
+	-- Random Wonders
+	if RandomWonders then
+		for _, player in ipairs(AllSeatedPlayers) do
+			RandomWonderObj[player] = WonderBags.Base.takeObject({
+				position = PlayerInfo[player].WonderPos,
+				rotation = PlayerInfo[player].ComponentRotation,
+				smooth = false,
+				callback_function = LockSpawnedObject})
+
+			DefaultButtonParams.width = 600
+			DefaultButtonParams.color = {1,1,1,1}
+			DefaultButtonParams.font_color = {0, 0, 0}
+			DefaultButtonParams.label = "Flip"
+			DefaultButtonParams.position = {0, 1, -0.5}
+			DefaultButtonParams.scale = {0.3, 0.3, 0.3}
+			DefaultButtonParams.font_size = 200
+			DefaultButtonParams.click_function = "HandleFlipButton"
+			RandomWonderObj[player].createButton(DefaultButtonParams)
+
+			DefaultButtonParams.label = "Keep"
+			DefaultButtonParams.position = {0, 1, 0}
+			DefaultButtonParams.click_function = "HandleKeepButton"
+			RandomWonderObj[player].createButton(DefaultButtonParams)
+		end
+	-- Draft Wonders
+	elseif DraftMode then
+		for _, player in ipairs(AllSeatedPlayers) do
+			for i = 1, DraftModeNumber do
+				DraftWonders[player][i] = WonderBags.Base.takeObject({
+					smooth = false,
+					position = PlayerInfo[player].DraftModePos,
+					rotation = PlayerInfo[player].ComponentRotation,
+					callback_function = LockSpawnedObject})
+
+				DefaultButtonParams.width = 600
+				DefaultButtonParams.color = {1,1,1,1}
+				DefaultButtonParams.font_color = {0, 0, 0}
+				DefaultButtonParams.label = "Flip"
+				DefaultButtonParams.position = {0, 1, -0.5}
+				DefaultButtonParams.scale = {0.3, 0.3, 0.3}
+				DefaultButtonParams.font_size = 200
+				DefaultButtonParams.click_function = "HandleFlipButton"
+				DraftWonders[player][i].createButton(DefaultButtonParams)
+
+				DefaultButtonParams.label = "Keep"
+				DefaultButtonParams.position = {0, 1, 0}
+				DefaultButtonParams.click_function = "HandleKeepButton"
+				DraftWonders[player][i].createButton(DefaultButtonParams)
+
+				DefaultButtonParams.label = "<"
+				DefaultButtonParams.position = {-1, 1, 0}
+				DefaultButtonParams.click_function = "HandleCycleLeftButton"
+				DraftWonders[player][i].createButton(DefaultButtonParams)
+
+				DefaultButtonParams.label = ">"
+				DefaultButtonParams.position = {1, 1, 0}
+				DefaultButtonParams.click_function = "HandleCycleRightButton"
+				DraftWonders[player][i].createButton(DefaultButtonParams)
+			end
+
+			DraftWonders[player][1].setPosition(PlayerInfo[player].WonderPos)
+		end
+	end
+
+	-- [[SET CAMERA POSITIONS]]
+	for _, player in ipairs(AllSeatedPlayers) do
+    -- Verify the player exists in CameraSettings
+    if CameraSettings[player] then
+      -- Safely get the wonder position (assuming it exists in _G)
+      local wonderPos = nil
+      if PlayerInfo[player] then
+        wonderPos = PlayerInfo[player].WonderPos
+      end
+
+      -- Apply camera lookAt with settings from CameraSettings
+      Player[player].lookAt({
+        position = wonderPos or {0, 0, 0},
+        pitch = CameraSettings[player].pitch,
+        yaw = CameraSettings[player].yaw,
+        distance = CameraSettings[player].distance
+      })
+    end
+	end
+end

@@ -75,7 +75,7 @@ function HandleStartGameButtonCo()
 		end
 
 		-- Checks if "Cities" is used, it adds 1 guild card
-		if bagKey == "Cities" and ExpansionsUsed.Cities then
+		if bagKey == "Cities" and ExpansionConfig.Cities then
 			bagObject.takeObject({
 				position = DeckZones.Guild.getPosition(),
 				rotation = DeckZones.Guild.getRotation() + vector(0, 0, 180),
@@ -84,7 +84,7 @@ function HandleStartGameButtonCo()
 		end
 
 		-- Checks if "Promo Guilds" is used, it adds 2 guild cards
-		if bagKey == "Promo" and ExpansionsUsed.PromoGuilds then
+		if bagKey == "Promo" and ExpansionConfig.PromoGuilds then
 			bagObject.takeObject({
 				position = DeckZones.Guild.getPosition(),
 				rotation = DeckZones.Guild.getRotation() + vector(0, 0, 180),
@@ -94,7 +94,7 @@ function HandleStartGameButtonCo()
 	end
 
 	-- [[LEADER DECKS SETUP]]
-	if ExpansionsUsed.Leaders.Base then
+	if ExpansionConfig.Leaders.Base then
 		for bagKey, bagObject in pairs(LeaderBags) do
 			if bagKey == "Base" then
 				bagObject.takeObject({
@@ -105,7 +105,7 @@ function HandleStartGameButtonCo()
 			end
 
 			-- Checks if "Promo" is used, it adds 1 leader card
-			if bagKey == "Promo" and ExpansionsUsed.Leaders.Promo then
+			if bagKey == "Promo" and ExpansionConfig.Leaders.Promo then
 				bagObject.takeObject({
 					position = DeckZones.Leaders.getPosition(),
 					rotation = DeckZones.Leaders.getRotation() + vector(0, 0, 180),
@@ -114,7 +114,7 @@ function HandleStartGameButtonCo()
 			end
 
 			-- Checks if "Expert" is used, it adds 15 leader cards
-			if bagKey == "Expert" and ExpansionsUsed.Leaders.Expert then
+			if bagKey == "Expert" and ExpansionConfig.Leaders.Expert then
 				bagObject.takeObject({
 					position = DeckZones.Leaders.getPosition(),
 					rotation = DeckZones.Leaders.getRotation() + vector(0, 0, 180),
@@ -123,7 +123,7 @@ function HandleStartGameButtonCo()
 			end
 
 			-- Checks if "Cities" is used, it adds 6 leader cards
-			if bagKey == "Cities" and ExpansionsUsed.Cities then
+			if bagKey == "Cities" and ExpansionConfig.Cities then
 				bagObject.takeObject({
 					position = DeckZones.Leaders.getPosition(),
 					rotation = DeckZones.Leaders.getRotation() + vector(0, 0, 180),
@@ -135,7 +135,7 @@ function HandleStartGameButtonCo()
 
 	-- [[CITIES DECKS SETUP]]
 	for bagKey, bagObject in pairs(CitiesBags) do
-		if ExpansionsUsed.Cities then
+		if ExpansionConfig.Cities then
 			bagObject.takeObject({
 				position = DeckZones.Cities[bagKey].getPosition(),
 				rotation = DeckZones.Cities[bagKey].getRotation() + vector(0, 0, 180),
@@ -146,7 +146,7 @@ function HandleStartGameButtonCo()
 
 	-- [[ARMADA DECKS SETUP]]
 	for bagKey, bagObject in pairs(ArmadaBags) do
-		if ExpansionsUsed.Armada then
+		if ExpansionConfig.Armada then
 			bagObject.takeObject({
 				position = DeckZones.Armada[bagKey].getPosition(),
 				rotation = DeckZones.Armada[bagKey].getRotation() + vector(0, 0, 180),
@@ -157,7 +157,7 @@ function HandleStartGameButtonCo()
 
 	-- [[ISLAND DECKS SETUP]]
 	for bagKey, bagObject in pairs(IslandBags) do
-		if ExpansionsUsed.Armada then
+		if ExpansionConfig.Armada then
 			bagObject.takeObject({
 				position = DeckZones.Island[bagKey].getPosition(),
 				rotation = DeckZones.Island[bagKey].getRotation() + vector(0, 0, 180),
@@ -305,7 +305,7 @@ function HandleStartGameButtonCo()
 	end
 
 	-------------------[[ PREPARE WONDERS ]]-------------------
-	if ExpansionsUsed.Leaders then
+	if ExpansionConfig.Leaders then
 		while WonderBags.Leaders.getQuantity() ~= 0 do
 			WonderBags.Leaders.takeObject({
 				position = WonderBags.Base.getPosition() + Vector(0, 2, 0),
@@ -314,7 +314,7 @@ function HandleStartGameButtonCo()
 		end
 	end
 
-	if ExpansionsUsed.Cities then
+	if ExpansionConfig.Cities then
 		while WonderBags.Cities.getQuantity() ~= 0 do
 			WonderBags.Cities.takeObject({
 				position = WonderBags.Base.getPosition() + Vector(0, 2, 0),
@@ -323,7 +323,7 @@ function HandleStartGameButtonCo()
 		end
 	end
 
-	if ExpansionsUsed.Armada then
+	if ExpansionConfig.Armada then
 		while WonderBags.Armada.getQuantity() ~= 0 do
 			WonderBags.Armada.takeObject({
 				position = WonderBags.Base.getPosition() + Vector(0, 2, 0),
@@ -332,7 +332,7 @@ function HandleStartGameButtonCo()
 		end
 	end
 
-	if WonderExpansionsUsed.Collection then
+	if WonderExpansionConfig.Collection then
 		while WonderBags.Collection.getQuantity() ~= 0 do
 			WonderBags.Collection.takeObject({
 				position = WonderBags.Base.getPosition() + Vector(0, 2, 0),
@@ -490,126 +490,7 @@ function HandleStartGameButtonCo()
 	return 1
 end
 
-function DealWonders()
-	GameState = "WonderStage"
-	UI.setValue("CurrentPhase", "Phase: Wonder Selection")
-	UI.setValue("PhaseDesc", "Choose your wonder")
-
-	-- Random Wonders
-	if RandomWonders then
-		for _, player in ipairs(AllSeatedPlayers) do
-			RandomWonderObj[player] = WonderBags.Base.takeObject({
-				position = _G["_"..player.."PlayerInfo"].WonderPos,
-				rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
-				smooth = false,
-				callback_function = LockSpawnedObject})
-
-			DefaultButtonParams.width = 600
-			DefaultButtonParams.color = {1,1,1,1}
-			DefaultButtonParams.font_color = {0, 0, 0}
-			DefaultButtonParams.label = "Flip"
-			DefaultButtonParams.position = {0, 1, -0.5}
-			DefaultButtonParams.scale = {0.3, 0.3, 0.3}
-			DefaultButtonParams.font_size = 200
-			DefaultButtonParams.click_function = "HandleFlipButton"
-			RandomWonderObj[player].createButton(DefaultButtonParams)
-
-			DefaultButtonParams.label = "Keep"
-			DefaultButtonParams.position = {0, 1, 0}
-			DefaultButtonParams.click_function = "HandleKeepButton"
-			RandomWonderObj[player].createButton(DefaultButtonParams)
-		end
-	-- Draft Wonders
-	elseif DraftMode then
-		for _, player in ipairs(AllSeatedPlayers) do
-			-- DraftMode1Pos
-			for i = 1, DraftModeNumber do
-				_G["_"..player.."DraftWonderObj"][i] = WonderBags.Base.takeObject({
-					smooth = false,
-					position = _G["_"..player.."PlayerInfo"]["DraftModePos"],
-					rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
-					callback_function = LockSpawnedObject})
-
-				DefaultButtonParams.width = 600
-				DefaultButtonParams.color = {1,1,1,1}
-				DefaultButtonParams.font_color = {0, 0, 0}
-				DefaultButtonParams.label = "Flip"
-				DefaultButtonParams.position = {0, 1, -0.5}
-				DefaultButtonParams.scale = {0.3, 0.3, 0.3}
-				DefaultButtonParams.font_size = 200
-				DefaultButtonParams.click_function = "HandleFlipButton"
-				_G["_"..player.."DraftWonderObj"][i].createButton(DefaultButtonParams)
-
-				DefaultButtonParams.label = "Keep"
-				DefaultButtonParams.position = {0, 1, 0}
-				DefaultButtonParams.click_function = "HandleKeepButton"
-				_G["_"..player.."DraftWonderObj"][i].createButton(DefaultButtonParams)
-
-				DefaultButtonParams.label = "<"
-				DefaultButtonParams.position = {-1, 1, 0}
-				DefaultButtonParams.click_function = "HandleCycleLeftButton"
-				_G["_"..player.."DraftWonderObj"][i].createButton(DefaultButtonParams)
-
-				DefaultButtonParams.label = ">"
-				DefaultButtonParams.position = {1, 1, 0}
-				DefaultButtonParams.click_function = "HandleCycleRightButton"
-				_G["_"..player.."DraftWonderObj"][i].createButton(DefaultButtonParams)
-			end
-
-			_G["_"..player.."DraftWonderObj"][1].setPosition(_G["_"..player.."PlayerInfo"].WonderPos)
-		end
-	end
-
-	-- [[SET CAMERA POSITIONS]]
-	for _, player in ipairs(AllSeatedPlayers) do
-		local playerColor = "_" .. player  -- Convert "White" to "_White"
-
-    -- Verify the player exists in CameraSettings
-    if CameraSettings[playerColor] then
-      -- Safely get the wonder position (assuming it exists in _G)
-      local wonderPos = nil
-      if _G[playerColor.."PlayerInfo"] then
-          wonderPos = _G[playerColor.."PlayerInfo"].WonderPos
-      end
-
-      -- Apply camera lookAt with settings from CameraSettings
-      Player[player].lookAt({
-          position = wonderPos or {0, 0, 0},  -- Fallback position
-          pitch = CameraSettings[playerColor].pitch,
-          yaw = CameraSettings[playerColor].yaw,
-          distance = CameraSettings[playerColor].distance
-      })
-    end
-	end
-end
-
-function DealArmada()
-	for _, player in ipairs(AllSeatedPlayers) do
-		DockyardBag.takeObject({
-			position = _G["_"..player.."PlayerInfo"].DockyardPos,
-			rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
-			smooth = false,
-			callback_function = LockSpawnedObject})
-		ShipBags.Red.takeObject({
-			position = _G["_"..player.."PlayerInfo"].RedShipPos,
-			rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
-			smooth = false})
-		ShipBags.Yellow.takeObject({
-			position = _G["_"..player.."PlayerInfo"].YellowShipPos,
-			rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
-			smooth = false})
-		ShipBags.Blue.takeObject({
-			position = _G["_"..player.."PlayerInfo"].BlueShipPos,
-			rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
-			smooth = false})
-		ShipBags.Green.takeObject({
-			position = _G["_"..player.."PlayerInfo"].GreenShipPos,
-			rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
-			smooth = false})
-	end
-end
-
-function DealCoins()
+function DealStartingCoins()
   local CoinAmount = ExpansionsUsed.Leaders.Base and 6 or 3
 
   for _, player in ipairs(AllSeatedPlayers) do
@@ -710,21 +591,21 @@ function MakeSetupButtons()
   DefaultButtonParams.position = {0.35, 0.1, 0.58}
   DefaultButtonParams.click_function = "HandleRandomButton"
   DefaultButtonParams.label = "[✓]"
-  DefaultButtonParams.font_color={0,1,0}
+  DefaultButtonParams.font_color={0, 1, 0}
   SetupBoard.createButton(DefaultButtonParams)
 
   -- Change default parameters of "DRAFT" BUTTON
   DefaultButtonParams.position = {0.35, 0.1, 0.68}
   DefaultButtonParams.click_function = "HandleDraftButton"
   DefaultButtonParams.label = "[    ]"
-  DefaultButtonParams.font_color={1,1,1}
+  DefaultButtonParams.font_color={1, 1, 1}
   SetupBoard.createButton(DefaultButtonParams)
 
 	-- Change default parameters of draft number button
   DefaultButtonParams.position = {0.20, 0.1, 0.68}
   DefaultButtonParams.click_function = "AdjustDraftNumber"
   DefaultButtonParams.label = "[" .. DraftModeNumber .. "]"
-  DefaultButtonParams.font_color={1,1,1}
+  DefaultButtonParams.font_color={1, 1, 1}
   SetupBoard.createButton(DefaultButtonParams)
 
 	-- Change default parameters of "FORCE LOAD" button
@@ -733,7 +614,7 @@ function MakeSetupButtons()
 	DefaultButtonParams.label = "FORCE LOAD"
 	DefaultButtonParams.color = {0.1,0,0,1}
 	DefaultButtonParams.font_size = 400
-	DefaultButtonParams.scale = {x=0.1,y=0.1,z=0.1}
+	DefaultButtonParams.scale = {x = 0.1, y = 0.1, z = 0.1}
 	DefaultButtonParams.font_color={1,1,0}
 	DefaultButtonParams.height = 500
 	DefaultButtonParams.width = 2500
@@ -744,10 +625,10 @@ function MakeSetupButtons()
   DefaultButtonParams.font_color = {1,1,1}
   DefaultButtonParams.position = {0.84, 0.1, 0.9}
   DefaultButtonParams.font_size = 500
-	DefaultButtonParams.scale = {x=0.1,y=0.1,z=0.1}
+	DefaultButtonParams.scale = {x = 0.1, y = 0.1, z = 0.1}
   DefaultButtonParams.height = 600
 	DefaultButtonParams.width = 1200
-	DefaultButtonParams.font_color={1,0,1}
+	DefaultButtonParams.font_color={1, 0, 1}
   DefaultButtonParams.click_function = "HandleStartGameButton"
   SetupBoard.createButton(DefaultButtonParams)
 end

@@ -31,7 +31,7 @@ function ReadyUp(player)
 		if GameState == "WonderStage" then
 			FinishWonderStage()
 
-			if ExpansionsUsed.Leaders.Base then
+			if ExpansionConfig.Leaders.Base then
 				PrepareLeaderStage()
 			else
 				PrepareAge1Stage()

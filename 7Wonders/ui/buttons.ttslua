@@ -1,23 +1,23 @@
 function HandleLeadersButton() -- Button index 0
-	ExpansionsUsed.Leaders.Base = not ExpansionsUsed.Leaders.Base
-	if ExpansionsUsed.Leaders.Base then
+	ExpansionConfig.Leaders.Base = not ExpansionConfig.Leaders.Base
+	if ExpansionConfig.Leaders.Base then
 		SetupBoard.editButton({index = 0, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 0, label = "[    ]", font_color={1,1,1}})
-		if ExpansionsUsed.Leaders.Promo then
+		if ExpansionConfig.Leaders.Promo then
 			HandlePromoButton()
 		end
-		if ExpansionsUsed.Leaders.Expert then
+		if ExpansionConfig.Leaders.Expert then
 			HandleExpertButton()
 		end
 	end
 end
 
 function HandlePromoButton() -- Button index 1
-	ExpansionsUsed.Leaders.Promo = not ExpansionsUsed.Leaders.Promo
-	if ExpansionsUsed.Leaders.Promo then
+	ExpansionConfig.Leaders.Promo = not ExpansionConfig.Leaders.Promo
+	if ExpansionConfig.Leaders.Promo then
 		SetupBoard.editButton({index = 1, label = "[✓]", font_color={0,1,0}})
-		if not ExpansionsUsed.Leaders.Base then
+		if not ExpansionConfig.Leaders.Base then
 			HandleLeadersButton()
 		end
 	else
@@ -26,10 +26,10 @@ function HandlePromoButton() -- Button index 1
 end
 
 function HandleExpertButton() -- Button index 2
-	ExpansionsUsed.Leaders.Expert = not ExpansionsUsed.Leaders.Expert
-	if ExpansionsUsed.Leaders.Expert then
+	ExpansionConfig.Leaders.Expert = not ExpansionConfig.Leaders.Expert
+	if ExpansionConfig.Leaders.Expert then
 		SetupBoard.editButton({index = 2, label = "[✓]", font_color={0,1,0}})
-		if not ExpansionsUsed.Leaders.Base then
+		if not ExpansionConfig.Leaders.Base then
 			HandleLeadersButton()
 		end
 	else
@@ -38,8 +38,8 @@ function HandleExpertButton() -- Button index 2
 end
 
 function HandleCitiesButton() -- Button index 3
-	ExpansionsUsed.Cities = not ExpansionsUsed.Cities
-	if ExpansionsUsed.Cities then
+	ExpansionConfig.Cities = not ExpansionConfig.Cities
+	if ExpansionConfig.Cities then
 		SetupBoard.editButton({index = 3, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 3, label = "[    ]", font_color={1,1,1}})
@@ -47,8 +47,8 @@ function HandleCitiesButton() -- Button index 3
 end
 
 function HandleArmadaButton() -- Button index 4
-	ExpansionsUsed.Armada = not ExpansionsUsed.Armada
-	if ExpansionsUsed.Armada then
+	ExpansionConfig.Armada = not ExpansionConfig.Armada
+	if ExpansionConfig.Armada then
 		SetupBoard.editButton({index = 4, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 4, label = "[    ]", font_color={1,1,1}})
@@ -56,8 +56,8 @@ function HandleArmadaButton() -- Button index 4
 end
 
 function HandleEdificeButton() -- Button index 5
-	ExpansionsUsed.Edifice = not ExpansionsUsed.Edifice
-	if ExpansionsUsed.Edifice then
+	ExpansionConfig.Edifice = not ExpansionConfig.Edifice
+	if ExpansionConfig.Edifice then
 		SetupBoard.editButton({index = 5, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 5, label = "[    ]", font_color={1,1,1}})
@@ -65,8 +65,8 @@ function HandleEdificeButton() -- Button index 5
 end
 
 function HandleRuinsButton() -- Button index 6
-	ExpansionsUsed.Ruins = not ExpansionsUsed.Ruins
-	if ExpansionsUsed.Ruins then
+	ExpansionConfig.Ruins = not ExpansionConfig.Ruins
+	if ExpansionConfig.Ruins then
 		SetupBoard.editButton({index = 6, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 6, label = "[    ]", font_color={1,1,1}})
@@ -74,8 +74,8 @@ function HandleRuinsButton() -- Button index 6
 end
 
 function HandleMythsButton() -- Button index 7
-	ExpansionsUsed.Myths = not ExpansionsUsed.Myths
-	if ExpansionsUsed.Myths then
+	ExpansionConfig.Myths = not ExpansionConfig.Myths
+	if ExpansionConfig.Myths then
 		SetupBoard.editButton({index = 7, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 7, label = "[    ]", font_color={1,1,1}})
@@ -83,8 +83,8 @@ function HandleMythsButton() -- Button index 7
 end
 
 function HandleFrontiersButton() -- Button index 8
-	ExpansionsUsed.Frontiers = not ExpansionsUsed.Frontiers
-	if ExpansionsUsed.Frontiers then
+	ExpansionConfig.Frontiers = not ExpansionConfig.Frontiers
+	if ExpansionConfig.Frontiers then
 		SetupBoard.editButton({index = 8, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 8, label = "[    ]", font_color={1,1,1}})
@@ -92,8 +92,8 @@ function HandleFrontiersButton() -- Button index 8
 end
 
 function HandlePromoGuildsButton() -- Button index 9
-	ExpansionsUsed.PromoGuilds = not ExpansionsUsed.PromoGuilds
-	if ExpansionsUsed.PromoGuilds then
+	ExpansionConfig.PromoGuilds = not ExpansionConfig.PromoGuilds
+	if ExpansionConfig.PromoGuilds then
 		SetupBoard.editButton({index = 9, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 9, label = "[    ]", font_color={1,1,1}})
@@ -101,8 +101,8 @@ function HandlePromoGuildsButton() -- Button index 9
 end
 
 function HandleCollectionButton() -- Button index 10
-	WonderExpansionsUsed.Collection = not WonderExpansionsUsed.Collection
-	if WonderExpansionsUsed.Collection then
+	ExpansionConfig.Collection = not ExpansionConfig.Collection
+	if ExpansionConfig.Collection then
 		SetupBoard.editButton({index = 10, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 10, label = "[    ]", font_color={1,1,1}})
@@ -115,8 +115,8 @@ function HandleCollectionButton() -- Button index 10
 end
 
 function HandlePromoWondersButton() -- Button index 11
-	WonderExpansionsUsed.Promo = not WonderExpansionsUsed.Promo
-	if WonderExpansionsUsed.Promo then
+	ExpansionConfig.Promo = not ExpansionConfig.Promo
+	if ExpansionConfig.Promo then
 		SetupBoard.editButton({index = 11, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 11, label = "[    ]", font_color={1,1,1}})
@@ -147,7 +147,7 @@ end
 function HandleDraftButton() -- Button index 13
 	DraftMode = not DraftMode
 
-	if DraftMode and not WonderExpansionsUsed.Collection then
+	if DraftMode and not WonderExpansionConfig.Collection then
 		broadcastToAll("Using Draft Mode without Collection Wonders is not possible. Toggling Collection.")
 		HandleCollectionButton()
 	end
@@ -205,7 +205,7 @@ function HandleFlipButton(obj, color, alt)
 
 	-- Random Mode
 	if not DraftMode then
-		local tempDefaultRot = {table.unpack(_G["_"..color.."PlayerInfo"].ComponentRotation)}
+		local tempDefaultRot = {table.unpack(PlayerInfo[color].ComponentRotation)}
 		local tempCurrentRot = RandomWonderObj[color].getRotation()
 
 		-- Flipped object have the same height in-game, but actually offset according to their pivot point, so we add 0.2 so the Wonder keeps its position-
@@ -254,8 +254,8 @@ function HandleFlipButton(obj, color, alt)
 		end
 	-- Draft Mode
 	else
-		local CurrentWonderObj = _G["_"..color.."DraftWonderObj"][PlayerCurrentlyChosenWonder[color]]
-		local tempDefaultRot = _G["_"..color.."PlayerInfo"].ComponentRotation
+		local CurrentWonderObj = DraftWonders[color][PlayerCurrentlyChosenWonder[color]]
+		local tempDefaultRot = PlayerInfo[color].ComponentRotation
 		local tempCurrentRot = 	CurrentWonderObj.getRotation()
 
 		-- Flipped object have the same height in-game, but actually offset according to their pivot point, so we add 0.2 so the Wonder keeps its position
@@ -267,19 +267,19 @@ function HandleFlipButton(obj, color, alt)
 		local tempNum = PlayerCurrentlyChosenWonder[color]
 
 		if rotationEquals(tempDefaultRot, tempCurrentRot) then
-			local playerWonderTable = _G["_"..color.."PlayerInfo"]
+			local playerWonderTable = PlayerInfo[color]
 			local componentRot = playerWonderTable.ComponentRotation
 
 			-- Add 180 to Z-axis only
 			CurrentWonderObj.setRotation({
-			  x = tempCurrentRot[1],               -- Keep original X
-			  y = tempCurrentRot[2],               -- Keep original Y
-			  z = tempCurrentRot[3] + 180          -- Add 180 to Z
+			  x = tempCurrentRot[1],
+			  y = tempCurrentRot[2],
+			  z = tempCurrentRot[3] + 180
 			})
 
 			CurrentWonderObj.setPosition(tempFlippedPos)
 
-			for i, wonder in ipairs(_G["_"..color.."DraftWonderObj"]) do
+			for i, wonder in ipairs(DraftWonders[color]) do
 				wonder.editButton({
 					index          = 0,
 					position       = {0, -0.8, -0.5},
@@ -306,7 +306,7 @@ function HandleFlipButton(obj, color, alt)
 			CurrentWonderObj.setRotation(tempDefaultRot)
 			CurrentWonderObj.setPosition(tempFlippedPos)
 
-			for i, wonder in ipairs(_G["_"..color.."DraftWonderObj"]) do
+			for i, wonder in ipairs(DraftWonders[color]) do
 				wonder.editButton({
 					index          = 0,
 					position       = {0, 1, -0.5},
@@ -339,11 +339,11 @@ function HandleKeepButton(obj, color, alt)
 	end
 
 	-- Based on rotation we know if it's Day or Night
-	local tempDefaultRot = _G["_"..color.."PlayerInfo"].ComponentRotation
+	local tempDefaultRot = PlayerInfo[color].ComponentRotation
 	local CurrentWonderObj = nil
 
 	if DraftMode then
-		CurrentWonderObj = _G["_"..color.."DraftWonderObj"][PlayerCurrentlyChosenWonder[color]]
+		CurrentWonderObj = DraftWonders[color][PlayerCurrentlyChosenWonder[color]]
 	else
 		CurrentWonderObj = RandomWonderObj[color]
 	end
@@ -375,11 +375,11 @@ function HandleCycleLeftButton(obj, color, alt)
 
 	local tempNum = PlayerCurrentlyChosenWonder[color]
 	-- We might be on Night / B side, so save the location and rotation
-	local CurrentWonderRot = _G["_"..color.."DraftWonderObj"][tempNum].getRotation()
-	local CurrentWonderPos = _G["_"..color.."DraftWonderObj"][tempNum].getPosition()
+	local CurrentWonderRot = DraftWonders[color][tempNum].getRotation()
+	local CurrentWonderPos = DraftWonders[color][tempNum].getPosition()
 
 	-- Move the current Wonder below the table
-	_G["_"..color.."DraftWonderObj"][tempNum].setPosition(_G["_"..color.."PlayerInfo"]["DraftModePos"])
+	DraftWonders[color][tempNum].setPosition(PlayerInfo[color].DraftModePos)
 
 	-- Find the previous (left) index
 	PlayerCurrentlyChosenWonder[color] = PlayerCurrentlyChosenWonder[color] - 1
@@ -387,8 +387,8 @@ function HandleCycleLeftButton(obj, color, alt)
 		PlayerCurrentlyChosenWonder[color] = DraftModeNumber
 	end
 
-	_G["_"..color.."DraftWonderObj"][PlayerCurrentlyChosenWonder[color]].setPosition(CurrentWonderPos)
-	_G["_"..color.."DraftWonderObj"][PlayerCurrentlyChosenWonder[color]].setRotation(CurrentWonderRot)
+	DraftWonders[color][PlayerCurrentlyChosenWonder[color]].setPosition(CurrentWonderPos)
+	DraftWonders[color][PlayerCurrentlyChosenWonder[color]].setRotation(CurrentWonderRot)
 end
 
 function HandleCycleRightButton(obj, color, alt)
@@ -399,11 +399,11 @@ function HandleCycleRightButton(obj, color, alt)
 
 	local tempNum = PlayerCurrentlyChosenWonder[color]
 	-- We might be on Night / B side, so save the location and rotation
-	local CurrentWonderRot = _G["_"..color.."DraftWonderObj"][tempNum].getRotation()
-	local CurrentWonderPos = _G["_"..color.."DraftWonderObj"][tempNum].getPosition()
+	local CurrentWonderRot = DraftWonders[color][tempNum].getRotation()
+	local CurrentWonderPos = DraftWonders[color][tempNum].getPosition()
 
 	-- Move the current Wonder below the table
-	_G["_"..color.."DraftWonderObj"][tempNum].setPosition(_G["_"..color.."PlayerInfo"]["DraftModePos"])
+	DraftWonders[color][tempNum].setPosition(PlayerInfo[color].DraftModePos)
 
 	-- Find the next (right) index
 	PlayerCurrentlyChosenWonder[color] = PlayerCurrentlyChosenWonder[color] + 1
@@ -411,8 +411,8 @@ function HandleCycleRightButton(obj, color, alt)
 		PlayerCurrentlyChosenWonder[color] = 1
 	end
 
-	_G["_"..color.."DraftWonderObj"][PlayerCurrentlyChosenWonder[color]].setPosition(CurrentWonderPos)
-	_G["_"..color.."DraftWonderObj"][PlayerCurrentlyChosenWonder[color]].setRotation(CurrentWonderRot)
+	DraftWonders[color][PlayerCurrentlyChosenWonder[color]].setPosition(CurrentWonderPos)
+	DraftWonders[color][PlayerCurrentlyChosenWonder[color]].setRotation(CurrentWonderRot)
 end
 
 function HandleBuyCard(obj, color, alt)

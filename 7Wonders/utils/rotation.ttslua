@@ -1,12 +1,12 @@
 function RotateHands(Card, Color, Direction)
   --local NextColor = FindNextColor(Color, Direction)
   --print("Passing card from "..Color.." to "..NextColor.." ("..Direction..")")
+  Card.setPosition(PlayerZones[Color][Direction].getPosition())
   Card.setRotation({
-    x = _G["_"..Color..Direction.."Zone"].getRotation().x,
-    y = _G["_"..Color..Direction.."Zone"].getRotation().y,
+    x = PlayerZones[Color][Direction].getRotation().x,
+    y = PlayerZones[Color][Direction].getRotation().y,
     z = 180
   })
-  Card.setPosition(_G["_"..Color..Direction.."Zone"].getPosition())
 end
 
 function ForceTakeCards(Direction)
@@ -15,7 +15,7 @@ function ForceTakeCards(Direction)
   for i, PlayerInstance in ipairs(Player.getPlayers()) do
     local OppositeDirection = (Direction == "Right") and "Left" or "Right"
     local NextColor = FindNextColor(PlayerInstance.color, Direction)
-    local CardsToTake = _G["_"..NextColor..OppositeDirection.."Zone"].getObjects()
+    local CardsToTake = PlayerZones[NextColor][OppositeDirection].getObjects()
 
     for _, Cards in ipairs(CardsToTake) do
       if Cards.type == 'Deck' then

@@ -1,0 +1,25 @@
+function DealArmada()
+	for _, player in ipairs(AllSeatedPlayers) do
+		DockyardBag.takeObject({
+			position = PlayerInfo[player].DockyardPos,
+			rotation = PlayerInfo[player].ComponentRotation,
+			smooth = false,
+			callback_function = LockSpawnedObject})
+		ShipBags.Red.takeObject({
+			position = PlayerInfo[player].ShipPositions.Red,
+			rotation = PlayerInfo[player].ComponentRotation,
+			smooth = false})
+		ShipBags.Yellow.takeObject({
+			position = PlayerInfo[player].ShipPositions.Yellow,
+			rotation = PlayerInfo[player].ComponentRotation,
+			smooth = false})
+		ShipBags.Blue.takeObject({
+			position = PlayerInfo[player].ShipPositions.Blue,
+			rotation = PlayerInfo[player].ComponentRotation,
+			smooth = false})
+		ShipBags.Green.takeObject({
+			position = PlayerInfo[player].ShipPositions.Green,
+			rotation = PlayerInfo[player].ComponentRotation,
+			smooth = false})
+	end
+end
