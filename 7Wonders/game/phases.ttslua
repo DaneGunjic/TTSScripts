@@ -1,3 +1,51 @@
+function ResolvePlayerActions()
+  -- Verify all players have selected actions
+  for _, color in ipairs(AllSeatedPlayers) do
+    if not PlayerSelectedAction[color] then
+      broadcastToAll("Waiting for all players to choose actions")
+      return false
+    end
+  end
+
+  for _, color in ipairs(AllSeatedPlayers) do
+    local success, result = pcall(function()
+	    local action = PlayerSelectedAction[color]
+
+	    if action == "Buy" then
+
+	  	elseif action == "Sell" then
+	      AddCoins(color, 3)
+	  	elseif action == "BuildWonder" then
+
+	    end
+    end)
+  end
+end
+
+-- Example action resolvers (could be in same file or separate)
+function ResolveBuyAction(color)
+    -- Get player's selected card
+    local card = PlayerSelectedCard[color]
+    if not card then return end
+
+    -- Deduct resources
+    DeductResources(color, card.cost)
+
+    -- Add to player's tableau
+    AddCardToTableau(color, card)
+
+    -- Log transaction
+    LogTransaction(color, "bought", card.name)
+end
+
+function ResolveSellAction(color)
+    --
+end
+
+function ResolveBuildWonderAction(color)
+    --
+end
+
 function FinishWonderStage()
 	-- Everybody selected their wonders and is ready
 	-- Deal coins and show the "Ready" button
@@ -93,7 +141,6 @@ function PrepareAge1Stage()
 	local tempDeck = DeckZones.Age.Age1.getObjects()
 	tempDeck[1].deal(#tempDeck[1].getObjects()/NumberOfPlayers)
 end
-
 
 function DoAge1Stage()
 	--

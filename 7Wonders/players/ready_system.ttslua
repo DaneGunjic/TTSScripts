@@ -27,6 +27,7 @@ function ReadyUp(player)
 
 		MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
 
+		print(GameState)
 		-- Did we finish choosing wonders
 		if GameState == "WonderStage" then
 			FinishWonderStage()
@@ -40,6 +41,9 @@ function ReadyUp(player)
 		-- Did we pass leaders
 		elseif GameState == "LeaderDrafting" then
 			DoLeaderStage()
+		-- Did we choose an action with the leader
+		elseif GameState == "LeaderSelectionStage" then
+			ResolvePlayerActions()
 		end
 	else
 		-- Update UI that shows who is ready

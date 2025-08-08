@@ -33,6 +33,66 @@ function onObjectLeaveScriptingZone(zone, leave_object)
 	HandleTileOnCardLeave(highlightedTile, leave_object, zone)
 end
 
+function AddCoins(color, amount, isRecursiveCall)
+	if amount <= 0 then return end
+
+	local amountToGive = amount
+
+	if not isRecursiveCall then
+		local coinText = (amount == 1) and "coin" or "coins"
+		broadcastToAll(player.steam_name .. " gained " .. amount .. coinText, {r=0.5, g=0.5, b=0.5})
+	end
+
+	local tempPost = Vector(PlayerInfo[color].WonderPos)
+	tempPost.y = 2
+	tempPost.x = tempPost.x + math.random(-150, 150) / 100
+	tempPost.z = tempPost.z + math.random(-100, 100) / 100
+
+	if amount > 15 then
+		CoinBags.Coin6.takeObject({
+			position = tempPost,
+			rotation = PlayerInfo[color].ComponentRotation,
+			smooth = false
+		})
+
+		amountToGive = amountToGive - 6
+		AddCoins(color, amountToGive, true)
+		return
+	elseif amount <= 15 and amount > 6 then
+		CoinBags.Coin3.takeObject({
+			position = tempPost,
+			rotation = PlayerInfo[color].ComponentRotation,
+			smooth = false
+		})
+
+		amountToGive = amountToGive - 3
+		AddCoins(color, amountToGive, true)
+		return
+	elseif amount <= 6 then
+		CoinBags.Coin1.takeObject({
+			position = tempPost,
+			rotation = PlayerInfo[color].ComponentRotation,
+			smooth = false
+		})
+
+		amountToGive = amountToGive - 3
+		AddCoins(color, amountToGive, true)
+		return
+	end
+end
+
+function SpendResources(color, cost)
+    -- Resource deduction logic
+end
+
+function AddToTableau(color, card)
+    -- Card placement logic
+end
+
+function CanBuildWonderStage(color)
+    -- Wonder stage validation
+end
+
 function IsObjectInPlayerWonderZone(obj, color)
   local key = color:sub(1,1):upper() .. color:sub(2):lower()
   local zone = WonderZones[key]
@@ -188,24 +248,6 @@ end
 
 function LockSpawnedObject(object)
 	object.setLock(true)
-end
-
-function normalizeRotation(rot)
-	if rot.x then -- If it's a key-value table (from getRotation)
-		return {rot.x, rot.y, rot.z}
-	else -- If it's already an array
-		return rot
-	end
-end
-
-function rotationEquals(rot1, rot2, tolerance)
-	tolerance = tolerance or 0.01
-	if rot1.x then rot1 = {rot1.x, rot1.y, rot1.z} end
-	if rot2.x then rot2 = {rot2.x, rot2.y, rot2.z} end
-
-	return math.abs(rot1[1] - rot2[1]) < tolerance
-	 and math.abs(rot1[2] - rot2[2]) < tolerance
-	 and math.abs(rot1[3] - rot2[3]) < tolerance
 end
 
 function printDeckZones()
