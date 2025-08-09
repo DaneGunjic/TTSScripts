@@ -45,9 +45,11 @@ PhaseHandlers = {
   },
   LeaderSelectionStage = {
     next = function()
+      print("LeaderSelectionStage next")
       GameState = "ResolveCardAction"
       PhaseHandlers[GameState].PhaseAfterResolving = "Age1"
       CreateReadyButtons()
+      ResolvePlayerActions()
     end
   },
   Age1 = {
@@ -91,6 +93,8 @@ function ResolvePlayerActions()
 
 	    end
     end)
+
+    PlayerSelectedAction[color] = nil
   end
 end
 

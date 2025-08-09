@@ -226,12 +226,12 @@ function HandleFlipButton(obj, color, alt)
 			RandomWonderObj[color].setPosition(tempFlippedPos)
 			RandomWonderObj[color].editButton({
 				index          = 0,
-				position       = {0, -0.8, -0.5},
+				position       = {0, 0, -0.5},
 				rotation       = {0, 0, 180}
 			})
 			RandomWonderObj[color].editButton({
 				index          = 1,
-				position       = {0, -0.8, 0},
+				position       = {0, 0, 0},
 				rotation       = {0, 0, 180}
 			})
 		else
@@ -243,12 +243,12 @@ function HandleFlipButton(obj, color, alt)
 			RandomWonderObj[color].setPosition(tempFlippedPos)
 			RandomWonderObj[color].editButton({
 				index          = 0,
-				position       = {0, 1, -0.5},
+				position       = {0, 0.2, -0.5},
 				rotation       = {0, 0, 0}
 			})
 			RandomWonderObj[color].editButton({
 				index          = 1,
-				position       = {0, 1, 0},
+				position       = {0, 0.2, 0},
 				rotation       = {0, 0, 0}
 			})
 		end
@@ -282,22 +282,22 @@ function HandleFlipButton(obj, color, alt)
 			for i, wonder in ipairs(DraftWonders[color]) do
 				wonder.editButton({
 					index          = 0,
-					position       = {0, -0.8, -0.5},
+					position       = {0, 0, -0.5},
 					rotation       = {0, 0, 180}
 				})
 				wonder.editButton({
 					index          = 1,
-					position       = {0, -0.8, 0},
+					position       = {0, 0, 0},
 					rotation       = {0, 0, 180}
 				})
 				wonder.editButton({
 					index          = 2,
-					position       = {1, -0.8, 0},
+					position       = {1, 0, 0},
 					rotation       = {0, 0, 180}
 				})
 				wonder.editButton({
 					index          = 3,
-					position       = {-1, -0.8, 0},
+					position       = {-1, 0, 0},
 					rotation       = {0, 0, 180}
 				})
 			end
@@ -309,22 +309,22 @@ function HandleFlipButton(obj, color, alt)
 			for i, wonder in ipairs(DraftWonders[color]) do
 				wonder.editButton({
 					index          = 0,
-					position       = {0, 1, -0.5},
+					position       = {0, 0.2, -0.5},
 					rotation       = {0, 0, 0}
 				})
 				wonder.editButton({
 					index          = 1,
-					position       = {0, 1, 0},
+					position       = {0, 0.2, 0},
 					rotation       = {0, 0, 0}
 				})
 				wonder.editButton({
 					index          = 2,
-					position       = {-1, 1, 0},
+					position       = {-1, 0.2, 0},
 					rotation       = {0, 0, 0}
 				})
 				wonder.editButton({
 					index          = 3,
-					position       = {1, 1, 0},
+					position       = {1, 0.2, 0},
 					rotation       = {0, 0, 0}
 				})
 			end
@@ -339,28 +339,12 @@ function HandleKeepButton(obj, color, alt)
 	end
 
 	-- Based on rotation we know if it's Day or Night
-	local tempDefaultRot = PlayerInfo[color].ComponentRotation
-	local CurrentWonderObj = nil
-
-	if DraftMode then
-		CurrentWonderObj = DraftWonders[color][PlayerCurrentlyChosenWonder[color]]
-	else
-		CurrentWonderObj = RandomWonderObj[color]
-	end
-
-	local tempCurrentRot = {
-		CurrentWonderObj.getRotation().x,
-		CurrentWonderObj.getRotation().y,
-		CurrentWonderObj.getRotation().z
-
-	}
 	local Side = "Day / A"
-
-	if not rotationEquals(tempDefaultRot, tempCurrentRot) then
+	if IsPlayerWonderFlipped(color) then
 		Side = "Night / B"
 	end
 
-	broadcastToAll(Player[color].steam_name .. " chose " .. CurrentWonderObj.getName() .. " (" .. Side .. ")")
+	broadcastToAll(Player[color].steam_name .. " chose " .. GetPlayerCurrentWonder(color).getName() .. " (" .. Side .. ")")
 
 	obj.clearButtons()
 
@@ -450,6 +434,9 @@ function HandleSellCard(obj, color, alt)
 		broadcastToColor("This isn't your tile!", player_clicker_color, {1,0,0})
 		return  -- Exit function if wrong player
 	end
+
+	PlayerSelectedAction[tileColor] = "Sell"
+	ReadyUp(Player[tileColor])
 end
 
 function HandleBuildWonder(obj, color, alt)
@@ -467,4 +454,7 @@ function HandleBuildWonder(obj, color, alt)
 		broadcastToColor("This isn't your tile!", player_clicker_color, {1,0,0})
 		return  -- Exit function if wrong player
 	end
+
+	PlayerSelectedAction[tileColor] = "BuildWonder"
+	ReadyUp(Player[tileColor])
 end

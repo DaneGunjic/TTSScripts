@@ -15,14 +15,14 @@ function DealWonders()
 			DefaultButtonParams.color = {1,1,1,1}
 			DefaultButtonParams.font_color = {0, 0, 0}
 			DefaultButtonParams.label = "Flip"
-			DefaultButtonParams.position = {0, 1, -0.5}
+			DefaultButtonParams.position = {0, 0.2, -0.5}
 			DefaultButtonParams.scale = {0.3, 0.3, 0.3}
 			DefaultButtonParams.font_size = 200
 			DefaultButtonParams.click_function = "HandleFlipButton"
 			RandomWonderObj[player].createButton(DefaultButtonParams)
 
 			DefaultButtonParams.label = "Keep"
-			DefaultButtonParams.position = {0, 1, 0}
+			DefaultButtonParams.position = {0, 0.2, 0}
 			DefaultButtonParams.click_function = "HandleKeepButton"
 			RandomWonderObj[player].createButton(DefaultButtonParams)
 		end
@@ -40,24 +40,24 @@ function DealWonders()
 				DefaultButtonParams.color = {1,1,1,1}
 				DefaultButtonParams.font_color = {0, 0, 0}
 				DefaultButtonParams.label = "Flip"
-				DefaultButtonParams.position = {0, 1, -0.5}
+				DefaultButtonParams.position = {0, 0.2, -0.5}
 				DefaultButtonParams.scale = {0.3, 0.3, 0.3}
 				DefaultButtonParams.font_size = 200
 				DefaultButtonParams.click_function = "HandleFlipButton"
 				DraftWonders[player][i].createButton(DefaultButtonParams)
 
 				DefaultButtonParams.label = "Keep"
-				DefaultButtonParams.position = {0, 1, 0}
+				DefaultButtonParams.position = {0, 0.2, 0}
 				DefaultButtonParams.click_function = "HandleKeepButton"
 				DraftWonders[player][i].createButton(DefaultButtonParams)
 
 				DefaultButtonParams.label = "<"
-				DefaultButtonParams.position = {-1, 1, 0}
+				DefaultButtonParams.position = {-1, 0.2, 0}
 				DefaultButtonParams.click_function = "HandleCycleLeftButton"
 				DraftWonders[player][i].createButton(DefaultButtonParams)
 
 				DefaultButtonParams.label = ">"
-				DefaultButtonParams.position = {1, 1, 0}
+				DefaultButtonParams.position = {1, 0.2, 0}
 				DefaultButtonParams.click_function = "HandleCycleRightButton"
 				DraftWonders[player][i].createButton(DefaultButtonParams)
 			end
@@ -93,4 +93,18 @@ function GetPlayerCurrentWonder(color)
 	else
 		return RandomWonderObj[color]
 	end
+end
+
+function IsPlayerWonderFlipped(color)
+	-- Based on rotation we know if it's Day or Night
+	local tempDefaultRot = PlayerInfo[color].ComponentRotation
+	local CurrentWonderObj = GetPlayerCurrentWonder(color)
+
+	local tempCurrentRot = {
+		CurrentWonderObj.getRotation().x,
+		CurrentWonderObj.getRotation().y,
+		CurrentWonderObj.getRotation().z
+	}
+
+	return not rotationEquals(tempDefaultRot, tempCurrentRot)
 end
