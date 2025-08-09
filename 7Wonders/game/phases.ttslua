@@ -1,6 +1,6 @@
 PhaseHandlers = {
   ResolveCardAction = {
-    next = function() end,
+    next = function() print("ResolveCardAction next") end,
     PhaseAfterResolving = ""
   },
   -- Setup = {
@@ -47,6 +47,7 @@ PhaseHandlers = {
     next = function()
       print("LeaderSelectionStage next")
       GameState = "ResolveCardAction"
+      updatePhaseUI("Phase: Card action", "Resolve your card action")
       PhaseHandlers[GameState].PhaseAfterResolving = "Age1"
       CreateReadyButtons()
       ResolvePlayerActions()
@@ -64,7 +65,7 @@ function TransitionPhase()
     MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
     local current = PhaseHandlers[GameState]
     if current then
-      print("Everyone is ready, calling current.next")
+      print("Everyone is ready, calling" .. GameState .. " next")
       current.next()
       --current.action()
       UnreadyAllPlayers()
@@ -82,20 +83,17 @@ function ResolvePlayerActions()
   end
 
   for _, color in ipairs(AllSeatedPlayers) do
-    local success, result = pcall(function()
-	    local action = PlayerSelectedAction[color]
+    local action = PlayerSelectedAction[color]
 
-	    if action == "Buy" then
+    if action == "Buy" then
 
-	  	elseif action == "Sell" then
-	      AddCoins(color, 3)
-	  	elseif action == "BuildWonder" then
+  	elseif action == "Sell" then
+      AddCoins(color, 3, false)
+  	elseif action == "BuildWonder" then
 
-	    end
-    end)
-
-    PlayerSelectedAction[color] = nil
+    end
   end
+  PlayerSelectedAction[color] = nil
 end
 
 function ResolveBuyAction(color)

@@ -5,7 +5,7 @@ function AddCoins(color, amount, isRecursiveCall)
 
 	if not isRecursiveCall then
 		local coinText = (amount == 1) and "coin" or "coins"
-		broadcastToAll(player.steam_name .. " gained " .. amount .. coinText, {r=0.5, g=0.5, b=0.5})
+		broadcastToAll(Player[color].steam_name .. " gained " .. amount .. coinText, {r=0.5, g=0.5, b=0.5})
 	end
 
 	local coinSpawnPosition = Vector(PlayerInfo[color].WonderPos)
@@ -20,8 +20,8 @@ function AddCoins(color, amount, isRecursiveCall)
 			smooth = false
 		})
 
-		amountToGive = amountToGive - 6
-		AddCoins(color, amountToGive, true)
+		amountToGive = amount - 6
+		Wait.time(function() AddCoins(color, amountToGive, true) end, 0.1)
 		return
 	elseif amount <= 15 and amount > 6 then
 		CoinBags.Coin3.takeObject({
@@ -30,8 +30,8 @@ function AddCoins(color, amount, isRecursiveCall)
 			smooth = false
 		})
 
-		amountToGive = amountToGive - 3
-		AddCoins(color, amountToGive, true)
+		amountToGive = amount - 3
+		Wait.time(function() AddCoins(color, amountToGive, true) end, 0.1)
 		return
 	elseif amount <= 6 then
 		CoinBags.Coin1.takeObject({
@@ -40,8 +40,8 @@ function AddCoins(color, amount, isRecursiveCall)
 			smooth = false
 		})
 
-		amountToGive = amountToGive - 3
-		AddCoins(color, amountToGive, true)
+		amountToGive = amount - 1
+		Wait.time(function() AddCoins(color, amountToGive, true) end, 0.1)
 		return
 	end
 end

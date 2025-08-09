@@ -124,8 +124,8 @@ function CreateReadyButtons()
 	DefaultButtonParams.color = {1,1,1,1}
 	DefaultButtonParams.font_color = {0, 0, 0}
 	DefaultButtonParams.label = "Ready"
-	DefaultButtonParams.position = IsPlayerWonderFlipped and {0, 0, -0.8} or {0, 0.2, -0.8}
-	DefaultButtonParams.rotation = IsPlayerWonderFlipped and {0, 0, 180} or {0, 0, 0}
+	DefaultButtonParams.position = IsPlayerWonderFlipped and {0, 0.2, -0.8} or {0, 0, -0.8}
+	DefaultButtonParams.rotation = IsPlayerWonderFlipped and {0, 0, 0} or {0, 0, 180}
 	DefaultButtonParams.scale = {0.3, 0.3, 0.3}
 	DefaultButtonParams.font_size = 200
 	DefaultButtonParams.click_function = "ReadyUpManual"
