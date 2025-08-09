@@ -1,0 +1,87 @@
+function onObjectEnterScriptingZone(zone, enter_object)
+	if enter_object.type ~= 'Card' and enter_object.type ~= 'Deck' then return end
+
+	local color = GetPlayerColorFromZone(zone)
+	if not color then return end
+
+	local data = PlayerCardHolder[color]
+	local cardCount = CountCardsInZone(zone)
+
+	-- Highlight the tile
+	data.Tile.highlightOn(color)
+	enter_object.setVar("highlightedTile", data.Tile)
+
+	-- Handle game state specific actions
+	if GameState == "LeaderDrafting"
+	and cardCount == CurrentPasses + 1
+	and not ReadyList[color] then
+		ReadyUp(Player[color])
+	elseif GameState == "Age1" or GameState == "Age2" or GameState == "Age3" or GameState == "LeaderSelectionStage" then
+		CreateActionButtons(data.Tile)
+		broadcastToColor("Choose your action!", color, color)
+	end
+end
+
+function onObjectLeaveScriptingZone(zone, leave_object)
+	if leave_object.type ~= 'Card' and leave_object.type ~= 'Deck' then return end
+
+	local color = GetPlayerColorFromZone(zone)
+	if not color then return end
+
+	local highlightedTile = leave_object.getVar("highlightedTile")
+	if not highlightedTile then return end
+
+	UnreadyPlayerIfNeeded(color, zone)
+	HandleTileOnCardLeave(highlightedTile, leave_object, zone)
+end
+
+function IsObjectInPlayerWonderZone(obj, color)
+  local key = color:sub(1,1):upper() .. color:sub(2):lower()
+  local zone = WonderZones[key]
+  if not zone then
+    print("Error: Wonder zone not found for color " .. color)
+    return false
+  end
+
+  for _, item in ipairs(zone.getObjects()) do
+    if item == obj then
+      return true
+    end
+  end
+
+  return false
+end
+
+function CountCardsInZone(zone)
+  local count = 0
+  local objects = zone.getObjects()
+
+  for _, obj in ipairs(objects) do
+    if obj.tag == "Card" then
+      count = count + 1
+    elseif obj.tag == "Deck" then
+      count = count + obj.getQuantity()
+    end
+  end
+
+  return count
+end
+
+function HandleTileOnCardLeave(highlightedTile, leave_object, zone)
+	if highlightedTile and CountCardsInZone(zone) == 0 then
+		highlightedTile.highlightOff()
+		leave_object.setVar("highlightedTile", nil)
+	end
+
+	highlightedTile.clearButtons()
+end
+
+function GetPlayerColorFromZone(zone)
+  -- If given a zone that's above the player's action tile, returns that player's color
+	for color, data in pairs(PlayerCardHolder) do
+		if data.Zone and zone.guid == data.Zone.guid then
+			return color
+		end
+	end
+	return nil
+end

@@ -15,6 +15,7 @@
 
 #include !\7Wonders\utils\helpers.ttslua
 #include !\7Wonders\utils\rotation.ttslua
+#include !\7Wonders\utils\zone_utils.ttslua
 
 #include !\utils.ttslua
 

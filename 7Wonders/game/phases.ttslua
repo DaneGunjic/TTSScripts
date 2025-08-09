@@ -1,3 +1,75 @@
+PhaseHandlers = {
+  ResolveCardAction = {
+    next = function() end,
+    PhaseAfterResolving = ""
+  },
+  -- Setup = {
+  --   action = SetupGame,
+  --   next = function() return "WonderStage" end
+  -- },
+  WonderStage = {
+    --action = FinishWonderStage,
+    next = function()
+      print("WonderStage next")
+      FinishWonderStage()
+      if ExpansionConfig.Leaders.Base then
+        PrepareLeaderStage()
+        return "LeaderDrafting"
+      else
+        PrepareAge1Stage()
+        return "Age1"
+      end
+    end
+  },
+  LeaderDrafting = {
+    --action = DoLeaderStage,
+    next = function()
+      print("LeaderDrafting next")
+      DoLeaderStage()
+      -- Check if the required number of passes is reached
+      if CurrentPasses == MaximumPasses then
+        -- Passed 3 times, now we have to choose 1 to play
+  			updatePhaseUI("Phase: Leader Selection", "Choose 1 Leader to play")
+  			Wait.time(function()
+  				-- After 0.1 take personal cards
+  				ForceTakePersonalCards()
+  				Wait.time(function()
+  					-- After 0.2 seconds change the game state
+  					-- This avoid buttons being created for a split second
+  					-- after ForceTakePersonalCards runs
+  					GameState = "LeaderSelectionStage"
+  				end, 0.1)
+  			end, 0.1)
+      end
+    end
+  },
+  LeaderSelectionStage = {
+    next = function()
+      GameState = "ResolveCardAction"
+      PhaseHandlers[GameState].PhaseAfterResolving = "Age1"
+      CreateReadyButtons()
+    end
+  },
+  Age1 = {
+    --action = PrepareAge1Stage,
+    next = function() end
+  },
+  -- Add more phases
+}
+
+function TransitionPhase()
+  if NumberOfReadyPlayers == #Player.getPlayers() then
+    MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
+    local current = PhaseHandlers[GameState]
+    if current then
+      print("Everyone is ready, calling current.next")
+      current.next()
+      --current.action()
+      UnreadyAllPlayers()
+    end
+  end
+end
+
 function ResolvePlayerActions()
   -- Verify all players have selected actions
   for _, color in ipairs(AllSeatedPlayers) do
@@ -22,7 +94,6 @@ function ResolvePlayerActions()
   end
 end
 
--- Example action resolvers (could be in same file or separate)
 function ResolveBuyAction(color)
     -- Get player's selected card
     local card = PlayerSelectedCard[color]
@@ -47,9 +118,10 @@ function ResolveBuildWonderAction(color)
 end
 
 function FinishWonderStage()
+  -- Runs only once per game
 	-- Everybody selected their wonders and is ready
-	-- Deal coins and show the "Ready" button
-	startLuaCoroutine(Global, "DealCoins")
+	-- Deal coins
+	startLuaCoroutine(Global, "DealStartingCoins")
 end
 
 function PrepareLeaderStage()
@@ -89,6 +161,7 @@ function PrepareLeaderStage()
 end
 
 function DoLeaderStage()
+  print("DoLeaderStage function")
 	-- Check how many passes we did so far
 	if CurrentPasses < MaximumPasses then
 		Wait.time(function()
@@ -103,21 +176,6 @@ function DoLeaderStage()
 		-- Increment how many passes we did so far
 		CurrentPasses = CurrentPasses + 1
 		updatePhaseUI("Phase: Leader Drafting", "Select 1 leader to keep\n"..CurrentPasses.."/"..MaximumPasses)
-
-		if CurrentPasses == MaximumPasses then
-			-- Passed 3 times, now we have to choose 1 to play
-			updatePhaseUI("Phase: Leader Selection", "Choose 1 Leader to play")
-			Wait.time(function()
-				-- After 0.1 take personal cards
-				ForceTakePersonalCards()
-				Wait.time(function()
-					-- After 0.2 seconds change the game state
-					-- This avoid buttons being created for a split second
-					-- after ForceTakePersonalCards runs
-					GameState = "LeaderSelectionStage"
-				end, 0.1)
-			end, 0.1)
-		end
 
 		-- After 1 second pick up passed Leaders
 		-- Passing right means we force take from left
@@ -140,6 +198,29 @@ function PrepareAge1Stage()
 
 	local tempDeck = DeckZones.Age.Age1.getObjects()
 	tempDeck[1].deal(#tempDeck[1].getObjects()/NumberOfPlayers)
+
+  local newTopImage = "https://i.imgur.com/kkuw2Co.jpeg"
+
+	-- Loop through all player tiles and update the image
+  for color, data in pairs(PlayerCardHolder) do
+    local tile = data.Tile
+
+    if tile and tile.getCustomObject then
+      tile.setCustomObject({
+				image = newTopImage,
+				image_bottom = newTopImage
+			})
+
+			-- It has a new GUID
+      PlayerCardHolder[color].Tile = tile.reload()
+
+    else
+      print("Tile not found or invalid for color: " .. color)
+    end
+  end
+
+	-- They are now new objects, lock them again
+	disableAllTiles()
 end
 
 function DoAge1Stage()

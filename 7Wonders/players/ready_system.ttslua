@@ -22,32 +22,28 @@ function ReadyUp(player)
 		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 	end
 
-	if NumberOfReadyPlayers == #Player.getPlayers() then
-		UnreadyAllPlayers()
+	TransitionPhase()
 
-		MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
-
-		print(GameState)
-		-- Did we finish choosing wonders
-		if GameState == "WonderStage" then
-			FinishWonderStage()
-
-			if ExpansionConfig.Leaders.Base then
-				PrepareLeaderStage()
-			else
-				PrepareAge1Stage()
-			end
-
-		-- Did we pass leaders
-		elseif GameState == "LeaderDrafting" then
-			DoLeaderStage()
-		-- Did we choose an action with the leader
-		elseif GameState == "LeaderSelectionStage" then
-			ResolvePlayerActions()
-		end
-	else
-		-- Update UI that shows who is ready
-	end
+	-- 	-- Did we finish choosing wonders
+	-- 	if GameState == "WonderStage" then
+	-- 		FinishWonderStage()
+	--
+	-- 		if ExpansionConfig.Leaders.Base then
+	-- 			PrepareLeaderStage()
+	-- 		else
+	-- 			PrepareAge1Stage()
+	-- 		end
+	--
+	-- 	-- Did we pass leaders
+	-- 	elseif GameState == "LeaderDrafting" then
+	-- 		DoLeaderStage()
+	-- 	-- Did we choose an action with the leader
+	-- 	elseif GameState == "LeaderSelectionStage" then
+	-- 		ResolvePlayerActions()
+	-- 	end
+	-- else
+	-- 	-- Update UI that shows who is ready
+	-- end
 end
 
 function CreateActionButtons(tile)
@@ -86,6 +82,7 @@ function CreateActionButtons(tile)
 end
 
 function ForceTakePersonalCards()
+	print("ForceTakePersonalCards")
 	-- Makes all players draw all cards on their tile
   for color, data in pairs(PlayerCardHolder) do
     local zone = data.Zone
@@ -109,13 +106,45 @@ function UnreadyPlayerIfNeeded(color, zone)
 
 	if cardCount <= CurrentPasses and GameState == "LeaderDrafting" then
 		if ReadyList[color] then
+			print("settings ready to false, first if")
 			ReadyList[color] = false
 			NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 			broadcastToAll(Player[color].steam_name .. " is not ready")
 		end
 	elseif GameState == "LeaderSelectionStage" and ReadyList[color] then
+		print("settings ready to false, second if")
 		ReadyList[color] = false
 		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 		broadcastToAll(Player[color].steam_name .. " is not ready")
 	end
+end
+
+function CreateReadyButtons()
+	DefaultButtonParams.width = 600
+	DefaultButtonParams.color = {1,1,1,1}
+	DefaultButtonParams.font_color = {0, 0, 0}
+	DefaultButtonParams.label = "Ready"
+	DefaultButtonParams.position = {0, 1, -0.5}
+	DefaultButtonParams.scale = {0.3, 0.3, 0.3}
+	DefaultButtonParams.font_size = 200
+	DefaultButtonParams.click_function = "ReadyUpManual"
+
+	for _, color in ipairs(AllSeatedPlayers) do
+		GetPlayerCurrentWonder(color).createButton(DefaultButtonParams)
+	end
+end
+
+function ReadyUpManual(obj, color, alt)
+	if not IsObjectInPlayerWonderZone(obj, color) then
+    broadcastToColor("You can't make other players ready!", color, {1, 0, 0})
+    return
+	end
+
+	local wonder = GetPlayerCurrentWonder(color)
+	for i, _ in ipairs(wonder.getButtons()) do
+		local newLabel = ReadyList[color] and "Ready" or "Undo"
+    wonder.editButton({index = i-1, label = newLabel})
+	end
+
+	ReadyUp(Player[color])
 end

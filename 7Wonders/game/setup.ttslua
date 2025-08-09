@@ -491,20 +491,20 @@ function HandleStartGameButtonCo()
 end
 
 function DealStartingCoins()
-  local CoinAmount = ExpansionsUsed.Leaders.Base and 6 or 3
+  local CoinAmount = ExpansionConfig.Leaders.Base and 6 or 3
 
   for _, player in ipairs(AllSeatedPlayers) do
-		local tempPost = Vector(_G["_"..player.."PlayerInfo"].WonderPos)
+		local tempPost = Vector(PlayerInfo[player].WonderPos)
 		tempPost.y = 2
 
     for i = 1, CoinAmount do
-			tempPost = Vector(_G["_"..player.."PlayerInfo"].WonderPos)
+			tempPost = Vector(PlayerInfo[player].WonderPos)
 			tempPost.y = 2
 			tempPost.x = tempPost.x + math.random(-100, 100) / 100
 			tempPost.z = tempPost.z + math.random(-100, 100) / 100
 			CoinBags.Coin1.takeObject({
 				position = tempPost,
-				rotation = _G["_"..player.."PlayerInfo"].ComponentRotation,
+				rotation = PlayerInfo[player].ComponentRotation,
 				smooth = false
 			})
 			pause(0.1)

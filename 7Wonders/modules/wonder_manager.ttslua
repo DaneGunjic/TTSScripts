@@ -1,7 +1,6 @@
 function DealWonders()
 	GameState = "WonderStage"
-	UI.setValue("CurrentPhase", "Phase: Wonder Selection")
-	UI.setValue("PhaseDesc", "Choose your wonder")
+	updatePhaseUI("Phase: Wonder Selection", "Choose your wonder")
 
 	-- Random Wonders
 	if RandomWonders then
@@ -68,22 +67,30 @@ function DealWonders()
 	end
 
 	-- [[SET CAMERA POSITIONS]]
-	for _, player in ipairs(AllSeatedPlayers) do
+	for _, color in ipairs(AllSeatedPlayers) do
     -- Verify the player exists in CameraSettings
-    if CameraSettings[player] then
+    if CameraSettings[color] then
       -- Safely get the wonder position (assuming it exists in _G)
       local wonderPos = nil
-      if PlayerInfo[player] then
-        wonderPos = PlayerInfo[player].WonderPos
+      if PlayerInfo[color] then
+        wonderPos = PlayerInfo[color].WonderPos
       end
 
       -- Apply camera lookAt with settings from CameraSettings
-      Player[player].lookAt({
+      Player[color].lookAt({
         position = wonderPos or {0, 0, 0},
-        pitch = CameraSettings[player].pitch,
-        yaw = CameraSettings[player].yaw,
-        distance = CameraSettings[player].distance
+        pitch = CameraSettings[color].pitch,
+        yaw = CameraSettings[color].yaw,
+        distance = CameraSettings[color].distance
       })
     end
+	end
+end
+
+function GetPlayerCurrentWonder(color)
+	if DraftMode then
+		return DraftWonders[color][PlayerCurrentlyChosenWonder[color]]
+	else
+		return RandomWonderObj[color]
 	end
 end
