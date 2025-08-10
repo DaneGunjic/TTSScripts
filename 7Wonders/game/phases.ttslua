@@ -1,7 +1,31 @@
 PhaseHandlers = {
   ResolveCardAction = {
-    next = function() print("ResolveCardAction next") end,
-    PhaseAfterResolving = ""
+    next = function(self)
+      print(self.PhaseAfterResolving .. self.PhaseBeforeResolving)
+      if self.PhaseAfterResolving == "Age1" and self.PhaseBeforeResolving == "LeaderSelectionStage" then
+        print("PrepareAge1Stage now?")
+        -- We resolved the leader action, we can start age 1
+        for _, color in ipairs(AllSeatedPlayers) do
+          local data = PlayerCardHolder[color]
+          if data and data.Zone and data.Tile then
+            local objects = Player[color].getHandObjects()
+            local tile = data.Tile
+            for _, obj in ipairs(objects) do
+              obj.setRotation(tile.getRotation() + vector(0, 0, 180))
+              obj.setPosition(tile.getPosition() - tile.getTransformRight() * - 3)
+            end
+          end
+        end
+        Wait.time(function()
+            PrepareAge1Stage()
+        end, 0.1)
+      elseif self.PhaseAfterResolving == self.PhaseBeforeResolving and self.PhaseAfterResolving == "Age1" then
+        print("Continue age 1 now?")
+        -- Continue age 1?
+      end
+    end, -- End of the 'next' function
+    PhaseAfterResolving  = "",
+    PhaseBeforeResolving = ""
   },
   -- Setup = {
   --   action = SetupGame,
@@ -30,6 +54,8 @@ PhaseHandlers = {
       if CurrentPasses == MaximumPasses then
         -- Passed 3 times, now we have to choose 1 to play
   			updatePhaseUI("Phase: Leader Selection", "Choose 1 Leader to play")
+        CurrentPasses = 0
+        MaximumPasses = 0
   			Wait.time(function()
   				-- After 0.1 take personal cards
   				ForceTakePersonalCards()
@@ -49,6 +75,7 @@ PhaseHandlers = {
       GameState = "ResolveCardAction"
       updatePhaseUI("Phase: Card action", "Resolve your card action")
       PhaseHandlers[GameState].PhaseAfterResolving = "Age1"
+      PhaseHandlers[GameState].PhaseBeforeResolving = "LeaderSelectionStage"
       CreateReadyButtons()
       ResolvePlayerActions()
     end
@@ -66,7 +93,7 @@ function TransitionPhase()
     local current = PhaseHandlers[GameState]
     if current then
       print("Everyone is ready, calling" .. GameState .. " next")
-      current.next()
+      current:next()
       --current.action()
       UnreadyAllPlayers()
     end
@@ -83,40 +110,98 @@ function ResolvePlayerActions()
   end
 
   for _, color in ipairs(AllSeatedPlayers) do
+    local wonder = GetPlayerCurrentWonder(color)
+    if wonder then
+        wonder.clearButtons()
+    end
+
     local action = PlayerSelectedAction[color]
 
     if action == "Buy" then
-
+      ResolveBuyAction(color)
   	elseif action == "Sell" then
-      AddCoins(color, 3, false)
+      ResolveSellAction(color)
   	elseif action == "BuildWonder" then
-
+      ResolveBuildWonderAction(color)
+    elseif action == "ArmadaSell" then
+      ResolveArmadaSellAction(color)
     end
   end
   PlayerSelectedAction[color] = nil
 end
 
 function ResolveBuyAction(color)
-    -- Get player's selected card
-    local card = PlayerSelectedCard[color]
-    if not card then return end
+    local data = PlayerCardHolder[color]
+    if not (data and data.Zone and data.Tile) then
+        print("Error: Player zone or tile not found for color: " .. color)
+        return
+    end
 
-    -- Deduct resources
-    DeductResources(color, card.cost)
+    local objects = data.Zone.getObjects()
+    if not objects or #objects == 0 then
+        print("Error: No card found in player zone for color: " .. color)
+        return
+    end
 
-    -- Add to player's tableau
-    AddCardToTableau(color, card)
+    local tile = data.Tile
+    local card_object = nil
 
-    -- Log transaction
-    LogTransaction(color, "bought", card.name)
+    for _, obj in ipairs(objects) do
+        if obj.type == 'Card' or obj.type == 'Deck' then
+            card_object = obj
+            break
+        end
+    end
+
+    if card_object then
+        local new_pos = tile.getPosition() + tile.getTransformForward() * -5
+        card_object.setPosition(new_pos)
+
+        local new_rot = card_object.getRotation()
+        new_rot.z = 0
+        card_object.setRotation(new_rot)
+    else
+        print("Error: No card object found for color: " .. color)
+    end
 end
 
 function ResolveSellAction(color)
-    --
+  local coinText = (amount == 1) and " coin" or " coins"
+  broadcastToAll(Player[color].steam_name .. " gained " .. amount .. coinText .. " for selling a card", {r=0.5, g=0.5, b=0.5})
+  AddCoins(color, 3, true)
+  DiscardPlayerActionCard(color)
 end
 
 function ResolveBuildWonderAction(color)
     --
+end
+
+function ResolveArmadaSellAction(color)
+  broadcastToAll(Player[color].steam_name .. " sold a card to advance their yellow ship ", {r=0.5, g=0.5, b=0.5})
+  local ship = PlayerShips[color]["Yellow"]
+  if ship then
+    ship.setPosition(ship.getPosition() + ship.getTransformForward() * 1.5)
+  end
+end
+
+function DiscardPlayerActionCard(color)
+  local discardZone = DeckZones.Discard
+  if not discardZone then
+    print("Error: Discard zone not found!")
+    return
+  end
+
+  local data = PlayerCardHolder[color]
+  if data and data.Zone then
+    local objects = data.Zone.getObjects()
+    for _, obj in ipairs(objects) do
+      if obj.type == 'Card' or obj.type == 'Deck' then
+        obj.setPosition(discardZone.getPosition())
+        obj.setRotation(discardZone.setRotation())
+        break -- Only discard one card/deck
+      end
+    end
+  end
 end
 
 function FinishWonderStage()

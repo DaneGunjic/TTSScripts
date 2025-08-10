@@ -1,0 +1,59 @@
+-------------------[[ DECK ZONE REFERENCES ]]-------------------
+DeckZones = {
+  Age = {
+    Age1 = getObjectFromGUID("56d221"),
+    Age2 = getObjectFromGUID("306db0"),
+    Age3 = getObjectFromGUID("a0fe65")
+  },
+  Cities = {
+    Age1 = getObjectFromGUID("05d80d"),
+    Age2 = getObjectFromGUID("f2659e"),
+    Age3 = getObjectFromGUID("3484af")
+  },
+  Armada = {
+    Age1 = getObjectFromGUID("f261d9"),
+    Age2 = getObjectFromGUID("06e74b"),
+    Age3 = getObjectFromGUID("50d040")
+  },
+
+  Leaders = getObjectFromGUID("d679f4"),
+  Guild = getObjectFromGUID("838ee1"),
+
+  Discard = getObjectFromGUID("cc6e31"),
+
+  Island = {
+    Level1 = getObjectFromGUID("43d444"),
+    Level2 = getObjectFromGUID("ffc10f"),
+    Level3 = getObjectFromGUID("27153d")
+  }
+}
+
+-------------------[[ FINAL DECK ZONE REFERENCES ]]-------------------
+-- These are the destination zones where decks will be placed once setup is complete
+-- nil variables are present but those decks are not moved after setup
+FinalDeckZones = {
+  Age = {
+    Age1 = nil,
+    Age2 = nil,
+    Age3 = nil
+  },
+  Cities = {
+    Age1 = getObjectFromGUID("6047cd"),
+    Age2 = getObjectFromGUID("00cc17"),
+    Age3 = getObjectFromGUID("e32431")
+  },
+  Armada = {
+    Age1 = getObjectFromGUID("2d751f"),
+    Age2 = getObjectFromGUID("389ff8"),
+    Age3 = getObjectFromGUID("48509b")
+  },
+
+  Leaders = nil,
+  Guild = getObjectFromGUID("189e24"),
+
+  Island = {
+    Level1 = nil,
+    Level2 = nil,
+    Level3 = nil
+  }
+}

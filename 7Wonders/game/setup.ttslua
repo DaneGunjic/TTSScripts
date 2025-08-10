@@ -458,10 +458,10 @@ function HandleStartGameButtonCo()
 
 	-- [[DEAL WONDERS]]
 	DealWonders()
-
+	print("DealWonders done")
 	-- [[DEAL RANDOM ARMADA BOARDS AND SHIPS]]
 	DealArmada()
-
+	print("DealArmada done")
 	-- Move all the bags into position
 	-- CoinBag1.setPosition(CoinBag1Position)
 	-- CoinBag3.setPosition(CoinBag3Position)

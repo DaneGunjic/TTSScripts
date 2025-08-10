@@ -1,4 +1,39 @@
+function MoveShip(player_color, ship_type)
+    local movement_count = PlayerShipMovements[player_color][ship_type]
+    if movement_count >= 6 then
+        broadcastToColor("This ship has already moved the maximum number of times.", player_color, {1, 0, 0})
+        return
+    end
+
+    PlayerShipMovements[player_color][ship_type] = movement_count + 1
+
+    local ship = PlayerShips[player_color][ship_type]
+    if ship then
+        ship.setPosition(ship.getPosition() + ship.getTransformForward() * 1.5)
+    end
+
+    local reward = ShipRewards[ship_type][movement_count + 1]
+    if reward then
+        if reward.coins then
+            AddCoins(player_color, reward.coins)
+        end
+        if reward.message then
+            local message = string.gsub(reward.message, "{player_name}", Player[player_color].steam_name)
+            broadcastToAll(message, {0.5, 0.5, 0.5})
+        end
+    end
+end
+
+function StorePlayerShip(player, shipType, shipObject)
+    if not PlayerShips[player] then
+        PlayerShips[player] = {}
+    end
+    PlayerShips[player][shipType] = shipObject
+    --shipObject.setLock(true)
+end
+
 function DealArmada()
+	print("DealArmada")
 	for _, player in ipairs(AllSeatedPlayers) do
 		DockyardBag.takeObject({
 			position = PlayerInfo[player].DockyardPos,
@@ -8,18 +43,26 @@ function DealArmada()
 		ShipBags.Red.takeObject({
 			position = PlayerInfo[player].ShipPositions.Red,
 			rotation = PlayerInfo[player].ComponentRotation,
-			smooth = false})
+			smooth = false,
+            callback_function = function(obj) StorePlayerShip(player, "Red", obj) end
+        })
 		ShipBags.Yellow.takeObject({
 			position = PlayerInfo[player].ShipPositions.Yellow,
 			rotation = PlayerInfo[player].ComponentRotation,
-			smooth = false})
+			smooth = false,
+            callback_function = function(obj) StorePlayerShip(player, "Yellow", obj) end
+        })
 		ShipBags.Blue.takeObject({
 			position = PlayerInfo[player].ShipPositions.Blue,
 			rotation = PlayerInfo[player].ComponentRotation,
-			smooth = false})
+			smooth = false,
+            callback_function = function(obj) StorePlayerShip(player, "Blue", obj) end
+        })
 		ShipBags.Green.takeObject({
 			position = PlayerInfo[player].ShipPositions.Green,
 			rotation = PlayerInfo[player].ComponentRotation,
-			smooth = false})
+			smooth = false,
+            callback_function = function(obj) StorePlayerShip(player, "Green", obj) end
+        })
 	end
 end

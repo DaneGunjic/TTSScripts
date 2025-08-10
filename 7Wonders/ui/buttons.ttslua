@@ -101,8 +101,8 @@ function HandlePromoGuildsButton() -- Button index 9
 end
 
 function HandleCollectionButton() -- Button index 10
-	ExpansionConfig.Collection = not ExpansionConfig.Collection
-	if ExpansionConfig.Collection then
+	WonderExpansionConfig.Collection = not WonderExpansionConfig.Collection
+	if WonderExpansionConfig.Collection then
 		SetupBoard.editButton({index = 10, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 10, label = "[    ]", font_color={1,1,1}})
@@ -431,7 +431,7 @@ function HandleSellCard(obj, color, alt)
 
 	-- Verify permission
 	if color:lower() ~= tileColor:lower() then
-		broadcastToColor("This isn't your tile!", player_clicker_color, {1,0,0})
+		broadcastToColor("This isn't your tile!", color, {1,0,0})
 		return  -- Exit function if wrong player
 	end
 

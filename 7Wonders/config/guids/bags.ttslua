@@ -1,0 +1,126 @@
+-------------------[[ BAG REFERENCES ]]-------------------
+-- [[BAGS | AGE 1]]
+Age1DeckBags = {
+  Age1_3p = getObjectFromGUID("569cf4"),
+  Age1_4p = getObjectFromGUID("e49b5b"),
+  Age1_5p = getObjectFromGUID("0f1373"),
+  Age1_6p = getObjectFromGUID("4f6d2d"),
+  Age1_7p = getObjectFromGUID("b3b7ad")
+}
+
+-- [[BAGS | AGE 2]]
+Age2DeckBags = {
+  Age2_3p = getObjectFromGUID("f05c32"),
+  Age2_4p = getObjectFromGUID("8aa8b7"),
+  Age2_5p = getObjectFromGUID("98784f"),
+  Age2_6p = getObjectFromGUID("e77147"),
+  Age2_7p = getObjectFromGUID("a6e0b0")
+}
+
+-- [[BAGS | AGE 3]]
+Age3DeckBags = {
+  Age3_3p = getObjectFromGUID("493654"),
+  Age3_4p = getObjectFromGUID("63d3ad"),
+  Age3_5p = getObjectFromGUID("e2b94c"),
+  Age3_6p = getObjectFromGUID("6940e3"),
+  Age3_7p = getObjectFromGUID("c97981")
+}
+
+-- [[BAGS | GUILDS]]
+GuildBags = {
+  Base = getObjectFromGUID("3cec0e"),
+  Promo = getObjectFromGUID("0cbeec"),
+  Cities = getObjectFromGUID("3f9ca3")
+}
+
+-- [[BAGS | LEADERS]]
+LeaderBags = {
+  Base = getObjectFromGUID("1ebb3d"),
+  Expert = getObjectFromGUID("c7c31f"),
+  Cities = getObjectFromGUID("1dd705"),
+  Promo = getObjectFromGUID("a5f906")
+}
+
+-- [[BAGS | CITIES]]
+CitiesBags = {
+  Age1 = getObjectFromGUID("e4136a"),
+  Age2 = getObjectFromGUID("33eacd"),
+  Age3 = getObjectFromGUID("6af278")
+}
+
+-- [[BAGS | ARMADA]]
+ArmadaBags = {
+  Age1 = getObjectFromGUID("1b953a"),
+  Age2 = getObjectFromGUID("92d9b9"),
+  Age3 = getObjectFromGUID("77cfbd")
+}
+
+-- [[BAGS | ARMADA 4 PLAYERS]]
+ArmadaBags_4P = {
+  Age1 = getObjectFromGUID("e4ba62"),
+  Age2 = getObjectFromGUID("3e4eb3"),
+  Age3 = getObjectFromGUID("75d02b")
+}
+
+ShipBags = {
+  Red = getObjectFromGUID("0eef1f"),
+  Blue = getObjectFromGUID("e75093"),
+  Yellow = getObjectFromGUID("10eb0f"),
+  Green = getObjectFromGUID("b230fd")
+}
+
+IslandBags = {
+  Level1 = getObjectFromGUID("bef882"),
+  Level2 = getObjectFromGUID("3b2a20"),
+  Level3 = getObjectFromGUID("df39ee")
+}
+
+DockyardBag = getObjectFromGUID("5b9a9c")
+
+-- [[BAGS | WONDERS]]
+WonderBags = {
+  Base = getObjectFromGUID("56d45b"),
+  Leaders = getObjectFromGUID("c1c61c"),
+  Cities = getObjectFromGUID("a26264"),
+  Armada = getObjectFromGUID("0c6087"),
+  Collection = getObjectFromGUID("7c6699")
+}
+
+-- [[BAGS | COINS]]
+CoinBags = {
+  Coin1 = getObjectFromGUID("3f95a5"),
+  Coin3 = getObjectFromGUID("3cad45"),
+  Coin6 = getObjectFromGUID("9e60c9")
+}
+
+-- [[BAGS | CONFLICT]]
+ConflictTokenBags = {
+  VictoryToken1 = getObjectFromGUID("c56b5a"),
+  VictoryToken3 = getObjectFromGUID("5411ef"),
+  VictoryToken5 = getObjectFromGUID("c8fc52"),
+  VictoryToken7 = getObjectFromGUID("c99037"),
+  DefeatToken = getObjectFromGUID("d6e612")
+}
+-- [[BAGS | BOARDING & DIPLOMACY]]
+BoardingTokenBag = getObjectFromGUID("511867")
+DiplomacyTokenBag = getObjectFromGUID("ff17ba")
+
+-- [[BAGS | NAVAL]]
+NavalTokenBags = {
+  VictoryToken1 = getObjectFromGUID("a30549"),
+  VictoryToken3 = getObjectFromGUID("1a1373"),
+  VictoryToken5 = getObjectFromGUID("8dcae9"),
+  VictoryToken7 = getObjectFromGUID("82878d"),
+  DefeatToken1 = getObjectFromGUID("4cb023"),
+  DefeatToken2 = getObjectFromGUID("9ca312"),
+  DefeatToken3 = getObjectFromGUID("dd7fca")
+}
+
+-- [[BAGS | DEBT]]
+DebtBags = {
+  DebtToken1 = getObjectFromGUID("b1f5a1"),
+  DebtToken5 = getObjectFromGUID("ed2335")
+}
+
+-- [[BAGS | FRONTIERS]]
+FrontiersBag = getObjectFromGUID("f46e91")

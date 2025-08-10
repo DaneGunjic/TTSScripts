@@ -47,10 +47,23 @@ function ReadyUp(player)
 end
 
 function CreateActionButtons(tile)
+  if ExpansionConfig.Armada then
+    tile.createButton({
+      click_function = "HandleArmadaSellCard",
+      label = "Armada Sell",
+      position = {-0.95, 0.1, -0.75},
+      rotation = {0, 0 ,0},
+      width = 1000,
+      height = 1000,
+      scale = {x=0.2,y=0.2,z=0.2},
+      font_size = 350,
+    })
+  end
+
   tile.createButton({
     click_function = "HandleBuyCard",
     label = "Buy",
-    position = {-0.95, 0.1, -0.5},
+    position = {-0.95, 0.1, -0.25},
     rotation = {0, 0 ,0},
     width = 1000,
     height = 1000,
@@ -61,7 +74,7 @@ function CreateActionButtons(tile)
   tile.createButton({
     click_function = "HandleSellCard",
     label = "Sell",
-    position = {-0.95, 0.1, 0},
+    position = {-0.95, 0.1, 0.25},
     rotation = {0, 0 ,0},
     width = 1000,
     height = 1000,
@@ -72,7 +85,7 @@ function CreateActionButtons(tile)
   tile.createButton({
     click_function = "HandleBuildWonder",
     label = "Wonder",
-    position = {-0.95, 0.1, 0.5},
+    position = {-0.95, 0.1, 0.75},
     rotation = {0, 0 ,0},
     width = 1350,
     height = 1000,
@@ -103,7 +116,7 @@ end
 
 function UnreadyPlayerIfNeeded(color, zone)
 	local cardCount = CountCardsInZone(zone)
-
+	print("UnreadyPlayerIfNeeded" .. cardCount)
 	if cardCount <= CurrentPasses and GameState == "LeaderDrafting" then
 		if ReadyList[color] then
 			print("settings ready to false, first if")
@@ -120,17 +133,21 @@ function UnreadyPlayerIfNeeded(color, zone)
 end
 
 function CreateReadyButtons()
-	DefaultButtonParams.width = 600
-	DefaultButtonParams.color = {1,1,1,1}
-	DefaultButtonParams.font_color = {0, 0, 0}
-	DefaultButtonParams.label = "Ready"
-	DefaultButtonParams.position = IsPlayerWonderFlipped and {0, 0.2, -0.8} or {0, 0, -0.8}
-	DefaultButtonParams.rotation = IsPlayerWonderFlipped and {0, 0, 0} or {0, 0, 180}
-	DefaultButtonParams.scale = {0.3, 0.3, 0.3}
-	DefaultButtonParams.font_size = 200
-	DefaultButtonParams.click_function = "ReadyUpManual"
+
 
 	for _, color in ipairs(AllSeatedPlayers) do
+		local flipped = IsPlayerWonderFlipped(color)
+
+		DefaultButtonParams.width = 600
+		DefaultButtonParams.color = {1,1,1,1}
+		DefaultButtonParams.font_color = {0, 0, 0}
+		DefaultButtonParams.label = "Ready"
+		DefaultButtonParams.position = flipped and {0, 0, -0.8} or {0, 0.2, -0.8}
+		DefaultButtonParams.rotation = flipped and {0, 0, 180} or {0, 0, 0}
+		DefaultButtonParams.scale = {0.3, 0.3, 0.3}
+		DefaultButtonParams.font_size = 200
+		DefaultButtonParams.click_function = "ReadyUpManual"
+
 		GetPlayerCurrentWonder(color).createButton(DefaultButtonParams)
 	end
 end

@@ -1,4 +1,5 @@
 function DealWonders()
+	print("DealWonders")
 	GameState = "WonderStage"
 	updatePhaseUI("Phase: Wonder Selection", "Choose your wonder")
 
@@ -29,6 +30,7 @@ function DealWonders()
 	-- Draft Wonders
 	elseif DraftMode then
 		for _, player in ipairs(AllSeatedPlayers) do
+			print("color: " .. player)
 			for i = 1, DraftModeNumber do
 				DraftWonders[player][i] = WonderBags.Base.takeObject({
 					smooth = false,
@@ -60,6 +62,8 @@ function DealWonders()
 				DefaultButtonParams.position = {1, 0.2, 0}
 				DefaultButtonParams.click_function = "HandleCycleRightButton"
 				DraftWonders[player][i].createButton(DefaultButtonParams)
+
+				print("made all 4 buttons")
 			end
 
 			DraftWonders[player][1].setPosition(PlayerInfo[player].WonderPos)

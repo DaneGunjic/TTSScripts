@@ -1,0 +1,22 @@
+-------------------[[ TOKEN POSITIONS ]]-------------------
+TokenPositions = {
+  CoinBag1 = Vector(-14.00, 0.46, -4.00),
+  CoinBag3 = Vector(-10.00, 0.46, -4.00),
+  CoinBag6 = Vector(-6.00, 0.46, -4.00),
+  ConflictToken1 = Vector(-2.00, 0.46, -4.00),
+  ConflictToken3 = Vector(2.00, 0.46, -4.00),
+  ConflictToken5 = Vector(6.00, 0.46, -4.00),
+  ConflictToken7 = Vector(10.00, 0.46, -4.00),
+  ConflictTokenDefeat = Vector(14.00, 0.46, -4.00),
+  BoardingToken = Vector(-17.00, 0.46, 0.00),
+  DiplomacyTokenPosition = Vector(14.00, 0.46, 0.00),
+  NavalVictory1 = Vector(-14.00, 0.46, 4.00),
+  NavalVictory3 = Vector(-10.00, 0.46, 4.00),
+  NavalVictory5 = Vector(-6.00, 0.46, 4.00),
+  NavalVictory7 = Vector(-2.00, 0.46, 4.00),
+  NavalDefeat1 = Vector(2.00, 0.46, 4.00),
+  NavalDefeat2 = Vector(6.00, 0.46, 4.00),
+  NavalDefeat3 = Vector(10.00, 0.46, 4.00),
+  Debt1 = Vector(-17.00, 0.46, 4.00),
+  Debt5 = Vector(-17.00, 0.46, -4.00)
+}

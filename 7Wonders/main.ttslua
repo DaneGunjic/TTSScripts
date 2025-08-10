@@ -1,6 +1,7 @@
 -- Main game file that includes all other components
 
 #include !\7Wonders\config\expansions.ttslua
+#include !\7Wonders\config\tokens.ttslua
 
 #include !\7Wonders\game\phases.ttslua
 #include !\7Wonders\game\setup.ttslua
@@ -23,6 +24,9 @@ function onLoad()
   -- Once the game loads initialize  all global variables
   #include !\7Wonders\globals_general.ttslua
   #include !\7Wonders\globals_players.ttslua
+
+  #include !\7Wonders\config\guids\bags.ttslua
+  #include !\7Wonders\config\guids\decks.ttslua
 
   MakeSetupButtons()
   MakeSetupBoardText()
