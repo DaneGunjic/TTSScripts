@@ -180,8 +180,10 @@ function ResolveArmadaSellAction(color)
   broadcastToAll(Player[color].steam_name .. " sold a card to advance their yellow ship ", {r=0.5, g=0.5, b=0.5})
   local ship = PlayerShips[color]["Yellow"]
   if ship then
-    ship.setPosition(ship.getPosition() + ship.getTransformForward() * 1.5)
+    MoveShip(color, "Yellow")
   end
+
+  DiscardPlayerActionCard(color)
 end
 
 function DiscardPlayerActionCard(color)
@@ -197,7 +199,7 @@ function DiscardPlayerActionCard(color)
     for _, obj in ipairs(objects) do
       if obj.type == 'Card' or obj.type == 'Deck' then
         obj.setPosition(discardZone.getPosition())
-        obj.setRotation(discardZone.setRotation())
+        obj.setRotation(discardZone.getRotation() + vector(0, 0, 180))
         break -- Only discard one card/deck
       end
     end

@@ -1,6 +1,7 @@
 -- Main game file that includes all other components
 
 #include !\7Wonders\config\expansions.ttslua
+#include !\7Wonders\config\rewards.ttslua
 #include !\7Wonders\config\tokens.ttslua
 
 #include !\7Wonders\game\phases.ttslua
