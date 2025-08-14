@@ -20,6 +20,7 @@ DeckZones = {
   Guild = getObjectFromGUID("838ee1"),
 
   Discard = getObjectFromGUID("cc6e31"),
+  AltDiscard = getObjectFromGUID("4089d6"),
 
   Island = {
     Level1 = getObjectFromGUID("43d444"),

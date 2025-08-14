@@ -80,6 +80,11 @@ function FindNextColor(Color, Direction)
 end
 
 function onChat(message, player)
+	if message:lower() == "button" then
+		CreateReadyButtons()
+		return false
+	end
+
 	if message == "debug" then
 		printToAll("Debug mode activated!", {1,1,0})
 
@@ -104,7 +109,7 @@ function onChat(message, player)
 		end
 
 		return false
-		end
+	end
 end
 
 function disableAllTiles()

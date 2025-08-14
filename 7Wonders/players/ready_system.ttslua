@@ -116,7 +116,7 @@ end
 
 function UnreadyPlayerIfNeeded(color, zone)
 	local cardCount = CountCardsInZone(zone)
-	print("UnreadyPlayerIfNeeded" .. cardCount)
+	print("UnreadyPlayerIfNeeded " .. cardCount)
 	if cardCount <= CurrentPasses and GameState == "LeaderDrafting" then
 		if ReadyList[color] then
 			print("settings ready to false, first if")
@@ -136,19 +136,22 @@ function CreateReadyButtons()
 	for _, color in ipairs(AllSeatedPlayers) do
 		local flipped = IsPlayerWonderFlipped(color)
 		print(flipped)
+		local tempPosition = flipped and {0, -0.2, -0.8} or {0, 0.2, -0.8}
+		local tempRotation = flipped and {0, 0, 180} or {0, 0, 0}
+
 		DefaultButtonParams.width = 600
 		DefaultButtonParams.color = {1,1,1,1}
 		DefaultButtonParams.font_color = {0, 0, 0}
 		DefaultButtonParams.label = "Ready"
-		DefaultButtonParams.position = flipped and {0, -0.2, -0.8} or {0, 0.2, -0.8}
-		DefaultButtonParams.rotation = flipped and {0, 0, 180} or {0, 0, 0}
+		DefaultButtonParams.position = tempPosition
+		DefaultButtonParams.rotation = tempRotation
 		DefaultButtonParams.scale = {0.3, 0.3, 0.3}
 		DefaultButtonParams.font_size = 200
 		DefaultButtonParams.click_function = "ReadyUpManual"
 
 		local debug = GetPlayerCurrentWonder(color)
 		GetPlayerCurrentWonder(color).createButton(DefaultButtonParams)
-		print(debug.getGUID())
+		print("CREATED WONDER READY BUTTON")
 	end
 end
 
@@ -158,11 +161,11 @@ function ReadyUpManual(obj, color, alt)
     return
 	end
 
+	ReadyUp(Player[color])
+
 	local wonder = GetPlayerCurrentWonder(color)
 	for i, _ in ipairs(wonder.getButtons()) do
-		local newLabel = ReadyList[color] and "Ready" or "Undo"
+		local newLabel = ReadyList[color] and "Undo" or "Ready"
     wonder.editButton({index = i-1, label = newLabel})
 	end
-
-	ReadyUp(Player[color])
 end

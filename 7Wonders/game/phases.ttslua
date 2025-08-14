@@ -1,6 +1,14 @@
 PhaseHandlers = {
   ResolveCardAction = {
     next = function(self)
+      for _, color in ipairs(AllSeatedPlayers) do
+        local wonder = GetPlayerCurrentWonder(color)
+        if wonder then
+          print("GONNA CLEAR ALL READY BUTTONS NOW")
+          wonder.clearButtons()
+        end
+      end
+
       print(self.PhaseAfterResolving .. self.PhaseBeforeResolving)
       if self.PhaseAfterResolving == "Age1" and self.PhaseBeforeResolving == "LeaderSelectionStage" then
         print("PrepareAge1Stage now?")
@@ -27,10 +35,6 @@ PhaseHandlers = {
     PhaseAfterResolving  = "",
     PhaseBeforeResolving = ""
   },
-  -- Setup = {
-  --   action = SetupGame,
-  --   next = function() return "WonderStage" end
-  -- },
   WonderStage = {
     --action = FinishWonderStage,
     next = function()
@@ -76,8 +80,8 @@ PhaseHandlers = {
       updatePhaseUI("Phase: Card action", "Resolve your card action")
       PhaseHandlers[GameState].PhaseAfterResolving = "Age1"
       PhaseHandlers[GameState].PhaseBeforeResolving = "LeaderSelectionStage"
-      CreateReadyButtons()
       ResolvePlayerActions()
+      CreateReadyButtons()
     end
   },
   Age1 = {
@@ -90,6 +94,7 @@ PhaseHandlers = {
 function TransitionPhase()
   if NumberOfReadyPlayers == #Player.getPlayers() then
     MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
+    MusicPlayer.pause()
     local current = PhaseHandlers[GameState]
     if current then
       print("Everyone is ready, calling" .. GameState .. " next")
@@ -109,24 +114,18 @@ function ResolvePlayerActions()
     end
   end
 
-  for _, color in ipairs(AllSeatedPlayers) do
-    local wonder = GetPlayerCurrentWonder(color)
-    if wonder then
-        wonder.clearButtons()
-    end
-
-    local action = PlayerSelectedAction[color]
-
-    if action == "Buy" then
-      ResolveBuyAction(color)
-  	elseif action == "Sell" then
-      ResolveSellAction(color)
-  	elseif action == "BuildWonder" then
-      ResolveBuildWonderAction(color)
-    elseif action == "ArmadaSell" then
-      ResolveArmadaSellAction(color)
-    end
+  local action = PlayerSelectedAction[color]
+  print("chosen action is: " .. action)
+  if action == "Buy" then
+    ResolveBuyAction(color)
+	elseif action == "Sell" then
+    ResolveSellAction(color)
+	elseif action == "BuildWonder" then
+    ResolveBuildWonderAction(color)
+  elseif action == "ArmadaSell" then
+    ResolveArmadaSellAction(color)
   end
+
   PlayerSelectedAction[color] = nil
 end
 
@@ -166,8 +165,7 @@ function ResolveBuyAction(color)
 end
 
 function ResolveSellAction(color)
-  local coinText = (amount == 1) and " coin" or " coins"
-  broadcastToAll(Player[color].steam_name .. " gained " .. amount .. coinText .. " for selling a card", {r=0.5, g=0.5, b=0.5})
+  broadcastToAll(Player[color].steam_name .. " gained 3 coins for selling a card", {r=0.5, g=0.5, b=0.5})
   AddCoins(color, 3, true)
   DiscardPlayerActionCard(color)
 end
@@ -187,17 +185,20 @@ function ResolveArmadaSellAction(color)
 end
 
 function DiscardPlayerActionCard(color)
-  local discardZone = DeckZones.Discard
-  if not discardZone then
-    print("Error: Discard zone not found!")
-    return
-  end
-
+  local discardZone = nil
   local data = PlayerCardHolder[color]
+
   if data and data.Zone then
     local objects = data.Zone.getObjects()
     for _, obj in ipairs(objects) do
       if obj.type == 'Card' or obj.type == 'Deck' then
+        -- Non-age cards go to another discard
+        if obj.memo == "Leader" then
+          discardZone = DeckZones.AltDiscard
+        else
+          discardZone = DeckZones.Discard
+        end
+
         obj.setPosition(discardZone.getPosition())
         obj.setRotation(discardZone.getRotation() + vector(0, 0, 180))
         break -- Only discard one card/deck
@@ -224,6 +225,15 @@ function PrepareLeaderStage()
 
 	local tempDeck = DeckZones.Leaders.getObjects()
 	tempDeck[1].deal(4)
+
+  Wait.time(function()
+    for _, color in ipairs(AllSeatedPlayers) do
+      local objects = Player[color].getHandObjects()
+      for _, obj in ipairs(objects) do
+        obj.memo = "Leader" -- Tag all leaders, so we can filter them later
+      end
+    end
+  end, 1)
 
 	local newTopImage = "https://i.imgur.com/oEisU1I.jpeg"
 
