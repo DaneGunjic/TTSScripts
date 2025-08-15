@@ -161,11 +161,15 @@ function ReadyUpManual(obj, color, alt)
     return
 	end
 
-	ReadyUp(Player[color])
-
+	-- Buttons might get removed after we ready up
+	-- So change the value first, based on the opposite of what it is now
+	-- If we aren't ready when we click it will be set to "Undo"
+	-- Only after that will we change to Ready
 	local wonder = GetPlayerCurrentWonder(color)
-	for i, _ in ipairs(wonder.getButtons()) do
-		local newLabel = ReadyList[color] and "Undo" or "Ready"
+			for i, _ in ipairs(wonder.getButtons()) do
+		local newLabel = ReadyList[color] and "Ready" or "Undo"
     wonder.editButton({index = i-1, label = newLabel})
 	end
+
+	ReadyUp(Player[color])
 end
