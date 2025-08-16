@@ -12,9 +12,9 @@ end
 
 -- Called when a player pressed the "Ready" button
 function ReadyUp(player)
-	-- Update player readiness using the new service
-	PlayerService:setPlayerReady(player.color, not ReadyList[player.color])
-	
+	-- Update player readiness using GameContext
+	GameContext:setPlayerReady(player.color, not ReadyList[player.color])
+
 	-- Emit event for UI updates and phase transitions
 	EventSystem:emit("player_ready_changed", {
 		playerColor = player.color,
@@ -23,27 +23,6 @@ function ReadyUp(player)
 		readyCount = NumberOfReadyPlayers,
 		totalPlayers = #AllSeatedPlayers
 	})
-
-	-- 	-- Did we finish choosing wonders
-	-- 	if GameState == "WonderStage" then
-	-- 		FinishWonderStage()
-	--
-	-- 		if ExpansionConfig.Leaders.Base then
-	-- 			PrepareLeaderStage()
-	-- 		else
-	-- 			PrepareAge1Stage()
-	-- 		end
-	--
-	-- 	-- Did we pass leaders
-	-- 	elseif GameState == "LeaderDrafting" then
-	-- 		DoLeaderStage()
-	-- 	-- Did we choose an action with the leader
-	-- 	elseif GameState == "LeaderSelectionStage" then
-	-- 		ResolvePlayerActions()
-	-- 	end
-	-- else
-	-- 	-- Update UI that shows who is ready
-	-- end
 end
 
 function CreateActionButtons(tile)
@@ -117,20 +96,20 @@ end
 function UnreadyPlayerIfNeeded(color, zone)
 	local cardCount = CountCardsInZone(zone)
 	local currentPhase = GameContext:getCurrentPhase()
-	
+
 	print("UnreadyPlayerIfNeeded " .. cardCount)
-	
+
 	local shouldUnready = false
 	if cardCount <= CurrentPasses and currentPhase == "LeaderDrafting" then
 		shouldUnready = true
 	elseif currentPhase == "LeaderSelectionStage" then
 		shouldUnready = true
 	end
-	
+
 	if shouldUnready and ReadyList[color] then
 		print("Setting player to not ready: " .. color)
-		PlayerService:setPlayerReady(color, false)
-		
+		GameContext:setPlayerReady(color, false)
+
 		-- Emit event for UI updates
 		EventSystem:emit("player_ready_changed", {
 			playerColor = color,

@@ -34,7 +34,7 @@ WonderPhase = {
     if PlayerService:areAllPlayersReady() then
       local nextPhase = PhaseFlow:getNextPhase(self.name, context)
       if nextPhase then
-        GameStateMachine:transitionTo(nextPhase)
+        GameStateMachine:transition(nextPhase)
       end
     end
   end,
@@ -94,7 +94,7 @@ WonderPhase = {
     GameContext:setPlayerWonderStage(player, 0)
     
     -- Update UI
-    UIService:updatePlayerWonderUI(player, wonder.getName(), 0)
+    -- Player wonder UI updates are handled by in-game objects, not UIService
     
     EventSystem:emit("wonder_assigned", {
       player = player,
@@ -189,7 +189,7 @@ WonderPhase = {
     local nextPhase = PhaseFlow:getNextPhase(self.name, GameContext)
     if nextPhase then
       UIService:broadcastToAllPlayers("Wonder phase skipped by admin", "Orange")
-      GameStateMachine:transitionTo(nextPhase)
+      GameStateMachine:transition(nextPhase)
     end
   end,
   

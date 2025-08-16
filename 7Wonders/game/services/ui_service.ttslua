@@ -7,14 +7,6 @@ UIService = {
     EventSystem:on("phase_changed", function(data)
       self:updatePhaseUI(data.newPhase, data.oldPhase)
     end)
-    
-    EventSystem:on("ready_count_changed", function(data)
-      self:updateReadyUI(data.readyCount, data.totalPlayers)
-    end)
-    
-    EventSystem:on("player_coins_changed", function(data)
-      self:updatePlayerCoinsUI(data.player, data.newAmount)
-    end)
   end,
   
   -- Update phase display in UI

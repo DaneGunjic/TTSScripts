@@ -8,7 +8,6 @@
 -- Configuration
 #include !\7Wonders\config\expansions.ttslua
 #include !\7Wonders\config\rewards.ttslua
-#include !\7Wonders\config\tokens.ttslua
 #include !\7Wonders\config\phase_flow.ttslua
 #include !\7Wonders\config\game_rules.ttslua
 
@@ -51,7 +50,7 @@ function onLoad()
   -- Initialize new architecture
   GameContext:initialize()
   GameRules:initializeFromConfig()
-  
+
   -- Register phase states in state machine
   GameStateMachine:addState("Setup", {
     onEnter = function() end,
@@ -71,19 +70,21 @@ function onLoad()
     onUpdate = function() end
   })
   GameStateMachine:addState("GameEnd", {
-    onEnter = function() UIService:showGameEndUI() end,
+    onEnter = function()
+        -- Game end UI is handled by in-game objects, not UIService
+      end,
     onExit = function() end,
     onUpdate = function() end
   })
-  
+
   -- Set initial state
-  GameStateMachine:transitionTo("Setup")
-  
-  -- Initialize UI
+  GameStateMachine:transition("Setup")
+
+  -- Initialize setup board
   MakeSetupButtons()
   MakeSetupBoardText()
   disableAllTiles()
-  
+
   -- Emit game loaded event
   EventSystem:emit("game_loaded")
 end

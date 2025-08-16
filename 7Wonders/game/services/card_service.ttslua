@@ -179,17 +179,17 @@ CardService = {
   
   -- Execute Armada sell action
   executeArmadaSellAction = function(self, player, card)
-    -- Armada-specific sell logic would go here
-    local sellValue = GameRules:getSellValue()
-    GameContext:addCoinsToPlayer(player, sellValue)
+    -- Move the yellow ship (this will handle coin rewards via ShipRewards)
+    if MoveShip then
+      MoveShip(player, "Yellow")
+    end
     
     -- Armada sell (assume age card unless specified otherwise)
     self:discardCard(card, true)
     
     EventSystem:emit("armada_card_sold", {
       player = player,
-      card = card,
-      coinsGained = sellValue
+      card = card
     })
   end,
   

@@ -189,6 +189,6 @@ function GameRules:initializeFromConfig()
     self:enableExpansion("Leaders", ExpansionConfig.Leaders or false)
     self:enableExpansion("Cities", ExpansionConfig.Cities or false)
     self:enableExpansion("Armada", ExpansionConfig.Armada or false)
-    self:enableExpansion("Babel", ExpansionConfig.Babel or false)
+    self:enableExpansion("Edifice", ExpansionConfig.Edifice or false)
   end
 end

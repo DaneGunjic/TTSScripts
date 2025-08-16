@@ -73,13 +73,9 @@ function GameContext:initialize()
     self.config.gameMode = GameModeConfig
   end
   
-  -- Set global references for backward compatibility
-  if RandomWonders ~= nil then
-    self.config.randomWonders = RandomWonders
-  end
-  if DraftMode ~= nil then
-    self.config.draftMode = DraftMode
-  end
+  -- Initialize configuration from defaults
+  self.config.randomWonders = true
+  self.config.draftMode = false
   
   EventSystem:emit("game_context_initialized", self)
 end
@@ -94,9 +90,7 @@ function GameContext:setSeatedPlayers(players)
     self.players.ready[color] = false
   end
   
-  -- Update global variables for backward compatibility
-  AllSeatedPlayers = players
-  NumberOfPlayers = #players
+
   
   EventSystem:emit("players_seated", {
     players = players,
@@ -113,9 +107,6 @@ function GameContext:setPlayerReady(color, ready)
     for _, isReady in pairs(self.players.ready) do
       if isReady then readyCount = readyCount + 1 end
     end
-    
-    -- Update global for backward compatibility
-    NumberOfReadyPlayers = readyCount
     
     EventSystem:emit("player_ready_changed", {
       color = color,
@@ -142,7 +133,7 @@ function GameContext:unreadyAllPlayers()
   for color, _ in pairs(self.players.ready) do
     self.players.ready[color] = false
   end
-  NumberOfReadyPlayers = 0
+
   
   EventSystem:emit("all_players_unready", {})
 end
@@ -151,11 +142,7 @@ end
 function GameContext:setPlayerAction(color, action)
   self.players.selectedActions[color] = action
   
-  -- Update global for backward compatibility
-  if not PlayerSelectedAction then
-    PlayerSelectedAction = {}
-  end
-  PlayerSelectedAction[color] = action
+
   
   EventSystem:emit("player_action_selected", {
     color = color,
@@ -165,9 +152,7 @@ end
 
 function GameContext:clearPlayerAction(color)
   self.players.selectedActions[color] = nil
-  if PlayerSelectedAction then
-    PlayerSelectedAction[color] = nil
-  end
+
 end
 
 function GameContext:haveAllPlayersSelectedActions()
@@ -189,8 +174,7 @@ function GameContext:setPhase(phase, description)
     self.ui.phaseDescription = description
   end
   
-  -- Update global for backward compatibility
-  GameState = phase
+
   
   EventSystem:emit("phase_changed", {
     current = phase,
@@ -203,9 +187,7 @@ function GameContext:setPasses(current, maximum)
   self.phases.passes.current = current
   self.phases.passes.maximum = maximum
   
-  -- Update globals for backward compatibility
-  CurrentPasses = current
-  MaximumPasses = maximum
+
   
   EventSystem:emit("passes_updated", {
     current = current,
@@ -217,11 +199,7 @@ end
 function GameContext:setPlayerCardHolder(color, data)
   self.players.cardHolders[color] = data
   
-  -- Update global for backward compatibility
-  if not PlayerCardHolder then
-    PlayerCardHolder = {}
-  end
-  PlayerCardHolder[color] = data
+
 end
 
 function GameContext:setPlayerShip(color, shipColor, shipObject)
@@ -230,14 +208,7 @@ function GameContext:setPlayerShip(color, shipColor, shipObject)
   end
   self.players.ships[color][shipColor] = shipObject
   
-  -- Update global for backward compatibility
-  if not PlayerShips then
-    PlayerShips = {}
-  end
-  if not PlayerShips[color] then
-    PlayerShips[color] = {}
-  end
-  PlayerShips[color][shipColor] = shipObject
+
 end
 
 function GameContext:setPlayerWonder(color, wonderObject)

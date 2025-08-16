@@ -31,7 +31,7 @@ ActionResolutionPhase = {
   
   -- Start the action resolution process
   startActionResolution = function(self)
-    UIService:showLoadingUI("Resolving actions...")
+    -- Loading UI is handled by in-game objects, not UIService
     
     -- Validate all player actions first
     if not self:validateAllPlayerActions() then
@@ -71,16 +71,16 @@ ActionResolutionPhase = {
   
   -- Handle validation failure
   handleValidationFailure = function(self)
-    UIService:hideLoadingUI()
+    -- Loading UI is handled by in-game objects, not UIService
     UIService:broadcastToAllPlayers("Some actions are invalid. Please reselect.", "Red")
     
     -- Return to the previous phase
     local transitionData = GameContext.phases.transitionData
     if transitionData and transitionData.phaseBeforeResolving then
-      GameStateMachine:transitionTo(transitionData.phaseBeforeResolving)
+      GameStateMachine:transition(transitionData.phaseBeforeResolving)
     else
       -- Fallback to Age1
-      GameStateMachine:transitionTo("Age1")
+      GameStateMachine:transition("Age1")
     end
   end,
   
@@ -154,7 +154,7 @@ ActionResolutionPhase = {
   
   -- Complete the action resolution process
   completeActionResolution = function(self)
-    UIService:hideLoadingUI()
+    -- Loading UI is handled by in-game objects, not UIService
     
     -- Clear all player actions
     PlayerService:clearAllPlayerActions()
@@ -179,10 +179,10 @@ ActionResolutionPhase = {
     end
     
     if nextPhase then
-      GameStateMachine:transitionTo(nextPhase)
+      GameStateMachine:transition(nextPhase)
     else
       -- Fallback
-      GameStateMachine:transitionTo("Age1")
+      GameStateMachine:transition("Age1")
     end
   end,
   
@@ -236,7 +236,7 @@ ActionResolutionPhase = {
     
     for _, player in ipairs(players) do
       local stage = GameContext:getPlayerWonderStage(player)
-      UIService:updatePlayerWonderUI(player, GameContext:getPlayerWonder(player), stage)
+      -- Player wonder UI updates are handled by in-game objects, not UIService
     end
     
     EventSystem:emit("wonder_actions_resolved")

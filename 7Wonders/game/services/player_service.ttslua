@@ -55,17 +55,11 @@ PlayerService = {
   getSeatedPlayers = function(self)
     local players = {}
     
-    -- This would use the actual TTS API to get seated players
-    -- For now, using the existing global approach
-    if getSeatedPlayers then
-      players = getSeatedPlayers()
-    else
-      -- Fallback to manual detection
-      for i = 1, 7 do
-        local playerColor = Player[getPlayerColor(i)]
-        if playerColor and playerColor.seated then
-          table.insert(players, playerColor.color)
-        end
+    local allColors = Player.getColors()
+    for _, color in ipairs(allColors) do
+      local player = Player[color]
+      if player and player.seated then
+        table.insert(players, color)
       end
     end
     

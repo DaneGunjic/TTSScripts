@@ -32,7 +32,7 @@ AgePhase = {
         GameContext.phases.transitionData = transitionData
         
         -- Transition to action resolution
-        GameStateMachine:transitionTo("ResolveCardAction")
+        GameStateMachine:transition("ResolveCardAction")
       end
     end,
     
@@ -55,7 +55,7 @@ AgePhase = {
       CardService:dealCardsForAge(self.ageNumber, playerCount)
       
       UIService:broadcastToAllPlayers("Age " .. self.ageNumber .. " begins!", "Blue")
-      UIService:updatePassCounterUI(1, GameContext.phases.passes.maximum)
+      -- Pass counter UI updates are handled by in-game objects, not UIService
       
       EventSystem:emit("age_started", {
         age = self.ageNumber,
@@ -72,7 +72,7 @@ AgePhase = {
         "Blue"
       )
       
-      UIService:updatePassCounterUI(currentPass, maxPasses)
+      -- Pass counter UI updates are handled by in-game objects, not UIService
     end
   },
   
@@ -103,7 +103,7 @@ AgePhase = {
       if PlayerService:haveAllPlayersSelectedActions() then
         local transitionData = PhaseFlow:getTransitionData(self.name)
         GameContext.phases.transitionData = transitionData
-        GameStateMachine:transitionTo("ResolveCardAction")
+        GameStateMachine:transition("ResolveCardAction")
       end
     end,
     
@@ -124,7 +124,7 @@ AgePhase = {
       CardService:dealCardsForAge(self.ageNumber, playerCount)
       
       UIService:broadcastToAllPlayers("Age " .. self.ageNumber .. " begins!", "Green")
-      UIService:updatePassCounterUI(1, GameContext.phases.passes.maximum)
+      -- Pass counter UI updates are handled by in-game objects, not UIService
       
       EventSystem:emit("age_started", {
         age = self.ageNumber,
@@ -141,7 +141,7 @@ AgePhase = {
         "Green"
       )
       
-      UIService:updatePassCounterUI(currentPass, maxPasses)
+      -- Pass counter UI updates are handled by in-game objects, not UIService
     end
   },
   
@@ -172,7 +172,7 @@ AgePhase = {
       if PlayerService:haveAllPlayersSelectedActions() then
         local transitionData = PhaseFlow:getTransitionData(self.name)
         GameContext.phases.transitionData = transitionData
-        GameStateMachine:transitionTo("ResolveCardAction")
+        GameStateMachine:transition("ResolveCardAction")
       end
     end,
     
@@ -193,7 +193,7 @@ AgePhase = {
       CardService:dealCardsForAge(self.ageNumber, playerCount)
       
       UIService:broadcastToAllPlayers("Age " .. self.ageNumber .. " begins!", "Red")
-      UIService:updatePassCounterUI(1, GameContext.phases.passes.maximum)
+      -- Pass counter UI updates are handled by in-game objects, not UIService
       
       EventSystem:emit("age_started", {
         age = self.ageNumber,
@@ -210,7 +210,7 @@ AgePhase = {
         "Red"
       )
       
-      UIService:updatePassCounterUI(currentPass, maxPasses)
+      -- Pass counter UI updates are handled by in-game objects, not UIService
     end
   }
 }
@@ -234,7 +234,7 @@ local AgePhaseCommon = {
       PlayerService:clearAllPlayerActions()
       
       -- Update UI for next pass
-      UIService:updatePassCounterUI(currentPass + 1, GameContext.phases.passes.maximum)
+      -- Pass counter UI updates are handled by in-game objects, not UIService
       
       EventSystem:emit("age_pass_completed", {
         age = agePhase.ageNumber,
@@ -272,7 +272,7 @@ local AgePhaseCommon = {
     -- Transition to next phase
     local nextPhase = PhaseFlow:getNextPhase(agePhase.name, GameContext)
     if nextPhase then
-      GameStateMachine:transitionTo(nextPhase)
+      GameStateMachine:transition(nextPhase)
     end
     
     EventSystem:emit("age_completed", {

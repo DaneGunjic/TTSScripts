@@ -88,9 +88,6 @@ function GameStateMachine:transition(newState, transitionData)
     context = self.context
   })
   
-  -- Update global GameState for backward compatibility
-  GameState = newState
-  
   return true
 end
 
@@ -163,7 +160,6 @@ function GameStateMachine:reset()
   self.currentState = "Setup"
   self.previousState = nil
   self.context = {}
-  GameState = "Setup"
   
   if self.debug then
     print("[StateMachine] Reset to initial state")

@@ -1,6 +1,25 @@
 function HandleStartGameButtonCo()
 	updatePhaseUI("Please Wait", "Setting things up")
 
+	-- Update GameContext with final configuration values from setup phase
+	if ExpansionConfig then
+		GameContext.config.expansions = ExpansionConfig
+	end
+	
+	if GameModeConfig then
+		GameContext.config.gameMode = GameModeConfig
+	end
+	
+	-- Update game mode settings
+	GameContext.config.randomWonders = RandomWonders
+	GameContext.config.draftMode = DraftMode
+	
+	-- Emit event that configuration has been finalized
+	EventSystem:emit("game_config_finalized", GameContext.config)
+	
+	-- Reinitialize GameRules with updated configuration
+	GameRules:initializeFromConfig()
+
 	-- Get a list of seated players
 	AllSeatedPlayers = getSeatedPlayers() -- [1] = "White", [2] = "Red" ...
 	NumberOfPlayers = #AllSeatedPlayers

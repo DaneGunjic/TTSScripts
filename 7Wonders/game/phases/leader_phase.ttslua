@@ -60,16 +60,12 @@ LeaderPhase = {
         "Purple"
       )
       
-      UIService:updatePassCounterUI(currentPass + 1, maxPasses)
+      -- Pass counter UI updates are handled by in-game objects, not UIService
     end,
     
     -- Deal leader cards to players
     dealLeaderCards = function(self)
-      if DealLeaders then
-        DealLeaders()
-      else
-        self:dealLeaderCardsManually()
-      end
+      self:dealLeaderCardsManually()
       
       EventSystem:emit("leader_cards_dealt")
     end,
@@ -79,13 +75,9 @@ LeaderPhase = {
       local players = PlayerService:getSeatedPlayers()
       local cardsPerPlayer = GameRules.leaders.cardsPerPlayer
       
-      -- This would contain the actual card dealing logic
-      -- For now, just emit events
-      for _, player in ipairs(players) do
-        EventSystem:emit("leader_cards_dealt_to_player", {
-          player = player,
-          cardCount = cardsPerPlayer
-        })
+      -- Deal leader cards from the leader deck
+      if DeckZones.Leaders and DeckZones.Leaders.deal then
+        DeckZones.Leaders.deal(cardsPerPlayer)
       end
     end,
     
@@ -103,7 +95,7 @@ LeaderPhase = {
       else
         -- Continue with next pass
         PlayerService:unreadyAllPlayers()
-        UIService:updatePassCounterUI(currentPass + 1, GameContext.phases.passes.maximum)
+        -- Pass counter UI updates are handled by in-game objects, not UIService
       end
     end,
     
@@ -122,7 +114,7 @@ LeaderPhase = {
       -- Transition to leader selection
       local nextPhase = PhaseFlow:getNextPhase(self.name, GameContext)
       if nextPhase then
-        GameStateMachine:transitionTo(nextPhase)
+        GameStateMachine:transition(nextPhase)
       end
     end
   },
@@ -156,7 +148,7 @@ LeaderPhase = {
         GameContext.phases.transitionData = transitionData
         
         -- Transition to action resolution
-        GameStateMachine:transitionTo("ResolveCardAction")
+        GameStateMachine:transition("ResolveCardAction")
       end
     end,
     
