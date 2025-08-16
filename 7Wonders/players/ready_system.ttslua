@@ -12,17 +12,17 @@ end
 
 -- Called when a player pressed the "Ready" button
 function ReadyUp(player)
-	ReadyList[player.color] = not ReadyList[player.color]
-
-	broadcastToAll(player.steam_name .. " is " .. (ReadyList[player.color] and "ready" or "not ready"))
-
-	if ReadyList[player.color] then
-		NumberOfReadyPlayers = NumberOfReadyPlayers + 1
-	else
-		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
-	end
-
-	TransitionPhase()
+	-- Update player readiness using the new service
+	PlayerService:setPlayerReady(player.color, not ReadyList[player.color])
+	
+	-- Emit event for UI updates and phase transitions
+	EventSystem:emit("player_ready_changed", {
+		playerColor = player.color,
+		playerName = player.steam_name,
+		isReady = ReadyList[player.color],
+		readyCount = NumberOfReadyPlayers,
+		totalPlayers = #AllSeatedPlayers
+	})
 
 	-- 	-- Did we finish choosing wonders
 	-- 	if GameState == "WonderStage" then
@@ -116,19 +116,29 @@ end
 
 function UnreadyPlayerIfNeeded(color, zone)
 	local cardCount = CountCardsInZone(zone)
+	local currentPhase = GameContext:getCurrentPhase()
+	
 	print("UnreadyPlayerIfNeeded " .. cardCount)
-	if cardCount <= CurrentPasses and GameState == "LeaderDrafting" then
-		if ReadyList[color] then
-			print("settings ready to false, first if")
-			ReadyList[color] = false
-			NumberOfReadyPlayers = NumberOfReadyPlayers - 1
-			broadcastToAll(Player[color].steam_name .. " is not ready")
-		end
-	elseif GameState == "LeaderSelectionStage" and ReadyList[color] then
-		print("settings ready to false, second if")
-		ReadyList[color] = false
-		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
-		broadcastToAll(Player[color].steam_name .. " is not ready")
+	
+	local shouldUnready = false
+	if cardCount <= CurrentPasses and currentPhase == "LeaderDrafting" then
+		shouldUnready = true
+	elseif currentPhase == "LeaderSelectionStage" then
+		shouldUnready = true
+	end
+	
+	if shouldUnready and ReadyList[color] then
+		print("Setting player to not ready: " .. color)
+		PlayerService:setPlayerReady(color, false)
+		
+		-- Emit event for UI updates
+		EventSystem:emit("player_ready_changed", {
+			playerColor = color,
+			playerName = Player[color].steam_name,
+			isReady = false,
+			readyCount = NumberOfReadyPlayers,
+			totalPlayers = #AllSeatedPlayers
+		})
 	end
 end
 

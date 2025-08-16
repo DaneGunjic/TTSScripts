@@ -1,0 +1,79 @@
+-- UI Service Module
+-- Handles all user interface operations and updates
+
+UIService = {
+  -- Initialize the UI service
+  init = function(self)
+    EventSystem:on("phase_changed", function(data)
+      self:updatePhaseUI(data.newPhase, data.oldPhase)
+    end)
+    
+    EventSystem:on("ready_count_changed", function(data)
+      self:updateReadyUI(data.readyCount, data.totalPlayers)
+    end)
+    
+    EventSystem:on("player_coins_changed", function(data)
+      self:updatePlayerCoinsUI(data.player, data.newAmount)
+    end)
+  end,
+  
+  -- Update phase display in UI
+  updatePhaseUI = function(self, newPhase, oldPhase)
+    local displayName = GameRules:getPhaseDisplayName(newPhase)
+    
+    -- Update the main phase display
+    if updatePhaseUI then
+      updatePhaseUI(displayName)
+    end
+    
+    -- Update XML UI if it exists
+    if UI and UI.setAttribute then
+      UI.setAttribute("PhaseText", "text", displayName)
+    end
+    
+    -- Broadcast phase change to all players
+    self:broadcastToAllPlayers("Phase: " .. displayName, "White")
+    
+    EventSystem:emit("ui_phase_updated", {
+      phase = newPhase,
+      displayName = displayName
+    })
+  end,
+  
+  -- Show notification to a specific player
+  showPlayerNotification = function(self, player, message, color)
+    color = color or "White"
+    
+    if Player[player] and Player[player].broadcast then
+      Player[player].broadcast(message, color)
+    end
+    
+    EventSystem:emit("ui_player_notification_shown", {
+      player = player,
+      message = message,
+      color = color
+    })
+  end,
+  
+  -- Broadcast message to all players
+  broadcastToAllPlayers = function(self, message, color)
+    color = color or "White"
+    
+    if broadcastToAll then
+      broadcastToAll(message, color)
+    else
+      -- Fallback: send to each player individually
+      for _, player in ipairs(PlayerService:getSeatedPlayers()) do
+        self:showPlayerNotification(player, message, color)
+      end
+    end
+    
+    EventSystem:emit("ui_broadcast_sent", {
+      message = message,
+      color = color
+    })
+  end
+}
+
+-- Initialize the service when loaded
+UIService:init()

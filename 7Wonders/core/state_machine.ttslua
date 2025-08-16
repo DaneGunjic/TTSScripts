@@ -1,0 +1,171 @@
+-- State Machine for managing game phases
+-- Provides structured state transitions with proper lifecycle management
+
+GameStateMachine = {
+  currentState = "Setup",
+  previousState = nil,
+  states = {},
+  context = {},
+  debug = false
+}
+
+-- Register a new state with its definition
+function GameStateMachine:addState(name, stateDefinition)
+  self.states[name] = {
+    onEnter = stateDefinition.onEnter,
+    onExit = stateDefinition.onExit,
+    onUpdate = stateDefinition.onUpdate,
+    canTransitionTo = stateDefinition.canTransitionTo or {},
+    data = stateDefinition.data or {}
+  }
+  
+  if self.debug then
+    print("[StateMachine] Registered state: " .. name)
+  end
+end
+
+-- Transition to a new state
+function GameStateMachine:transition(newState, transitionData)
+  if not self.states[newState] then
+    print("[StateMachine] Error: Unknown state '" .. newState .. "'")
+    return false
+  end
+  
+  -- Check if transition is allowed
+  local currentStateObj = self.states[self.currentState]
+  if currentStateObj and currentStateObj.canTransitionTo then
+    local canTransition = false
+    for _, allowedState in ipairs(currentStateObj.canTransitionTo) do
+      if allowedState == newState then
+        canTransition = true
+        break
+      end
+    end
+    
+    if not canTransition and #currentStateObj.canTransitionTo > 0 then
+      print("[StateMachine] Error: Cannot transition from '" .. self.currentState .. "' to '" .. newState .. "'")
+      return false
+    end
+  end
+  
+  if self.debug then
+    print("[StateMachine] Transitioning from '" .. self.currentState .. "' to '" .. newState .. "'")
+  end
+  
+  -- Exit current state
+  if currentStateObj and currentStateObj.onExit then
+    currentStateObj.onExit(self.context, transitionData)
+  end
+  
+  -- Emit state exit event
+  EventSystem:emit("state_exit", {
+    state = self.currentState,
+    nextState = newState,
+    context = self.context
+  })
+  
+  -- Update state
+  self.previousState = self.currentState
+  self.currentState = newState
+  
+  -- Merge transition data into context
+  if transitionData then
+    for key, value in pairs(transitionData) do
+      self.context[key] = value
+    end
+  end
+  
+  -- Enter new state
+  local newStateObj = self.states[newState]
+  if newStateObj.onEnter then
+    newStateObj.onEnter(self.context, transitionData)
+  end
+  
+  -- Emit state enter event
+  EventSystem:emit("state_enter", {
+    state = newState,
+    previousState = self.previousState,
+    context = self.context
+  })
+  
+  -- Update global GameState for backward compatibility
+  GameState = newState
+  
+  return true
+end
+
+-- Get current state name
+function GameStateMachine:getCurrentState()
+  return self.currentState
+end
+
+-- Get previous state name
+function GameStateMachine:getPreviousState()
+  return self.previousState
+end
+
+-- Get current context
+function GameStateMachine:getContext()
+  return self.context
+end
+
+-- Update context data
+function GameStateMachine:updateContext(key, value)
+  self.context[key] = value
+  
+  EventSystem:emit("context_updated", {
+    key = key,
+    value = value,
+    context = self.context
+  })
+end
+
+-- Check if we can transition to a specific state
+function GameStateMachine:canTransitionTo(targetState)
+  local currentStateObj = self.states[self.currentState]
+  if not currentStateObj or not currentStateObj.canTransitionTo then
+    return true -- No restrictions
+  end
+  
+  for _, allowedState in ipairs(currentStateObj.canTransitionTo) do
+    if allowedState == targetState then
+      return true
+    end
+  end
+  
+  return false
+end
+
+-- Update current state (for states that need periodic updates)
+function GameStateMachine:update()
+  local currentStateObj = self.states[self.currentState]
+  if currentStateObj and currentStateObj.onUpdate then
+    currentStateObj.onUpdate(self.context)
+  end
+end
+
+-- Get all registered states
+function GameStateMachine:getStates()
+  local stateNames = {}
+  for name, _ in pairs(self.states) do
+    table.insert(stateNames, name)
+  end
+  return stateNames
+end
+
+-- Enable/disable debug logging
+function GameStateMachine:setDebug(enabled)
+  self.debug = enabled
+end
+
+-- Reset state machine to initial state
+function GameStateMachine:reset()
+  self.currentState = "Setup"
+  self.previousState = nil
+  self.context = {}
+  GameState = "Setup"
+  
+  if self.debug then
+    print("[StateMachine] Reset to initial state")
+  end
+end

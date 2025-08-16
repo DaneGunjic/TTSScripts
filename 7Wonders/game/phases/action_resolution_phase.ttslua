@@ -1,0 +1,307 @@
+-- Action Resolution Phase Module
+-- Handles the resolution of player actions (Buy, Sell, BuildWonder, ArmadaSell)
+
+ActionResolutionPhase = {
+  name = "ResolveCardAction",
+  
+  onEnter = function(self, context)
+    EventSystem:emit("phase_entered", {
+      phase = self.name,
+      context = context
+    })
+    
+    -- Start resolving all player actions
+    self:startActionResolution()
+    
+    UIService:updatePhaseUI(self.name)
+    UIService:broadcastToAllPlayers("Resolving player actions...", "Orange")
+  end,
+  
+  onExit = function(self, context)
+    EventSystem:emit("phase_exited", {
+      phase = self.name,
+      context = context
+    })
+  end,
+  
+  onUpdate = function(self, context)
+    -- This phase automatically transitions after resolving actions
+    -- No manual ready check needed
+  end,
+  
+  -- Start the action resolution process
+  startActionResolution = function(self)
+    UIService:showLoadingUI("Resolving actions...")
+    
+    -- Validate all player actions first
+    if not self:validateAllPlayerActions() then
+      self:handleValidationFailure()
+      return
+    end
+    
+    -- Resolve actions by type in specific order
+    self:resolveActionsByType()
+    
+    -- Complete the resolution
+    self:completeActionResolution()
+  end,
+  
+  -- Validate all player actions
+  validateAllPlayerActions = function(self)
+    local players = PlayerService:getSeatedPlayers()
+    local allValid = true
+    
+    for _, player in ipairs(players) do
+      local action = GameContext:getPlayerAction(player)
+      if action then
+        local isValid = CardService:validatePlayerAction(player, action.action, action.card)
+        if not isValid then
+          allValid = false
+          UIService:showPlayerNotification(
+            player, 
+            "Invalid action: " .. action.action, 
+            "Red"
+          )
+        end
+      end
+    end
+    
+    return allValid
+  end,
+  
+  -- Handle validation failure
+  handleValidationFailure = function(self)
+    UIService:hideLoadingUI()
+    UIService:broadcastToAllPlayers("Some actions are invalid. Please reselect.", "Red")
+    
+    -- Return to the previous phase
+    local transitionData = GameContext.phases.transitionData
+    if transitionData and transitionData.phaseBeforeResolving then
+      GameStateMachine:transitionTo(transitionData.phaseBeforeResolving)
+    else
+      -- Fallback to Age1
+      GameStateMachine:transitionTo("Age1")
+    end
+  end,
+  
+  -- Resolve actions by type in specific order
+  resolveActionsByType = function(self)
+    -- Resolution order: Buy -> BuildWonder -> Sell -> ArmadaSell
+    local resolutionOrder = {"Buy", "BuildWonder", "Sell", "ArmadaSell"}
+    
+    for _, actionType in ipairs(resolutionOrder) do
+      self:resolveActionsOfType(actionType)
+    end
+  end,
+  
+  -- Resolve all actions of a specific type
+  resolveActionsOfType = function(self, actionType)
+    local players = PlayerService:getSeatedPlayers()
+    local actionsResolved = 0
+    
+    for _, player in ipairs(players) do
+      local action = GameContext:getPlayerAction(player)
+      if action and action.action == actionType then
+        self:resolvePlayerAction(player, action)
+        actionsResolved = actionsResolved + 1
+      end
+    end
+    
+    if actionsResolved > 0 then
+      EventSystem:emit("action_type_resolved", {
+        actionType = actionType,
+        count = actionsResolved
+      })
+    end
+  end,
+  
+  -- Resolve a single player action
+  resolvePlayerAction = function(self, player, actionData)
+    local action = actionData.action
+    local card = actionData.card
+    
+    -- Execute the action through CardService
+    CardService:executePlayerAction(player, actionData)
+    
+    -- Show resolution feedback
+    local message = self:getActionResolutionMessage(player, action, card)
+    UIService:showPlayerNotification(player, message, "Green")
+    
+    EventSystem:emit("player_action_resolved", {
+      player = player,
+      action = action,
+      card = card
+    })
+  end,
+  
+  -- Get user-friendly message for action resolution
+  getActionResolutionMessage = function(self, player, action, card)
+    local cardName = card and card.getName and card.getName() or "card"
+    
+    if action == "Buy" then
+      return "Built " .. cardName
+    elseif action == "Sell" then
+      return "Sold " .. cardName .. " for " .. GameRules:getSellValue() .. " coins"
+    elseif action == "BuildWonder" then
+      local stage = GameContext:getPlayerWonderStage(player)
+      return "Built wonder stage " .. stage .. " using " .. cardName
+    elseif action == "ArmadaSell" then
+      return "Armada sold " .. cardName .. " for " .. GameRules:getSellValue() .. " coins"
+    else
+      return "Completed action: " .. action
+    end
+  end,
+  
+  -- Complete the action resolution process
+  completeActionResolution = function(self)
+    UIService:hideLoadingUI()
+    
+    -- Clear all player actions
+    PlayerService:clearAllPlayerActions()
+    
+    -- Emit completion event
+    EventSystem:emit("all_actions_resolved")
+    
+    -- Transition back to the originating phase
+    self:transitionToNextPhase()
+  end,
+  
+  -- Transition to the next appropriate phase
+  transitionToNextPhase = function(self)
+    local transitionData = GameContext.phases.transitionData
+    local nextPhase
+    
+    if transitionData and transitionData.phaseAfterResolving then
+      nextPhase = transitionData.phaseAfterResolving
+    else
+      -- Use PhaseFlow to determine next phase
+      nextPhase = PhaseFlow:getNextPhase(self.name, GameContext)
+    end
+    
+    if nextPhase then
+      GameStateMachine:transitionTo(nextPhase)
+    else
+      -- Fallback
+      GameStateMachine:transitionTo("Age1")
+    end
+  end,
+  
+  -- Get resolution statistics
+  getResolutionStats = function(self)
+    local players = PlayerService:getSeatedPlayers()
+    local stats = {
+      totalActions = 0,
+      actionsByType = {
+        Buy = 0,
+        Sell = 0,
+        BuildWonder = 0,
+        ArmadaSell = 0
+      },
+      playerActions = {}
+    }
+    
+    for _, player in ipairs(players) do
+      local action = GameContext:getPlayerAction(player)
+      if action then
+        stats.totalActions = stats.totalActions + 1
+        stats.actionsByType[action.action] = (stats.actionsByType[action.action] or 0) + 1
+        stats.playerActions[player] = action.action
+      end
+    end
+    
+    return stats
+  end,
+  
+  -- Handle special resolution cases
+  handleSpecialResolution = function(self, actionType)
+    if actionType == "Buy" then
+      self:handleBuyResolution()
+    elseif actionType == "BuildWonder" then
+      self:handleWonderResolution()
+    elseif actionType == "ArmadaSell" then
+      self:handleArmadaResolution()
+    end
+  end,
+  
+  -- Handle Buy action special cases
+  handleBuyResolution = function(self)
+    -- Check for resource conflicts, chain building, etc.
+    EventSystem:emit("buy_actions_resolved")
+  end,
+  
+  -- Handle Wonder building special cases
+  handleWonderResolution = function(self)
+    -- Update wonder stages, check for completion bonuses
+    local players = PlayerService:getSeatedPlayers()
+    
+    for _, player in ipairs(players) do
+      local stage = GameContext:getPlayerWonderStage(player)
+      UIService:updatePlayerWonderUI(player, GameContext:getPlayerWonder(player), stage)
+    end
+    
+    EventSystem:emit("wonder_actions_resolved")
+  end,
+  
+  -- Handle Armada sell special cases
+  handleArmadaResolution = function(self)
+    if not GameRules:isExpansionEnabled("Armada") then
+      return
+    end
+    
+    EventSystem:emit("armada_actions_resolved")
+  end,
+  
+  -- Force complete resolution (admin function)
+  forceCompleteResolution = function(self)
+    UIService:broadcastToAllPlayers("Action resolution forced by admin", "Orange")
+    self:completeActionResolution()
+  end,
+  
+  -- Get current resolution status
+  getResolutionStatus = function(self)
+    local stats = self:getResolutionStats()
+    
+    return {
+      phase = self.name,
+      totalActions = stats.totalActions,
+      actionsByType = stats.actionsByType,
+      isResolving = true,
+      transitionData = GameContext.phases.transitionData
+    }
+  end
+}
+
+-- Register event listeners
+EventSystem:on("resolve_player_actions", function()
+  if GameStateMachine:getCurrentState() == ActionResolutionPhase.name then
+    ActionResolutionPhase:startActionResolution()
+  end
+end)
+
+EventSystem:on("action_validation_failed", function(data)
+  if GameStateMachine:getCurrentState() == ActionResolutionPhase.name then
+    UIService:showPlayerNotification(
+      data.player, 
+      "Action failed: " .. (data.reason or "Unknown error"), 
+      "Red"
+    )
+  end
+end)
+
+EventSystem:on("card_bought", function(data)
+  if GameStateMachine:getCurrentState() == ActionResolutionPhase.name then
+    ActionResolutionPhase:handleSpecialResolution("Buy")
+  end
+end)
+
+EventSystem:on("wonder_stage_built", function(data)
+  if GameStateMachine:getCurrentState() == ActionResolutionPhase.name then
+    ActionResolutionPhase:handleSpecialResolution("BuildWonder")
+  end
+end)
+
+EventSystem:on("armada_card_sold", function(data)
+  if GameStateMachine:getCurrentState() == ActionResolutionPhase.name then
+    ActionResolutionPhase:handleSpecialResolution("ArmadaSell")
+  end
+end)

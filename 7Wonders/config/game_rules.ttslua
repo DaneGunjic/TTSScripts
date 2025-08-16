@@ -1,0 +1,194 @@
+-- Game Rules Configuration
+-- Defines game constants, rules, and validation logic
+
+GameRules = {
+  -- Player configuration
+  players = {
+    minimum = 3,
+    maximum = 7,
+    defaultCoins = 3
+  },
+  
+  -- Age configuration
+  ages = {
+    count = 3,
+    cardsPerAge = {
+      [3] = 7, -- 3 players: 7 cards per age
+      [4] = 7, -- 4 players: 7 cards per age
+      [5] = 7, -- 5 players: 7 cards per age
+      [6] = 7, -- 6 players: 7 cards per age
+      [7] = 7  -- 7 players: 7 cards per age
+    },
+    passesPerAge = {
+      [3] = 6, -- 3 players: 6 passes (7 cards - 1 discarded)
+      [4] = 6, -- 4 players: 6 passes
+      [5] = 6, -- 5 players: 6 passes
+      [6] = 6, -- 6 players: 6 passes
+      [7] = 6  -- 7 players: 6 passes
+    }
+  },
+  
+  -- Leader configuration (Leaders expansion)
+  leaders = {
+    draftPasses = 3,
+    cardsPerPlayer = 4,
+    selectCount = 1
+  },
+  
+  -- Wonder configuration
+  wonders = {
+    stagesPerWonder = 3,
+    wondersPerPlayer = 1
+  },
+  
+  -- Action types
+  actions = {
+    valid = {
+      "Buy",
+      "Sell",
+      "BuildWonder",
+      "ArmadaSell" -- Armada expansion
+    },
+    sellValue = 3 -- Coins gained from selling a card
+  },
+  
+  -- Resource types
+  resources = {
+    basic = {
+      "Wood", "Stone", "Clay", "Ore"
+    },
+    manufactured = {
+      "Glass", "Papyrus", "Textile"
+    },
+    special = {
+      "Coins"
+    }
+  },
+  
+  -- Expansion configurations
+  expansions = {
+    Leaders = {
+      enabled = false,
+      phases = {"LeaderDrafting", "LeaderSelectionStage"}
+    },
+    Cities = {
+      enabled = false,
+      phases = {}
+    },
+    Armada = {
+      enabled = false,
+      actions = {"ArmadaSell"}
+    },
+    Babel = {
+      enabled = false,
+      phases = {}
+    }
+  },
+  
+  -- UI configuration
+  ui = {
+    readyButtonText = "Ready",
+    unreadyButtonText = "Not Ready",
+    phaseDisplayNames = {
+      Setup = "Game Setup",
+      WonderStage = "Wonder Selection",
+      LeaderDrafting = "Leader Drafting",
+      LeaderSelectionStage = "Leader Selection",
+      Age1 = "Age I",
+      Age2 = "Age II",
+      Age3 = "Age III",
+      ResolveCardAction = "Resolving Actions",
+      Scoring = "Final Scoring",
+      GameEnd = "Game Complete"
+    }
+  }
+}
+
+-- Validation functions
+function GameRules:validatePlayerCount(count)
+  return count >= self.players.minimum and count <= self.players.maximum
+end
+
+function GameRules:getCardsPerAge(playerCount)
+  return self.ages.cardsPerAge[playerCount] or 7
+end
+
+function GameRules:getPassesPerAge(playerCount)
+  return self.ages.passesPerAge[playerCount] or 6
+end
+
+function GameRules:isValidAction(action)
+  for _, validAction in ipairs(self.actions.valid) do
+    if validAction == action then
+      return true
+    end
+  end
+  return false
+end
+
+function GameRules:isExpansionEnabled(expansion)
+  local config = self.expansions[expansion]
+  return config and config.enabled or false
+end
+
+function GameRules:enableExpansion(expansion, enabled)
+  local config = self.expansions[expansion]
+  if config then
+    config.enabled = enabled
+    return true
+  end
+  return false
+end
+
+function GameRules:getExpansionPhases(expansion)
+  local config = self.expansions[expansion]
+  if config and config.enabled then
+    return config.phases or {}
+  end
+  return {}
+end
+
+function GameRules:getExpansionActions(expansion)
+  local config = self.expansions[expansion]
+  if config and config.enabled then
+    return config.actions or {}
+  end
+  return {}
+end
+
+function GameRules:getPhaseDisplayName(phase)
+  return self.ui.phaseDisplayNames[phase] or phase
+end
+
+function GameRules:isBasicResource(resource)
+  for _, basicResource in ipairs(self.resources.basic) do
+    if basicResource == resource then
+      return true
+    end
+  end
+  return false
+end
+
+function GameRules:isManufacturedResource(resource)
+  for _, manufacturedResource in ipairs(self.resources.manufactured) do
+    if manufacturedResource == resource then
+      return true
+    end
+  end
+  return false
+end
+
+function GameRules:getSellValue()
+  return self.actions.sellValue
+end
+
+-- Initialize default expansion states based on current config
+function GameRules:initializeFromConfig()
+  -- This will be called to sync with existing expansion configuration
+  if ExpansionConfig then
+    self:enableExpansion("Leaders", ExpansionConfig.Leaders or false)
+    self:enableExpansion("Cities", ExpansionConfig.Cities or false)
+    self:enableExpansion("Armada", ExpansionConfig.Armada or false)
+    self:enableExpansion("Babel", ExpansionConfig.Babel or false)
+  end
+end

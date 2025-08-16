@@ -1,10 +1,29 @@
 -- Main game file that includes all other components
 
+-- Core architecture
+#include !\7Wonders\core\event_system.ttslua
+#include !\7Wonders\core\state_machine.ttslua
+#include !\7Wonders\core\game_context.ttslua
+
+-- Configuration
 #include !\7Wonders\config\expansions.ttslua
 #include !\7Wonders\config\rewards.ttslua
 #include !\7Wonders\config\tokens.ttslua
+#include !\7Wonders\config\phase_flow.ttslua
+#include !\7Wonders\config\game_rules.ttslua
 
-#include !\7Wonders\game\phases.ttslua
+-- Services
+#include !\7Wonders\game\services\card_service.ttslua
+#include !\7Wonders\game\services\player_service.ttslua
+#include !\7Wonders\game\services\ui_service.ttslua
+
+-- Phase modules
+#include !\7Wonders\game\phases\wonder_phase.ttslua
+#include !\7Wonders\game\phases\leader_phase.ttslua
+#include !\7Wonders\game\phases\age_phase.ttslua
+#include !\7Wonders\game\phases\action_resolution_phase.ttslua
+
+-- Game setup
 #include !\7Wonders\game\setup.ttslua
 
 #include !\7Wonders\modules\armada_manager.ttslua
@@ -22,14 +41,49 @@
 #include !\utils.ttslua
 
 function onLoad()
-  -- Once the game loads initialize  all global variables
+  -- Once the game loads initialize all global variables
   #include !\7Wonders\globals_general.ttslua
   #include !\7Wonders\globals_players.ttslua
 
   #include !\7Wonders\config\guids\bags.ttslua
   #include !\7Wonders\config\guids\decks.ttslua
 
+  -- Initialize new architecture
+  GameContext:initialize()
+  GameRules:initializeFromConfig()
+  
+  -- Register phase states in state machine
+  GameStateMachine:addState("Setup", {
+    onEnter = function() end,
+    onExit = function() end,
+    onUpdate = function() end
+  })
+  GameStateMachine:addState("WonderStage", WonderPhase)
+  GameStateMachine:addState("LeaderDrafting", LeaderPhase.LeaderDrafting)
+  GameStateMachine:addState("LeaderSelectionStage", LeaderPhase.LeaderSelectionStage)
+  GameStateMachine:addState("Age1", AgePhase.Age1)
+  GameStateMachine:addState("Age2", AgePhase.Age2)
+  GameStateMachine:addState("Age3", AgePhase.Age3)
+  GameStateMachine:addState("ResolveCardAction", ActionResolutionPhase)
+  GameStateMachine:addState("Scoring", {
+    onEnter = function() UIService:broadcastToAllPlayers("Calculating final scores...", "Gold") end,
+    onExit = function() end,
+    onUpdate = function() end
+  })
+  GameStateMachine:addState("GameEnd", {
+    onEnter = function() UIService:showGameEndUI() end,
+    onExit = function() end,
+    onUpdate = function() end
+  })
+  
+  -- Set initial state
+  GameStateMachine:transitionTo("Setup")
+  
+  -- Initialize UI
   MakeSetupButtons()
   MakeSetupBoardText()
   disableAllTiles()
+  
+  -- Emit game loaded event
+  EventSystem:emit("game_loaded")
 end

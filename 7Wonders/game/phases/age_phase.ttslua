@@ -1,0 +1,321 @@
+-- Age Phase Module
+-- Handles Age 1, 2, and 3 gameplay phases
+
+AgePhase = {
+  -- Age 1 Phase
+  Age1 = {
+    name = "Age1",
+    ageNumber = 1,
+    
+    onEnter = function(self, context)
+      EventSystem:emit("phase_entered", {
+        phase = self.name,
+        context = context
+      })
+      
+      self:initializeAge()
+      UIService:updatePhaseUI(self.name)
+      PlayerService:unreadyAllPlayers()
+    end,
+    
+    onExit = function(self, context)
+      EventSystem:emit("phase_exited", {
+        phase = self.name,
+        context = context
+      })
+    end,
+    
+    onUpdate = function(self, context)
+      if PlayerService:haveAllPlayersSelectedActions() then
+        -- Set up transition data for action resolution
+        local transitionData = PhaseFlow:getTransitionData(self.name)
+        GameContext.phases.transitionData = transitionData
+        
+        -- Transition to action resolution
+        GameStateMachine:transitionTo("ResolveCardAction")
+      end
+    end,
+    
+    initializeAge = function(self)
+      if GameContext.phases.passes.current == 0 then
+        self:startNewAge()
+      else
+        self:continueAge()
+      end
+    end,
+    
+    startNewAge = function(self)
+      local playerCount = GameContext:getPlayerCount()
+      
+      -- Initialize pass tracking
+      GameContext.phases.passes.current = 0
+      GameContext.phases.passes.maximum = GameRules:getPassesPerAge(playerCount)
+      
+      -- Deal cards for this age
+      CardService:dealCardsForAge(self.ageNumber, playerCount)
+      
+      UIService:broadcastToAllPlayers("Age " .. self.ageNumber .. " begins!", "Blue")
+      UIService:updatePassCounterUI(1, GameContext.phases.passes.maximum)
+      
+      EventSystem:emit("age_started", {
+        age = self.ageNumber,
+        playerCount = playerCount
+      })
+    end,
+    
+    continueAge = function(self)
+      local currentPass = GameContext.phases.passes.current + 1
+      local maxPasses = GameContext.phases.passes.maximum
+      
+      UIService:broadcastToAllPlayers(
+        "Age " .. self.ageNumber .. " - Pass " .. currentPass .. "/" .. maxPasses, 
+        "Blue"
+      )
+      
+      UIService:updatePassCounterUI(currentPass, maxPasses)
+    end
+  },
+  
+  -- Age 2 Phase
+  Age2 = {
+    name = "Age2",
+    ageNumber = 2,
+    
+    onEnter = function(self, context)
+      EventSystem:emit("phase_entered", {
+        phase = self.name,
+        context = context
+      })
+      
+      self:initializeAge()
+      UIService:updatePhaseUI(self.name)
+      PlayerService:unreadyAllPlayers()
+    end,
+    
+    onExit = function(self, context)
+      EventSystem:emit("phase_exited", {
+        phase = self.name,
+        context = context
+      })
+    end,
+    
+    onUpdate = function(self, context)
+      if PlayerService:haveAllPlayersSelectedActions() then
+        local transitionData = PhaseFlow:getTransitionData(self.name)
+        GameContext.phases.transitionData = transitionData
+        GameStateMachine:transitionTo("ResolveCardAction")
+      end
+    end,
+    
+    initializeAge = function(self)
+      if GameContext.phases.passes.current == 0 then
+        self:startNewAge()
+      else
+        self:continueAge()
+      end
+    end,
+    
+    startNewAge = function(self)
+      local playerCount = GameContext:getPlayerCount()
+      
+      GameContext.phases.passes.current = 0
+      GameContext.phases.passes.maximum = GameRules:getPassesPerAge(playerCount)
+      
+      CardService:dealCardsForAge(self.ageNumber, playerCount)
+      
+      UIService:broadcastToAllPlayers("Age " .. self.ageNumber .. " begins!", "Green")
+      UIService:updatePassCounterUI(1, GameContext.phases.passes.maximum)
+      
+      EventSystem:emit("age_started", {
+        age = self.ageNumber,
+        playerCount = playerCount
+      })
+    end,
+    
+    continueAge = function(self)
+      local currentPass = GameContext.phases.passes.current + 1
+      local maxPasses = GameContext.phases.passes.maximum
+      
+      UIService:broadcastToAllPlayers(
+        "Age " .. self.ageNumber .. " - Pass " .. currentPass .. "/" .. maxPasses, 
+        "Green"
+      )
+      
+      UIService:updatePassCounterUI(currentPass, maxPasses)
+    end
+  },
+  
+  -- Age 3 Phase
+  Age3 = {
+    name = "Age3",
+    ageNumber = 3,
+    
+    onEnter = function(self, context)
+      EventSystem:emit("phase_entered", {
+        phase = self.name,
+        context = context
+      })
+      
+      self:initializeAge()
+      UIService:updatePhaseUI(self.name)
+      PlayerService:unreadyAllPlayers()
+    end,
+    
+    onExit = function(self, context)
+      EventSystem:emit("phase_exited", {
+        phase = self.name,
+        context = context
+      })
+    end,
+    
+    onUpdate = function(self, context)
+      if PlayerService:haveAllPlayersSelectedActions() then
+        local transitionData = PhaseFlow:getTransitionData(self.name)
+        GameContext.phases.transitionData = transitionData
+        GameStateMachine:transitionTo("ResolveCardAction")
+      end
+    end,
+    
+    initializeAge = function(self)
+      if GameContext.phases.passes.current == 0 then
+        self:startNewAge()
+      else
+        self:continueAge()
+      end
+    end,
+    
+    startNewAge = function(self)
+      local playerCount = GameContext:getPlayerCount()
+      
+      GameContext.phases.passes.current = 0
+      GameContext.phases.passes.maximum = GameRules:getPassesPerAge(playerCount)
+      
+      CardService:dealCardsForAge(self.ageNumber, playerCount)
+      
+      UIService:broadcastToAllPlayers("Age " .. self.ageNumber .. " begins!", "Red")
+      UIService:updatePassCounterUI(1, GameContext.phases.passes.maximum)
+      
+      EventSystem:emit("age_started", {
+        age = self.ageNumber,
+        playerCount = playerCount
+      })
+    end,
+    
+    continueAge = function(self)
+      local currentPass = GameContext.phases.passes.current + 1
+      local maxPasses = GameContext.phases.passes.maximum
+      
+      UIService:broadcastToAllPlayers(
+        "Age " .. self.ageNumber .. " - Pass " .. currentPass .. "/" .. maxPasses, 
+        "Red"
+      )
+      
+      UIService:updatePassCounterUI(currentPass, maxPasses)
+    end
+  }
+}
+
+-- Common age phase functionality
+local AgePhaseCommon = {
+  -- Process an age pass (common to all ages)
+  processAgePass = function(agePhase)
+    local currentPass = GameContext.phases.passes.current + 1
+    GameContext.phases.passes.current = currentPass
+    
+    -- Pass cards to next player
+    AgePhaseCommon:passCards(agePhase.ageNumber, currentPass)
+    
+    -- Check if age is complete
+    if currentPass >= GameContext.phases.passes.maximum then
+      AgePhaseCommon:completeAge(agePhase)
+    else
+      -- Continue with next pass
+      PlayerService:unreadyAllPlayers()
+      PlayerService:clearAllPlayerActions()
+      
+      -- Update UI for next pass
+      UIService:updatePassCounterUI(currentPass + 1, GameContext.phases.passes.maximum)
+      
+      EventSystem:emit("age_pass_completed", {
+        age = agePhase.ageNumber,
+        pass = currentPass,
+        totalPasses = GameContext.phases.passes.maximum
+      })
+    end
+  end,
+  
+  -- Pass cards between players
+  passCards = function(self, ageNumber, passNumber)
+    -- Direction alternates by age: Age 1 & 3 clockwise, Age 2 counter-clockwise
+    local clockwise = (ageNumber == 1 or ageNumber == 3)
+    
+    EventSystem:emit("cards_passed", {
+      age = ageNumber,
+      pass = passNumber,
+      direction = clockwise and "clockwise" or "counter-clockwise"
+    })
+    
+    -- This would contain the actual card passing logic
+    -- For now, just emit the event
+  end,
+  
+  -- Complete an age
+  completeAge = function(self, agePhase)
+    UIService:broadcastToAllPlayers("Age " .. agePhase.ageNumber .. " complete!", "Yellow")
+    
+    -- Resolve military conflicts
+    self:resolveMilitaryConflicts(agePhase.ageNumber)
+    
+    -- Reset pass counter for next age
+    GameContext.phases.passes.current = 0
+    
+    -- Transition to next phase
+    local nextPhase = PhaseFlow:getNextPhase(agePhase.name, GameContext)
+    if nextPhase then
+      GameStateMachine:transitionTo(nextPhase)
+    end
+    
+    EventSystem:emit("age_completed", {
+      age = agePhase.ageNumber
+    })
+  end,
+  
+  -- Resolve military conflicts at end of age
+  resolveMilitaryConflicts = function(self, ageNumber)
+    -- This would contain the actual military resolution logic
+    EventSystem:emit("military_conflicts_resolved", {
+      age = ageNumber
+    })
+  end
+}
+
+-- Helper function to get the appropriate age phase
+function getAgePhase(phaseName)
+  if phaseName == "Age1" then
+    return AgePhase.Age1
+  elseif phaseName == "Age2" then
+    return AgePhase.Age2
+  elseif phaseName == "Age3" then
+    return AgePhase.Age3
+  end
+  return nil
+end
+
+-- Register event listeners for age phases
+EventSystem:on("all_actions_resolved", function()
+  local currentPhase = GameStateMachine:getCurrentState()
+  local agePhase = getAgePhase(currentPhase)
+  
+  if agePhase then
+    AgePhaseCommon:processAgePass(agePhase)
+  end
+end)
+
+EventSystem:on("player_action_selected", function(data)
+  local currentPhase = GameStateMachine:getCurrentState()
+  local agePhase = getAgePhase(currentPhase)
+  
+  if agePhase and agePhase.onUpdate then
+    agePhase:onUpdate(GameContext)
+  end
+end)

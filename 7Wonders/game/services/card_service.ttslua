@@ -1,0 +1,289 @@
+-- Card Service Module
+-- Handles all card-related operations and logic
+
+CardService = {
+  -- Initialize the card service
+  init = function(self)
+    EventSystem:on("player_action_selected", function(data)
+      self:validatePlayerAction(data.player, data.action, data.card)
+    end)
+    
+    EventSystem:on("resolve_player_actions", function()
+      self:resolveAllPlayerActions()
+    end)
+  end,
+  
+  -- Validate if a player can perform an action with a card
+  validatePlayerAction = function(self, player, action, card)
+    if not GameRules:isValidAction(action) then
+      EventSystem:emit("action_validation_failed", {
+        player = player,
+        action = action,
+        reason = "Invalid action type"
+      })
+      return false
+    end
+    
+    local canPerform, reason = self:canPlayerPerformAction(player, action, card)
+    if not canPerform then
+      EventSystem:emit("action_validation_failed", {
+        player = player,
+        action = action,
+        card = card,
+        reason = reason
+      })
+      return false
+    end
+    
+    EventSystem:emit("action_validated", {
+      player = player,
+      action = action,
+      card = card
+    })
+    return true
+  end,
+  
+  -- Check if a player can perform a specific action
+  canPlayerPerformAction = function(self, player, action, card)
+    if action == "Buy" then
+      return self:canPlayerBuyCard(player, card)
+    elseif action == "Sell" then
+      return self:canPlayerSellCard(player, card)
+    elseif action == "BuildWonder" then
+      return self:canPlayerBuildWonder(player, card)
+    elseif action == "ArmadaSell" then
+      return self:canPlayerArmadaSell(player, card)
+    end
+    
+    return false, "Unknown action"
+  end,
+  
+  -- Check if player can buy a card
+  canPlayerBuyCard = function(self, player, card)
+    -- This would contain the actual card buying logic
+    -- For now, return true as placeholder
+    return true, "Can buy card"
+  end,
+  
+  -- Check if player can sell a card
+  canPlayerSellCard = function(self, player, card)
+    -- Players can always sell cards for coins
+    return true, "Can sell card"
+  end,
+  
+  -- Check if player can build wonder stage
+  canPlayerBuildWonder = function(self, player, card)
+    local wonder = GameContext:getPlayerWonder(player)
+    if not wonder then
+      return false, "Player has no wonder"
+    end
+    
+    local currentStage = GameContext:getPlayerWonderStage(player)
+    if currentStage >= GameRules.wonders.stagesPerWonder then
+      return false, "Wonder already completed"
+    end
+    
+    return true, "Can build wonder stage"
+  end,
+  
+  -- Check if player can perform Armada sell action
+  canPlayerArmadaSell = function(self, player, card)
+    if not GameRules:isExpansionEnabled("Armada") then
+      return false, "Armada expansion not enabled"
+    end
+    
+    return true, "Can perform Armada sell"
+  end,
+  
+  -- Resolve all player actions
+  resolveAllPlayerActions = function(self)
+    local players = GameContext:getSeatedPlayers()
+    
+    for _, player in ipairs(players) do
+      local action = GameContext:getPlayerAction(player)
+      if action then
+        self:executePlayerAction(player, action)
+      end
+    end
+    
+    -- Clear all player actions after resolution
+    GameContext:clearAllPlayerActions()
+    
+    EventSystem:emit("all_actions_resolved")
+  end,
+  
+  -- Execute a specific player action
+  executePlayerAction = function(self, player, actionData)
+    local action = actionData.action
+    local card = actionData.card
+    
+    if action == "Buy" then
+      self:executeBuyAction(player, card)
+    elseif action == "Sell" then
+      self:executeSellAction(player, card)
+    elseif action == "BuildWonder" then
+      self:executeBuildWonderAction(player, card)
+    elseif action == "ArmadaSell" then
+      self:executeArmadaSellAction(player, card)
+    end
+    
+    EventSystem:emit("player_action_executed", {
+      player = player,
+      action = action,
+      card = card
+    })
+  end,
+  
+  -- Execute buy action
+  executeBuyAction = function(self, player, card)
+    -- Add card to player's tableau
+    GameContext:addCardToPlayer(player, card)
+    
+    -- Deduct resources/coins (this would be more complex in real implementation)
+    -- For now, just emit an event
+    EventSystem:emit("card_bought", {
+      player = player,
+      card = card
+    })
+  end,
+  
+  -- Execute sell action
+  executeSellAction = function(self, player, card)
+    local sellValue = GameRules:getSellValue()
+    GameContext:addCoinsToPlayer(player, sellValue)
+    
+    -- Discard the card (assume age card unless specified otherwise)
+    self:discardCard(card, true)
+    
+    EventSystem:emit("card_sold", {
+      player = player,
+      card = card,
+      coinsGained = sellValue
+    })
+  end,
+  
+  -- Execute build wonder action
+  executeBuildWonderAction = function(self, player, card)
+    local currentStage = GameContext:getPlayerWonderStage(player)
+    GameContext:setPlayerWonderStage(player, currentStage + 1)
+    
+    -- Use the card to build the wonder stage (assume age card unless specified otherwise)
+    self:discardCard(card, true)
+    
+    EventSystem:emit("wonder_stage_built", {
+      player = player,
+      card = card,
+      stage = currentStage + 1
+    })
+  end,
+  
+  -- Execute Armada sell action
+  executeArmadaSellAction = function(self, player, card)
+    -- Armada-specific sell logic would go here
+    local sellValue = GameRules:getSellValue()
+    GameContext:addCoinsToPlayer(player, sellValue)
+    
+    -- Armada sell (assume age card unless specified otherwise)
+    self:discardCard(card, true)
+    
+    EventSystem:emit("armada_card_sold", {
+      player = player,
+      card = card,
+      coinsGained = sellValue
+    })
+  end,
+  
+  -- Discard a card
+  discardCard = function(self, card, isAgeCard)
+    if not card then return end
+    
+    -- Determine which discard zone to use
+    local discardZone
+    if isAgeCard == false then
+      -- Non-age cards (leaders, etc.) go to AltDiscard
+      discardZone = DeckZones.AltDiscard
+    else
+      -- Age cards go to regular Discard
+      discardZone = DeckZones.Discard
+    end
+    
+    if discardZone then
+      card.setPosition(discardZone.getPosition())
+      card.setRotation(discardZone.getRotation())
+    else
+      print("Warning: Discard zone not found, destroying card instead")
+    end
+    
+    EventSystem:emit("card_discarded", {
+      card = card,
+      isAgeCard = isAgeCard
+    })
+  end,
+  
+  -- Deal cards to players for an age
+  dealCardsForAge = function(self, age, playerCount)
+    local cardsPerPlayer = GameRules:getCardsPerAge(playerCount)
+    
+    EventSystem:emit("dealing_cards", {
+      age = age,
+      playerCount = playerCount,
+      cardsPerPlayer = cardsPerPlayer
+    })
+    
+    -- This would contain the actual card dealing logic
+    -- For now, just emit completion event
+    EventSystem:emit("cards_dealt", {
+      age = age,
+      playerCount = playerCount
+    })
+  end,
+  
+  -- Get available actions for a card
+  getAvailableActions = function(self, player, card)
+    local actions = {}
+    
+    if self:canPlayerBuyCard(player, card) then
+      table.insert(actions, "Buy")
+    end
+    
+    if self:canPlayerSellCard(player, card) then
+      table.insert(actions, "Sell")
+    end
+    
+    if self:canPlayerBuildWonder(player, card) then
+      table.insert(actions, "BuildWonder")
+    end
+    
+    if GameRules:isExpansionEnabled("Armada") and self:canPlayerArmadaSell(player, card) then
+      table.insert(actions, "ArmadaSell")
+    end
+    
+    return actions
+  end,
+  
+  -- Helper method to determine if a card is an age card
+  isAgeCard = function(self, card)
+    if not card or not card.getName then
+      return true -- Default to age card if uncertain
+    end
+    
+    local cardName = card.getName()
+    -- Leader cards typically have "Leader" in their name or description
+    -- This is a simple heuristic - could be improved with more specific logic
+    if string.find(cardName:lower(), "leader") then
+      return false
+    end
+    
+    -- Default to age card
+    return true
+  end,
+  
+  -- Convenience method to discard a card with automatic type detection
+  discardCardAuto = function(self, card)
+    local isAge = self:isAgeCard(card)
+    self:discardCard(card, isAge)
+  end
+}
+
+-- Initialize the service when loaded
+CardService:init()

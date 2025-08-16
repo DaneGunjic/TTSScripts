@@ -1,0 +1,91 @@
+-- Event System for decoupled component communication
+-- Allows modules to communicate without direct dependencies
+
+EventSystem = {
+  listeners = {},
+  debug = false
+}
+
+-- Register a callback for a specific event
+function EventSystem:on(eventName, callback, priority)
+  if not self.listeners[eventName] then
+    self.listeners[eventName] = {}
+  end
+  
+  local listener = {
+    callback = callback,
+    priority = priority or 0
+  }
+  
+  table.insert(self.listeners[eventName], listener)
+  
+  -- Sort by priority (higher priority first)
+  table.sort(self.listeners[eventName], function(a, b)
+    return a.priority > b.priority
+  end)
+  
+  if self.debug then
+    print("[EventSystem] Registered listener for event: " .. eventName)
+  end
+end
+
+-- Remove a specific callback for an event
+function EventSystem:off(eventName, callback)
+  if not self.listeners[eventName] then return end
+  
+  for i = #self.listeners[eventName], 1, -1 do
+    if self.listeners[eventName][i].callback == callback then
+      table.remove(self.listeners[eventName], i)
+      if self.debug then
+        print("[EventSystem] Removed listener for event: " .. eventName)
+      end
+      break
+    end
+  end
+end
+
+-- Emit an event to all registered listeners
+function EventSystem:emit(eventName, data)
+  if self.debug then
+    print("[EventSystem] Emitting event: " .. eventName)
+  end
+  
+  if self.listeners[eventName] then
+    for _, listener in ipairs(self.listeners[eventName]) do
+      local success, result = pcall(listener.callback, data)
+      if not success then
+        print("[EventSystem] Error in event listener for " .. eventName .. ": " .. tostring(result))
+      end
+    end
+  end
+end
+
+-- Get list of events that have listeners
+function EventSystem:getRegisteredEvents()
+  local events = {}
+  for eventName, _ in pairs(self.listeners) do
+    table.insert(events, eventName)
+  end
+  return events
+end
+
+-- Clear all listeners for an event
+function EventSystem:clearEvent(eventName)
+  self.listeners[eventName] = nil
+  if self.debug then
+    print("[EventSystem] Cleared all listeners for event: " .. eventName)
+  end
+end
+
+-- Clear all listeners
+function EventSystem:clearAll()
+  self.listeners = {}
+  if self.debug then
+    print("[EventSystem] Cleared all event listeners")
+  end
+end
+
+-- Enable/disable debug logging
+function EventSystem:setDebug(enabled)
+  self.debug = enabled
+end

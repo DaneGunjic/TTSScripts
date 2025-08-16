@@ -1,0 +1,272 @@
+-- Game Context - Centralized game state management
+-- Provides a single source of truth for game state
+
+GameContext = {
+  -- Player state
+  players = {
+    seated = {},
+    ready = {},
+    count = 0,
+    selectedActions = {},
+    cardHolders = {},
+    ships = {},
+    wonderObjects = {}
+  },
+  
+  -- Phase state
+  phases = {
+    current = "Setup",
+    previous = nil,
+    passes = {
+      current = 0,
+      maximum = 0
+    }
+  },
+  
+  -- Game objects
+  objects = {
+    setupBoard = nil,
+    deckZones = {},
+    coinBags = {},
+    wonderBags = {},
+    shipBags = {}
+  },
+  
+  -- Configuration
+  config = {
+    expansions = {},
+    gameMode = {},
+    randomWonders = true,
+    draftMode = false
+  },
+  
+  -- UI state
+  ui = {
+    currentPhase = "",
+    phaseDescription = ""
+  }
+}
+
+-- Initialize game context with default values
+function GameContext:initialize()
+  -- Reset all state
+  self.players.seated = {}
+  self.players.ready = {}
+  self.players.count = 0
+  self.players.selectedActions = {}
+  self.players.cardHolders = {}
+  self.players.ships = {}
+  self.players.wonderObjects = {}
+  
+  self.phases.current = "Setup"
+  self.phases.previous = nil
+  self.phases.passes.current = 0
+  self.phases.passes.maximum = 0
+  
+  -- Copy expansion config
+  if ExpansionConfig then
+    self.config.expansions = ExpansionConfig
+  end
+  
+  -- Copy game mode config
+  if GameModeConfig then
+    self.config.gameMode = GameModeConfig
+  end
+  
+  -- Set global references for backward compatibility
+  if RandomWonders ~= nil then
+    self.config.randomWonders = RandomWonders
+  end
+  if DraftMode ~= nil then
+    self.config.draftMode = DraftMode
+  end
+  
+  EventSystem:emit("game_context_initialized", self)
+end
+
+-- Player management
+function GameContext:setSeatedPlayers(players)
+  self.players.seated = players
+  self.players.count = #players
+  
+  -- Initialize ready state for all players
+  for _, color in ipairs(players) do
+    self.players.ready[color] = false
+  end
+  
+  -- Update global variables for backward compatibility
+  AllSeatedPlayers = players
+  NumberOfPlayers = #players
+  
+  EventSystem:emit("players_seated", {
+    players = players,
+    count = #players
+  })
+end
+
+function GameContext:setPlayerReady(color, ready)
+  if self.players.ready[color] ~= ready then
+    self.players.ready[color] = ready
+    
+    -- Update ready count
+    local readyCount = 0
+    for _, isReady in pairs(self.players.ready) do
+      if isReady then readyCount = readyCount + 1 end
+    end
+    
+    -- Update global for backward compatibility
+    NumberOfReadyPlayers = readyCount
+    
+    EventSystem:emit("player_ready_changed", {
+      color = color,
+      ready = ready,
+      readyCount = readyCount,
+      totalPlayers = self.players.count
+    })
+  end
+end
+
+function GameContext:getReadyCount()
+  local count = 0
+  for _, ready in pairs(self.players.ready) do
+    if ready then count = count + 1 end
+  end
+  return count
+end
+
+function GameContext:areAllPlayersReady()
+  return self:getReadyCount() == self.players.count
+end
+
+function GameContext:unreadyAllPlayers()
+  for color, _ in pairs(self.players.ready) do
+    self.players.ready[color] = false
+  end
+  NumberOfReadyPlayers = 0
+  
+  EventSystem:emit("all_players_unready", {})
+end
+
+-- Action management
+function GameContext:setPlayerAction(color, action)
+  self.players.selectedActions[color] = action
+  
+  -- Update global for backward compatibility
+  if not PlayerSelectedAction then
+    PlayerSelectedAction = {}
+  end
+  PlayerSelectedAction[color] = action
+  
+  EventSystem:emit("player_action_selected", {
+    color = color,
+    action = action
+  })
+end
+
+function GameContext:clearPlayerAction(color)
+  self.players.selectedActions[color] = nil
+  if PlayerSelectedAction then
+    PlayerSelectedAction[color] = nil
+  end
+end
+
+function GameContext:haveAllPlayersSelectedActions()
+  for _, color in ipairs(self.players.seated) do
+    if not self.players.selectedActions[color] then
+      return false
+    end
+  end
+  return true
+end
+
+-- Phase management
+function GameContext:setPhase(phase, description)
+  self.phases.previous = self.phases.current
+  self.phases.current = phase
+  
+  if description then
+    self.ui.currentPhase = phase
+    self.ui.phaseDescription = description
+  end
+  
+  -- Update global for backward compatibility
+  GameState = phase
+  
+  EventSystem:emit("phase_changed", {
+    current = phase,
+    previous = self.phases.previous,
+    description = description
+  })
+end
+
+function GameContext:setPasses(current, maximum)
+  self.phases.passes.current = current
+  self.phases.passes.maximum = maximum
+  
+  -- Update globals for backward compatibility
+  CurrentPasses = current
+  MaximumPasses = maximum
+  
+  EventSystem:emit("passes_updated", {
+    current = current,
+    maximum = maximum
+  })
+end
+
+-- Object management
+function GameContext:setPlayerCardHolder(color, data)
+  self.players.cardHolders[color] = data
+  
+  -- Update global for backward compatibility
+  if not PlayerCardHolder then
+    PlayerCardHolder = {}
+  end
+  PlayerCardHolder[color] = data
+end
+
+function GameContext:setPlayerShip(color, shipColor, shipObject)
+  if not self.players.ships[color] then
+    self.players.ships[color] = {}
+  end
+  self.players.ships[color][shipColor] = shipObject
+  
+  -- Update global for backward compatibility
+  if not PlayerShips then
+    PlayerShips = {}
+  end
+  if not PlayerShips[color] then
+    PlayerShips[color] = {}
+  end
+  PlayerShips[color][shipColor] = shipObject
+end
+
+function GameContext:setPlayerWonder(color, wonderObject)
+  self.players.wonderObjects[color] = wonderObject
+end
+
+-- Configuration helpers
+function GameContext:isExpansionEnabled(expansion)
+  return self.config.expansions[expansion] == true
+end
+
+function GameContext:isLeadersEnabled()
+  return self.config.expansions.Leaders and self.config.expansions.Leaders.Base
+end
+
+function GameContext:isCitiesEnabled()
+  return self.config.expansions.Cities
+end
+
+function GameContext:isArmadaEnabled()
+  return self.config.expansions.Armada
+end
+
+-- Get context snapshot for debugging
+function GameContext:getSnapshot()
+  return {
+    players = self.players,
+    phases = self.phases,
+    config = self.config,
+    ui = self.ui
+  }
+end

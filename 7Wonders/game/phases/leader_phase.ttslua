@@ -1,0 +1,252 @@
+-- Leader Phase Module
+-- Handles leader drafting and selection phases
+
+LeaderPhase = {
+  -- Leader Drafting Phase
+  LeaderDrafting = {
+    name = "LeaderDrafting",
+    
+    onEnter = function(self, context)
+      EventSystem:emit("phase_entered", {
+        phase = self.name,
+        context = context
+      })
+      
+      -- Initialize or continue leader drafting
+      if GameContext.phases.passes.current == 0 then
+        self:initializeLeaderDrafting()
+      else
+        self:continueLeaderDrafting()
+      end
+      
+      UIService:updatePhaseUI(self.name)
+      PlayerService:unreadyAllPlayers()
+    end,
+    
+    onExit = function(self, context)
+      EventSystem:emit("phase_exited", {
+        phase = self.name,
+        context = context
+      })
+    end,
+    
+    onUpdate = function(self, context)
+      if PlayerService:areAllPlayersReady() then
+        self:processLeaderDraftingPass()
+      end
+    end,
+    
+    -- Initialize leader drafting
+    initializeLeaderDrafting = function(self)
+      -- Set up passes
+      GameContext.phases.passes.current = 0
+      GameContext.phases.passes.maximum = GameRules.leaders.draftPasses
+      
+      -- Deal leader cards to players
+      self:dealLeaderCards()
+      
+      UIService:broadcastToAllPlayers("Leader Drafting begins! Select cards to draft.", "Purple")
+      
+      EventSystem:emit("leader_drafting_initialized")
+    end,
+    
+    -- Continue leader drafting for subsequent passes
+    continueLeaderDrafting = function(self)
+      local currentPass = GameContext.phases.passes.current
+      local maxPasses = GameContext.phases.passes.maximum
+      
+      UIService:broadcastToAllPlayers(
+        "Leader Drafting - Pass " .. (currentPass + 1) .. "/" .. maxPasses, 
+        "Purple"
+      )
+      
+      UIService:updatePassCounterUI(currentPass + 1, maxPasses)
+    end,
+    
+    -- Deal leader cards to players
+    dealLeaderCards = function(self)
+      if DealLeaders then
+        DealLeaders()
+      else
+        self:dealLeaderCardsManually()
+      end
+      
+      EventSystem:emit("leader_cards_dealt")
+    end,
+    
+    -- Manual leader card dealing (fallback)
+    dealLeaderCardsManually = function(self)
+      local players = PlayerService:getSeatedPlayers()
+      local cardsPerPlayer = GameRules.leaders.cardsPerPlayer
+      
+      -- This would contain the actual card dealing logic
+      -- For now, just emit events
+      for _, player in ipairs(players) do
+        EventSystem:emit("leader_cards_dealt_to_player", {
+          player = player,
+          cardCount = cardsPerPlayer
+        })
+      end
+    end,
+    
+    -- Process a leader drafting pass
+    processLeaderDraftingPass = function(self)
+      local currentPass = GameContext.phases.passes.current + 1
+      GameContext.phases.passes.current = currentPass
+      
+      -- Pass cards to next player
+      self:passLeaderCards()
+      
+      -- Check if drafting is complete
+      if currentPass >= GameContext.phases.passes.maximum then
+        self:completeLeaderDrafting()
+      else
+        -- Continue with next pass
+        PlayerService:unreadyAllPlayers()
+        UIService:updatePassCounterUI(currentPass + 1, GameContext.phases.passes.maximum)
+      end
+    end,
+    
+    -- Pass leader cards between players
+    passLeaderCards = function(self)
+      -- This would contain the actual card passing logic
+      EventSystem:emit("leader_cards_passed", {
+        pass = GameContext.phases.passes.current
+      })
+    end,
+    
+    -- Complete leader drafting phase
+    completeLeaderDrafting = function(self)
+      UIService:broadcastToAllPlayers("Leader Drafting complete!", "Green")
+      
+      -- Transition to leader selection
+      local nextPhase = PhaseFlow:getNextPhase(self.name, GameContext)
+      if nextPhase then
+        GameStateMachine:transitionTo(nextPhase)
+      end
+    end
+  },
+  
+  -- Leader Selection Phase
+  LeaderSelectionStage = {
+    name = "LeaderSelectionStage",
+    
+    onEnter = function(self, context)
+      EventSystem:emit("phase_entered", {
+        phase = self.name,
+        context = context
+      })
+      
+      self:initializeLeaderSelection()
+      UIService:updatePhaseUI(self.name)
+      PlayerService:unreadyAllPlayers()
+    end,
+    
+    onExit = function(self, context)
+      EventSystem:emit("phase_exited", {
+        phase = self.name,
+        context = context
+      })
+    end,
+    
+    onUpdate = function(self, context)
+      if PlayerService:haveAllPlayersSelectedActions() then
+        -- Set up transition data for action resolution
+        local transitionData = PhaseFlow:getTransitionData(self.name)
+        GameContext.phases.transitionData = transitionData
+        
+        -- Transition to action resolution
+        GameStateMachine:transitionTo("ResolveCardAction")
+      end
+    end,
+    
+    -- Initialize leader selection
+    initializeLeaderSelection = function(self)
+      UIService:broadcastToAllPlayers(
+        "Select " .. GameRules.leaders.selectCount .. " leader(s) to play!", 
+        "Purple"
+      )
+      
+      -- Clear any previous actions
+      PlayerService:clearAllPlayerActions()
+      
+      EventSystem:emit("leader_selection_initialized")
+    end,
+    
+    -- Handle leader selection by player
+    handleLeaderSelection = function(self, player, leaders)
+      if #leaders ~= GameRules.leaders.selectCount then
+        UIService:showPlayerNotification(
+          player, 
+          "Must select exactly " .. GameRules.leaders.selectCount .. " leader(s)", 
+          "Red"
+        )
+        return false
+      end
+      
+      -- Store the selection as a player action
+      GameContext:setPlayerAction(player, {
+        action = "SelectLeaders",
+        leaders = leaders,
+        timestamp = os.time()
+      })
+      
+      EventSystem:emit("leader_selected", {
+        player = player,
+        leaders = leaders
+      })
+      
+      return true
+    end,
+    
+    -- Get selected leaders for a player
+    getPlayerSelectedLeaders = function(self, player)
+      local action = GameContext:getPlayerAction(player)
+      if action and action.action == "SelectLeaders" then
+        return action.leaders
+      end
+      return nil
+    end,
+    
+    -- Check if player has selected leaders
+    hasPlayerSelectedLeaders = function(self, player)
+      return self:getPlayerSelectedLeaders(player) ~= nil
+    end
+  }
+}
+
+-- Helper function to get the appropriate leader phase
+function getLeaderPhase(phaseName)
+  if phaseName == "LeaderDrafting" then
+    return LeaderPhase.LeaderDrafting
+  elseif phaseName == "LeaderSelectionStage" then
+    return LeaderPhase.LeaderSelectionStage
+  end
+  return nil
+end
+
+-- Register event listeners for leader phases
+EventSystem:on("player_ready_changed", function(data)
+  local currentPhase = GameStateMachine:getCurrentState()
+  local leaderPhase = getLeaderPhase(currentPhase)
+  
+  if leaderPhase and leaderPhase.onUpdate then
+    leaderPhase:onUpdate(GameContext)
+  end
+end)
+
+EventSystem:on("leader_card_selected", function(data)
+  local currentPhase = GameStateMachine:getCurrentState()
+  
+  if currentPhase == "LeaderSelectionStage" then
+    LeaderPhase.LeaderSelectionStage:handleLeaderSelection(data.player, data.leaders)
+  end
+end)
+
+EventSystem:on("leader_drafting_pass_complete", function()
+  local currentPhase = GameStateMachine:getCurrentState()
+  
+  if currentPhase == "LeaderDrafting" then
+    LeaderPhase.LeaderDrafting:processLeaderDraftingPass()
+  end
+end)

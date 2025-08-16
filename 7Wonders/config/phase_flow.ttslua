@@ -1,0 +1,237 @@
+-- Phase Flow Configuration
+-- Defines how phases transition and their requirements
+
+PhaseFlow = {
+  -- Setup phase - initial game setup
+  Setup = {
+    next = function(context)
+      return "WonderStage"
+    end,
+    canTransitionTo = {"WonderStage"},
+    requirements = {
+      minPlayers = 3,
+      maxPlayers = 7
+    }
+  },
+  
+  -- Wonder selection phase
+  WonderStage = {
+    next = function(context)
+      if GameContext:isLeadersEnabled() then
+        return "LeaderDrafting"
+      else
+        return "Age1"
+      end
+    end,
+    canTransitionTo = {"LeaderDrafting", "Age1"},
+    requirements = {
+      allPlayersReady = true
+    }
+  },
+  
+  -- Leader drafting phase (3 passes)
+  LeaderDrafting = {
+    next = function(context)
+      local passes = GameContext.phases.passes
+      if passes.current >= passes.maximum then
+        return "LeaderSelectionStage"
+      else
+        return "LeaderDrafting" -- Stay in same phase for more passes
+      end
+    end,
+    canTransitionTo = {"LeaderDrafting", "LeaderSelectionStage"},
+    requirements = {
+      allPlayersReady = true,
+      expansionEnabled = "Leaders"
+    }
+  },
+  
+  -- Leader selection phase (choose 1 to play)
+  LeaderSelectionStage = {
+    next = function(context)
+      return "ResolveCardAction"
+    end,
+    canTransitionTo = {"ResolveCardAction"},
+    requirements = {
+      allPlayersReady = true,
+      allPlayersSelectedActions = true
+    },
+    transitionData = {
+      phaseAfterResolving = "Age1",
+      phaseBeforeResolving = "LeaderSelectionStage"
+    }
+  },
+  
+  -- Age 1 gameplay
+  Age1 = {
+    next = function(context)
+      local passes = GameContext.phases.passes
+      if passes.current >= passes.maximum then
+        return "Age2"
+      else
+        return "ResolveCardAction"
+      end
+    end,
+    canTransitionTo = {"ResolveCardAction", "Age2"},
+    requirements = {
+      allPlayersReady = true
+    },
+    transitionData = {
+      phaseAfterResolving = "Age1",
+      phaseBeforeResolving = "Age1"
+    }
+  },
+  
+  -- Age 2 gameplay
+  Age2 = {
+    next = function(context)
+      local passes = GameContext.phases.passes
+      if passes.current >= passes.maximum then
+        return "Age3"
+      else
+        return "ResolveCardAction"
+      end
+    end,
+    canTransitionTo = {"ResolveCardAction", "Age3"},
+    requirements = {
+      allPlayersReady = true
+    },
+    transitionData = {
+      phaseAfterResolving = "Age2",
+      phaseBeforeResolving = "Age2"
+    }
+  },
+  
+  -- Age 3 gameplay
+  Age3 = {
+    next = function(context)
+      local passes = GameContext.phases.passes
+      if passes.current >= passes.maximum then
+        return "Scoring"
+      else
+        return "ResolveCardAction"
+      end
+    end,
+    canTransitionTo = {"ResolveCardAction", "Scoring"},
+    requirements = {
+      allPlayersReady = true
+    },
+    transitionData = {
+      phaseAfterResolving = "Age3",
+      phaseBeforeResolving = "Age3"
+    }
+  },
+  
+  -- Card action resolution phase
+  ResolveCardAction = {
+    next = function(context)
+      -- Return to the phase that triggered this resolution
+      local afterResolving = context.phaseAfterResolving
+      if afterResolving then
+        return afterResolving
+      else
+        return "Age1" -- Default fallback
+      end
+    end,
+    canTransitionTo = {"Age1", "Age2", "Age3", "LeaderSelectionStage"},
+    requirements = {
+      allPlayersSelectedActions = true
+    }
+  },
+  
+  -- Final scoring phase
+  Scoring = {
+    next = function(context)
+      return "GameEnd"
+    end,
+    canTransitionTo = {"GameEnd"},
+    requirements = {}
+  },
+  
+  -- Game end
+  GameEnd = {
+    next = function(context)
+      return "Setup" -- Allow restart
+    end,
+    canTransitionTo = {"Setup"},
+    requirements = {}
+  }
+}
+
+-- Validate if a phase transition is allowed
+function PhaseFlow:canTransition(fromPhase, toPhase, context)
+  local phaseConfig = self[fromPhase]
+  if not phaseConfig then
+    return false, "Unknown phase: " .. fromPhase
+  end
+  
+  -- Check if target phase is in allowed transitions
+  local canTransitionTo = phaseConfig.canTransitionTo or {}
+  local isAllowed = false
+  for _, allowedPhase in ipairs(canTransitionTo) do
+    if allowedPhase == toPhase then
+      isAllowed = true
+      break
+    end
+  end
+  
+  if not isAllowed then
+    return false, "Cannot transition from " .. fromPhase .. " to " .. toPhase
+  end
+  
+  -- Check requirements
+  local requirements = phaseConfig.requirements or {}
+  
+  if requirements.allPlayersReady and not GameContext:areAllPlayersReady() then
+    return false, "Not all players are ready"
+  end
+  
+  if requirements.allPlayersSelectedActions and not GameContext:haveAllPlayersSelectedActions() then
+    return false, "Not all players have selected actions"
+  end
+  
+  if requirements.minPlayers and GameContext.players.count < requirements.minPlayers then
+    return false, "Not enough players (minimum " .. requirements.minPlayers .. ")"
+  end
+  
+  if requirements.maxPlayers and GameContext.players.count > requirements.maxPlayers then
+    return false, "Too many players (maximum " .. requirements.maxPlayers .. ")"
+  end
+  
+  if requirements.expansionEnabled then
+    local expansion = requirements.expansionEnabled
+    if not GameContext:isExpansionEnabled(expansion) then
+      return false, "Required expansion not enabled: " .. expansion
+    end
+  end
+  
+  return true, "Transition allowed"
+end
+
+-- Get the next phase for a given phase
+function PhaseFlow:getNextPhase(currentPhase, context)
+  local phaseConfig = self[currentPhase]
+  if not phaseConfig or not phaseConfig.next then
+    return nil
+  end
+  
+  return phaseConfig.next(context or GameContext)
+end
+
+-- Get transition data for a phase
+function PhaseFlow:getTransitionData(phase)
+  local phaseConfig = self[phase]
+  if phaseConfig and phaseConfig.transitionData then
+    return phaseConfig.transitionData
+  end
+  return {}
+end
+
+-- Get all possible next phases for a given phase
+function PhaseFlow:getPossibleTransitions(phase)
+  local phaseConfig = self[phase]
+  if phaseConfig and phaseConfig.canTransitionTo then
+    return phaseConfig.canTransitionTo
+  end
+  return {}
+end
