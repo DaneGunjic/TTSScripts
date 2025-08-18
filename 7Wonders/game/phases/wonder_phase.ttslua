@@ -3,42 +3,45 @@
 
 WonderPhase = {
   name = "WonderStage",
-  
+
   -- Phase lifecycle methods
   onEnter = function(self, context)
     EventSystem:emit("phase_entered", {
       phase = self.name,
       context = context
     })
-    
+
     -- Deal wonders to players
     self:dealWonders()
-    
+
     -- Update UI
     UIService:broadcastToAllPlayers("Select your Wonder!", "Yellow")
     UIService:updatePhaseUI(self.name)
-    
+
     -- Unready all players for wonder selection
     PlayerService:unreadyAllPlayers()
   end,
-  
+
   onExit = function(self, context)
     EventSystem:emit("phase_exited", {
       phase = self.name,
       context = context
     })
   end,
-  
+
   onUpdate = function(self, context)
+    print("Wonder Phase: onUpdate")
     -- Check if all players are ready to proceed
     if PlayerService:areAllPlayersReady() then
+      print("PlayerService:areAllPlayersReady is true")
       local nextPhase = PhaseFlow:getNextPhase(self.name, context)
+      print(nextPhase)
       if nextPhase then
         GameStateMachine:transition(nextPhase)
       end
     end
   end,
-  
+
   -- Deal wonders to players
   dealWonders = function(self)
     -- Use existing wonder manager if available
@@ -48,18 +51,18 @@ WonderPhase = {
       -- Fallback wonder dealing logic
       self:dealWondersManually()
     end
-    
+
     EventSystem:emit("wonders_dealt")
   end,
-  
+
   -- Manual wonder dealing (fallback)
   dealWondersManually = function(self)
-    local players = PlayerService:getSeatedPlayers()
+    local players = getSeatedPlayers()
     local wonderGuids = self:getWonderGuids()
-    
+
     -- Shuffle wonders
     self:shuffleTable(wonderGuids)
-    
+
     -- Deal one wonder to each player
     for i, player in ipairs(players) do
       if wonderGuids[i] then
@@ -70,63 +73,63 @@ WonderPhase = {
       end
     end
   end,
-  
+
   -- Get wonder GUIDs (this would be populated from actual config)
   getWonderGuids = function(self)
     -- This would come from the deck configuration
     -- For now, return empty table as placeholder
     return {}
   end,
-  
+
   -- Assign a wonder to a player
   assignWonderToPlayer = function(self, wonder, player, playerIndex)
     if not wonder then return end
-    
+
     -- Get player position
     local wonderPos = self:getWonderPosition(playerIndex)
     if wonderPos then
       wonder.setPosition(wonderPos)
       wonder.setRotation({0, self:getPlayerRotation(playerIndex), 0})
     end
-    
+
     -- Store wonder assignment in game context
-    GameContext:setPlayerWonder(player, wonder)
+    GameContext:setPlayerWonderObject(player, wonder)
     GameContext:setPlayerWonderStage(player, 0)
-    
+
     -- Update UI
     -- Player wonder UI updates are handled by in-game objects, not UIService
-    
+
     EventSystem:emit("wonder_assigned", {
       player = player,
       wonder = wonder,
       playerIndex = playerIndex
     })
   end,
-  
+
   -- Get wonder position for player index
   getWonderPosition = function(self, playerIndex)
     -- Use existing position data if available
     if WonderPos and WonderPos[playerIndex] then
       return WonderPos[playerIndex]
     end
-    
+
     -- Fallback positioning logic
     local basePos = {0, 1, 0}
     local angle = (playerIndex - 1) * (360 / 7) -- Assume max 7 players
     local radius = 15
-    
+
     return {
       basePos[1] + math.cos(math.rad(angle)) * radius,
       basePos[2],
       basePos[3] + math.sin(math.rad(angle)) * radius
     }
   end,
-  
+
   -- Get player rotation for wonder
   getPlayerRotation = function(self, playerIndex)
     return (playerIndex - 1) * (360 / 7)
   end,
-  
+
   -- Shuffle table utility
   shuffleTable = function(self, tbl)
     for i = #tbl, 2, -1 do
@@ -134,44 +137,40 @@ WonderPhase = {
       tbl[i], tbl[j] = tbl[j], tbl[i]
     end
   end,
-  
+
   -- Handle player ready for wonder selection
   handlePlayerReady = function(self, player)
-    GameContext:setPlayerReady(player, true)
-    
-    EventSystem:emit("player_ready_wonder", {
-      player = player,
-      phase = self.name
-    })
-    
+    print("Wonder Phase: handlePlayerReady " .. player.steam_name)
+
     -- Check if we can transition
     self:onUpdate(GameContext)
   end,
-  
+
   -- Handle player unready
   handlePlayerUnready = function(self, player)
     GameContext:setPlayerReady(player, false)
-    
+
     EventSystem:emit("player_unready_wonder", {
       player = player,
       phase = self.name
     })
   end,
-  
+
   -- Get current wonder for a player
   getPlayerWonder = function(self, player)
     return GameContext:getPlayerWonder(player)
   end,
-  
+
   -- Check if player has selected a wonder
   hasPlayerSelectedWonder = function(self, player)
     return self:getPlayerWonder(player) ~= nil
   end,
-  
+
   -- Validate wonder selection
   validateWonderSelection = function(self, player, wonder)
+    print("Validate wonder selection")
     -- Check if wonder is already taken
-    local players = PlayerService:getSeatedPlayers()
+    local players = getSeatedPlayers()
     for _, otherPlayer in ipairs(players) do
       if otherPlayer ~= player then
         local otherWonder = self:getPlayerWonder(otherPlayer)
@@ -180,10 +179,10 @@ WonderPhase = {
         end
       end
     end
-    
+
     return true, "Wonder selection valid"
   end,
-  
+
   -- Force transition to next phase (admin function)
   forceTransition = function(self)
     local nextPhase = PhaseFlow:getNextPhase(self.name, GameContext)
@@ -192,19 +191,20 @@ WonderPhase = {
       GameStateMachine:transition(nextPhase)
     end
   end,
-  
+
   -- Get phase status
   getStatus = function(self)
-    local players = PlayerService:getSeatedPlayers()
+    print("get Status")
+    local players = getSeatedPlayers()
     local readyCount = PlayerService:getReadyPlayerCount()
     local wondersAssigned = 0
-    
+
     for _, player in ipairs(players) do
       if self:hasPlayerSelectedWonder(player) then
         wondersAssigned = wondersAssigned + 1
       end
     end
-    
+
     return {
       phase = self.name,
       totalPlayers = #players,
@@ -217,11 +217,13 @@ WonderPhase = {
 
 -- Register event listeners
 EventSystem:on("player_ready_changed", function(data)
+  print("EventSystem: on player_ready_changed " .. WonderPhase.name .. " " .. tostring(data.ready))
+  print(GameStateMachine:getCurrentState())
   if GameStateMachine:getCurrentState() == WonderPhase.name then
-    if data.isReady then
-      WonderPhase:handlePlayerReady(data.player)
+    if data.ready then
+      WonderPhase:handlePlayerReady(data.color)
     else
-      WonderPhase:handlePlayerUnready(data.player)
+      WonderPhase:handlePlayerUnready(data.color)
     end
   end
 end)
@@ -236,3 +238,9 @@ EventSystem:on("wonder_selected", function(data)
     end
   end
 end)
+
+-- Listen for wonders_dealt event to transition to WonderStage
+  EventSystem:on("wonders_dealt", function()
+    print("Wonders dealt - transitioning to WonderStage")
+    GameStateMachine:transition("WonderStage")
+  end)

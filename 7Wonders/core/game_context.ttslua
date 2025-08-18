@@ -12,7 +12,7 @@ GameContext = {
     ships = {},
     wonderObjects = {}
   },
-  
+
   -- Phase state
   phases = {
     current = "Setup",
@@ -22,7 +22,7 @@ GameContext = {
       maximum = 0
     }
   },
-  
+
   -- Game objects
   objects = {
     setupBoard = nil,
@@ -31,7 +31,7 @@ GameContext = {
     wonderBags = {},
     shipBags = {}
   },
-  
+
   -- Configuration
   config = {
     expansions = {},
@@ -39,7 +39,7 @@ GameContext = {
     randomWonders = true,
     draftMode = false
   },
-  
+
   -- UI state
   ui = {
     currentPhase = "",
@@ -57,26 +57,26 @@ function GameContext:initialize()
   self.players.cardHolders = {}
   self.players.ships = {}
   self.players.wonderObjects = {}
-  
+
   self.phases.current = "Setup"
   self.phases.previous = nil
   self.phases.passes.current = 0
   self.phases.passes.maximum = 0
-  
+
   -- Copy expansion config
   if ExpansionConfig then
     self.config.expansions = ExpansionConfig
   end
-  
+
   -- Copy game mode config
   if GameModeConfig then
     self.config.gameMode = GameModeConfig
   end
-  
+
   -- Initialize configuration from defaults
   self.config.randomWonders = true
   self.config.draftMode = false
-  
+
   EventSystem:emit("game_context_initialized", self)
 end
 
@@ -84,14 +84,14 @@ end
 function GameContext:setSeatedPlayers(players)
   self.players.seated = players
   self.players.count = #players
-  
+
   -- Initialize ready state for all players
   for _, color in ipairs(players) do
     self.players.ready[color] = false
   end
-  
 
-  
+
+
   EventSystem:emit("players_seated", {
     players = players,
     count = #players
@@ -99,15 +99,18 @@ function GameContext:setSeatedPlayers(players)
 end
 
 function GameContext:setPlayerReady(color, ready)
+
   if self.players.ready[color] ~= ready then
     self.players.ready[color] = ready
-    
+
     -- Update ready count
     local readyCount = 0
     for _, isReady in pairs(self.players.ready) do
       if isReady then readyCount = readyCount + 1 end
     end
-    
+
+    print("readyCount is " .. readyCount)
+
     EventSystem:emit("player_ready_changed", {
       color = color,
       ready = ready,
@@ -134,25 +137,30 @@ function GameContext:unreadyAllPlayers()
     self.players.ready[color] = false
   end
 
-  
+
   EventSystem:emit("all_players_unready", {})
 end
 
 -- Action management
 function GameContext:setPlayerAction(color, action)
   self.players.selectedActions[color] = action
-  
 
-  
   EventSystem:emit("player_action_selected", {
     color = color,
     action = action
   })
 end
 
+function GameContext:getPlayerAction(color)
+  return self.players.selectedActions[color]
+end
+
 function GameContext:clearPlayerAction(color)
   self.players.selectedActions[color] = nil
+end
 
+function GameContext:clearAllPlayerActions()
+  self.players.selectedActions = {}
 end
 
 function GameContext:haveAllPlayersSelectedActions()
@@ -164,18 +172,67 @@ function GameContext:haveAllPlayersSelectedActions()
   return true
 end
 
+-- Player data management
+function GameContext:initializePlayerData(color)
+  if not self.players.coins then self.players.coins = {} end
+  if not self.players.wonders then self.players.wonders = {} end
+  if not self.players.wonderStages then self.players.wonderStages = {} end
+  if not self.players.cards then self.players.cards = {} end
+  
+  self.players.coins[color] = self.players.coins[color] or 3
+  self.players.cards[color] = self.players.cards[color] or {}
+end
+
+function GameContext:getPlayerCoins(color)
+  return self.players.coins and self.players.coins[color] or 0
+end
+
+function GameContext:setPlayerCoins(color, amount)
+  if not self.players.coins then self.players.coins = {} end
+  self.players.coins[color] = amount
+end
+
+function GameContext:addCoinsToPlayer(color, amount)
+  if not self.players.coins then self.players.coins = {} end
+  self.players.coins[color] = (self.players.coins[color] or 0) + amount
+end
+
+function GameContext:getPlayerWonder(color)
+  return self.players.wonders and self.players.wonders[color]
+end
+
+function GameContext:setPlayerWonder(color, wonder)
+  if not self.players.wonders then self.players.wonders = {} end
+  self.players.wonders[color] = wonder
+end
+
+function GameContext:getPlayerWonderStage(color)
+  return self.players.wonderStages and self.players.wonderStages[color] or 0
+end
+
+function GameContext:setPlayerWonderStage(color, stage)
+  if not self.players.wonderStages then self.players.wonderStages = {} end
+  self.players.wonderStages[color] = stage
+end
+
+function GameContext:addCardToPlayer(color, card)
+  if not self.players.cards then self.players.cards = {} end
+  if not self.players.cards[color] then self.players.cards[color] = {} end
+  table.insert(self.players.cards[color], card)
+end
+
 -- Phase management
 function GameContext:setPhase(phase, description)
   self.phases.previous = self.phases.current
   self.phases.current = phase
-  
+
   if description then
     self.ui.currentPhase = phase
     self.ui.phaseDescription = description
   end
-  
 
-  
+
+
   EventSystem:emit("phase_changed", {
     current = phase,
     previous = self.phases.previous,
@@ -183,12 +240,16 @@ function GameContext:setPhase(phase, description)
   })
 end
 
+function GameContext:getCurrentPhase()
+  return self.currentPhase and self.currentPhase.name or "unknown"
+end
+
 function GameContext:setPasses(current, maximum)
   self.phases.passes.current = current
   self.phases.passes.maximum = maximum
-  
 
-  
+
+
   EventSystem:emit("passes_updated", {
     current = current,
     maximum = maximum
@@ -198,7 +259,7 @@ end
 -- Object management
 function GameContext:setPlayerCardHolder(color, data)
   self.players.cardHolders[color] = data
-  
+
 
 end
 
@@ -207,11 +268,12 @@ function GameContext:setPlayerShip(color, shipColor, shipObject)
     self.players.ships[color] = {}
   end
   self.players.ships[color][shipColor] = shipObject
-  
+
 
 end
 
-function GameContext:setPlayerWonder(color, wonderObject)
+function GameContext:setPlayerWonderObject(color, wonderObject)
+  if not self.players.wonderObjects then self.players.wonderObjects = {} end
   self.players.wonderObjects[color] = wonderObject
 end
 

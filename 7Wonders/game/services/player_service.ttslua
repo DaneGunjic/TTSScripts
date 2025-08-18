@@ -5,86 +5,85 @@ PlayerService = {
   -- Initialize the player service
   init = function(self)
     EventSystem:on("player_ready_changed", function(data)
-      self:handlePlayerReadyChange(data.player, data.isReady)
+      -- GameContext already handles the ready state change
+      -- This listener is for additional processing if needed
+      local readyCount = self:getReadyPlayerCount()
+      local totalPlayers = #getSeatedPlayers()
+
+      EventSystem:emit("ready_count_changed", {
+        readyCount = readyCount,
+        totalPlayers = totalPlayers,
+        allReady = readyCount == totalPlayers
+      })
+
+      -- Check if all players are ready
+      if readyCount == totalPlayers then
+        EventSystem:emit("all_players_ready")
+      end
     end)
-    
+
     EventSystem:on("player_action_selected", function(data)
       self:handlePlayerActionSelection(data.player, data.action, data.card)
     end)
-    
+
     EventSystem:on("game_started", function()
       self:initializePlayers()
     end)
   end,
-  
+
   -- Initialize all players at game start
   initializePlayers = function(self)
-    local seatedPlayers = self:getSeatedPlayers()
-    
+    local seatedPlayers = getSeatedPlayers()
+
     for _, player in ipairs(seatedPlayers) do
       self:initializePlayer(player)
     end
-    
-    GameContext:setPlayerCount(#seatedPlayers)
-    
+
+    GameContext:setSeatedPlayers(seatedPlayers)
+
     EventSystem:emit("players_initialized", {
       playerCount = #seatedPlayers,
       players = seatedPlayers
     })
   end,
-  
+
   -- Initialize a single player
   initializePlayer = function(self, player)
     -- Set initial coins
     GameContext:setPlayerCoins(player, GameRules.players.defaultCoins)
-    
+
     -- Clear any existing state
     GameContext:setPlayerReady(player, false)
     GameContext:clearPlayerAction(player)
-    
+
     -- Initialize player-specific data
     GameContext:initializePlayerData(player)
-    
+
     EventSystem:emit("player_initialized", {
       player = player,
       initialCoins = GameRules.players.defaultCoins
     })
   end,
-  
-  -- Get all seated players
-  getSeatedPlayers = function(self)
-    local players = {}
-    
-    local allColors = Player.getColors()
-    for _, color in ipairs(allColors) do
-      local player = Player[color]
-      if player and player.seated then
-        table.insert(players, color)
-      end
-    end
-    
-    return players
-  end,
-  
+
   -- Handle player ready state change
   handlePlayerReadyChange = function(self, player, isReady)
     GameContext:setPlayerReady(player, isReady)
-    
+
     local readyCount = self:getReadyPlayerCount()
-    local totalPlayers = GameContext:getPlayerCount()
-    
+    local totalPlayers = #getSeatedPlayers()
+
     EventSystem:emit("ready_count_changed", {
       readyCount = readyCount,
       totalPlayers = totalPlayers,
       allReady = readyCount == totalPlayers
     })
-    
+
     -- Check if all players are ready
     if readyCount == totalPlayers then
       EventSystem:emit("all_players_ready")
     end
   end,
-  
+
   -- Handle player action selection
   handlePlayerActionSelection = function(self, player, action, card)
     GameContext:setPlayerAction(player, {
@@ -92,10 +91,10 @@ PlayerService = {
       card = card,
       timestamp = os.time()
     })
-    
+
     local actionsSelected = self:getPlayersWithActionsCount()
-    local totalPlayers = GameContext:getPlayerCount()
-    
+    local totalPlayers = #getSeatedPlayers()
+
     EventSystem:emit("action_selection_changed", {
       player = player,
       action = action,
@@ -104,93 +103,84 @@ PlayerService = {
       totalPlayers = totalPlayers,
       allSelected = actionsSelected == totalPlayers
     })
-    
+
     -- Check if all players have selected actions
     if actionsSelected == totalPlayers then
       EventSystem:emit("all_players_selected_actions")
     end
   end,
-  
+
   -- Get count of ready players
   getReadyPlayerCount = function(self)
-    local count = 0
-    local players = self:getSeatedPlayers()
-    
-    for _, player in ipairs(players) do
-      if GameContext:isPlayerReady(player) then
-        count = count + 1
-      end
-    end
-    
-    return count
+    return GameContext:getReadyCount()
   end,
-  
+
   -- Get count of players who have selected actions
   getPlayersWithActionsCount = function(self)
     local count = 0
-    local players = self:getSeatedPlayers()
-    
+    local players = getSeatedPlayers()
+
     for _, player in ipairs(players) do
       if GameContext:getPlayerAction(player) then
         count = count + 1
       end
     end
-    
+
     return count
   end,
-  
+
   -- Check if all players are ready
   areAllPlayersReady = function(self)
     local readyCount = self:getReadyPlayerCount()
-    local totalPlayers = GameContext:getPlayerCount()
+    local totalPlayers = #getSeatedPlayers()
     return readyCount == totalPlayers and totalPlayers > 0
   end,
-  
+
   -- Check if all players have selected actions
   haveAllPlayersSelectedActions = function(self)
     local actionsSelected = self:getPlayersWithActionsCount()
-    local totalPlayers = GameContext:getPlayerCount()
+    local totalPlayers = #getSeatedPlayers()
     return actionsSelected == totalPlayers and totalPlayers > 0
   end,
-  
+
   -- Unready all players
   unreadyAllPlayers = function(self)
-    local players = self:getSeatedPlayers()
-    
+    local players = getSeatedPlayers()
+
     for _, player in ipairs(players) do
       GameContext:setPlayerReady(player, false)
     end
-    
+
     EventSystem:emit("all_players_unreadied", {
       playerCount = #players
     })
   end,
-  
+
   -- Clear all player actions
   clearAllPlayerActions = function(self)
-    local players = self:getSeatedPlayers()
-    
+    local players = getSeatedPlayers()
+
     for _, player in ipairs(players) do
       GameContext:clearPlayerAction(player)
     end
-    
+
     EventSystem:emit("all_player_actions_cleared", {
       playerCount = #players
     })
   end,
-  
+
   -- Add coins to a player
   addCoinsToPlayer = function(self, player, amount)
     local currentCoins = GameContext:getPlayerCoins(player) or 0
     local newAmount = currentCoins + amount
-    
+
     GameContext:setPlayerCoins(player, newAmount)
-    
+
     -- Visual effect for coin addition (if helpers exist)
     if AddCoins then
       AddCoins(player, amount)
     end
-    
+
     EventSystem:emit("player_coins_changed", {
       player = player,
       oldAmount = currentCoins,
@@ -198,49 +188,49 @@ PlayerService = {
       change = amount
     })
   end,
-  
+
   -- Spend player resources
   spendPlayerResources = function(self, player, resources)
     -- This would contain the actual resource spending logic
     -- For now, just emit an event
-    
+
     if SpendResources then
       SpendResources(player, resources)
     end
-    
+
     EventSystem:emit("player_resources_spent", {
       player = player,
       resources = resources
     })
   end,
-  
+
   -- Get player statistics
   getPlayerStats = function(self, player)
     return {
       coins = GameContext:getPlayerCoins(player) or 0,
-      isReady = GameContext:isPlayerReady(player) or false,
+      isReady = GameContext.players.ready[player] or false,
       hasSelectedAction = GameContext:getPlayerAction(player) ~= nil,
       wonder = GameContext:getPlayerWonder(player),
       wonderStage = GameContext:getPlayerWonderStage(player) or 0
     }
   end,
-  
+
   -- Get all player statistics
   getAllPlayerStats = function(self)
     local stats = {}
-    local players = self:getSeatedPlayers()
-    
+    local players = getSeatedPlayers()
+
     for _, player in ipairs(players) do
       stats[player] = self:getPlayerStats(player)
     end
-    
+
     return stats
   end,
-  
+
   -- Validate player count for game start
   validatePlayerCount = function(self)
-    local playerCount = GameContext:getPlayerCount()
-    
+    local playerCount = #getSeatedPlayers()
+
     if not GameRules:validatePlayerCount(playerCount) then
       EventSystem:emit("invalid_player_count", {
         current = playerCount,
@@ -249,16 +239,16 @@ PlayerService = {
       })
       return false
     end
-    
+
     return true
   end,
-  
+
   -- Get player color by index (for compatibility)
   getPlayerColor = function(self, index)
     if getPlayerColor then
       return getPlayerColor(index)
     end
-    
+
     -- Fallback color mapping
     local colors = {"White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue", "Purple", "Pink"}
     return colors[index] or "White"

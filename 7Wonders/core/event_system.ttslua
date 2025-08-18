@@ -3,7 +3,7 @@
 
 EventSystem = {
   listeners = {},
-  debug = false
+  debug = true
 }
 
 -- Register a callback for a specific event
@@ -11,19 +11,19 @@ function EventSystem:on(eventName, callback, priority)
   if not self.listeners[eventName] then
     self.listeners[eventName] = {}
   end
-  
+
   local listener = {
     callback = callback,
     priority = priority or 0
   }
-  
+
   table.insert(self.listeners[eventName], listener)
-  
+
   -- Sort by priority (higher priority first)
   table.sort(self.listeners[eventName], function(a, b)
     return a.priority > b.priority
   end)
-  
+
   if self.debug then
     print("[EventSystem] Registered listener for event: " .. eventName)
   end
@@ -32,7 +32,7 @@ end
 -- Remove a specific callback for an event
 function EventSystem:off(eventName, callback)
   if not self.listeners[eventName] then return end
-  
+
   for i = #self.listeners[eventName], 1, -1 do
     if self.listeners[eventName][i].callback == callback then
       table.remove(self.listeners[eventName], i)
@@ -49,7 +49,7 @@ function EventSystem:emit(eventName, data)
   if self.debug then
     print("[EventSystem] Emitting event: " .. eventName)
   end
-  
+
   if self.listeners[eventName] then
     for _, listener in ipairs(self.listeners[eventName]) do
       local success, result = pcall(listener.callback, data)

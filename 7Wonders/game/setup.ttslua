@@ -5,18 +5,18 @@ function HandleStartGameButtonCo()
 	if ExpansionConfig then
 		GameContext.config.expansions = ExpansionConfig
 	end
-	
+
 	if GameModeConfig then
 		GameContext.config.gameMode = GameModeConfig
 	end
-	
+
 	-- Update game mode settings
 	GameContext.config.randomWonders = RandomWonders
 	GameContext.config.draftMode = DraftMode
-	
+
 	-- Emit event that configuration has been finalized
 	EventSystem:emit("game_config_finalized", GameContext.config)
-	
+
 	-- Reinitialize GameRules with updated configuration
 	GameRules:initializeFromConfig()
 
@@ -476,31 +476,13 @@ function HandleStartGameButtonCo()
 	end
 
 	-- [[DEAL WONDERS]]
-	DealWonders()
-	print("DealWonders done")
+	-- DealWonders()
+
+	-- Emit wonders_dealt event to trigger phase transition
+	EventSystem:emit("wonders_dealt")
+
 	-- [[DEAL RANDOM ARMADA BOARDS AND SHIPS]]
 	DealArmada()
-	print("DealArmada done")
-	-- Move all the bags into position
-	-- CoinBag1.setPosition(CoinBag1Position)
-	-- CoinBag3.setPosition(CoinBag3Position)
-	-- CoinBag6.setPosition(CoinBag6Position)
-	-- ConflictToken1.setPosition(ConflictToken1Position)
-	-- ConflictToken3.setPosition(ConflictToken3Position)
-	-- ConflictToken5.setPosition(ConflictToken5Position)
-	-- ConflictToken7.setPosition(ConflictToken7Position)
-	-- ConflictTokenDefeat.setPosition(ConflictTokenDefeatPosition)
-	-- BoardingToken.setPosition(BoardingTokenPosition)
-	-- DiplomacyToken.setPosition(DiplomacyTokenPosition)
-	-- NavalVictoryToken1.setPosition(NavalVictoryToken1Position)
-	-- NavalVictoryToken3.setPosition(NavalVictoryToken3Position)
-	-- NavalVictoryToken5.setPosition(NavalVictoryToken5Position)
-	-- NavalVictoryToken7.setPosition(NavalVictoryToken7Position)
-	-- NavalDefeatToken1.setPosition(NavalDefeatToken1Position)
-	-- NavalDefeatToken2.setPosition(NavalDefeatToken2Position)
-	-- NavalDefeatToken3.setPosition(NavalDefeatToken3Position)
-	-- Debt1Token.setPosition(Debt1TokenPosition)
-	-- Debt5Token.setPosition(Debt5TokenPosition)
 
 	-- Play a sound
 	MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})

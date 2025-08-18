@@ -45,7 +45,7 @@ AgePhase = {
     end,
     
     startNewAge = function(self)
-      local playerCount = GameContext:getPlayerCount()
+      local playerCount = #getSeatedPlayers()
       
       -- Initialize pass tracking
       GameContext.phases.passes.current = 0
@@ -116,7 +116,7 @@ AgePhase = {
     end,
     
     startNewAge = function(self)
-      local playerCount = GameContext:getPlayerCount()
+      local playerCount = #getSeatedPlayers()
       
       GameContext.phases.passes.current = 0
       GameContext.phases.passes.maximum = GameRules:getPassesPerAge(playerCount)
@@ -185,7 +185,7 @@ AgePhase = {
     end,
     
     startNewAge = function(self)
-      local playerCount = GameContext:getPlayerCount()
+      local playerCount = #getSeatedPlayers()
       
       GameContext.phases.passes.current = 0
       GameContext.phases.passes.maximum = GameRules:getPassesPerAge(playerCount)

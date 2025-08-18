@@ -10,19 +10,9 @@ function UnreadyAllPlayers()
 	NumberOfReadyPlayers = 0
 end
 
--- Called when a player pressed the "Ready" button
 function ReadyUp(player)
 	-- Update player readiness using GameContext
 	GameContext:setPlayerReady(player.color, not ReadyList[player.color])
-
-	-- Emit event for UI updates and phase transitions
-	EventSystem:emit("player_ready_changed", {
-		playerColor = player.color,
-		playerName = player.steam_name,
-		isReady = ReadyList[player.color],
-		readyCount = NumberOfReadyPlayers,
-		totalPlayers = #AllSeatedPlayers
-	})
 end
 
 function CreateActionButtons(tile)

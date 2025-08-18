@@ -97,7 +97,7 @@ CardService = {
   
   -- Resolve all player actions
   resolveAllPlayerActions = function(self)
-    local players = GameContext:getSeatedPlayers()
+    local players = getSeatedPlayers()
     
     for _, player in ipairs(players) do
       local action = GameContext:getPlayerAction(player)

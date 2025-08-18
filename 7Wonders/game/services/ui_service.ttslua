@@ -55,7 +55,7 @@ UIService = {
       broadcastToAll(message, color)
     else
       -- Fallback: send to each player individually
-      for _, player in ipairs(PlayerService:getSeatedPlayers()) do
+      for _, player in ipairs(getSeatedPlayers()) do
         self:showPlayerNotification(player, message, color)
       end
     end
