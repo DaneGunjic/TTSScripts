@@ -51,8 +51,6 @@ WonderPhase = {
       -- Fallback wonder dealing logic
       self:dealWondersManually()
     end
-
-    EventSystem:emit("wonders_dealt")
   end,
 
   -- Manual wonder dealing (fallback)
