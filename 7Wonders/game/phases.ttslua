@@ -99,7 +99,7 @@ PhaseHandlers = {
 }
 
 function TransitionPhase()
-  if NumberOfReadyPlayers == #Player.getPlayers() then
+  if NumberOfReadyPlayers == NumberOfPlayers() then
     MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
     MusicPlayer.pause()
     local current = PhaseHandlers[GameState]
