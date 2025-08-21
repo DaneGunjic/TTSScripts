@@ -29,7 +29,7 @@ local PhaseConfig = {
       end,
       ["Age1->ConflictResolution"] = function()
         broadcastToAll("Conflict resolution!", {r=1, g=0.5, b=0.5})
-
+        CreateReadyButtons()
       end,
       ["ConflictResolution->NavalCombat"] = function()
 

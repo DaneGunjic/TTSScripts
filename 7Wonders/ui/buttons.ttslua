@@ -451,7 +451,7 @@ function HandleBuildWonder(obj, color, alt)
 
 	-- Verify permission
 	if color:lower() ~= tileColor:lower() then
-		broadcastToColor("This isn't your button!", player_clicker_color, {1,0,0})
+		broadcastToColor("This isn't your button!", color, {1,0,0})
 		return  -- Exit function if wrong player
 	end
 
@@ -471,7 +471,7 @@ function HandleArmadaSellCard(obj, color, alt)
 
 	-- Verify permission
 	if color:lower() ~= tileColor:lower() then
-		broadcastToColor("This isn't your button!", player_clicker_color, {1,0,0})
+		broadcastToColor("This isn't your button!", color, {1,0,0})
 		return  -- Exit function if wrong player
 	end
 
