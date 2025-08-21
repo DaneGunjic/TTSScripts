@@ -28,8 +28,25 @@ local PhaseConfig = {
       	DoAge3Stage()
       end,
       ["Age1->ConflictResolution"] = function()
+        CurrentPasses = 0
+        MaximumPasses = 0
         broadcastToAll("Conflict resolution!", {r=1, g=0.5, b=0.5})
         CreateReadyButtons()
+        updatePhaseUI("Phase: Conflict", "Take victiroy/defeat tokens")
+
+        if ExpansionConfig.Armada then
+          PhaseHandlers[GameState].PhaseBeforeResolving = "ConflictResolution"
+          PhaseHandlers[GameState].PhaseAfterResolving = "NavalCombat"
+        elseif ExpansionConfig.Leaders.Base then
+          PhaseHandlers[GameState].PhaseBeforeResolving = "ConflictResolution"
+          PhaseHandlers[GameState].PhaseAfterResolving = "LeaderSelectionStage"
+        else
+          PhaseHandlers[GameState].PhaseBeforeResolving = "ConflictResolution"
+          PhaseHandlers[GameState].PhaseAfterResolving = "Age2"
+        end
+      end,
+      ["ConflictResolution->LeaderSelectionStage"] = function()
+
       end,
       ["ConflictResolution->NavalCombat"] = function()
 
@@ -196,7 +213,9 @@ PhaseHandlers = {
     end
   },
 
-  ConflictResolution = {},
+  ConflictResolution = {
+
+  },
 
   NavalCombat = {},
 }
