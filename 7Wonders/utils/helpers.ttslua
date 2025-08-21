@@ -46,6 +46,19 @@ function AddCoins(color, amount, skip_message)
 	end
 end
 
+function DiscardPlayerHands()
+	for _, color in ipairs(getSeatedPlayers()) do
+		local objects = Player[color].getHandObjects()
+		for _, obj in ipairs(objects) do
+			if obj.type == 'Card' then
+			discardZone = DeckZones.Discard
+			obj.setPosition(discardZone.getPosition())
+			obj.setRotation(discardZone.getRotation() + vector(0, 0, 180))
+			end
+		end
+	end
+end
+
 function SpendResources(color, cost)
     -- Resource deduction logic
 end

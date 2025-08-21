@@ -28,6 +28,7 @@ local PhaseConfig = {
       	DoAge3Stage()
       end,
       ["Age1->ConflictResolution"] = function()
+        broadcastToAll("Conflict resolution!", {r=1, g=0.5, b=0.5})
 
       end,
       ["ConflictResolution->NavalCombat"] = function()
@@ -61,6 +62,8 @@ PhaseHandlers = {
       -- Execute transition based on phase combination
       local transitionKey = self.PhaseBeforeResolving .. "->" .. self.PhaseAfterResolving
       local config = PhaseConfig.ResolveCardAction
+
+      print("new PhaseBeforeResolving: " .. self.PhaseBeforeResolving .. " new PhaseAfterResolving: " .. self.PhaseAfterResolving)
 
       if config.transitions[transitionKey] then
         config.transitions[transitionKey]()
@@ -135,8 +138,12 @@ PhaseHandlers = {
     name = "Age 1",
     description = "Select a card to play",
     next = function()
-      -- afterPhase Should change based on current/maximum passes
-      PhaseHandlers.Age1:transitionToCardAction("Age1", "Age1")
+      if CurrentPasses >= MaximumPasses then
+        PhaseHandlers.Age1:transitionToCardAction("ConflictResolution", "Age1")
+        DiscardPlayerHands()
+      else
+        PhaseHandlers.Age1:transitionToCardAction("Age1", "Age1")
+      end
     end,
 
     transitionToCardAction = function(self, afterPhase, beforePhase)
@@ -452,7 +459,6 @@ function PrepareAge1Stage()
   -- Runs only once
   -- Initialize Age 1 phase
   GameState = "Age1"
-  updatePhaseUI("Phase: Age 1", string.format("Select 1 card to play\n%d/%d", CurrentPasses, MaximumPasses))
 
   -- Calculate maximum passes based on expansions
   CurrentPasses = 0
@@ -463,6 +469,8 @@ function PrepareAge1Stage()
   if ExpansionConfig.Armada then
     MaximumPasses = MaximumPasses + 1
   end
+
+  updatePhaseUI("Phase: Age 1", string.format("Select 1 card to play\n%d/%d", CurrentPasses, MaximumPasses))
 
   -- Deal Age 1 cards
   local age1Deck = DeckZones.Age.Age1.getObjects()
