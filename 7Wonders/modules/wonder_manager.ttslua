@@ -5,7 +5,7 @@ function DealWonders()
 
 	-- Random Wonders
 	if RandomWonders then
-		for _, player in ipairs(AllSeatedPlayers) do
+		for _, player in ipairs(getSeatedPlayers()) do
 			RandomWonderObj[player] = WonderBags.Base.takeObject({
 				position = PlayerInfo[player].WonderPos,
 				rotation = PlayerInfo[player].ComponentRotation,
@@ -29,7 +29,7 @@ function DealWonders()
 		end
 	-- Draft Wonders
 	elseif DraftMode then
-		for _, player in ipairs(AllSeatedPlayers) do
+		for _, player in ipairs(getSeatedPlayers()) do
 			print("color: " .. player)
 			for i = 1, DraftModeNumber do
 				DraftWonders[player][i] = WonderBags.Base.takeObject({
@@ -71,7 +71,7 @@ function DealWonders()
 	end
 
 	-- [[SET CAMERA POSITIONS]]
-	for _, color in ipairs(AllSeatedPlayers) do
+	for _, color in ipairs(getSeatedPlayers()) do
     -- Verify the player exists in CameraSettings
     if CameraSettings[color] then
       -- Safely get the wonder position (assuming it exists in _G)

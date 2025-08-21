@@ -1,139 +1,277 @@
-PhaseHandlers = {
+local PhaseConfig = {
   ResolveCardAction = {
-    next = function(self)
-      for _, color in ipairs(AllSeatedPlayers) do
-        local wonder = GetPlayerCurrentWonder(color)
-        if wonder then
-          print("GONNA CLEAR ALL READY BUTTONS NOW")
-          wonder.clearButtons()
-        end
-      end
-
-      print(self.PhaseAfterResolving .. self.PhaseBeforeResolving)
-      if self.PhaseAfterResolving == "Age1" and self.PhaseBeforeResolving == "LeaderSelectionStage" then
-        print("PrepareAge1Stage now?")
-        -- We resolved the leader action, we can start age 1
-        for _, color in ipairs(AllSeatedPlayers) do
+    name = "Card Action Resolution",
+    description = "Resolve your card action",
+    transitions = {
+      ["LeaderSelectionStage->Age1"] = function()
+        -- Move cards from hands to card holders before starting Age1
+        for _, color in ipairs(getSeatedPlayers()) do
           local data = PlayerCardHolder[color]
           if data and data.Zone and data.Tile then
             local objects = Player[color].getHandObjects()
             local tile = data.Tile
             for _, obj in ipairs(objects) do
-              -- This moves all card from player hands to left from their card holder
               obj.setRotation(tile.getRotation() + vector(0, 0, 180))
               obj.setPosition(tile.getPosition() + tile.getTransformRight() * 3)
             end
           end
         end
-        Wait.time(function()
-          PrepareAge1Stage()
-        end, 0.1)
-      elseif self.PhaseAfterResolving == self.PhaseBeforeResolving and self.PhaseAfterResolving == "Age1" then
-        print("Continue age 1 now?")
-        -- Continue age 1?
+        Wait.time(PrepareAge1Stage, 0.1)
+      end,
+      ["Age1->Age1"] = function()
+      	DoAge1Stage()
+      end,
+      ["Age2->Age2"] = function()
+      	DoAge2Stage()
+      end,
+      ["Age3->Age3"] = function()
+      	DoAge3Stage()
+      end,
+      ["Age1->ConflictResolution"] = function()
+
+      end,
+      ["ConflictResolution->NavalCombat"] = function()
+
+      end,
+      ["NavalCombat->Age2"] = function()
+
+      end,
+      ["ConflictResolution->Age2"] = function()
+
+      end,
+      ["Age2->ConflictResolution"] = function()
+
       end
-    end, -- End of the 'next' function
-    PhaseAfterResolving  = "",
+    }
+  }
+}
+
+PhaseHandlers = {
+  ResolveCardAction = {
+    name = "Resolve Card Action",
+    next = function(self)
+      -- Clear wonder buttons
+      for _, color in ipairs(getSeatedPlayers()) do
+        local wonder = GetPlayerCurrentWonder(color)
+        if wonder then
+          wonder.clearButtons()
+        end
+      end
+
+      -- Execute transition based on phase combination
+      local transitionKey = self.PhaseBeforeResolving .. "->" .. self.PhaseAfterResolving
+      local config = PhaseConfig.ResolveCardAction
+
+      if config.transitions[transitionKey] then
+        config.transitions[transitionKey]()
+      else
+        print("No transition defined for: " .. transitionKey)
+      end
+    end,
+    PhaseAfterResolving = "",
     PhaseBeforeResolving = ""
   },
   WonderStage = {
-    --action = FinishWonderStage,
+    name = "Wonder Selection",
+    description = "Select your wonder",
     next = function()
-      print("WonderStage next")
+      -- Currently only deals starting coins
       FinishWonderStage()
+
+      -- Determine next phase based on expansion configuration
       if ExpansionConfig.Leaders.Base then
         PrepareLeaderStage()
-        return "LeaderDrafting"
       else
         PrepareAge1Stage()
-        return "Age1"
       end
     end
   },
+
   LeaderDrafting = {
-    --action = DoLeaderStage,
+    name = "Leader Drafting",
+    description = "Draft leaders",
     next = function()
-      print("LeaderDrafting next")
+      -- Rotate and force take cards, update UI
       DoLeaderStage()
-      -- Check if the required number of passes is reached
-      if CurrentPasses == MaximumPasses then
-        -- Passed 3 times, now we have to choose 1 to play
-  			updatePhaseUI("Phase: Leader Selection", "Choose 1 Leader to play")
-        CurrentPasses = 0
-        MaximumPasses = 0
-  			Wait.time(function()
-  				-- After 0.1 take personal cards
-  				ForceTakePersonalCards()
-  				Wait.time(function()
-  					-- After 0.2 seconds change the game state
-  					-- This avoid buttons being created for a split second
-  					-- after ForceTakePersonalCards runs
-  					GameState = "LeaderSelectionStage"
-  				end, 0.1)
-  			end, 0.1)
+
+      -- Transition to leader selection after maximum passes
+      if CurrentPasses >= MaximumPasses then
+        PhaseHandlers.LeaderDrafting:transitionToLeaderSelection()
       end
+    end,
+
+    transitionToLeaderSelection = function(self)
+      updatePhaseUI("Phase: Leader Selection", "Choose 1 Leader to play")
+      CurrentPasses = 0
+      MaximumPasses = 0
+
+      Wait.time(function()
+        ForceTakePersonalCards()
+        Wait.time(function()
+          GameState = "LeaderSelectionStage"
+        end, 0.1)
+      end, 0.1)
     end
   },
+
   LeaderSelectionStage = {
+    name = "Leader Selection",
+    description = "Choose 1 Leader to play",
     next = function()
-      print("LeaderSelectionStage next")
+      PhaseHandlers.LeaderSelectionStage:transitionToCardAction("Age1", "LeaderSelectionStage")
+    end,
+
+    transitionToCardAction = function(self, afterPhase, beforePhase)
       GameState = "ResolveCardAction"
       updatePhaseUI("Phase: Card action", "Resolve your card action")
-      PhaseHandlers[GameState].PhaseAfterResolving = "Age1"
-      PhaseHandlers[GameState].PhaseBeforeResolving = "LeaderSelectionStage"
+      PhaseHandlers[GameState].PhaseAfterResolving = afterPhase
+      PhaseHandlers[GameState].PhaseBeforeResolving = beforePhase
       ResolvePlayerActions()
       CreateReadyButtons()
     end
   },
+
   Age1 = {
-    --action = PrepareAge1Stage,
+    name = "Age 1",
+    description = "Select a card to play",
     next = function()
-      print("Age 1 next")
+      -- afterPhase Should change based on current/maximum passes
+      PhaseHandlers.Age1:transitionToCardAction("Age1", "Age1")
+    end,
+
+    transitionToCardAction = function(self, afterPhase, beforePhase)
       GameState = "ResolveCardAction"
       updatePhaseUI("Phase: Card action", "Resolve your card action")
-      PhaseHandlers[GameState].PhaseAfterResolving = "Age1"
-      PhaseHandlers[GameState].PhaseBeforeResolving = "Age1"
+      PhaseHandlers[GameState].PhaseAfterResolving = afterPhase
+      PhaseHandlers[GameState].PhaseBeforeResolving = beforePhase
+      ResolvePlayerActions()
+      CreateReadyButtons()
     end
   },
-  -- Add more phases
+
+  Age2 = {
+    name = "Age 2",
+    description = "Select a card to play",
+    next = function()
+      -- afterPhase Should change based on current/maximum passes
+      PhaseHandlers.Age2:transitionToCardAction("Age2", "Age2")
+    end,
+
+    transitionToCardAction = function(self, afterPhase, beforePhase)
+      GameState = "ResolveCardAction"
+      updatePhaseUI("Phase: Card action", "Resolve your card action")
+      PhaseHandlers[GameState].PhaseAfterResolving = afterPhase
+      PhaseHandlers[GameState].PhaseBeforeResolving = beforePhase
+      ResolvePlayerActions()
+      CreateReadyButtons()
+    end
+  },
+
+  Age3 = {
+    name = "Age 3",
+    description = "Select a card to play",
+    next = function()
+      -- afterPhase Should change based on current/maximum passes
+      if CurrentPasses >= MaximumPasses then
+        PhaseHandlers.Age3:transitionToCardAction("ConflictResolution", "Age3")
+      else
+        PhaseHandlers.Age3:transitionToCardAction("Age3", "Age3")
+      end
+    end,
+
+    transitionToCardAction = function(self, afterPhase, beforePhase)
+      GameState = "ResolveCardAction"
+      updatePhaseUI("Phase: Card action", "Resolve your card action")
+      PhaseHandlers[GameState].PhaseAfterResolving = afterPhase
+      PhaseHandlers[GameState].PhaseBeforeResolving = beforePhase
+      ResolvePlayerActions()
+      CreateReadyButtons()
+    end
+  },
+
+  ConflictResolution = {},
+
+  NavalCombat = {},
 }
 
+local function validatePhaseHandler(phaseName)
+  local handler = PhaseHandlers[phaseName]
+  if not handler then
+    print("Error: No phase handler found for: " .. tostring(phaseName))
+    return false
+  end
+  if not handler.next then
+    print("Error: Phase handler missing 'next' function: " .. phaseName)
+    return false
+  end
+  return true
+end
+
+local function logPhaseTransition(fromPhase, toPhase)
+  print(string.format("Phase transition: %s -> %s", fromPhase or "Unknown", toPhase or "Unknown"))
+end
+
 function TransitionPhase()
-  if NumberOfReadyPlayers == NumberOfPlayers() then
-    MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
-    MusicPlayer.pause()
-    local current = PhaseHandlers[GameState]
-    if current then
-      print("Everyone is ready, calling " .. GameState .. " next")
-      current:next()
-      --current.action()
+  print(string.format("TransitionPhase: %d/%d players ready", NumberOfReadyPlayers, NumberOfPlayers))
+
+  if NumberOfReadyPlayers >= NumberOfPlayers then
+    -- Play ready sound
+    if MusicPlayer then
+      MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
+      MusicPlayer.pause()
+    end
+
+    print("TransitionPhase, GameState is " .. GameState)
+    local currentHandler = PhaseHandlers[GameState]
+    if validatePhaseHandler(GameState) then
+      local previousPhase = GameState
+      print("Calling " .. currentHandler.name .. "'s next function")
+      local nextPhase = currentHandler:next()
+
+      if nextPhase and nextPhase ~= GameState then
+        logPhaseTransition(previousPhase, nextPhase)
+        GameState = nextPhase
+      end
+
       UnreadyAllPlayers()
+    else
+      print("Error: Cannot transition from invalid phase: " .. tostring(GameState))
     end
   end
 end
 
 function ResolvePlayerActions()
   -- Verify all players have selected actions
-  for _, color in ipairs(AllSeatedPlayers) do
+  local seatedPlayers = getSeatedPlayers()
+
+  for _, color in ipairs(seatedPlayers) do
     if not PlayerSelectedAction[color] then
       broadcastToAll("Waiting for all players to choose actions")
       return false
     end
-
-  local action = PlayerSelectedAction[color]
-  print("chosen action is: " .. action)
-  if action == "Buy" then
-    ResolveBuyAction(color)
-	elseif action == "Sell" then
-    ResolveSellAction(color)
-	elseif action == "BuildWonder" then
-    ResolveBuildWonderAction(color)
-  elseif action == "ArmadaSell" then
-    ResolveArmadaSellAction(color)
   end
-end
 
-  PlayerSelectedAction[color] = nil
+  -- Execute all player actions
+  for _, color in ipairs(seatedPlayers) do
+    local action = PlayerSelectedAction[color]
+    print(string.format("%s selected action: %s", color, action))
+
+    local resolver = ActionResolvers[action]
+    print(resolver)
+    if resolver then
+      local success, error = pcall(resolver, color)
+      if not success then
+        print(string.format("Error resolving %s action for %s: %s", action, color, error))
+        broadcastToAll(string.format("Error processing %s's action", Player[color].steam_name), {r=1, g=0, b=0})
+      end
+    else
+      print(string.format("Unknown action: %s for player %s", action, color))
+    end
+
+    PlayerSelectedAction[color] = nil
+  end
+
+  return true
 end
 
 function ResolveBuyAction(color)
@@ -178,7 +316,7 @@ function ResolveSellAction(color)
 end
 
 function ResolveBuildWonderAction(color)
-    --
+  --
 end
 
 function ResolveArmadaSellAction(color)
@@ -214,6 +352,14 @@ function DiscardPlayerActionCard(color)
   end
 end
 
+-- Action resolution mapping for better maintainability
+ActionResolvers = {
+  Buy = ResolveBuyAction,
+  Sell = ResolveSellAction,
+  BuildWonder = ResolveBuildWonderAction,
+  ArmadaSell = ResolveArmadaSellAction
+}
+
 function FinishWonderStage()
   -- Runs only once per game
 	-- Everybody selected their wonders and is ready
@@ -221,53 +367,66 @@ function FinishWonderStage()
 	startLuaCoroutine(Global, "DealStartingCoins")
 end
 
-function PrepareLeaderStage()
-	-- Runs only once per game
-	GameState = "LeaderDrafting"
-
-	MaximumPasses = 3
-	CurrentPasses = 0
-
-	updatePhaseUI("Phase: Leader Drafting", "Select 1 leader to keep\n"..CurrentPasses.."/"..MaximumPasses)
-
-	local tempDeck = DeckZones.Leaders.getObjects()
-	tempDeck[1].deal(4)
-
-  Wait.time(function()
-    for _, color in ipairs(AllSeatedPlayers) do
-      local objects = Player[color].getHandObjects()
-      for _, obj in ipairs(objects) do
-        obj.memo = "Leader" -- Tag all leaders, so we can filter them later
-      end
-    end
-  end, 1)
-
-	local newTopImage = "https://i.imgur.com/oEisU1I.jpeg"
-
-	-- Loop through all player tiles and update the image
+-- Helper function to update player tiles with new images
+local function updatePlayerTiles(imageUrl)
   for color, data in pairs(PlayerCardHolder) do
     local tile = data.Tile
-
     if tile and tile.getCustomObject then
       tile.setCustomObject({
-				image = newTopImage,
-				image_bottom = newTopImage
-			})
-
-			-- It has a new GUID
+        image = imageUrl,
+        image_bottom = imageUrl
+      })
+      -- Update reference after reload
       PlayerCardHolder[color].Tile = tile.reload()
-
     else
-      print("Tile not found or invalid for color: " .. color)
+      print(string.format("Warning: Tile not found for player %s", color))
     end
   end
 
-	-- They are now new objects, lock them again
-	disableAllTiles()
+  -- Re-lock tiles after update
+  if disableAllTiles then
+    disableAllTiles()
+  end
+end
+
+-- Helper function to tag player hand objects
+local function tagPlayerHandObjects(memo, delay)
+  delay = delay or 1
+  Wait.time(function()
+    for _, color in ipairs(getSeatedPlayers()) do
+      local objects = Player[color].getHandObjects()
+      for _, obj in ipairs(objects) do
+        obj.memo = memo
+      end
+    end
+  end, delay)
+end
+
+function PrepareLeaderStage()
+  -- Initialize leader drafting phase
+  GameState = "LeaderDrafting"
+  MaximumPasses = 3
+  CurrentPasses = 0
+
+  updatePhaseUI("Phase: Leader Drafting", string.format("Select 1 leader to keep\n%d/%d", CurrentPasses, MaximumPasses))
+
+  -- Deal leader cards
+  local leaderDeck = DeckZones.Leaders.getObjects()
+  if leaderDeck and leaderDeck[1] then
+    leaderDeck[1].deal(4)
+  else
+    print("Error: Leader deck not found")
+    return
+  end
+
+  -- Tag all dealt cards as leaders
+  tagPlayerHandObjects("Leader", 1)
+
+  -- Update player tiles with leader image
+  updatePlayerTiles("https://i.imgur.com/oEisU1I.jpeg")
 end
 
 function DoLeaderStage()
-  print("DoLeaderStage function")
 	-- Check how many passes we did so far
 	if CurrentPasses < MaximumPasses then
 		Wait.time(function()
@@ -290,45 +449,141 @@ function DoLeaderStage()
 end
 
 function PrepareAge1Stage()
-	-- Runs only once per game
-	GameState = "Age1"
-	updatePhaseUI("Age 1", "Select a card to play")
+  -- Runs only once
+  -- Initialize Age 1 phase
+  GameState = "Age1"
+  updatePhaseUI("Phase: Age 1", string.format("Select 1 card to play\n%d/%d", CurrentPasses, MaximumPasses))
 
-	MaximumPasses = 5
-	if ExpansionConfig.Cities then
-		MaximumPasses = MaximumPasses + 1
-	end
-	if ExpansionConfig.Armada then
-		MaximumPasses = MaximumPasses + 1
-	end
-
-	local tempDeck = DeckZones.Age.Age1.getObjects()
-	tempDeck[1].deal(#tempDeck[1].getObjects()/NumberOfPlayers)
-
-  local newTopImage = "https://i.imgur.com/kkuw2Co.jpeg"
-
-	-- Loop through all player tiles and update the image
-  for color, data in pairs(PlayerCardHolder) do
-    local tile = data.Tile
-
-    if tile and tile.getCustomObject then
-      tile.setCustomObject({
-				image = newTopImage,
-				image_bottom = newTopImage
-			})
-
-			-- It has a new GUID
-      PlayerCardHolder[color].Tile = tile.reload()
-
-    else
-      print("Tile not found or invalid for color: " .. color)
-    end
+  -- Calculate maximum passes based on expansions
+  CurrentPasses = 0
+  MaximumPasses = 5
+  if ExpansionConfig.Cities then
+    MaximumPasses = MaximumPasses + 1
+  end
+  if ExpansionConfig.Armada then
+    MaximumPasses = MaximumPasses + 1
   end
 
-	-- They are now new objects, lock them again
-	disableAllTiles()
+  -- Deal Age 1 cards
+  local age1Deck = DeckZones.Age.Age1.getObjects()
+  if age1Deck and age1Deck[1] then
+    local cardsPerPlayer = math.floor(#age1Deck[1].getObjects() / NumberOfPlayers)
+    age1Deck[1].deal(cardsPerPlayer)
+  else
+    print("Error: Age 1 deck not found")
+    return
+  end
+
+  -- Update player tiles with Age 1 image
+  updatePlayerTiles("https://i.imgur.com/kkuw2Co.jpeg")
+end
+
+function PrepareAge2Stage()
+  -- Runs only once
+  -- Initialize Age 2 phase
+  GameState = "Age2"
+  updatePhaseUI("Phase: Age 2", string.format("Select 1 card to play\n%d/%d", CurrentPasses, MaximumPasses))
+
+  -- Calculate maximum passes based on expansions
+  CurrentPasses = 0
+  MaximumPasses = 5
+  if ExpansionConfig.Cities then
+    MaximumPasses = MaximumPasses + 1
+  end
+  if ExpansionConfig.Armada then
+    MaximumPasses = MaximumPasses + 1
+  end
+
+  -- Deal Age 2 cards
+  local age2Deck = DeckZones.Age.Age2.getObjects()
+  if age2Deck and age2Deck[1] then
+    local cardsPerPlayer = math.floor(#age2Deck[1].getObjects() / NumberOfPlayers)
+    age2Deck[1].deal(cardsPerPlayer)
+  else
+    print("Error: Age 1 deck not found")
+    return
+  end
+
+  -- Update player tiles with Age 2 image
+  updatePlayerTiles("https://i.imgur.com/7FkHefG.jpeg")
+end
+
+function PrepareAge3Stage()
+  -- Runs only once
+  -- Initialize Age 3 phase
+  GameState = "Age3"
+  updatePhaseUI("Phase: Age 3", string.format("Select 1 card to play\n%d/%d", CurrentPasses, MaximumPasses))
+
+  -- Calculate maximum passes based on expansions
+  CurrentPasses = 0
+  MaximumPasses = 5
+  if ExpansionConfig.Cities then
+    MaximumPasses = MaximumPasses + 1
+  end
+  if ExpansionConfig.Armada then
+    MaximumPasses = MaximumPasses + 1
+  end
+
+  -- Deal Age 3 cards
+  local age3Deck = DeckZones.Age.Age3.getObjects()
+  if age3Deck and age3Deck[1] then
+    local cardsPerPlayer = math.floor(#age3Deck[1].getObjects() / NumberOfPlayers)
+    age3Deck[1].deal(cardsPerPlayer)
+  else
+    print("Error: Age 3 deck not found")
+    return
+  end
+
+  -- Update player tiles with Age 2 image
+  updatePlayerTiles("https://i.imgur.com/Aq9X7wM.jpeg")
 end
 
 function DoAge1Stage()
-	--
+  if CurrentPasses < MaximumPasses then
+    -- Rotate hands
+    Wait.time(function()
+      for _, PlayerInstance in ipairs(Player.getPlayers()) do
+        local handObjects = PlayerInstance.getHandObjects()
+        for _, Card in ipairs(handObjects) do
+          RotateHands(Card, PlayerInstance.color, "Left")
+        end
+      end
+    end , 0.1)
+
+    -- Increment how many passes we did so far
+    CurrentPasses = CurrentPasses + 1
+    updatePhaseUI("Phase: Age 1", string.format("Select 1 card to play\n%d/%d", CurrentPasses, MaximumPasses))
+
+    -- After 1 second pick up passed cards
+    -- Passing left means we force take from right
+    Wait.time(function() ForceTakeCards("Right") end, 1)
+  end
+
+  -- It's still Age 1
+  GameState = "Age1"
+end
+
+function DoAge2Stage()
+  if CurrentPasses < MaximumPasses then
+    -- Rotate hands
+    Wait.time(function()
+      for _, PlayerInstance in ipairs(Player.getPlayers()) do
+        local handObjects = PlayerInstance.getHandObjects()
+        for _, Card in ipairs(handObjects) do
+          RotateHands(Card, PlayerInstance.color, "Right")
+        end
+      end
+    end , 0.1)
+
+    -- Increment how many passes we did so far
+    CurrentPasses = CurrentPasses + 1
+    updatePhaseUI("Phase: Age 2", string.format("Select 1 card to play\n%d/%d", CurrentPasses, MaximumPasses))
+
+    -- After 1 second pick up passed cards
+    -- Passing left means we force take from right
+    Wait.time(function() ForceTakeCards("Left") end, 1)
+  end
+
+  -- It's still Age 2
+  GameState = "Age2"
 end

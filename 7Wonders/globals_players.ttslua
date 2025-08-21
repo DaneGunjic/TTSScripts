@@ -104,7 +104,7 @@ for _, color in ipairs(Players) do
   PlayerSelectedAction[color] = nil
   PlayerShips[color] = {}
   PlayerShipMovements[color] = { Yellow = 0, Red = 0, Blue = 0, Green = 0 }
-  ReadyList[color] = true
+  ReadyList[color] = false
 end
 
 PlayerCardHolder = {

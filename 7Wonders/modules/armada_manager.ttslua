@@ -34,7 +34,7 @@ end
 
 function DealArmada()
 	--print("DealArmada")
-	for _, player in ipairs(AllSeatedPlayers) do
+	for _, player in ipairs(getSeatedPlayers()) do
 		DockyardBag.takeObject({
 			position = PlayerInfo[player].DockyardPos,
 			rotation = PlayerInfo[player].ComponentRotation,

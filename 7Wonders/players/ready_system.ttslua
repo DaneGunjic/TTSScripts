@@ -1,13 +1,11 @@
 function UnreadyAllPlayers()
-	for i, j in pairs(ReadyList) do
-		for m, n in pairs(AllSeatedPlayers) do
-			if i == n then
-				ReadyList[i] = false
-			end
-		end
-	end
+	local seatedPlayers = getSeatedPlayers()
 
-	NumberOfReadyPlayers = 0
+	for _, color in ipairs(seatedPlayers) do
+		--print("Setting player " .. color .. " to not ready")
+		ReadyList[color] = false
+		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
+	end
 end
 
 -- Called when a player pressed the "Ready" button
@@ -23,27 +21,6 @@ function ReadyUp(player)
 	end
 
 	TransitionPhase()
-
-	-- 	-- Did we finish choosing wonders
-	-- 	if GameState == "WonderStage" then
-	-- 		FinishWonderStage()
-	--
-	-- 		if ExpansionConfig.Leaders.Base then
-	-- 			PrepareLeaderStage()
-	-- 		else
-	-- 			PrepareAge1Stage()
-	-- 		end
-	--
-	-- 	-- Did we pass leaders
-	-- 	elseif GameState == "LeaderDrafting" then
-	-- 		DoLeaderStage()
-	-- 	-- Did we choose an action with the leader
-	-- 	elseif GameState == "LeaderSelectionStage" then
-	-- 		ResolvePlayerActions()
-	-- 	end
-	-- else
-	-- 	-- Update UI that shows who is ready
-	-- end
 end
 
 function CreateActionButtons(tile)
@@ -95,7 +72,7 @@ function CreateActionButtons(tile)
 end
 
 function ForceTakePersonalCards()
-	print("ForceTakePersonalCards")
+	print("ready_system.ttslua -- ForceTakePersonalCards")
 	-- Makes all players draw all cards on their tile
   for color, data in pairs(PlayerCardHolder) do
     local zone = data.Zone
@@ -116,16 +93,16 @@ end
 
 function UnreadyPlayerIfNeeded(color, zone)
 	local cardCount = CountCardsInZone(zone)
-	print("UnreadyPlayerIfNeeded " .. cardCount)
+	--print("UnreadyPlayerIfNeeded " .. cardCount)
 	if cardCount <= CurrentPasses and GameState == "LeaderDrafting" then
 		if ReadyList[color] then
-			print("settings ready to false, first if")
+			--print("settings ready to false, first if")
 			ReadyList[color] = false
 			NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 			broadcastToAll(Player[color].steam_name .. " is not ready")
 		end
 	elseif GameState == "LeaderSelectionStage" and ReadyList[color] then
-		print("settings ready to false, second if")
+		--print("settings ready to false, second if")
 		ReadyList[color] = false
 		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 		broadcastToAll(Player[color].steam_name .. " is not ready")
@@ -133,7 +110,7 @@ function UnreadyPlayerIfNeeded(color, zone)
 end
 
 function CreateReadyButtons()
-	for _, color in ipairs(AllSeatedPlayers) do
+	for _, color in ipairs(getSeatedPlayers()) do
 		local flipped = IsPlayerWonderFlipped(color)
 		print(flipped)
 		local tempPosition = flipped and {0, -0.2, -0.8} or {0, 0.2, -0.8}
@@ -151,7 +128,7 @@ function CreateReadyButtons()
 
 		local debug = GetPlayerCurrentWonder(color)
 		GetPlayerCurrentWonder(color).createButton(DefaultButtonParams)
-		print("CREATED WONDER READY BUTTON")
+		--print("CREATED WONDER READY BUTTON")
 	end
 end
 
