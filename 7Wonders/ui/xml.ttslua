@@ -3,6 +3,27 @@ function updatePhaseUI(phaseName, phaseDescription)
   	UI.setValue("PhaseDesc", phaseDescription)
 end
 
+-- Global variable to track menu state
+GameMenuOpen = false
+
+function ToggleGameMenu(player, click, id)
+    if click == "-1" then -- Left click
+        GameMenuOpen = not GameMenuOpen
+
+        if GameMenuOpen then
+            -- Show the menu panel
+            UI.setAttribute("GameMenuPanel", "active", "true")
+            -- Change arrow to point right (close direction)
+            UI.setAttribute("MenuToggle", "text", "►")
+        else
+            -- Hide the menu panel
+            UI.setAttribute("GameMenuPanel", "active", "false")
+            -- Change arrow to point left (open direction)
+            UI.setAttribute("MenuToggle", "text", "◄")
+        end
+    end
+end
+
 function DoCoinUI(player, click, id)
 	if click == "-1" then
 		local tempPost = Vector(_G["_"..player.color.."PlayerWonder"].WonderPos)

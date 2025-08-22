@@ -456,7 +456,7 @@ function HandleStartGameButtonCo()
 
 	-- [[MOVE GUILDS]]
 	local guildDecksToMove = DeckZones.Guild.getObjects()
-	for _, items in ipairs(guildDecksToMove) do
+		for _, items in ipairs(guildDecksToMove) do
 		--items.setPositionSmooth(FinalDeckZones.Guild.getPosition(), false, false)
 		--items.setRotation(FinalDeckZones.Guild.getRotation())
 	end

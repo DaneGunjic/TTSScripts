@@ -32,8 +32,8 @@ GameState = "Setup"
 SetupBoard = getObjectFromGUID("511af3")
 
 Audio = {
-  Conflict = "https://files.catbox.moe/exsobn.mp3",
-  NavalCombat = "https://files.catbox.moe/o9t4fm.MP3",
-  Ready = "https://files.catbox.moe/trpxp3.mp3",
-  ReadyAlt = "https://files.catbox.moe/r57yox.mp3"
+  Conflict = "https://files.catbox.moe/m0bsx4.mp3",
+  NavalCombat = "https://files.catbox.moe/hw4tr5.mp3",
+  Ready = "https://files.catbox.moe/f9qwaj.mp3",
+  ReadyAlt = "https://files.catbox.moe/fc60eg.mp3"
 }
