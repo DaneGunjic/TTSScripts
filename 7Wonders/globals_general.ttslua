@@ -30,3 +30,10 @@ GameState = "Setup"
 
 -- Get Setup Board that's in the center of the table
 SetupBoard = getObjectFromGUID("511af3")
+
+Audio = {
+  Conflict = "https://files.catbox.moe/exsobn.mp3",
+  NavalCombat = "https://files.catbox.moe/o9t4fm.MP3",
+  Ready = "https://files.catbox.moe/trpxp3.mp3",
+  ReadyAlt = "https://files.catbox.moe/r57yox.mp3"
+}

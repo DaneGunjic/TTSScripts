@@ -42,6 +42,36 @@ local PhaseConfig = {
         end
         Wait.time(PrepareAge1Stage, 0.1)
       end,
+      ["LeaderSelectionStage->Age2"] = function()
+        -- Move cards from hands to card holders before starting Age2
+        for _, color in ipairs(getSeatedPlayers()) do
+          local data = PlayerCardHolder[color]
+          if data and data.Zone and data.Tile then
+            local objects = Player[color].getHandObjects()
+            local tile = data.Tile
+            for _, obj in ipairs(objects) do
+              obj.setRotation(tile.getRotation() + vector(0, 0, 180))
+              obj.setPosition(tile.getPosition() + tile.getTransformRight() * 3)
+            end
+          end
+        end
+        Wait.time(PrepareAge2Stage, 0.1)
+      end,
+      ["LeaderSelectionStage->Age3"] = function()
+        -- Move cards from hands to card holders before starting Age2
+        for _, color in ipairs(getSeatedPlayers()) do
+          local data = PlayerCardHolder[color]
+          if data and data.Zone and data.Tile then
+            local objects = Player[color].getHandObjects()
+            local tile = data.Tile
+            for _, obj in ipairs(objects) do
+              obj.setRotation(tile.getRotation() + vector(0, 0, 180))
+              obj.setPosition(tile.getPosition() + tile.getTransformRight() * 3)
+            end
+          end
+        end
+        Wait.time(PrepareAge3Stage, 0.1)
+      end,
       ["Age1->Age1"] = function()
       	DoAge1Stage()
       end,
@@ -55,7 +85,7 @@ local PhaseConfig = {
         PrepareConflictResolution()
       end,
       ["Age2->ConflictResolution"] = function()
-
+        PrepareConflictResolution()
       end
     }
   }
@@ -249,6 +279,8 @@ PhaseHandlers = {
         CurrentAge = CurrentAge + 1
         GameState = "LeaderSelectionStage"
         broadcastToAll("Take your leaders and choose 1 to play", {r=1, g=1, b=1})
+        updatePhaseUI("Phase: Leader Selection", "Choose 1 Leader to play")
+
       else
         EndGame()
       end
@@ -278,10 +310,8 @@ function TransitionPhase()
 
   if NumberOfReadyPlayers >= NumberOfPlayers then
     -- Play ready sound
-    if MusicPlayer then
-      MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
-      MusicPlayer.pause()
-    end
+    MusicPlayer.setCurrentAudioclip({url=Audio.Ready, title = "All Players Ready"})
+    MusicPlayer.pause()
 
     print("TransitionPhase, GameState is " .. GameState)
     local currentHandler = PhaseHandlers[GameState]
@@ -289,11 +319,6 @@ function TransitionPhase()
       local previousPhase = GameState
       print("Calling " .. currentHandler.name .. "'s next function")
       local nextPhase = currentHandler:next()
-
-      --if nextPhase and nextPhase ~= GameState then
-        --logPhaseTransition(previousPhase, nextPhase)
-        --GameState = nextPhase
-      --end
 
       UnreadyAllPlayers()
     else
@@ -689,11 +714,11 @@ function PrepareConflictResolution()
   MaximumPasses = 0
 
   broadcastToAll("Conflict resolution!", {r=1, g=0.5, b=0.5})
-  MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
+  MusicPlayer.setCurrentAudioclip({url=Audio.Conflict, title = "Conflict"})
   MusicPlayer.pause()
 
   CreateReadyButtons()
-  updatePhaseUI("Phase: Conflict", "Take victiroy/defeat tokens")
+  updatePhaseUI("Phase: Conflict", "Take victory/defeat tokens")
 end
 
 function PrepareNavalCombat()
@@ -703,7 +728,9 @@ function PrepareNavalCombat()
   MaximumPasses = 0
 
   broadcastToAll("Naval combat!", {r=0.5, g=0.5, b=1})
+  MusicPlayer.setCurrentAudioclip({url=Audio.NavalCombat, title = "Naval Combat"})
+  MusicPlayer.pause()
 
   CreateReadyButtons()
-  updatePhaseUI("Phase: Naval combat", "Take victiroy/defeat tokens")
+  updatePhaseUI("Phase: Naval combat", "Take victory/defeat tokens")
 end

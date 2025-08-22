@@ -472,7 +472,7 @@ function HandleStartGameButtonCo()
 	DealArmada()
 
 	-- Play a sound
-	MusicPlayer.setCurrentAudioclip({url="https://sndup.net/pckc/d", title = "All Players Ready"})
+	MusicPlayer.setCurrentAudioclip({url=Audio.ReadyAlt, title = "All Players Ready"})
 	MusicPlayer.pause()
 
 	return 1

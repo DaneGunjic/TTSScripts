@@ -9,7 +9,7 @@ function MoveShip(player_color, ship_type)
 
     local ship = PlayerShips[player_color][ship_type]
     if ship then
-        ship.setPosition(ship.getPosition() + ship.getTransformForward() * -1.5)
+        ship.setPosition(ship.getPosition() + ship.getTransformForward() * -1.4)
     end
 
     local reward = ShipRewards[ship_type][movement_count + 1]
