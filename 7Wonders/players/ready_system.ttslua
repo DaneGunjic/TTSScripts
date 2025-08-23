@@ -24,71 +24,71 @@ function ReadyUp(player)
 end
 
 function CreateActionButtons(tile)
-  if ExpansionConfig.Armada then
-    tile.createButton({
-      click_function = "HandleArmadaSellCard",
-      label = "Armada\nSell",
-      position = {-1.5, 0.1, 0},
-      rotation = {0, 0 ,0},
-      width = 1250,
-      height = 1000,
-      scale = {x=0.2,y=0.2,z=0.2},
-      font_size = 350,
-    })
-  end
+	if ExpansionConfig.Armada then
+		tile.createButton({
+			click_function = "HandleArmadaSellCard",
+			label = "Armada\nSell",
+			position = {-1.5, 0.1, 0},
+			rotation = {0, 0 ,0},
+			width = 1250,
+			height = 1000,
+			scale = {x=0.2,y=0.2,z=0.2},
+			font_size = 350,
+		})
+	end
 
-  tile.createButton({
-    click_function = "HandleBuyCard",
-    label = "Buy",
-    position = {-0.95, 0.1, -0.5},
-    rotation = {0, 0 ,0},
-    width = 1000,
-    height = 1000,
-    scale = {x=0.2,y=0.2,z=0.2},
-    font_size = 500,
-  })
+	tile.createButton({
+		click_function = "HandleBuyCard",
+		label = "Buy",
+		position = {-0.95, 0.1, -0.5},
+		rotation = {0, 0 ,0},
+		width = 1000,
+		height = 1000,
+		scale = {x=0.2,y=0.2,z=0.2},
+		font_size = 500,
+	})
 
-  tile.createButton({
-    click_function = "HandleSellCard",
-    label = "Sell",
-    position = {-0.95, 0.1, 0},
-    rotation = {0, 0 ,0},
-    width = 1000,
-    height = 1000,
-    scale = {x=0.2,y=0.2,z=0.2},
-    font_size = 500,
-  })
+	tile.createButton({
+		click_function = "HandleSellCard",
+		label = "Sell",
+		position = {-0.95, 0.1, 0},
+		rotation = {0, 0 ,0},
+		width = 1000,
+		height = 1000,
+		scale = {x=0.2,y=0.2,z=0.2},
+		font_size = 500,
+	})
 
-  tile.createButton({
-    click_function = "HandleBuildWonder",
-    label = "Wonder",
-    position = {-0.95, 0.1, 0.5},
-    rotation = {0, 0 ,0},
-    width = 1350,
-    height = 1000,
-    scale = {x=0.2,y=0.2,z=0.2},
-    font_size = 350,
-  })
+	tile.createButton({
+		click_function = "HandleBuildWonder",
+		label = "Wonder",
+		position = {-0.95, 0.1, 0.5},
+		rotation = {0, 0 ,0},
+		width = 1350,
+		height = 1000,
+		scale = {x=0.2,y=0.2,z=0.2},
+		font_size = 350,
+	})
 end
 
 function ForceTakePersonalCards()
-	print("ready_system.ttslua -- ForceTakePersonalCards")
+	--print("ForceTakePersonalCards")
 	-- Makes all players draw all cards on their tile
-  for color, data in pairs(PlayerCardHolder) do
-    local zone = data.Zone
-    if zone ~= nil then
-      local objectsInZone = zone.getObjects()
-      for _, obj in ipairs(objectsInZone) do
+	for color, data in pairs(PlayerCardHolder) do
+		local zone = data.Zone
+		if zone ~= nil then
+			local objectsInZone = zone.getObjects()
+			for _, obj in ipairs(objectsInZone) do
 				if obj.type == 'Deck' then
-	        obj.deal(#obj.getObjects(), color)
-	      elseif obj.type == 'Card' then
-	        obj.deal(1, color)
+					obj.deal(#obj.getObjects(), color)
+				elseif obj.type == 'Card' then
+					obj.deal(1, color)
 				end
-      end
-    else
-        print("Zone not found for player color: " .. color)
-    end
-  end
+			end
+		else
+			print("Zone not found for player color: " .. color)
+		end
+	end
 end
 
 function UnreadyPlayerIfNeeded(color, zone)
@@ -134,8 +134,8 @@ end
 
 function ReadyUpManual(obj, color, alt)
 	if not IsObjectInPlayerWonderZone(obj, color) then
-    broadcastToColor("You can't make other players ready!", color, {1, 0, 0})
-    return
+		broadcastToColor("You can't make other players ready!", color, {1, 0, 0})
+		return
 	end
 
 	-- Buttons might get removed after we ready up
@@ -143,9 +143,9 @@ function ReadyUpManual(obj, color, alt)
 	-- If we aren't ready when we click it will be set to "Undo"
 	-- Only after that will we change to Ready
 	local wonder = GetPlayerCurrentWonder(color)
-			for i, _ in ipairs(wonder.getButtons()) do
+	for i, _ in ipairs(wonder.getButtons()) do
 		local newLabel = ReadyList[color] and "Ready" or "Undo"
-    wonder.editButton({index = i-1, label = newLabel})
+		wonder.editButton({index = i-1, label = newLabel})
 	end
 
 	ReadyUp(Player[color])

@@ -1,385 +1,385 @@
 function updatePhaseUI(phase, description)
-    UI.setAttribute("CurrentPhase", "text", "Phase: " .. phase)
-    UI.setAttribute("PhaseDesc", "text", description)
+  UI.setAttribute("CurrentPhase", "text", "Phase: " .. phase)
+  UI.setAttribute("PhaseDesc", "text", description)
 end
 
 -- Global variables to track menu state for each player
 GameMenuOpen = {
-    White = false,
-    Red = false,
-    Yellow = false,
-    Green = false,
-    Pink = false,
-    Blue = false,
-    Purple = false
+  White = false,
+  Red = false,
+  Yellow = false,
+  Green = false,
+  Pink = false,
+  Blue = false,
+  Purple = false
 }
 
 -- Player-specific toggle functions
 function ToggleGameMenuWhite()
-    GameMenuOpen.White = not GameMenuOpen.White
-    UI.setAttribute("GameMenuPanelWhite", "active", tostring(GameMenuOpen.White))
-    UI.setAttribute("MenuToggleWhite", "text", GameMenuOpen.White and "◄" or "▶")
+  GameMenuOpen.White = not GameMenuOpen.White
+  UI.setAttribute("GameMenuPanelWhite", "active", tostring(GameMenuOpen.White))
+  UI.setAttribute("MenuToggleWhite", "text", GameMenuOpen.White and "◄" or "▶")
 end
 
 function ToggleGameMenuRed()
-    GameMenuOpen.Red = not GameMenuOpen.Red
-    UI.setAttribute("GameMenuPanelRed", "active", tostring(GameMenuOpen.Red))
-    UI.setAttribute("MenuToggleRed", "text", GameMenuOpen.Red and "◄" or "▶")
+  GameMenuOpen.Red = not GameMenuOpen.Red
+  UI.setAttribute("GameMenuPanelRed", "active", tostring(GameMenuOpen.Red))
+  UI.setAttribute("MenuToggleRed", "text", GameMenuOpen.Red and "◄" or "▶")
 end
 
 function ToggleGameMenuYellow()
-    GameMenuOpen.Yellow = not GameMenuOpen.Yellow
-    UI.setAttribute("GameMenuPanelYellow", "active", tostring(GameMenuOpen.Yellow))
-    UI.setAttribute("MenuToggleYellow", "text", GameMenuOpen.Yellow and "◄" or "▶")
+  GameMenuOpen.Yellow = not GameMenuOpen.Yellow
+  UI.setAttribute("GameMenuPanelYellow", "active", tostring(GameMenuOpen.Yellow))
+  UI.setAttribute("MenuToggleYellow", "text", GameMenuOpen.Yellow and "◄" or "▶")
 end
 
 function ToggleGameMenuGreen()
-    GameMenuOpen.Green = not GameMenuOpen.Green
-    UI.setAttribute("GameMenuPanelGreen", "active", tostring(GameMenuOpen.Green))
-    UI.setAttribute("MenuToggleGreen", "text", GameMenuOpen.Green and "◄" or "▶")
+  GameMenuOpen.Green = not GameMenuOpen.Green
+  UI.setAttribute("GameMenuPanelGreen", "active", tostring(GameMenuOpen.Green))
+  UI.setAttribute("MenuToggleGreen", "text", GameMenuOpen.Green and "◄" or "▶")
 end
 
 function ToggleGameMenuBlue()
-    GameMenuOpen.Blue = not GameMenuOpen.Blue
-    UI.setAttribute("GameMenuPanelBlue", "active", tostring(GameMenuOpen.Blue))
-    UI.setAttribute("MenuToggleBlue", "text", GameMenuOpen.Blue and "◄" or "▶")
+  GameMenuOpen.Blue = not GameMenuOpen.Blue
+  UI.setAttribute("GameMenuPanelBlue", "active", tostring(GameMenuOpen.Blue))
+  UI.setAttribute("MenuToggleBlue", "text", GameMenuOpen.Blue and "◄" or "▶")
 end
 
 function ToggleGameMenuPurple()
-    GameMenuOpen.Purple = not GameMenuOpen.Purple
-    UI.setAttribute("GameMenuPanelPurple", "active", tostring(GameMenuOpen.Purple))
-    UI.setAttribute("MenuTogglePurple", "text", GameMenuOpen.Purple and "◄" or "▶")
+  GameMenuOpen.Purple = not GameMenuOpen.Purple
+  UI.setAttribute("GameMenuPanelPurple", "active", tostring(GameMenuOpen.Purple))
+  UI.setAttribute("MenuTogglePurple", "text", GameMenuOpen.Purple and "◄" or "▶")
 end
 
 function ToggleGameMenuPink()
-    GameMenuOpen.Pink = not GameMenuOpen.Pink
-    UI.setAttribute("GameMenuPanelPink", "active", tostring(GameMenuOpen.Pink))
-    UI.setAttribute("MenuTogglePink", "text", GameMenuOpen.Pink and "◄" or "▶")
+  GameMenuOpen.Pink = not GameMenuOpen.Pink
+  UI.setAttribute("GameMenuPanelPink", "active", tostring(GameMenuOpen.Pink))
+  UI.setAttribute("MenuTogglePink", "text", GameMenuOpen.Pink and "◄" or "▶")
 end
 
 function DoCoinUI(player, click, id)
-	if click == "-1" then
-		local tempPost = Vector(PlayerInfo[player.color].WonderPos)
-		tempPost.y = 2
-		tempPost.x = tempPost.x + math.random(-150, 150) / 100
-		tempPost.z = tempPost.z + math.random(-100, 100) / 100
+  if click == "-1" then
+    local tempPost = Vector(PlayerInfo[player.color].WonderPos)
+    tempPost.y = 2
+    tempPost.x = tempPost.x + math.random(-150, 150) / 100
+    tempPost.z = tempPost.z + math.random(-100, 100) / 100
 
-		if(string.find(id, "Coin1")) then
-		  	CoinBags.Coin1.takeObject({
-          position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
-      })
-			broadcastToAll(player.steam_name .. " gained 1 coin", {r=0.5, g=0.5, b=0.5})
-		elseif(string.find(id, "Coin3")) then
-			CoinBags.Coin3.takeObject({
+    if(string.find(id, "Coin1")) then
+      CoinBags.Coin1.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained 3 coins", {r=1, g=1, b=0})
-		else
-			CoinBags.Coin6.takeObject({
+      broadcastToAll(player.steam_name .. " gained 1 coin", {r=0.5, g=0.5, b=0.5})
+    elseif(string.find(id, "Coin3")) then
+      CoinBags.Coin3.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained 6 coins", {r=153/255, g=76/255, b=0})
-		end
-	end
+      broadcastToAll(player.steam_name .. " gained 3 coins", {r=1, g=1, b=0})
+    else
+      CoinBags.Coin6.takeObject({
+        position = tempPost,
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
+      })
+      broadcastToAll(player.steam_name .. " gained 6 coins", {r=153/255, g=76/255, b=0})
+    end
+  end
 
-	if click == "-2" then
-		local tempObjects = WonderZones[player.color].getObjects()
-		for i, obj in ipairs(tempObjects) do
-			if obj.hasTag("Coin1") and string.find(id, "Coin1") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost 1 coin", {r=1, g=0, b=0})
-				return;
-			end
+  if click == "-2" then
+    local tempObjects = WonderZones[player.color].getObjects()
+    for i, obj in ipairs(tempObjects) do
+      if obj.hasTag("Coin1") and string.find(id, "Coin1") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost 1 coin", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("Coin3") and string.find(id, "Coin3") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost 3 coins", {r=1, g=0, b=0})
-				return;
-			end
+      if obj.hasTag("Coin3") and string.find(id, "Coin3") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost 3 coins", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("Coin6") and string.find(id, "Coin6") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost 6 coins", {r=1, g=0, b=0})
-				return;
-			end
-		end
-	end
+      if obj.hasTag("Coin6") and string.find(id, "Coin6") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost 6 coins", {r=1, g=0, b=0})
+        return;
+      end
+    end
+  end
 end
 
 function DoOtherUI(player, click, id)
-	if click == "-1" then
-		local tempPost = Vector(PlayerInfo[player.color].WonderPos)
-		tempPost.y = 2
-		tempPost.x = tempPost.x + math.random(-150, 150) / 100
-		tempPost.z = tempPost.z + math.random(-100, 100) / 100
+  if click == "-1" then
+    local tempPost = Vector(PlayerInfo[player.color].WonderPos)
+    tempPost.y = 2
+    tempPost.x = tempPost.x + math.random(-150, 150) / 100
+    tempPost.z = tempPost.z + math.random(-100, 100) / 100
 
-		if(string.find(id, "Diplomacy")) then
-			DiplomacyTokenBag.takeObject({
-				position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
-			})
-			broadcastToAll(player.steam_name .. " gained a diplomacy token", {r=0.6, g=0.4, b=0.8})
-		elseif(string.find(id, "Boarding")) then
-			BoardingTokenBag.takeObject({
-				position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
-			})
-			broadcastToAll(player.steam_name .. " gained a boarding token", {r=0.8, g=0.6, b=0.2})
-		end
-	end
+    if(string.find(id, "Diplomacy")) then
+      DiplomacyTokenBag.takeObject({
+        position = tempPost,
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
+      })
+      broadcastToAll(player.steam_name .. " gained a diplomacy token", {r=0.6, g=0.4, b=0.8})
+    elseif(string.find(id, "Boarding")) then
+      BoardingTokenBag.takeObject({
+        position = tempPost,
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
+      })
+      broadcastToAll(player.steam_name .. " gained a boarding token", {r=0.8, g=0.6, b=0.2})
+    end
+  end
 
-	if click == "-2" then
-		local tempObjects = WonderZones[player.color].getObjects()
-		for i, obj in ipairs(tempObjects) do
-			if obj.hasTag("Diplomacy") and string.find(id, "Diplomacy") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost a diplomacy token", {r=1, g=0, b=0})
-				return;
-			end
+  if click == "-2" then
+    local tempObjects = WonderZones[player.color].getObjects()
+    for i, obj in ipairs(tempObjects) do
+      if obj.hasTag("Diplomacy") and string.find(id, "Diplomacy") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost a diplomacy token", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("Boarding") and string.find(id, "Boarding") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost a boarding token", {r=1, g=0, b=0})
-				return;
-			end
-		end
-	end
+      if obj.hasTag("Boarding") and string.find(id, "Boarding") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost a boarding token", {r=1, g=0, b=0})
+        return;
+      end
+    end
+  end
 end
 
 function DoNavalUI(player, click, id)
-	if click == "-1" then
-		local tempPost = Vector(PlayerInfo[player.color].WonderPos)
-		tempPost.y = 2
-		tempPost.x = tempPost.x + math.random(-150, 150) / 100
-		tempPost.z = tempPost.z + math.random(-100, 100) / 100
+  if click == "-1" then
+    local tempPost = Vector(PlayerInfo[player.color].WonderPos)
+    tempPost.y = 2
+    tempPost.x = tempPost.x + math.random(-150, 150) / 100
+    tempPost.z = tempPost.z + math.random(-100, 100) / 100
 
-		if(string.find(id, "NavalVictory1")) then
-			NavalTokenBags.VictoryToken1.takeObject({
+    if(string.find(id, "NavalVictory1")) then
+      NavalTokenBags.VictoryToken1.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Naval Victory 1", {r=0, g=0.5, b=0.5})
-		elseif(string.find(id, "NavalVictory3")) then
-			NavalTokenBags.VictoryToken3.takeObject({
+      broadcastToAll(player.steam_name .. " gained Naval Victory 1", {r=0, g=0.5, b=0.5})
+    elseif(string.find(id, "NavalVictory3")) then
+      NavalTokenBags.VictoryToken3.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Naval Victory 3", {r=0, g=0.5, b=0.5})
-		elseif(string.find(id, "NavalVictory5")) then
-			NavalTokenBags.VictoryToken5.takeObject({
+      broadcastToAll(player.steam_name .. " gained Naval Victory 3", {r=0, g=0.5, b=0.5})
+    elseif(string.find(id, "NavalVictory5")) then
+      NavalTokenBags.VictoryToken5.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Naval Victory 5", {r=0, g=0.5, b=0.5})
-		elseif(string.find(id, "NavalVictory7")) then
-			NavalTokenBags.VictoryToken7.takeObject({
+      broadcastToAll(player.steam_name .. " gained Naval Victory 5", {r=0, g=0.5, b=0.5})
+    elseif(string.find(id, "NavalVictory7")) then
+      NavalTokenBags.VictoryToken7.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Naval Victory 7", {r=0, g=0.5, b=0.5})
-		elseif(string.find(id, "DefeatNaval1")) then
-			NavalTokenBags.DefeatToken1.takeObject({
+      broadcastToAll(player.steam_name .. " gained Naval Victory 7", {r=0, g=0.5, b=0.5})
+    elseif(string.find(id, "DefeatNaval1")) then
+      NavalTokenBags.DefeatToken1.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Naval Defeat 1", {r=0, g=0.5, b=0.5})
-		elseif(string.find(id, "DefeatNaval2")) then
-			NavalTokenBags.DefeatToken2.takeObject({
+      broadcastToAll(player.steam_name .. " gained Naval Defeat 1", {r=0, g=0.5, b=0.5})
+    elseif(string.find(id, "DefeatNaval2")) then
+      NavalTokenBags.DefeatToken2.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Naval Defeat 2", {r=0, g=0.5, b=0.5})
-		elseif(string.find(id, "DefeatNaval3")) then
-			NavalTokenBags.DefeatToken3.takeObject({
+      broadcastToAll(player.steam_name .. " gained Naval Defeat 2", {r=0, g=0.5, b=0.5})
+    elseif(string.find(id, "DefeatNaval3")) then
+      NavalTokenBags.DefeatToken3.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Naval Defeat 3", {r=0, g=0.5, b=0.5})
-		end
-	end
+      broadcastToAll(player.steam_name .. " gained Naval Defeat 3", {r=0, g=0.5, b=0.5})
+    end
+  end
 
-	if click == "-2" then
-		local tempObjects = WonderZones[player.color].getObjects()
-		for i, obj in ipairs(tempObjects) do
-			if obj.hasTag("NavalVictory1") and string.find(id, "NavalVictory1") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Naval Victory 1", {r=1, g=0, b=0})
-				return;
-			end
+  if click == "-2" then
+    local tempObjects = WonderZones[player.color].getObjects()
+    for i, obj in ipairs(tempObjects) do
+      if obj.hasTag("NavalVictory1") and string.find(id, "NavalVictory1") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Naval Victory 1", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("NavalVictory3") and string.find(id, "NavalVictory3") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Naval Victory 3", {r=1, g=0, b=0})
-				return;
-			end
+      if obj.hasTag("NavalVictory3") and string.find(id, "NavalVictory3") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Naval Victory 3", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("NavalVictory5") and string.find(id, "NavalVictory5") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Naval Victory 5", {r=1, g=0, b=0})
-				return;
-			end
+      if obj.hasTag("NavalVictory5") and string.find(id, "NavalVictory5") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Naval Victory 5", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("NavalVictory7") and string.find(id, "NavalVictory7") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Naval Victory 7", {r=1, g=0, b=0})
-				return;
-			end
+      if obj.hasTag("NavalVictory7") and string.find(id, "NavalVictory7") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Naval Victory 7", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("NavalDefeat1") and string.find(id, "DefeatNaval1") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Naval Defeat 1", {r=1, g=0, b=0})
-				return;
-			end
+      if obj.hasTag("NavalDefeat1") and string.find(id, "DefeatNaval1") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Naval Defeat 1", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("NavalDefeat2") and string.find(id, "DefeatNaval2") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Naval Defeat 2", {r=1, g=0, b=0})
-				return;
-			end
+      if obj.hasTag("NavalDefeat2") and string.find(id, "DefeatNaval2") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Naval Defeat 2", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("NavalDefeat3") and string.find(id, "DefeatNaval3") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Naval Defeat 3", {r=1, g=0, b=0})
-				return;
-			end
-		end
-	end
+      if obj.hasTag("NavalDefeat3") and string.find(id, "DefeatNaval3") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Naval Defeat 3", {r=1, g=0, b=0})
+        return;
+      end
+    end
+  end
 end
 
 function DoMilitaryUI(player, click, id)
-	if click == "-1" then
-		local tempPost = Vector(PlayerInfo[player.color].WonderPos)
-		tempPost.y = 2
-		tempPost.x = tempPost.x + math.random(-150, 150) / 100
-		tempPost.z = tempPost.z + math.random(-100, 100) / 100
+  if click == "-1" then
+    local tempPost = Vector(PlayerInfo[player.color].WonderPos)
+    tempPost.y = 2
+    tempPost.x = tempPost.x + math.random(-150, 150) / 100
+    tempPost.z = tempPost.z + math.random(-100, 100) / 100
 
-		if(string.find(id, "Victory1")) then
-			ConflictTokenBags.VictoryToken1.takeObject({
+    if(string.find(id, "Victory1")) then
+      ConflictTokenBags.VictoryToken1.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Military Victory 1", {r=1, g=0.5, b=0.5})
-		elseif(string.find(id, "Victory3")) then
-			ConflictTokenBags.VictoryToken3.takeObject({
+      broadcastToAll(player.steam_name .. " gained Military Victory 1", {r=1, g=0.5, b=0.5})
+    elseif(string.find(id, "Victory3")) then
+      ConflictTokenBags.VictoryToken3.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Military Victory 3", {r=1, g=0.5, b=0.5})
-		elseif(string.find(id, "Victory5")) then
-			ConflictTokenBags.VictoryToken5.takeObject({
+      broadcastToAll(player.steam_name .. " gained Military Victory 3", {r=1, g=0.5, b=0.5})
+    elseif(string.find(id, "Victory5")) then
+      ConflictTokenBags.VictoryToken5.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Military Victory 5", {r=1, g=0.5, b=0.5})
-		elseif(string.find(id, "Victory7")) then
-			ConflictTokenBags.VictoryToken7.takeObject({
+      broadcastToAll(player.steam_name .. " gained Military Victory 5", {r=1, g=0.5, b=0.5})
+    elseif(string.find(id, "Victory7")) then
+      ConflictTokenBags.VictoryToken7.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Military Victory 7", {r=1, g=0.5, b=0.5})
-		elseif(string.find(id, "DefeatConflict")) then
-			ConflictTokenBags.DefeatToken.takeObject({
+      broadcastToAll(player.steam_name .. " gained Military Victory 7", {r=1, g=0.5, b=0.5})
+    elseif(string.find(id, "DefeatConflict")) then
+      ConflictTokenBags.DefeatToken.takeObject({
         position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
       })
-			broadcastToAll(player.steam_name .. " gained Military Defeat", {r=1, g=0.5, b=0.5})
-		end
-	end
+      broadcastToAll(player.steam_name .. " gained Military Defeat", {r=1, g=0.5, b=0.5})
+    end
+  end
 
-	if click == "-2" then
-		local tempObjects = WonderZones[player.color].getObjects()
-		for i, obj in ipairs(tempObjects) do
-			if obj.hasTag("Military1") and string.find(id, "Victory1") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Military Victory 1", {r=1, g=0, b=0})
-				return;
-			end
+  if click == "-2" then
+    local tempObjects = WonderZones[player.color].getObjects()
+    for i, obj in ipairs(tempObjects) do
+      if obj.hasTag("Military1") and string.find(id, "Victory1") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Military Victory 1", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("Military3") and string.find(id, "Victory3") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Military Victory 3", {r=1, g=0, b=0})
-				return;
-			end
+      if obj.hasTag("Military3") and string.find(id, "Victory3") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Military Victory 3", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("Military5") and string.find(id, "Victory5") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Military Victory 5", {r=1, g=0, b=0})
-				return;
-			end
+      if obj.hasTag("Military5") and string.find(id, "Victory5") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Military Victory 5", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("Military7") and string.find(id, "Victory7") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Military Victory 7", {r=1, g=0, b=0})
-				return;
-			end
+      if obj.hasTag("Military7") and string.find(id, "Victory7") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Military Victory 7", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("DefeatConflict") and string.find(id, "DefeatConflict") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost Military Defeat", {r=1, g=0, b=0})
-				return;
-			end
-		end
-	end
+      if obj.hasTag("DefeatConflict") and string.find(id, "DefeatConflict") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost Military Defeat", {r=1, g=0, b=0})
+        return;
+      end
+    end
+  end
 end
 
 function DoDebtUI(player, click, id)
-	if click == "-1" then
-		local tempPost = Vector(PlayerInfo[player.color].WonderPos)
-		tempPost.y = 2
-		tempPost.x = tempPost.x + math.random(-150, 150) / 100
-		tempPost.z = tempPost.z + math.random(-100, 100) / 100
+  if click == "-1" then
+    local tempPost = Vector(PlayerInfo[player.color].WonderPos)
+    tempPost.y = 2
+    tempPost.x = tempPost.x + math.random(-150, 150) / 100
+    tempPost.z = tempPost.z + math.random(-100, 100) / 100
 
-		if(string.find(id, "Debt1")) then
-			DebtBags.DebtToken1.takeObject({
-				position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
-			})
-			broadcastToAll(player.steam_name .. " gained 1 debt token", {r=0.8, g=0.2, b=0.2})
-		elseif(string.find(id, "Debt5")) then
-			DebtBags.DebtToken5.takeObject({
-				position = tempPost,
-				rotation = PlayerInfo[player.color].ComponentRotation,
-				smooth = false
-			})
-			broadcastToAll(player.steam_name .. " gained 5 debt tokens", {r=0.8, g=0.2, b=0.2})
-		end
-	end
+    if(string.find(id, "Debt1")) then
+      DebtBags.DebtToken1.takeObject({
+        position = tempPost,
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
+      })
+      broadcastToAll(player.steam_name .. " gained 1 debt token", {r=0.8, g=0.2, b=0.2})
+    elseif(string.find(id, "Debt5")) then
+      DebtBags.DebtToken5.takeObject({
+        position = tempPost,
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
+      })
+      broadcastToAll(player.steam_name .. " gained 5 debt tokens", {r=0.8, g=0.2, b=0.2})
+    end
+  end
 
-	if click == "-2" then
-		local tempObjects = WonderZones[player.color].getObjects()
-		for i, obj in ipairs(tempObjects) do
-			if obj.hasTag("Debt1") and string.find(id, "Debt1") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost 1 debt token", {r=1, g=0, b=0})
-				return;
-			end
+  if click == "-2" then
+    local tempObjects = WonderZones[player.color].getObjects()
+    for i, obj in ipairs(tempObjects) do
+      if obj.hasTag("Debt1") and string.find(id, "Debt1") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost 1 debt token", {r=1, g=0, b=0})
+        return;
+      end
 
-			if obj.hasTag("Debt5") and string.find(id, "Debt3") then
-				obj.destruct()
-				broadcastToAll(player.steam_name .. " lost 5 debt tokens", {r=1, g=0, b=0})
-				return;
-			end
-		end
-	end
+      if obj.hasTag("Debt5") and string.find(id, "Debt5") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost 5 debt tokens", {r=1, g=0, b=0})
+        return;
+      end
+    end
+  end
 end

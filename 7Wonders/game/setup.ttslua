@@ -6,7 +6,7 @@ function HandleStartGameButtonCo()
 	if NumberOfPlayers < 3 then
 		-- This simulates the other players, which are always ready
 		NumberOfReadyPlayers = 3 - NumberOfPlayers
-    -- For now we allow starting the game even with less than 3 players
+		-- For now we allow starting the game even with less than 3 players
 		NumberOfPlayers = 3
 	end
 
@@ -173,40 +173,40 @@ function HandleStartGameButtonCo()
 	-------------------[[ SHUFFLE DECKS ]]-------------------
 	-- [[SHUFFLE CITIES]]
 	local citiesDecksToShuffle = {
-    DeckZones.Cities.Age1,
-    DeckZones.Cities.Age2,
-    DeckZones.Cities.Age3
+		DeckZones.Cities.Age1,
+		DeckZones.Cities.Age2,
+		DeckZones.Cities.Age3
 	}
 
 	for _, deck in ipairs(citiesDecksToShuffle) do
-	  if deck and deck.getObjects then
-	    for _, item in ipairs(deck.getObjects()) do
-        item.randomize()
-	    end
-	  end
+		if deck and deck.getObjects then
+			for _, item in ipairs(deck.getObjects()) do
+				item.randomize()
+			end
+		end
 	end
 
 	-- [[SHUFFLE ARMADA]]
 	local armadaDecksToShuffle = {
-    DeckZones.Armada.Age1,
-    DeckZones.Armada.Age2,
-    DeckZones.Armada.Age3
+		DeckZones.Armada.Age1,
+		DeckZones.Armada.Age2,
+		DeckZones.Armada.Age3
 	}
 
 	for _, deck in ipairs(armadaDecksToShuffle) do
-	  if deck and deck.getObjects then
-	    for _, item in ipairs(deck.getObjects()) do
-        item.randomize()
-	    end
-	  end
+		if deck and deck.getObjects then
+			for _, item in ipairs(deck.getObjects()) do
+				item.randomize()
+			end
+		end
 	end
 
 	-- [[SHUFFLE GUILDS]]
 	local GuildDeck = DeckZones.Guild.getObjects()
 	for _, item in ipairs(GuildDeck) do
-    if item.randomize then
-      item.randomize()
-    end
+		if item.randomize then
+			item.randomize()
+		end
 	end
 
 	for i = 0, 200 do
@@ -216,38 +216,38 @@ function HandleStartGameButtonCo()
 	-------------------[[ INSERT CARDS INTO DECKS ]]-------------------
 	-- [[INSERT ARMADA CARDS]]
 	local AgeDecks = {
-    {
-      sourceZone = DeckZones.Armada.Age1,
-      targetZone = DeckZones.Age.Age1,
-      playersRequired = NumberOfPlayers
-    },
-    {
-      sourceZone = DeckZones.Armada.Age2,
-      targetZone = DeckZones.Age.Age2,
-      playersRequired = NumberOfPlayers
-    },
-    {
-      sourceZone = DeckZones.Armada.Age3,
-      targetZone = DeckZones.Age.Age3,
-      playersRequired = NumberOfPlayers
-    }
+		{
+			sourceZone = DeckZones.Armada.Age1,
+			targetZone = DeckZones.Age.Age1,
+			playersRequired = NumberOfPlayers
+		},
+		{
+			sourceZone = DeckZones.Armada.Age2,
+			targetZone = DeckZones.Age.Age2,
+			playersRequired = NumberOfPlayers
+		},
+		{
+			sourceZone = DeckZones.Armada.Age3,
+			targetZone = DeckZones.Age.Age3,
+			playersRequired = NumberOfPlayers
+		}
 	}
 
 	for _, deckConfig in ipairs(AgeDecks) do
 		if deckConfig.sourceZone and deckConfig.targetZone then
-	    local deckObjects = deckConfig.sourceZone.getObjects()
+			local deckObjects = deckConfig.sourceZone.getObjects()
 
-	    for _, item in ipairs(deckObjects) do
-	      if item.takeObject then
-	        for i = 1, deckConfig.playersRequired do
-	          item.takeObject({
-	            position = deckConfig.targetZone.getPosition(),
-	            rotation = deckConfig.targetZone.getRotation() + vector(0, 0, 180),
-	            smooth = false
-	          })
-	        end
-	      end
-	    end
+			for _, item in ipairs(deckObjects) do
+				if item.takeObject then
+					for i = 1, deckConfig.playersRequired do
+						item.takeObject({
+							position = deckConfig.targetZone.getPosition(),
+							rotation = deckConfig.targetZone.getRotation() + vector(0, 0, 180),
+							smooth = false
+						})
+					end
+				end
+			end
 		else
 			print("sourceZone/targetZone invalid for Armada")
 		end
@@ -255,38 +255,38 @@ function HandleStartGameButtonCo()
 
 	-- [[INSERT CITIES CARDS]]
 	local AgeDecks = {
-    {
-      sourceZone = DeckZones.Cities.Age1,
-      targetZone = DeckZones.Age.Age1,
-      playersRequired = NumberOfPlayers
-    },
-    {
-      sourceZone = DeckZones.Cities.Age2,
-      targetZone = DeckZones.Age.Age2,
-      playersRequired = NumberOfPlayers
-    },
-    {
-      sourceZone = DeckZones.Cities.Age3,
-      targetZone = DeckZones.Age.Age3,
-      playersRequired = NumberOfPlayers
-    }
+		{
+			sourceZone = DeckZones.Cities.Age1,
+			targetZone = DeckZones.Age.Age1,
+			playersRequired = NumberOfPlayers
+		},
+		{
+			sourceZone = DeckZones.Cities.Age2,
+			targetZone = DeckZones.Age.Age2,
+			playersRequired = NumberOfPlayers
+		},
+		{
+			sourceZone = DeckZones.Cities.Age3,
+			targetZone = DeckZones.Age.Age3,
+			playersRequired = NumberOfPlayers
+		}
 	}
 
 	for _, deckConfig in ipairs(AgeDecks) do
 		if deckConfig.sourceZone and deckConfig.targetZone then
-	    local deckObjects = deckConfig.sourceZone.getObjects()
+			local deckObjects = deckConfig.sourceZone.getObjects()
 
-	    for _, item in ipairs(deckObjects) do
-	      if item.takeObject then
-	        for i = 1, deckConfig.playersRequired do
-	          item.takeObject({
-	            position = deckConfig.targetZone.getPosition(),
-	            rotation = deckConfig.targetZone.getRotation() + vector(0, 0, 180),
-	            smooth = false
-	          })
-	        end
-	      end
-	    end
+			for _, item in ipairs(deckObjects) do
+				if item.takeObject then
+					for i = 1, deckConfig.playersRequired do
+						item.takeObject({
+							position = deckConfig.targetZone.getPosition(),
+							rotation = deckConfig.targetZone.getRotation() + vector(0, 0, 180),
+							smooth = false
+						})
+					end
+				end
+			end
 		else
 			print("sourceZone/targetZone invalid for Cities")
 		end
@@ -295,13 +295,13 @@ function HandleStartGameButtonCo()
 	-- [[INSERT GUILD CARDS]]
 	local GuildDeck = DeckZones.Guild.getObjects()
 	for _, items in ipairs(GuildDeck) do
-			for i = 1, NumberOfPlayers + 2 do
-				items.takeObject({
-					position = DeckZones.Age.Age3.getPosition(),
-					rotation = DeckZones.Age.Age3.getRotation() + vector(0, 0, 180),
-					smooth = false
-				})
-			end
+		for i = 1, NumberOfPlayers + 2 do
+			items.takeObject({
+				position = DeckZones.Age.Age3.getPosition(),
+				rotation = DeckZones.Age.Age3.getRotation() + vector(0, 0, 180),
+				smooth = false
+			})
+		end
 	end
 
 	-------------------[[ PREPARE WONDERS ]]-------------------
@@ -357,20 +357,20 @@ function HandleStartGameButtonCo()
 	-------------------[[ FINAL SHUFFLE BEFORE GAME START ]]-------------------
 	-- [[SHUFFLE AGE DECKS]]
 	local ageDecksToShuffle = {
-    DeckZones.Age.Age1,
-    DeckZones.Age.Age2,
-    DeckZones.Age.Age3
+		DeckZones.Age.Age1,
+		DeckZones.Age.Age2,
+		DeckZones.Age.Age3
 	}
 
 	for ageNum, zone in ipairs(ageDecksToShuffle) do
-    if zone and zone.getObjects then
-      local deck = zone.getObjects()
-      for _, item in ipairs(deck) do
-        if item.randomize then
-          item.randomize()
-        end
-      end
-    end
+		if zone and zone.getObjects then
+			local deck = zone.getObjects()
+			for _, item in ipairs(deck) do
+				if item.randomize then
+					item.randomize()
+				end
+			end
+		end
 	end
 
 	-- [[SHUFFLE LEADER DECK]]
@@ -382,20 +382,20 @@ function HandleStartGameButtonCo()
 
 	-- [[SHUFFLE ISLAND DECKS]]
 	local islandLevels = {
-    DeckZones.Island.Level1,
-    DeckZones.Island.Level2,
-    DeckZones.Island.Level3
+		DeckZones.Island.Level1,
+		DeckZones.Island.Level2,
+		DeckZones.Island.Level3
 	}
 
 	for levelNum, zone in ipairs(islandLevels) do
-    if zone and zone.getObjects then
-      local deck = zone.getObjects()
-      for _, item in ipairs(deck) do
-        if item.randomize then
-          item.randomize()
-        end
-      end
-    end
+		if zone and zone.getObjects then
+			local deck = zone.getObjects()
+			for _, item in ipairs(deck) do
+				if item.randomize then
+					item.randomize()
+				end
+			end
+		end
 	end
 
 	WonderBags.Base.randomize()
@@ -404,59 +404,59 @@ function HandleStartGameButtonCo()
 	-------------------[[ MOVE ALL UNUSED CARDS TO THE SIDE]]-------------------
 	-- [[MOVE CITIES]]
 	local citiesDecksToMove = {
-    {
-        source = DeckZones.Cities.Age1,
-        destination = FinalDeckZones.Cities.Age1,
-    },
-    {
-        source = DeckZones.Cities.Age2,
-        destination = FinalDeckZones.Cities.Age2,
-    },
-    {
-        source = DeckZones.Cities.Age3,
-        destination = FinalDeckZones.Cities.Age3,
-    }
+		{
+			source = DeckZones.Cities.Age1,
+			destination = FinalDeckZones.Cities.Age1,
+		},
+		{
+			source = DeckZones.Cities.Age2,
+			destination = FinalDeckZones.Cities.Age2,
+		},
+		{
+			source = DeckZones.Cities.Age3,
+			destination = FinalDeckZones.Cities.Age3,
+		}
 	}
 
 	for _, deckConfig in ipairs(citiesDecksToMove) do
-    if deckConfig.source and deckConfig.destination then
-      local deckObjects = deckConfig.source.getObjects()
-      for _, item in ipairs(deckObjects) do
-        item.setPositionSmooth(deckConfig.destination.getPosition(), false, false)
-        item.rotate({0, 90, 0})
-      end
-    end
+		if deckConfig.source and deckConfig.destination then
+			local deckObjects = deckConfig.source.getObjects()
+			for _, item in ipairs(deckObjects) do
+				item.setPositionSmooth(deckConfig.destination.getPosition(), false, false)
+				item.rotate({0, 90, 0})
+			end
+		end
 	end
 
 	-- [[MOVE ARMADA]]
 	local armadaDecksToMove = {
-    {
-        source = DeckZones.Armada.Age1,
-        destination = FinalDeckZones.Armada.Age1,
-    },
-    {
-        source = DeckZones.Armada.Age2,
-        destination = FinalDeckZones.Armada.Age2,
-    },
-    {
-        source = DeckZones.Armada.Age3,
-        destination = FinalDeckZones.Armada.Age3,
-    }
+		{
+			source = DeckZones.Armada.Age1,
+			destination = FinalDeckZones.Armada.Age1,
+		},
+		{
+			source = DeckZones.Armada.Age2,
+			destination = FinalDeckZones.Armada.Age2,
+		},
+		{
+			source = DeckZones.Armada.Age3,
+			destination = FinalDeckZones.Armada.Age3,
+		}
 	}
 
 	for _, deckConfig in ipairs(armadaDecksToMove) do
-    if deckConfig.source and deckConfig.destination then
-      local deckObjects = deckConfig.source.getObjects()
-      for _, item in ipairs(deckObjects) do
-        item.setPositionSmooth(deckConfig.destination.getPosition(), false, false)
-        item.rotate({0, 90, 0})
-      end
-    end
+		if deckConfig.source and deckConfig.destination then
+			local deckObjects = deckConfig.source.getObjects()
+			for _, item in ipairs(deckObjects) do
+				item.setPositionSmooth(deckConfig.destination.getPosition(), false, false)
+				item.rotate({0, 90, 0})
+			end
+		end
 	end
 
 	-- [[MOVE GUILDS]]
 	local guildDecksToMove = DeckZones.Guild.getObjects()
-		for _, items in ipairs(guildDecksToMove) do
+	for _, items in ipairs(guildDecksToMove) do
 		--items.setPositionSmooth(FinalDeckZones.Guild.getPosition(), false, false)
 		--items.setRotation(FinalDeckZones.Guild.getRotation())
 	end
@@ -479,13 +479,13 @@ function HandleStartGameButtonCo()
 end
 
 function DealStartingCoins()
-  local CoinAmount = ExpansionConfig.Leaders.Base and 6 or 3
+	local CoinAmount = ExpansionConfig.Leaders.Base and 6 or 3
 
-  for _, player in ipairs(getSeatedPlayers()) do
+	for _, player in ipairs(getSeatedPlayers()) do
 		local tempPost = Vector(PlayerInfo[player].WonderPos)
 		tempPost.y = 2
 
-    for i = 1, CoinAmount do
+		for i = 1, CoinAmount do
 			tempPost = Vector(PlayerInfo[player].WonderPos)
 			tempPost.y = 2
 			tempPost.x = tempPost.x + math.random(-100, 100) / 100
@@ -496,36 +496,36 @@ function DealStartingCoins()
 				smooth = false
 			})
 			pause(0.1)
-    end
-  end
+		end
+	end
 
 	return 1
 end
 
 function MakeSetupButtons()
-  -- Change default parameters of "LEADERS" BUTTON
-  DefaultButtonParams.position = {-0.35, 0.1, -0.02}
-  DefaultButtonParams.click_function = "HandleLeadersButton"
-  DefaultButtonParams.label = "[    ]"
-  SetupBoard.createButton(DefaultButtonParams)
+	-- Change default parameters of "LEADERS" BUTTON
+	DefaultButtonParams.position = {-0.35, 0.1, -0.02}
+	DefaultButtonParams.click_function = "HandleLeadersButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
 
 	-- Change default parameters of "PROMO" BUTTON
-  DefaultButtonParams.position = {-0.35, 0.2, 0.08}
-  DefaultButtonParams.click_function = "HandlePromoButton"
-  DefaultButtonParams.label = "[    ]"
-  SetupBoard.createButton(DefaultButtonParams)
+	DefaultButtonParams.position = {-0.35, 0.2, 0.08}
+	DefaultButtonParams.click_function = "HandlePromoButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
 
 	-- Change default parameters of "EXPERT" BUTTON
-  DefaultButtonParams.position = {-0.35, 0.2, 0.18}
-  DefaultButtonParams.click_function = "HandleExpertButton"
-  DefaultButtonParams.label = "[    ]"
-  SetupBoard.createButton(DefaultButtonParams)
+	DefaultButtonParams.position = {-0.35, 0.2, 0.18}
+	DefaultButtonParams.click_function = "HandleExpertButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
 
-  -- Change default parameters of "CITIES" BUTTON
-  DefaultButtonParams.position = {-0.35, 0.2, 0.28}
-  DefaultButtonParams.click_function = "HandleCitiesButton"
-  DefaultButtonParams.label = "[    ]"
-  SetupBoard.createButton(DefaultButtonParams)
+	-- Change default parameters of "CITIES" BUTTON
+	DefaultButtonParams.position = {-0.35, 0.2, 0.28}
+	DefaultButtonParams.click_function = "HandleCitiesButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
 
 	-- Change default parameters of "ARMADA" BUTTON
 	DefaultButtonParams.position = {-0.35, 0.2, 0.38}
@@ -533,35 +533,35 @@ function MakeSetupButtons()
 	DefaultButtonParams.label = "[    ]"
 	SetupBoard.createButton(DefaultButtonParams)
 
-  -- Change default parameters of "EDIFICE" BUTTON
-  DefaultButtonParams.position = {-0.35, 0.2, 0.48}
-  DefaultButtonParams.click_function = "HandleEdificeButton"
-  DefaultButtonParams.label = "[    ]"
-  SetupBoard.createButton(DefaultButtonParams)
+	-- Change default parameters of "EDIFICE" BUTTON
+	DefaultButtonParams.position = {-0.35, 0.2, 0.48}
+	DefaultButtonParams.click_function = "HandleEdificeButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
 
-  -- Change default parameters of "RUINS" BUTTON
-  DefaultButtonParams.position = {-0.35, 0.2, 0.58}
-  DefaultButtonParams.click_function = "HandleRuinsButton"
-  DefaultButtonParams.label = "[    ]"
-  SetupBoard.createButton(DefaultButtonParams)
+	-- Change default parameters of "RUINS" BUTTON
+	DefaultButtonParams.position = {-0.35, 0.2, 0.58}
+	DefaultButtonParams.click_function = "HandleRuinsButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
 
-  -- Change default parameters of "MYTHS" BUTTON
-  DefaultButtonParams.position = {-0.35, 0.2, 0.68}
-  DefaultButtonParams.click_function = "HandleMythsButton"
-  DefaultButtonParams.label = "[    ]"
-  SetupBoard.createButton(DefaultButtonParams)
+	-- Change default parameters of "MYTHS" BUTTON
+	DefaultButtonParams.position = {-0.35, 0.2, 0.68}
+	DefaultButtonParams.click_function = "HandleMythsButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
 
-  -- Change default parameters of "FRONTIERS" BUTTON
-  DefaultButtonParams.position = {-0.35, 0.2, 0.78}
-  DefaultButtonParams.click_function = "HandleFrontiersButton"
-  DefaultButtonParams.label = "[    ]"
-  SetupBoard.createButton(DefaultButtonParams)
+	-- Change default parameters of "FRONTIERS" BUTTON
+	DefaultButtonParams.position = {-0.35, 0.2, 0.78}
+	DefaultButtonParams.click_function = "HandleFrontiersButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
 
-  -- Change default parameters of "PROMO GUILDS" BUTTON
-  DefaultButtonParams.position = {-0.35, 0.2, 0.88}
-  DefaultButtonParams.click_function = "HandlePromoGuildsButton"
-  DefaultButtonParams.label = "[    ]"
-  SetupBoard.createButton(DefaultButtonParams)
+	-- Change default parameters of "PROMO GUILDS" BUTTON
+	DefaultButtonParams.position = {-0.35, 0.2, 0.88}
+	DefaultButtonParams.click_function = "HandlePromoGuildsButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
 
 	-- Change default parameters of "COLLECTION" BUTTON
 	DefaultButtonParams.position = {0.35, 0.1, -0.02}
@@ -575,26 +575,26 @@ function MakeSetupButtons()
 	DefaultButtonParams.label = "[    ]"
 	SetupBoard.createButton(DefaultButtonParams)
 
-  -- Change default parameters of "RANDOM" BUTTON
-  DefaultButtonParams.position = {0.35, 0.1, 0.58}
-  DefaultButtonParams.click_function = "HandleRandomButton"
-  DefaultButtonParams.label = "[✓]"
-  DefaultButtonParams.font_color={0, 1, 0}
-  SetupBoard.createButton(DefaultButtonParams)
+	-- Change default parameters of "RANDOM" BUTTON
+	DefaultButtonParams.position = {0.35, 0.1, 0.58}
+	DefaultButtonParams.click_function = "HandleRandomButton"
+	DefaultButtonParams.label = "[✓]"
+	DefaultButtonParams.font_color={0, 1, 0}
+	SetupBoard.createButton(DefaultButtonParams)
 
-  -- Change default parameters of "DRAFT" BUTTON
-  DefaultButtonParams.position = {0.35, 0.1, 0.68}
-  DefaultButtonParams.click_function = "HandleDraftButton"
-  DefaultButtonParams.label = "[    ]"
-  DefaultButtonParams.font_color={1, 1, 1}
-  SetupBoard.createButton(DefaultButtonParams)
+	-- Change default parameters of "DRAFT" BUTTON
+	DefaultButtonParams.position = {0.35, 0.1, 0.68}
+	DefaultButtonParams.click_function = "HandleDraftButton"
+	DefaultButtonParams.label = "[    ]"
+	DefaultButtonParams.font_color={1, 1, 1}
+	SetupBoard.createButton(DefaultButtonParams)
 
 	-- Change default parameters of draft number button
-  DefaultButtonParams.position = {0.20, 0.1, 0.68}
-  DefaultButtonParams.click_function = "AdjustDraftNumber"
-  DefaultButtonParams.label = "[" .. DraftModeNumber .. "]"
-  DefaultButtonParams.font_color={1, 1, 1}
-  SetupBoard.createButton(DefaultButtonParams)
+	DefaultButtonParams.position = {0.20, 0.1, 0.68}
+	DefaultButtonParams.click_function = "AdjustDraftNumber"
+	DefaultButtonParams.label = "[" .. DraftModeNumber .. "]"
+	DefaultButtonParams.font_color={1, 1, 1}
+	SetupBoard.createButton(DefaultButtonParams)
 
 	-- Change default parameters of "FORCE LOAD" button
 	DefaultButtonParams.position = {0, 0.1, -0.2}
@@ -608,17 +608,17 @@ function MakeSetupButtons()
 	DefaultButtonParams.width = 2500
 	SetupBoard.createButton(DefaultButtonParams)
 
-  -- Change default parameters of "Start Game" BUTTON
-  DefaultButtonParams.label = "PLAY"
-  DefaultButtonParams.font_color = {1,1,1}
-  DefaultButtonParams.position = {0.84, 0.1, 0.9}
-  DefaultButtonParams.font_size = 500
+	-- Change default parameters of "Start Game" BUTTON
+	DefaultButtonParams.label = "PLAY"
+	DefaultButtonParams.font_color = {1,1,1}
+	DefaultButtonParams.position = {0.84, 0.1, 0.9}
+	DefaultButtonParams.font_size = 500
 	DefaultButtonParams.scale = {x = 0.1, y = 0.1, z = 0.1}
-  DefaultButtonParams.height = 600
+	DefaultButtonParams.height = 600
 	DefaultButtonParams.width = 1200
 	DefaultButtonParams.font_color={1, 0, 1}
-  DefaultButtonParams.click_function = "HandleStartGameButton"
-  SetupBoard.createButton(DefaultButtonParams)
+	DefaultButtonParams.click_function = "HandleStartGameButton"
+	SetupBoard.createButton(DefaultButtonParams)
 end
 
 function MakeSetupBoardText()
@@ -641,9 +641,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("LEADERS")
+	text.TextTool.setValue("LEADERS")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -653,9 +653,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("       ↪PROMO")
+	text.TextTool.setValue("       ↪PROMO")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -665,9 +665,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("       ↪EXPERT")
+	text.TextTool.setValue("       ↪EXPERT")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -677,9 +677,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("CITIES")
+	text.TextTool.setValue("CITIES")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -689,9 +689,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("ARMADA")
+	text.TextTool.setValue("ARMADA")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -701,9 +701,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("EDIFICE")
+	text.TextTool.setValue("EDIFICE")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -713,9 +713,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("RUINS")
+	text.TextTool.setValue("RUINS")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -725,9 +725,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("MYTHS")
+	text.TextTool.setValue("MYTHS")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -737,9 +737,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("FRONTIERS")
+	text.TextTool.setValue("FRONTIERS")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -749,9 +749,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("PROMO GUILDS")
+	text.TextTool.setValue("PROMO GUILDS")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -761,8 +761,8 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("WONDER\nEXPANSIONS")
-  text.setLock(true)
+	text.TextTool.setValue("WONDER\nEXPANSIONS")
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -772,9 +772,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("COLLECTION")
+	text.TextTool.setValue("COLLECTION")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -784,9 +784,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("PROMO")
+	text.TextTool.setValue("PROMO")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -796,8 +796,8 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("SELECTION\nMODE")
-  text.setLock(true)
+	text.TextTool.setValue("SELECTION\nMODE")
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -807,9 +807,9 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("RANDOM")
+	text.TextTool.setValue("RANDOM")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 
 	DefaultTextParams.position = {
@@ -819,8 +819,8 @@ function MakeSetupBoardText()
 	}
 
 	text = spawnObject(DefaultTextParams)
-  text.TextTool.setValue("DRAFT")
+	text.TextTool.setValue("DRAFT")
 	text.TextTool.setFontSize(50)
-  text.setLock(true)
+	text.setLock(true)
 	table.insert(TextOnSetupBoard, text)
 end
