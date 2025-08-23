@@ -6,10 +6,10 @@
     </VerticalLayout>
 </Panel>
 
-<!-- Menu Toggle Button -->
+<!-- Menu Toggle Buttons - Player Specific -->
 <Button
-    id="MenuToggle"
-    onClick="ToggleGameMenu"
+    id="MenuToggleWhite"
+    onClick="ToggleGameMenuWhite"
     rectAlignment="MiddleRight"
     offsetXY="-10 0"
     height="40"
@@ -18,12 +18,97 @@
     fontStyle="Bold"
     color="#444444FF"
     textColor="#FFFFFFFF"
+    visibility="White"
+    >▶
+</Button>
+<Button
+    id="MenuToggleRed"
+    onClick="ToggleGameMenuRed"
+    rectAlignment="MiddleRight"
+    offsetXY="-10 0"
+    height="40"
+    width="40"
+    fontSize="20"
+    fontStyle="Bold"
+    color="#444444FF"
+    textColor="#FFFFFFFF"
+    visibility="Red"
+    >▶
+</Button>
+<Button
+    id="MenuToggleYellow"
+    onClick="ToggleGameMenuYellow"
+    rectAlignment="MiddleRight"
+    offsetXY="-10 0"
+    height="40"
+    width="40"
+    fontSize="20"
+    fontStyle="Bold"
+    color="#444444FF"
+    textColor="#FFFFFFFF"
+    visibility="Yellow"
+    >▶
+</Button>
+<Button
+    id="MenuToggleGreen"
+    onClick="ToggleGameMenuGreen"
+    rectAlignment="MiddleRight"
+    offsetXY="-10 0"
+    height="40"
+    width="40"
+    fontSize="20"
+    fontStyle="Bold"
+    color="#444444FF"
+    textColor="#FFFFFFFF"
+    visibility="Green"
+    >▶
+</Button>
+<Button
+    id="MenuToggleBlue"
+    onClick="ToggleGameMenuBlue"
+    rectAlignment="MiddleRight"
+    offsetXY="-10 0"
+    height="40"
+    width="40"
+    fontSize="20"
+    fontStyle="Bold"
+    color="#444444FF"
+    textColor="#FFFFFFFF"
+    visibility="Blue"
+    >▶
+</Button>
+<Button
+    id="MenuTogglePurple"
+    onClick="ToggleGameMenuPurple"
+    rectAlignment="MiddleRight"
+    offsetXY="-10 0"
+    height="40"
+    width="40"
+    fontSize="20"
+    fontStyle="Bold"
+    color="#444444FF"
+    textColor="#FFFFFFFF"
+    visibility="Purple"
+    >▶
+</Button>
+<Button
+    id="MenuTogglePink"
+    onClick="ToggleGameMenuPink"
+    rectAlignment="MiddleRight"
+    offsetXY="-10 0"
+    height="40"
+    width="40"
+    fontSize="20"
+    fontStyle="Bold"
+    color="#444444FF"
+    textColor="#FFFFFFFF"
+    visibility="Pink"
     >▶
 </Button>
 
-<!-- Collapsible Game Menu Panel -->
+<!-- Collapsible Game Menu Panels - Player Specific -->
 <Panel
-    id="GameMenuPanel"
+    id="GameMenuPanelWhite"
     active="false"
     rectAlignment="MiddleRight"
     offsetXY="-60 0"
@@ -31,6 +116,7 @@
     width="220"
     color="rgba(0,0,0,0.8)"
     padding="10 10 10 10"
+    visibility="White"
     >
     <VerticalLayout spacing="10">
 		<!-- Coin Buttons Section -->
@@ -41,7 +127,7 @@
                     <Button
                         icon="Coin1"
                         onClick="DoCoinUI"
-                        id="Coin1"
+                        id="Coin1White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -52,7 +138,7 @@
                     <Button
                         icon="Coin3"
                         onClick="DoCoinUI"
-                        id="Coin3"
+                        id="Coin3White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -63,7 +149,7 @@
                     <Button
                         icon="Coin6"
                         onClick="DoCoinUI"
-                        id="Coin6"
+                        id="Coin6White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -83,7 +169,7 @@
                     <Button
                         icon="Victory1"
                         onClick="DoMilitaryUI"
-                        id="Victory1"
+                        id="Victory1White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -94,7 +180,7 @@
                     <Button
                         icon="Victory3"
                         onClick="DoMilitaryUI"
-                        id="Victory3"
+                        id="Victory3White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -105,7 +191,7 @@
                     <Button
                         icon="Victory5"
                         onClick="DoMilitaryUI"
-                        id="Victory5"
+                        id="Victory5White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -116,7 +202,7 @@
                     <Button
                         icon="Victory7"
                         onClick="DoMilitaryUI"
-                        id="Victory7"
+                        id="Victory7White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -127,7 +213,7 @@
                     <Button
                         icon="DefeatConflict"
                         onClick="DoMilitaryUI"
-                        id="DefeatConflict"
+                        id="DefeatConflictWhite"
                         height="50"
                         width="50"
                         color="#000000"
@@ -147,7 +233,7 @@
                     <Button
                         icon="NavalVictory1"
                         onClick="DoNavalUI"
-                        id="NavalVictory1"
+                        id="NavalVictory1White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -158,7 +244,7 @@
                     <Button
                         icon="NavalVictory3"
                         onClick="DoNavalUI"
-                        id="NavalVictory3"
+                        id="NavalVictory3White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -169,7 +255,7 @@
                     <Button
                         icon="NavalVictory5"
                         onClick="DoNavalUI"
-                        id="NavalVictory5"
+                        id="NavalVictory5White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -180,7 +266,7 @@
                     <Button
                         icon="NavalVictory7"
                         onClick="DoNavalUI"
-                        id="NavalVictory7"
+                        id="NavalVictory7White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -191,7 +277,7 @@
                     <Button
                         icon="NavalDefeat1"
                         onClick="DoNavalUI"
-                        id="DefeatNaval1"
+                        id="DefeatNaval1White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -202,7 +288,7 @@
                     <Button
                         icon="NavalDefeat2"
                         onClick="DoNavalUI"
-                        id="DefeatNaval2"
+                        id="DefeatNaval2White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -213,7 +299,7 @@
                     <Button
                         icon="NavalDefeat3"
                         onClick="DoNavalUI"
-                        id="DefeatNaval3"
+                        id="DefeatNaval3White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -233,7 +319,7 @@
                     <Button
                         icon="Debt1"
                         onClick="DoDebtUI"
-                        id="Debt1"
+                        id="Debt1White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -244,7 +330,7 @@
                     <Button
                         icon="Debt5"
                         onClick="DoDebtUI"
-                        id="Debt3"
+                        id="Debt5White"
                         height="50"
                         width="50"
                         color="#000000"
@@ -263,8 +349,8 @@
                 <GridLayout cellSize="55 55" spacing="8 8">
                     <Button
                         icon="Diplomacy"
-                        onClick="DoDiplomacyUI"
-                        id="Diplomacy"
+                        onClick="DoOtherUI"
+                        id="DiplomacyWhite"
                         height="50"
                         width="50"
                         color="#000000"
@@ -274,8 +360,1616 @@
                         ></Button>
                     <Button
                         icon="Boarding"
-                        onClick="DoBoardingUI"
-                        id="Boarding"
+                        onClick="DoOtherUI"
+                        id="BoardingWhite"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+    </VerticalLayout>
+</Panel>
+
+<Panel
+    id="GameMenuPanelRed"
+    active="false"
+    rectAlignment="MiddleRight"
+    offsetXY="-60 0"
+    height="800"
+    width="220"
+    color="rgba(0,0,0,0.8)"
+    padding="10 10 10 10"
+    visibility="Red"
+    >
+    <VerticalLayout spacing="10">
+		<!-- Coin Buttons Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Coin1"
+                        onClick="DoCoinUI"
+                        id="Coin1Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin3"
+                        onClick="DoCoinUI"
+                        id="Coin3Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin6"
+                        onClick="DoCoinUI"
+                        id="Coin6Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Military Victory/Defeat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Victory1"
+                        onClick="DoMilitaryUI"
+                        id="Victory1Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory3"
+                        onClick="DoMilitaryUI"
+                        id="Victory3Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory5"
+                        onClick="DoMilitaryUI"
+                        id="Victory5Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory7"
+                        onClick="DoMilitaryUI"
+                        id="Victory7Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="DefeatConflict"
+                        onClick="DoMilitaryUI"
+                        id="DefeatConflictRed"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Naval Combat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="NavalVictory1"
+                        onClick="DoNavalUI"
+                        id="NavalVictory1Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory3"
+                        onClick="DoNavalUI"
+                        id="NavalVictory3Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory5"
+                        onClick="DoNavalUI"
+                        id="NavalVictory5Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory7"
+                        onClick="DoNavalUI"
+                        id="NavalVictory7Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat1"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval1Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat2"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval2Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat3"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval3Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Debt Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Debt1"
+                        onClick="DoDebtUI"
+                        id="Debt1Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Debt5"
+                        onClick="DoDebtUI"
+                        id="Debt5Red"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Diplomacy & Boarding Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Diplomacy"
+                        onClick="DoOtherUI"
+                        id="DiplomacyRed"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Boarding"
+                        onClick="DoOtherUI"
+                        id="BoardingRed"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+    </VerticalLayout>
+</Panel>
+
+<Panel
+    id="GameMenuPanelYellow"
+    active="false"
+    rectAlignment="MiddleRight"
+    offsetXY="-60 0"
+    height="800"
+    width="220"
+    color="rgba(0,0,0,0.8)"
+    padding="10 10 10 10"
+    visibility="Yellow"
+    >
+    <VerticalLayout spacing="10">
+		<!-- Coin Buttons Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Coin1"
+                        onClick="DoCoinUI"
+                        id="Coin1Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin3"
+                        onClick="DoCoinUI"
+                        id="Coin3Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin6"
+                        onClick="DoCoinUI"
+                        id="Coin6Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Military Victory/Defeat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Victory1"
+                        onClick="DoMilitaryUI"
+                        id="Victory1Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory3"
+                        onClick="DoMilitaryUI"
+                        id="Victory3Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory5"
+                        onClick="DoMilitaryUI"
+                        id="Victory5Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory7"
+                        onClick="DoMilitaryUI"
+                        id="Victory7Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="DefeatConflict"
+                        onClick="DoMilitaryUI"
+                        id="DefeatConflictYellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Naval Combat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="NavalVictory1"
+                        onClick="DoNavalUI"
+                        id="NavalVictory1Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory3"
+                        onClick="DoNavalUI"
+                        id="NavalVictory3Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory5"
+                        onClick="DoNavalUI"
+                        id="NavalVictory5Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory7"
+                        onClick="DoNavalUI"
+                        id="NavalVictory7Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat1"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval1Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat2"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval2Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat3"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval3Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Debt Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Debt1"
+                        onClick="DoDebtUI"
+                        id="Debt1Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Debt5"
+                        onClick="DoDebtUI"
+                        id="Debt5Yellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Diplomacy & Boarding Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Diplomacy"
+                        onClick="DoOtherUI"
+                        id="DiplomacyYellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Boarding"
+                        onClick="DoOtherUI"
+                        id="BoardingYellow"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+    </VerticalLayout>
+</Panel>
+
+<Panel
+    id="GameMenuPanelGreen"
+    active="false"
+    rectAlignment="MiddleRight"
+    offsetXY="-60 0"
+    height="800"
+    width="220"
+    color="rgba(0,0,0,0.8)"
+    padding="10 10 10 10"
+    visibility="Green"
+    >
+    <VerticalLayout spacing="10">
+		<!-- Coin Buttons Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Coin1"
+                        onClick="DoCoinUI"
+                        id="Coin1Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin3"
+                        onClick="DoCoinUI"
+                        id="Coin3Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin6"
+                        onClick="DoCoinUI"
+                        id="Coin6Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Military Victory/Defeat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Victory1"
+                        onClick="DoMilitaryUI"
+                        id="Victory1Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory3"
+                        onClick="DoMilitaryUI"
+                        id="Victory3Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory5"
+                        onClick="DoMilitaryUI"
+                        id="Victory5Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory7"
+                        onClick="DoMilitaryUI"
+                        id="Victory7Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="DefeatConflict"
+                        onClick="DoMilitaryUI"
+                        id="DefeatConflictGreen"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Naval Combat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="NavalVictory1"
+                        onClick="DoNavalUI"
+                        id="NavalVictory1Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory3"
+                        onClick="DoNavalUI"
+                        id="NavalVictory3Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory5"
+                        onClick="DoNavalUI"
+                        id="NavalVictory5Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory7"
+                        onClick="DoNavalUI"
+                        id="NavalVictory7Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat1"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval1Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat2"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval2Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat3"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval3Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Debt Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Debt1"
+                        onClick="DoDebtUI"
+                        id="Debt1Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Debt5"
+                        onClick="DoDebtUI"
+                        id="Debt5Green"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Diplomacy & Boarding Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Diplomacy"
+                        onClick="DoOtherUI"
+                        id="DiplomacyGreen"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Boarding"
+                        onClick="DoOtherUI"
+                        id="BoardingGreen"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+    </VerticalLayout>
+</Panel>
+
+<Panel
+    id="GameMenuPanelBlue"
+    active="false"
+    rectAlignment="MiddleRight"
+    offsetXY="-60 0"
+    height="800"
+    width="220"
+    color="rgba(0,0,0,0.8)"
+    padding="10 10 10 10"
+    visibility="Blue"
+    >
+    <VerticalLayout spacing="10">
+		<!-- Coin Buttons Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Coin1"
+                        onClick="DoCoinUI"
+                        id="Coin1Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin3"
+                        onClick="DoCoinUI"
+                        id="Coin3Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin6"
+                        onClick="DoCoinUI"
+                        id="Coin6Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Military Victory/Defeat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Victory1"
+                        onClick="DoMilitaryUI"
+                        id="Victory1Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory3"
+                        onClick="DoMilitaryUI"
+                        id="Victory3Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory5"
+                        onClick="DoMilitaryUI"
+                        id="Victory5Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory7"
+                        onClick="DoMilitaryUI"
+                        id="Victory7Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="DefeatConflict"
+                        onClick="DoMilitaryUI"
+                        id="DefeatConflictBlue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Naval Combat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="NavalVictory1"
+                        onClick="DoNavalUI"
+                        id="NavalVictory1Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory3"
+                        onClick="DoNavalUI"
+                        id="NavalVictory3Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory5"
+                        onClick="DoNavalUI"
+                        id="NavalVictory5Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory7"
+                        onClick="DoNavalUI"
+                        id="NavalVictory7Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat1"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval1Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat2"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval2Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat3"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval3Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Debt Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Debt1"
+                        onClick="DoDebtUI"
+                        id="Debt1Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Debt5"
+                        onClick="DoDebtUI"
+                        id="Debt5Blue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Diplomacy & Boarding Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Diplomacy"
+                        onClick="DoOtherUI"
+                        id="DiplomacyBlue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Boarding"
+                        onClick="DoOtherUI"
+                        id="BoardingBlue"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+    </VerticalLayout>
+</Panel>
+
+<Panel
+    id="GameMenuPanelPurple"
+    active="false"
+    rectAlignment="MiddleRight"
+    offsetXY="-60 0"
+    height="800"
+    width="220"
+    color="rgba(0,0,0,0.8)"
+    padding="10 10 10 10"
+    visibility="Purple"
+    >
+    <VerticalLayout spacing="10">
+		<!-- Coin Buttons Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Coin1"
+                        onClick="DoCoinUI"
+                        id="Coin1Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin3"
+                        onClick="DoCoinUI"
+                        id="Coin3Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin6"
+                        onClick="DoCoinUI"
+                        id="Coin6Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Military Victory/Defeat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Victory1"
+                        onClick="DoMilitaryUI"
+                        id="Victory1Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory3"
+                        onClick="DoMilitaryUI"
+                        id="Victory3Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory5"
+                        onClick="DoMilitaryUI"
+                        id="Victory5Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory7"
+                        onClick="DoMilitaryUI"
+                        id="Victory7Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="DefeatConflict"
+                        onClick="DoMilitaryUI"
+                        id="DefeatConflictPurple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Naval Combat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="NavalVictory1"
+                        onClick="DoNavalUI"
+                        id="NavalVictory1Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory3"
+                        onClick="DoNavalUI"
+                        id="NavalVictory3Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory5"
+                        onClick="DoNavalUI"
+                        id="NavalVictory5Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory7"
+                        onClick="DoNavalUI"
+                        id="NavalVictory7Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat1"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval1Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat2"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval2Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat3"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval3Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Debt Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Debt1"
+                        onClick="DoDebtUI"
+                        id="Debt1Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Debt5"
+                        onClick="DoDebtUI"
+                        id="Debt5Purple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Diplomacy & Boarding Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Diplomacy"
+                        onClick="DoOtherUI"
+                        id="DiplomacyPurple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Boarding"
+                        onClick="DoOtherUI"
+                        id="BoardingPurple"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+    </VerticalLayout>
+</Panel>
+
+<Panel
+    id="GameMenuPanelPink"
+    active="false"
+    rectAlignment="MiddleRight"
+    offsetXY="-60 0"
+    height="800"
+    width="220"
+    color="rgba(0,0,0,0.8)"
+    padding="10 10 10 10"
+    visibility="Pink"
+    >
+    <VerticalLayout spacing="10">
+		<!-- Coin Buttons Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Coin1"
+                        onClick="DoCoinUI"
+                        id="Coin1Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin3"
+                        onClick="DoCoinUI"
+                        id="Coin3Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Coin6"
+                        onClick="DoCoinUI"
+                        id="Coin6Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Military Victory/Defeat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Victory1"
+                        onClick="DoMilitaryUI"
+                        id="Victory1Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory3"
+                        onClick="DoMilitaryUI"
+                        id="Victory3Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory5"
+                        onClick="DoMilitaryUI"
+                        id="Victory5Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Victory7"
+                        onClick="DoMilitaryUI"
+                        id="Victory7Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="DefeatConflict"
+                        onClick="DoMilitaryUI"
+                        id="DefeatConflictPink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Naval Combat Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="NavalVictory1"
+                        onClick="DoNavalUI"
+                        id="NavalVictory1Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory3"
+                        onClick="DoNavalUI"
+                        id="NavalVictory3Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory5"
+                        onClick="DoNavalUI"
+                        id="NavalVictory5Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalVictory7"
+                        onClick="DoNavalUI"
+                        id="NavalVictory7Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat1"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval1Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat2"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval2Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="NavalDefeat3"
+                        onClick="DoNavalUI"
+                        id="DefeatNaval3Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Debt Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Debt1"
+                        onClick="DoDebtUI"
+                        id="Debt1Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Debt5"
+                        onClick="DoDebtUI"
+                        id="Debt5Pink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                </GridLayout>
+            </VerticalLayout>
+        </Panel>
+
+        <!-- Diplomacy & Boarding Section -->
+        <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+            <VerticalLayout>
+                <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+                <GridLayout cellSize="55 55" spacing="8 8">
+                    <Button
+                        icon="Diplomacy"
+                        onClick="DoOtherUI"
+                        id="DiplomacyPink"
+                        height="50"
+                        width="50"
+                        color="#000000"
+                        textColor="#FFFFFF"
+                        fontSize="12"
+                        fontStyle="Bold"
+                        ></Button>
+                    <Button
+                        icon="Boarding"
+                        onClick="DoOtherUI"
+                        id="BoardingPink"
                         height="50"
                         width="50"
                         color="#000000"
