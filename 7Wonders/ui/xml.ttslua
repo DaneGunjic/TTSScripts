@@ -1,54 +1,51 @@
-function updatePhaseUI(phaseName, phaseDescription)
-    UI.setValue("CurrentPhase", phaseName)
-  	UI.setValue("PhaseDesc", phaseDescription)
+function updatePhaseUI(phase, description)
+    UI.setAttribute("CurrentPhase", "text", "Phase: " .. phase)
+    UI.setAttribute("PhaseDesc", "text", description)
 end
 
 -- Global variable to track menu state
 GameMenuOpen = false
 
-function ToggleGameMenu(player, click, id)
-    if click == "-1" then -- Left click
-        GameMenuOpen = not GameMenuOpen
+-- Function to toggle the game menu visibility
+function ToggleGameMenu()
+    GameMenuOpen = not GameMenuOpen
 
-        if GameMenuOpen then
-            -- Show the menu panel
-            UI.setAttribute("GameMenuPanel", "active", "true")
-            -- Change arrow to point right (close direction)
-            UI.setAttribute("MenuToggle", "text", "►")
-        else
-            -- Hide the menu panel
-            UI.setAttribute("GameMenuPanel", "active", "false")
-            -- Change arrow to point left (open direction)
-            UI.setAttribute("MenuToggle", "text", "◄")
-        end
+    -- Update the panel visibility
+    UI.setAttribute("GameMenuPanel", "active", tostring(GameMenuOpen))
+
+    -- Update the toggle button text to show current state
+    if GameMenuOpen then
+        UI.setAttribute("MenuToggle", "text", "◄")  -- Arrow pointing left (close)
+    else
+        UI.setAttribute("MenuToggle", "text", "▶")  -- Arrow pointing right (open)
     end
 end
 
 function DoCoinUI(player, click, id)
 	if click == "-1" then
-		local tempPost = Vector(_G["_"..player.color.."PlayerWonder"].WonderPos)
+		local tempPost = Vector(PlayerInfo[player.color].WonderPos)
 		tempPost.y = 2
 		tempPost.x = tempPost.x + math.random(-150, 150) / 100
 		tempPost.z = tempPost.z + math.random(-100, 100) / 100
 
 		if(id == "Coin1") then
-		  	CoinBag1.takeObject({
+		  	CoinBags.Coin1.takeObject({
           position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained 1 coin", {r=0.5, g=0.5, b=0.5})
 		elseif(id == "Coin3") then
-			CoinBag3.takeObject({
+			CoinBags.Coin3.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained 3 coins", {r=1, g=1, b=0})
 		else
-			CoinBag6.takeObject({
+			CoinBags.Coin6.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained 6 coins", {r=153/255, g=76/255, b=0})
@@ -56,7 +53,7 @@ function DoCoinUI(player, click, id)
 	end
 
 	if click == "-2" then
-		local tempObjects = _G[player.color.."WonderZone"].getObjects()
+		local tempObjects = WonderZones[player.color].getObjects()
 		for i, obj in ipairs(tempObjects) do
 			if obj.hasTag("Coin1") and id == "Coin1" then
 				obj.destruct()
@@ -81,57 +78,57 @@ end
 
 function DoNavalUI(player, click, id)
 	if click == "-1" then
-		local tempPost = Vector(_G["_"..player.color.."PlayerWonder"].WonderPos)
+		local tempPost = Vector(PlayerInfo[player.color].WonderPos)
 		tempPost.y = 2
 		tempPost.x = tempPost.x + math.random(-150, 150) / 100
 		tempPost.z = tempPost.z + math.random(-100, 100) / 100
 
 		if(id == "NavalVictory1") then
-			NavalVictoryToken1.takeObject({
+			NavalTokenBags.VictoryToken1.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Naval Victory 1", {r=0, g=0.5, b=0.5})
 		elseif(id == "NavalVictory3") then
-			NavalVictoryToken3.takeObject({
+			NavalTokenBags.VictoryToken3.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Naval Victory 3", {r=0, g=0.5, b=0.5})
 		elseif(id == "NavalVictory5") then
-			NavalVictoryToken5.takeObject({
+			NavalTokenBags.VictoryToken5.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Naval Victory 5", {r=0, g=0.5, b=0.5})
 		elseif(id == "NavalVictory7") then
-			NavalVictoryToken7.takeObject({
+			NavalTokenBags.VictoryToken7.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Naval Victory 7", {r=0, g=0.5, b=0.5})
 		elseif(id == "DefeatNaval1") then
-			NavalDefeatToken1.takeObject({
+			NavalTokenBags.DefeatToken1.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Naval Defeat 1", {r=0, g=0.5, b=0.5})
 		elseif(id == "DefeatNaval2") then
-			NavalDefeatToken2.takeObject({
+			NavalTokenBags.DefeatToken2.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Naval Defeat 2", {r=0, g=0.5, b=0.5})
 		elseif(id == "DefeatNaval3") then
-			NavalDefeatToken3.takeObject({
+			NavalTokenBags.DefeatToken3.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Naval Defeat 3", {r=0, g=0.5, b=0.5})
@@ -139,7 +136,7 @@ function DoNavalUI(player, click, id)
 	end
 
 	if click == "-2" then
-		local tempObjects = _G[player.color.."WonderZone"].getObjects()
+		local tempObjects = WonderZones[player.color].getObjects()
 		for i, obj in ipairs(tempObjects) do
 			if obj.hasTag("NavalVictory1") and id == "NavalVictory1" then
 				obj.destruct()
@@ -188,43 +185,43 @@ end
 
 function DoMilitaryUI(player, click, id)
 	if click == "-1" then
-		local tempPost = Vector(_G["_"..player.color.."PlayerWonder"].WonderPos)
+		local tempPost = Vector(PlayerInfo[player.color].WonderPos)
 		tempPost.y = 2
 		tempPost.x = tempPost.x + math.random(-150, 150) / 100
 		tempPost.z = tempPost.z + math.random(-100, 100) / 100
 
 		if(id == "Victory1") then
-			ConflictToken1.takeObject({
+			ConflictTokenBags.VictoryToken1.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Military Victory 1", {r=1, g=0.5, b=0.5})
 		elseif(id == "Victory3") then
-			ConflictToken3.takeObject({
+			ConflictTokenBags.VictoryToken3.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Military Victory 3", {r=1, g=0.5, b=0.5})
 		elseif(id == "Victory5") then
-			ConflictToken5.takeObject({
+			ConflictTokenBags.VictoryToken5.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Military Victory 5", {r=1, g=0.5, b=0.5})
 		elseif(id == "Victory7") then
-			ConflictToken7.takeObject({
+			ConflictTokenBags.VictoryToken7.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Military Victory 7", {r=1, g=0.5, b=0.5})
 		elseif(id == "DefeatConflict") then
-			ConflictTokenDefeat.takeObject({
+			ConflictTokenBags.DefeatToken.takeObject({
         position = tempPost,
-				rotation = _G["_"..player.color.."PlayerWonder"].WonderRot,
+				rotation = PlayerInfo[player.color].ComponentRotation,
 				smooth = false
       })
 			broadcastToAll(player.steam_name .. " gained Military Defeat", {r=1, g=0.5, b=0.5})
@@ -232,7 +229,7 @@ function DoMilitaryUI(player, click, id)
 	end
 
 	if click == "-2" then
-		local tempObjects = _G[player.color.."WonderZone"].getObjects()
+		local tempObjects = WonderZones[player.color].getObjects()
 		for i, obj in ipairs(tempObjects) do
 			if obj.hasTag("Military1") and id == "Victory1" then
 				obj.destruct()
