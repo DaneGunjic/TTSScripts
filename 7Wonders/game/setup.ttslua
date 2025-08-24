@@ -16,6 +16,7 @@ function HandleStartGameButtonCo()
 	SetupBoard.destruct()
 
 	-------------------[[ PREPARE DECKS ]]-------------------
+
 	-- [[AGE 1 DECKS SETUP]]
 	for bagKey, bagObject in pairs(Age1DeckBags) do
 		-- Extract player count from key name (e.g., "Age1_3p" → 3)
@@ -171,6 +172,7 @@ function HandleStartGameButtonCo()
 	end
 
 	-------------------[[ SHUFFLE DECKS ]]-------------------
+
 	-- [[SHUFFLE CITIES]]
 	local citiesDecksToShuffle = {
 		DeckZones.Cities.Age1,
@@ -214,6 +216,7 @@ function HandleStartGameButtonCo()
 	end
 
 	-------------------[[ INSERT CARDS INTO DECKS ]]-------------------
+
 	-- [[INSERT ARMADA CARDS]]
 	local AgeDecks = {
 		{
@@ -305,7 +308,8 @@ function HandleStartGameButtonCo()
 	end
 
 	-------------------[[ PREPARE WONDERS ]]-------------------
-	if ExpansionConfig.Leaders then
+
+	if ExpansionConfig.Leaders.Base then
 		while WonderBags.Leaders.getQuantity() ~= 0 do
 			WonderBags.Leaders.takeObject({
 				position = WonderBags.Base.getPosition() + Vector(0, 2, 0),
@@ -355,6 +359,7 @@ function HandleStartGameButtonCo()
 	end
 
 	-------------------[[ FINAL SHUFFLE BEFORE GAME START ]]-------------------
+
 	-- [[SHUFFLE AGE DECKS]]
 	local ageDecksToShuffle = {
 		DeckZones.Age.Age1,

@@ -115,16 +115,11 @@ function HandleCollectionButton() -- Button index 10
 end
 
 function HandlePromoWondersButton() -- Button index 11
-	ExpansionConfig.Promo = not ExpansionConfig.Promo
-	if ExpansionConfig.Promo then
+	WonderExpansionConfig.Promo = not WonderExpansionConfig.Promo
+	if WonderExpansionConfig.Promo then
 		SetupBoard.editButton({index = 11, label = "[✓]", font_color={0,1,0}})
 	else
 		SetupBoard.editButton({index = 11, label = "[    ]", font_color={1,1,1}})
-
-		-- If Collection is off but Draft is on, disable Draft
-		if DraftMode then
-			HandleDraftButton()
-		end
 	end
 end
 

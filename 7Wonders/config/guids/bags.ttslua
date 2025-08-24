@@ -1,4 +1,5 @@
 -------------------[[ BAG REFERENCES ]]-------------------
+
 -- [[BAGS | AGE 1]]
 Age1DeckBags = {
   Age1_3p = getObjectFromGUID("569cf4"),
@@ -83,7 +84,8 @@ WonderBags = {
   Leaders = getObjectFromGUID("c1c61c"),
   Cities = getObjectFromGUID("a26264"),
   Armada = getObjectFromGUID("0c6087"),
-  Collection = getObjectFromGUID("7c6699")
+  Collection = getObjectFromGUID("7c6699"),
+  Promo = getObjectFromGUID("01d275")
 }
 
 -- [[BAGS | COINS]]

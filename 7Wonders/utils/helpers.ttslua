@@ -137,11 +137,12 @@ end
 function ForceLoadAllAssets()
   -- Add any bags that should have their contents pre-loaded
   local AllBagsToLoad = {
-    WonderBags.Collection,
     WonderBags.Base,
     WonderBags.Leader,
     WonderBags.Cities,
     WonderBags.Armada,
+		WonderBags.Collection,
+		WonderBags.Promo,
     DockyardBag,
     FrontiersBag
   }
@@ -207,4 +208,52 @@ function printDeckZones()
 
 	printTable(DeckZones)
 	print("----- Finished Printing -----")
+end
+
+function TransferMoneyFromZones()
+	-- Transfer all coins from money transfer zones to the appropriate adjacent players
+	local seatedPlayers = getSeatedPlayers()
+	
+	for _, color in ipairs(seatedPlayers) do
+		local leftZone = MoneyTransferZones[color].Left
+		local rightZone = MoneyTransferZones[color].Right
+		
+		if leftZone then
+			local leftTarget = FindNextColor(color, "Left")
+			TransferCoinsFromZone(leftZone, leftTarget, color)
+		end
+		
+		if rightZone then
+			local rightTarget = FindNextColor(color, "Right")
+			TransferCoinsFromZone(rightZone, rightTarget, color)
+		end
+	end
+end
+
+function TransferCoinsFromZone(zone, targetColor, senderColor)
+	-- Transfer all coins from a specific zone to the target player's wonder area
+	if not zone or not targetColor then return end
+	
+	local objectsInZone = zone.getObjects()
+	local coinCount = 0
+	
+	for _, obj in ipairs(objectsInZone) do
+		if obj.getName():find("Coin") or obj.hasTag("Coin") then
+			coinCount = coinCount + GetCoinValue(obj)
+			
+			-- Move coin to target player's wonder area
+			local targetPos = Vector(PlayerInfo[targetColor].WonderPos)
+			targetPos.y = 2
+			targetPos.x = targetPos.x + math.random(-150, 150) / 100
+			targetPos.z = targetPos.z + math.random(-100, 100) / 100
+			
+			obj.setPosition(targetPos)
+			obj.setRotation(PlayerInfo[targetColor].ComponentRotation)
+		end
+	end
+	
+	if coinCount > 0 then
+		local coinText = (coinCount == 1) and " coin" or " coins"
+		broadcastToAll(Player[senderColor].steam_name .. " sent " .. coinCount .. coinText .. " to " .. Player[targetColor].steam_name, {r=0.8, g=0.8, b=0.2})
+	end
 end
