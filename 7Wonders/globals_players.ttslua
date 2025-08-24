@@ -169,11 +169,11 @@ PlayerZones = {
 
 -- [[ MONEY TRANSFER ZONES ]]
 MoneyTransferZones = {
-  White = { Left = nil, Right = nil },
-  Red = { Left = nil, Right = nil },
-  Yellow = { Left = nil, Right = nil },
-  Green = { Left = nil, Right = nil },
-  Pink = { Left = nil, Right = nil },
-  Blue = { Left = nil, Right = nil },
-  Purple = { Left = nil, Right = nil },
+  White = { Left = getObjectFromGUID("9ab059"), Right = getObjectFromGUID("4b3578") },
+  Red = { Left = getObjectFromGUID("23b61e"), Right = getObjectFromGUID("39b96b") },
+  Yellow = { Left = getObjectFromGUID("69f4c4"), Right = getObjectFromGUID("ac0adf") },
+  Green = { Left = getObjectFromGUID("80b6ae"), Right = getObjectFromGUID("8c2d96") },
+  Pink = { Left = getObjectFromGUID("6df06e"), Right = getObjectFromGUID("67d1c4") },
+  Blue = { Left = getObjectFromGUID("8d9e16"), Right = getObjectFromGUID("a34e0c") },
+  Purple = { Left = getObjectFromGUID("6d33b8"), Right = getObjectFromGUID("72d191") },
 }

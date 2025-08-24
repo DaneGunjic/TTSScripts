@@ -1,6 +1,6 @@
 function DealWonders()
 	GameState = "WonderStage"
-	updatePhaseUI("Phase: Wonder Selection", "Choose your wonder")
+	updatePhaseUI("Wonder Selection", "Choose your wonder")
 
 	-- Random Wonders
 	if RandomWonders then

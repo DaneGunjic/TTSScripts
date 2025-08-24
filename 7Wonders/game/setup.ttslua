@@ -1,5 +1,5 @@
 function HandleStartGameButtonCo()
-	updatePhaseUI("Please Wait", "Setting things up")
+	updatePhaseUI("Loading", "Please wait")
 
 	NumberOfPlayers = #getSeatedPlayers()
 

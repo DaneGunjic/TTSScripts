@@ -112,7 +112,7 @@ end
 function CreateReadyButtons()
 	for _, color in ipairs(getSeatedPlayers()) do
 		local flipped = IsPlayerWonderFlipped(color)
-		print(flipped)
+		--print(flipped)
 		local tempPosition = flipped and {0, -0.2, -0.8} or {0, 0.2, -0.8}
 		local tempRotation = flipped and {0, 0, 180} or {0, 0, 0}
 

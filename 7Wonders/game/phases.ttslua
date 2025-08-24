@@ -53,7 +53,7 @@ PhaseHandlers = {
       local transitionKey = self.PhaseBeforeResolving .. "->" .. self.PhaseAfterResolving
       local config = PhaseConfig.ResolveCardAction
 
-      print("new PhaseBeforeResolving: " .. self.PhaseBeforeResolving .. " new PhaseAfterResolving: " .. self.PhaseAfterResolving)
+      --print("new PhaseBeforeResolving: " .. self.PhaseBeforeResolving .. " new PhaseAfterResolving: " .. self.PhaseAfterResolving)
 
       if config.transitions[transitionKey] then
         config.transitions[transitionKey]()
@@ -94,7 +94,7 @@ PhaseHandlers = {
     end,
 
     transitionToLeaderSelection = function(self)
-      updatePhaseUI("Phase: Leader Selection", "Choose 1 Leader to play")
+      updatePhaseUI("Leader Selection", "Choose 1 Leader to play")
       CurrentPasses = 0
       MaximumPasses = 0
 
@@ -237,7 +237,7 @@ function LogPhaseTransition(fromPhase, toPhase)
 end
 
 function TransitionPhase()
-  print(string.format("TransitionPhase: %d/%d players ready", NumberOfReadyPlayers, NumberOfPlayers))
+  --print(string.format("TransitionPhase: %d/%d players ready", NumberOfReadyPlayers, NumberOfPlayers))
 
   if NumberOfReadyPlayers >= NumberOfPlayers then
     -- Play ready sound
@@ -247,11 +247,11 @@ function TransitionPhase()
     -- Transfer money from money transfer zones before phase transition
     TransferMoneyFromZones()
 
-    print("TransitionPhase, GameState is " .. GameState)
+    --print("TransitionPhase, GameState is " .. GameState)
     local currentHandler = PhaseHandlers[GameState]
     if ValidatePhaseHandler(GameState) then
       local previousPhase = GameState
-      print("Calling " .. currentHandler.name .. "'s next function")
+      printToAll("Everyone is ready! Advancing to the next phase.", "Grey")
       local nextPhase = currentHandler:next()
 
       UnreadyAllPlayers()
@@ -275,7 +275,7 @@ function ResolvePlayerActions()
   -- Execute all player actions
   for _, color in ipairs(seatedPlayers) do
     local action = PlayerSelectedAction[color]
-    print(string.format("%s selected action: %s", color, action))
+    --print(string.format("%s selected action: %s", color, action))
 
     local resolver = ActionResolvers[action]
     print(resolver)
@@ -283,7 +283,7 @@ function ResolvePlayerActions()
       local success, error = pcall(resolver, color)
       if not success then
         print(string.format("Error resolving %s action for %s: %s", action, color, error))
-        broadcastToAll(string.format("Error processing %s's action", Player[color].steam_name), {r=1, g=0, b=0})
+        print(string.format("Error processing %s's action", Player[color].steam_name), {r=1, g=0, b=0})
       end
     else
       print(string.format("Unknown action: %s for player %s", action, color))
@@ -331,7 +331,7 @@ function ResolveBuyAction(color)
 end
 
 function ResolveSellAction(color)
-  broadcastToAll(Player[color].steam_name .. " gained 3 coins for selling a card", {r=0.5, g=0.5, b=0.5})
+  printToAll(Player[color].steam_name .. " gained 3 coins for selling a card", {r=0.5, g=0.5, b=0.5})
   AddCoins(color, 3, true)
   DiscardPlayerActionCard(color)
 end
@@ -341,7 +341,7 @@ function ResolveBuildWonderAction(color)
 end
 
 function ResolveArmadaSellAction(color)
-  broadcastToAll(Player[color].steam_name .. " sold a card to advance their yellow ship ", {r=0.5, g=0.5, b=0.5})
+  printToAll(Player[color].steam_name .. " sold a card to advance their yellow ship ", {r=0.5, g=0.5, b=0.5})
   local ship = PlayerShips[color]["Yellow"]
   if ship then
     MoveShip(color, "Yellow")
@@ -461,7 +461,7 @@ function DoLeaderStage()
 
     -- Increment how many passes we did so far
     CurrentPasses = CurrentPasses + 1
-    updatePhaseUI("Phase: Leader Drafting", "Select 1 leader to keep\n"..CurrentPasses.."/"..MaximumPasses)
+    updatePhaseUI("Leader Drafting", "Select 1 leader to keep\n"..CurrentPasses.."/"..MaximumPasses)
 
     -- After 1 second pick up passed Leaders
     -- Passing right means we force take from left
@@ -562,7 +562,7 @@ function prepareAgeStage(ageNumber, deckKey, imageUrl, gameState)
     MaximumPasses = MaximumPasses + 1
   end
 
-  updatePhaseUI("Phase: Age " .. ageNumber, string.format("Select 1 card to play\n%d/%d", CurrentPasses, MaximumPasses + 1))
+  updatePhaseUI("Age " .. ageNumber, string.format("Select 1 card to play\n%d/%d", CurrentPasses, MaximumPasses + 1))
 
   -- Deal age cards
   local ageDeck = DeckZones.Age[deckKey].getObjects()
@@ -592,7 +592,7 @@ function doAgeStage(ageNumber, rotationDirection, forceTakeDirection, gameState)
 
     -- Increment how many passes we did so far
     CurrentPasses = CurrentPasses + 1
-    updatePhaseUI("Phase: Age " .. ageNumber, string.format("Select 1 card to play\n%d/%d", CurrentPasses, MaximumPasses + 1))
+    updatePhaseUI("Age " .. ageNumber, string.format("Select 1 card to play\n%d/%d", CurrentPasses, MaximumPasses + 1))
 
     -- After 1 second pick up passed cards
     Wait.time(function() ForceTakeCards(forceTakeDirection) end, 1)
