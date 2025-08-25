@@ -115,7 +115,7 @@ end
 function DoOtherUI(player, click, id)
   if click == "-1" then
     local tempPost = Vector(PlayerInfo[player.color].WonderPos)
-    tempPost.y = 2
+    tempPost.y = 3
     tempPost.x = tempPost.x + math.random(-150, 150) / 100
     tempPost.z = tempPost.z + math.random(-100, 100) / 100
 
@@ -355,14 +355,28 @@ function DoDebtUI(player, click, id)
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained 1 debt token", {r=0.8, g=0.2, b=0.2})
+      broadcastToAll(player.steam_name .. " gained debt token 1", {r=0.8, g=0.2, b=0.2})
+    elseif(string.find(id, "Debt2")) then
+      DebtBags.DebtToken2.takeObject({
+        position = tempPost,
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
+      })
+      broadcastToAll(player.steam_name .. " gained debt token 2", {r=0.8, g=0.2, b=0.2})
+    elseif(string.find(id, "Debt3")) then
+      DebtBags.DebtToken3.takeObject({
+        position = tempPost,
+        rotation = PlayerInfo[player.color].ComponentRotation,
+        smooth = false
+      })
+      broadcastToAll(player.steam_name .. " gained debt token 3", {r=0.8, g=0.2, b=0.2})
     elseif(string.find(id, "Debt5")) then
       DebtBags.DebtToken5.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained 5 debt tokens", {r=0.8, g=0.2, b=0.2})
+      broadcastToAll(player.steam_name .. " gained debt token 5", {r=0.8, g=0.2, b=0.2})
     end
   end
 
@@ -371,13 +385,25 @@ function DoDebtUI(player, click, id)
     for i, obj in ipairs(tempObjects) do
       if obj.hasTag("Debt1") and string.find(id, "Debt1") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost 1 debt token", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost debt token 1", {r=1, g=0, b=0})
+        return;
+      end
+
+      if obj.hasTag("Debt2") and string.find(id, "Debt2") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost debt token 2", {r=1, g=0, b=0})
+        return;
+      end
+
+      if obj.hasTag("Debt3") and string.find(id, "Debt3") then
+        obj.destruct()
+        broadcastToAll(player.steam_name .. " lost debt token 3", {r=1, g=0, b=0})
         return;
       end
 
       if obj.hasTag("Debt5") and string.find(id, "Debt5") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost 5 debt tokens", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost debt token 5", {r=1, g=0, b=0})
         return;
       end
     end

@@ -525,7 +525,9 @@ function HandleStartGameButtonCo()
 	DealWonders()
 
 	-- [[DEAL RANDOM ARMADA BOARDS AND SHIPS]]
-	DealArmada()
+	if ExpansionConfig.Armada then
+		DealArmada()
+	end
 
 	-- Play a sound
 	MusicPlayer.setCurrentAudioclip({url=Audio.ReadyAlt, title = "All Players Ready"})

@@ -137,23 +137,26 @@ end
 function ForceLoadAllAssets()
   -- Add any bags that should have their contents pre-loaded
   local AllBagsToLoad = {
-    WonderBags.Base,
-    WonderBags.Leader,
-    WonderBags.Cities,
-    WonderBags.Armada,
+		WonderBags.Base,
+		WonderBags.Leaders,
+		WonderBags.Cities,
+		WonderBags.Armada,
+		WonderBags.Edifice,
 		WonderBags.Collection,
 		WonderBags.Promo,
-    DockyardBag,
-    FrontiersBag
+		DockyardBag,
+		FrontiersBag
   }
 
   for _, BagToLoad in ipairs(AllBagsToLoad) do
     if BagToLoad and BagToLoad.getObjects then
+			--print(BagToLoad.getName())
       for _, Board in ipairs(BagToLoad.getObjects()) do
         BagToLoad.takeObject({
           position = {68.00, -10, 19.00},
           smooth = false,
           callback_function = function(spawnedObject)
+						--print(spawnedObject.getName())
             spawnedObject.setLock(true)
 
             -- Define recursive wait function

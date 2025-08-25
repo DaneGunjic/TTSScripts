@@ -34,6 +34,7 @@ SetupBoard = getObjectFromGUID("511af3")
 Audio = {
   Conflict = "https://drive.google.com/uc?export=download&id=1Ou4IsW7Qa1K_t4tShhzxOsB2iX0CE9xq",
   NavalCombat = "https://drive.google.com/uc?export=download&id=1ueJFdQ6pW40wCX6uvfPS7MnkqAn4LcEk",
+  Edifice = "https://drive.google.com/uc?export=download&id=1JAK4fkyVq6aBOAEHzgG8ye6-IKPwfydc",
   Ready = "https://drive.google.com/uc?export=download&id=1QrwInFT1NSl5IZDGkRj5RGjXyVj3L3yt",
   ReadyAlt = "https://drive.google.com/uc?export=download&id=1JAXFta5BudxY0XuqyRd2wJXm8hfuGNMX",
   EndGame = "https://drive.google.com/uc?export=download&id=1VkJicHYzS4tB37MzqfRpKn6J9bj0NHNg"

@@ -5,7 +5,7 @@ ShipRewards = {
         [3] = { coins = 3 },
         [4] = { coins = 4, message = "player_name has triggered tax -2!" },
         [5] = { coins = 5 },
-        [6] = { coins = 6, message = "player_name has triggered tax -3!" }
+        [6] = { message = "player_name has triggered tax -4!" }
     },
     Blue = { message = "{player_name} advanced their blue ship!" },
     Green = { message = "{player_name} advanced their green ship!" }

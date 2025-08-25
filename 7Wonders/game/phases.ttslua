@@ -38,6 +38,15 @@ PhaseConfig = {
       end,
       ["Age3->ConflictResolution"] = function()
         PrepareConflictResolution()
+      end,
+      ["Age1->EdificeStage"] = function()
+        PrepareEdificeStage()
+      end,
+      ["Age2->EdificeStage"] = function()
+        PrepareEdificeStage()
+      end,
+      ["Age3->EdificeStage"] = function()
+        PrepareEdificeStage()
       end
     }
   }
@@ -137,8 +146,12 @@ PhaseHandlers = {
     description = "Select a card to play",
     next = function()
       if CurrentPasses >= MaximumPasses then
-        sharedTransitionToCardAction("ConflictResolution", "Age1")
         DiscardPlayerHands()
+        if ExpansionConfig.Edifice then
+          sharedTransitionToCardAction("EdificeStage", "Age1")
+        else
+          sharedTransitionToCardAction("ConflictResolution", "Age1")
+        end
       else
         sharedTransitionToCardAction("Age1", "Age1")
       end
@@ -150,8 +163,12 @@ PhaseHandlers = {
     description = "Select a card to play",
     next = function()
       if CurrentPasses >= MaximumPasses then
-        sharedTransitionToCardAction("ConflictResolution", "Age2")
         DiscardPlayerHands()
+        if ExpansionConfig.Edifice then
+          sharedTransitionToCardAction("EdificeStage", "Age2")
+        else
+          sharedTransitionToCardAction("ConflictResolution", "Age2")
+        end
       else
         sharedTransitionToCardAction("Age2", "Age2")
       end
@@ -163,11 +180,24 @@ PhaseHandlers = {
     description = "Select a card to play",
     next = function()
       if CurrentPasses >= MaximumPasses then
-        sharedTransitionToCardAction("ConflictResolution", "Age3")
         DiscardPlayerHands()
+        if ExpansionConfig.Edifice then
+          sharedTransitionToCardAction("EdificeStage", "Age3")
+        else
+          sharedTransitionToCardAction("ConflictResolution", "Age3")
+        end
       else
         sharedTransitionToCardAction("Age3", "Age3")
       end
+    end
+  },
+
+  EdificeStage = {
+    name = "Edifice Resolution",
+    description = "Resolve project rewards",
+    next = function()
+      ClearWonderButtons()
+      PrepareConflictResolution()
     end
   },
 
@@ -179,7 +209,11 @@ PhaseHandlers = {
       if ExpansionConfig.Armada then
         PrepareNavalCombat()
       elseif ExpansionConfig.Leaders.Base then
-        -- Leaders
+        -- Leader selection
+        CurrentAge = CurrentAge + 1
+        GameState = "LeaderSelectionStage"
+        broadcastToAll("Take your leaders and choose 1 to play", {r=1, g=1, b=1})
+        updatePhaseUI("Leader Selection", "Choose 1 Leader to play")
       else
         PhaseHandlers.ConflictResolution:transitionToNextAge()
       end
@@ -191,7 +225,7 @@ PhaseHandlers = {
       elseif CurrentAge == 2 then
         PrepareAge3Stage()
       else
-        -- Age 3 complete, transition to endgame
+        EndTheGame()
       end
     end
   },
@@ -251,7 +285,7 @@ function TransitionPhase()
     local currentHandler = PhaseHandlers[GameState]
     if ValidatePhaseHandler(GameState) then
       local previousPhase = GameState
-      printToAll("Everyone is ready! Advancing to the next phase.", "Grey")
+      printToAll("Everyone is ready! Advancing game state.", "Grey")
       local nextPhase = currentHandler:next()
 
       UnreadyAllPlayers()
@@ -337,7 +371,25 @@ function ResolveSellAction(color)
 end
 
 function ResolveBuildWonderAction(color)
-  --
+  local data = PlayerCardHolder[color]
+  local objects = data.Zone.getObjects()
+
+  local tile = data.Tile
+  local card_object = nil
+
+  for _, obj in ipairs(objects) do
+    if obj.type == 'Card' or obj.type == 'Deck' then
+      card_object = obj
+      break
+    end
+  end
+
+  if card_object then
+    local new_pos = tile.getPosition() + tile.getTransformForward() * 5
+    card_object.setPosition(new_pos)
+  else
+    print("Error: No card object found for color: " .. color)
+  end
 end
 
 function ResolveArmadaSellAction(color)
@@ -491,6 +543,20 @@ end
 
 function DoAge3Stage()
   doAgeStage(3, "Right", "Left", "Age3")
+end
+
+function PrepareEdificeStage()
+  GameState = "EdificeStage"
+
+  CurrentPasses = 0
+  MaximumPasses = 0
+
+  broadcastToAll("Edifice resolution!", {r=0.5, g=1, b=0.5})
+  MusicPlayer.setCurrentAudioclip({url=Audio.Edifice, title = "Edifice"})
+  MusicPlayer.pause()
+
+  CreateReadyButtons()
+  updatePhaseUI("Edifice", "Take rewards/penalities")
 end
 
 function PrepareConflictResolution()

@@ -10,6 +10,7 @@ function MoveShip(player_color, ship_type)
     local ship = PlayerShips[player_color][ship_type]
     if ship then
         ship.setPosition(ship.getPosition() + ship.getTransformForward() * -1.4)
+        broadcastToColor("Ship moved.", player_color, {0.5, 0.5, 0.5})
     end
 
     local reward = ShipRewards[ship_type][movement_count + 1]
@@ -24,12 +25,51 @@ function MoveShip(player_color, ship_type)
     end
 end
 
+function MoveShipBackward(player_color, ship_type)
+    local movement_count = PlayerShipMovements[player_color][ship_type]
+    if movement_count <= 0 then
+        broadcastToColor("This ship cannot move backward any further.", player_color, {1, 0, 0})
+        return
+    end
+
+    PlayerShipMovements[player_color][ship_type] = movement_count - 1
+
+    local ship = PlayerShips[player_color][ship_type]
+    if ship then
+        ship.setPosition(ship.getPosition() + ship.getTransformForward() * 1.4)
+    end
+
+    broadcastToColor("Ship moved backward.", player_color, {0.5, 0.5, 0.5})
+end
+
 function StorePlayerShip(player, shipType, shipObject)
     if not PlayerShips[player] then
         PlayerShips[player] = {}
     end
     PlayerShips[player][shipType] = shipObject
-    --shipObject.setLock(true)
+    shipObject.setLock(true)
+
+    -- Create a button behind the ship for movement
+    local buttonPosition = {0, 0.2, 4} -- Behind the ship
+    shipObject.createButton({
+        click_function = "MoveShipButton_" .. player .. "_" .. shipType,
+        function_owner = self,
+        label = "+",
+        position = buttonPosition,
+        rotation = {0, 0, 0},
+        width = 1000,
+        height = 1000,
+        font_size = 1000
+    })
+
+    -- Create the click function for this specific ship
+    _G["MoveShipButton_" .. player .. "_" .. shipType] = function(obj, color, alt)
+        if alt then
+            MoveShipBackward(color, shipType)
+        else
+            MoveShip(color, shipType)
+        end
+    end
 end
 
 function DealArmada()
