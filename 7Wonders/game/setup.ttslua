@@ -167,6 +167,56 @@ function HandleStartGameButtonCo()
 		end
 	end
 
+	-- [[EDIFICE SETUP]]
+	if ExpansionConfig.Edifice then
+		EdificeBags.ProjectAge1.randomize()
+		EdificeBags.ProjectAge1.takeObject({
+			position = vector(5, 0.5, 0)
+		})
+
+		EdificeBags.ProjectAge2.randomize()
+		EdificeBags.ProjectAge2.takeObject({
+			position = vector(0, 0.5, 0)
+		})
+
+		EdificeBags.ProjectAge3.randomize()
+		EdificeBags.ProjectAge3.takeObject({
+			position = vector(-5, 0.5, 0)
+		})
+
+		local function PlayerToPawn(n)
+	    local map = {
+	        [3] = 2,
+	        [4] = 3,
+	        [5] = 3,
+	        [6] = 4,
+	        [7] = 5
+	    }
+	    return map[n]
+		end
+
+		local PawnsToSpawn = PlayerToPawn(NumberOfPlayers)
+
+		-- Spawn pawns on project cards
+		for i = 1, PawnsToSpawn do
+			EdificeBags.PawnAge1.takeObject({
+				position = vector(5, 5, -4 + (i * 1.2)),
+				rotation = vector(0, 90, 0),
+				smooth = false
+			})
+
+			EdificeBags.PawnAge2.takeObject({
+				position = vector(0, 5, -4 + (i * 1.2)),
+				smooth = false
+			})
+
+			EdificeBags.PawnAge3.takeObject({
+				position = vector(-5, 5, -4 + (i * 1.2)),
+				smooth = false
+			})
+		end
+	end
+
 	for i = 0, 200 do
 		coroutine.yield(0)
 	end
@@ -406,7 +456,8 @@ function HandleStartGameButtonCo()
 	WonderBags.Base.randomize()
 	DockyardBag.randomize()
 
-	-------------------[[ MOVE ALL UNUSED CARDS TO THE SIDE]]-------------------
+	-------------------[[ MOVE ALL UNUSED CARDS TO THE SIDE ]]-------------------
+
 	-- [[MOVE CITIES]]
 	local citiesDecksToMove = {
 		{

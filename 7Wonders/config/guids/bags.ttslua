@@ -78,6 +78,16 @@ IslandBags = {
 
 DockyardBag = getObjectFromGUID("5b9a9c")
 
+-- [[BAGS | EDIFICE]]
+EdificeBags = {
+  ProjectAge1 = getObjectFromGUID("e79369"),
+  ProjectAge2 = getObjectFromGUID("2f364a"),
+  ProjectAge3 = getObjectFromGUID("0402fd"),
+  PawnAge1 = getObjectFromGUID("1b76da"),
+  PawnAge2 = getObjectFromGUID("b54145"),
+  PawnAge3 = getObjectFromGUID("a498a3")
+}
+
 -- [[BAGS | WONDERS]]
 WonderBags = {
   Base = getObjectFromGUID("56d45b"),

@@ -28,6 +28,7 @@ function CreateActionButtons(tile)
 		tile.createButton({
 			click_function = "HandleArmadaSellCard",
 			label = "Armada\nSell",
+			tooltip = "Moves your yellow ship for free.\nAutomatically grants coins from Armada.",
 			position = {-1.5, 0.1, 0},
 			rotation = {0, 0 ,0},
 			width = 1250,
@@ -40,6 +41,7 @@ function CreateActionButtons(tile)
 	tile.createButton({
 		click_function = "HandleBuyCard",
 		label = "Buy",
+		tooltip = "Adds the card to your tableau.\nPay manually.",
 		position = {-0.95, 0.1, -0.5},
 		rotation = {0, 0 ,0},
 		width = 1000,
@@ -51,6 +53,7 @@ function CreateActionButtons(tile)
 	tile.createButton({
 		click_function = "HandleSellCard",
 		label = "Sell",
+		tooltip = "Gain 3 coins.",
 		position = {-0.95, 0.1, 0},
 		rotation = {0, 0 ,0},
 		width = 1000,
@@ -62,6 +65,7 @@ function CreateActionButtons(tile)
 	tile.createButton({
 		click_function = "HandleBuildWonder",
 		label = "Wonder",
+		tooltip = "Won't move the card. Place it below your wonder stage manually.",
 		position = {-0.95, 0.1, 0.5},
 		rotation = {0, 0 ,0},
 		width = 1350,
