@@ -123,23 +123,32 @@ function HandlePromoWondersButton() -- Button index 11
 	end
 end
 
-function HandleRandomButton() -- Button index 12
+function HandleOtherWondersButton()
+	WonderExpansionConfig.Other = not WonderExpansionConfig.Other
+	if WonderExpansionConfig.Other then
+		SetupBoard.editButton({index = 12, label = "[✓]", font_color={0,1,0}})
+	else
+		SetupBoard.editButton({index = 12, label = "[    ]", font_color={1,1,1}})
+	end
+end
+
+function HandleRandomButton() -- Button index 13
 	RandomWonders = not RandomWonders
 	-- If both are true then disable Draft
 	if RandomWonders then
-		SetupBoard.editButton({index = 12, label = "[✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 13, label = "[✓]", font_color={0,1,0}})
 		if DraftMode then
 			HandleDraftButton()
 		end
 	else
-		SetupBoard.editButton({index = 12, label = "[    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 13, label = "[    ]", font_color={1,1,1}})
 		if not DraftMode then
 			HandleDraftButton()
 		end
 	end
 end
 
-function HandleDraftButton() -- Button index 13
+function HandleDraftButton() -- Button index 14
 	DraftMode = not DraftMode
 
 	if DraftMode and not WonderExpansionConfig.Collection then
@@ -148,19 +157,19 @@ function HandleDraftButton() -- Button index 13
 	end
 
 	if DraftMode then
-		SetupBoard.editButton({index = 13, label = "[✓]", font_color={0,1,0}})
+		SetupBoard.editButton({index = 14, label = "[✓]", font_color={0,1,0}})
 		if RandomWonders then
 			HandleRandomButton()
 		end
 	else
-		SetupBoard.editButton({index = 13, label = "[    ]", font_color={1,1,1}})
+		SetupBoard.editButton({index = 14, label = "[    ]", font_color={1,1,1}})
 		if not RandomWonders then
 			HandleRandomButton()
 		end
 	end
 end
 
-function AdjustDraftNumber(obj, color, alt) -- Button index 14
+function AdjustDraftNumber(obj, color, alt) -- Button index 15
 	if alt then
 		DraftModeNumber = DraftModeNumber - 1
 		if DraftModeNumber == 2 then
@@ -174,7 +183,7 @@ function AdjustDraftNumber(obj, color, alt) -- Button index 14
 	end
 
 	SetupBoard.editButton({
-            index = 14,
+            index = 15,
             label = "[" .. DraftModeNumber .. "]"
 					})
 end

@@ -96,7 +96,8 @@ WonderBags = {
   Armada = getObjectFromGUID("0c6087"),
   Edifice = getObjectFromGUID("d9d9c0"),
   Collection = getObjectFromGUID("7c6699"),
-  Promo = getObjectFromGUID("01d275")
+  Promo = getObjectFromGUID("01d275"),
+  Other = getObjectFromGUID("3aa2e0")
 }
 
 -- [[BAGS | COINS]]

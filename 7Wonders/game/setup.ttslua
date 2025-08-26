@@ -395,6 +395,15 @@ function HandleStartGameButtonCo()
 		end
 	end
 
+	if WonderExpansionConfig.Other then
+		while WonderBags.Other.getQuantity() ~= 0 do
+			WonderBags.Other.takeObject({
+				position = WonderBags.Base.getPosition() + Vector(0, 2, 0),
+				smooth = false
+			})
+		end
+	end
+
 	if WonderExpansionConfig.Collection then
 		while WonderBags.Collection.getQuantity() ~= 0 do
 			WonderBags.Collection.takeObject({
@@ -633,6 +642,12 @@ function MakeSetupButtons()
 	DefaultButtonParams.label = "[    ]"
 	SetupBoard.createButton(DefaultButtonParams)
 
+	-- Change default parameters of "OTHER WONDERS" BUTTON
+	DefaultButtonParams.position = {0.35, 0.1, 0.18}
+	DefaultButtonParams.click_function = "HandleOtherWondersButton"
+	DefaultButtonParams.label = "[    ]"
+	SetupBoard.createButton(DefaultButtonParams)
+
 	-- Change default parameters of "RANDOM" BUTTON
 	DefaultButtonParams.position = {0.35, 0.1, 0.58}
 	DefaultButtonParams.click_function = "HandleRandomButton"
@@ -850,7 +865,19 @@ function MakeSetupBoardText()
 	DefaultTextParams.position = {
 		SetupBoard.getPosition().x + 7,
 		SetupBoard.getPosition().y + 0.1,
-		SetupBoard.getPosition().z - 2.5
+		SetupBoard.getPosition().z - 1.5
+	}
+
+	text = spawnObject(DefaultTextParams)
+	text.TextTool.setValue("OTHER")
+	text.TextTool.setFontSize(50)
+	text.setLock(true)
+	table.insert(TextOnSetupBoard, text)
+
+	DefaultTextParams.position = {
+		SetupBoard.getPosition().x + 7,
+		SetupBoard.getPosition().y + 0.1,
+		SetupBoard.getPosition().z - 3
 	}
 
 	text = spawnObject(DefaultTextParams)

@@ -16,7 +16,8 @@ ExpansionConfig = {
 
 WonderExpansionConfig = {
   Collection = false,
-  Promo = false
+  Promo = false,
+  Other = false
 }
 
 GameModeConfig = {
