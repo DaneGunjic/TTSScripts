@@ -243,7 +243,7 @@ PhaseHandlers = {
         broadcastToAll("Take your leaders and choose 1 to play", {r=1, g=1, b=1})
         updatePhaseUI("Leader Selection", "Choose 1 Leader to play")
       elseif not ExpansionConfig.Leaders.Base and CurrentAge < 3 then
-        _G[PrepareAge .. (CurrentAge + 1) .. Stage]()
+        _G["PrepareAge" .. (CurrentAge + 1) .. "Stage"]()
       else
         EndTheGame()
       end
