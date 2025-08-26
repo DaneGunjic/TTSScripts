@@ -133,8 +133,8 @@ NavalTokenBags = {
 -- [[BAGS | DEBT]]
 DebtBags = {
   DebtToken1 = getObjectFromGUID("b1f5a1"),
-  DebtToken2 = getObjectFromGUID("b1f5a1"),
-  DebtToken3 = getObjectFromGUID("b1f5a1"),
+  DebtToken2 = getObjectFromGUID("f6e7d1"),
+  DebtToken3 = getObjectFromGUID("b42e17"),
   DebtToken5 = getObjectFromGUID("ed2335")
 }
 

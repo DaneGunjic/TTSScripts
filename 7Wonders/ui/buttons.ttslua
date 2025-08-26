@@ -188,7 +188,7 @@ function AdjustDraftNumber(obj, color, alt) -- Button index 15
 					})
 end
 
--- [[CALL WHEN 'START GAME' BUTTON IS PRESSED]]
+-- [[CALL WHEN 'PLAY' BUTTON IS PRESSED]]
 function HandleStartGameButton()
 
 	for _, textObject in ipairs(TextOnSetupBoard) do
