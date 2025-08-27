@@ -31,7 +31,9 @@ Age3DeckBags = {
 GuildBags = {
   Base = getObjectFromGUID("3cec0e"),
   Promo = getObjectFromGUID("0cbeec"),
-  Cities = getObjectFromGUID("3f9ca3")
+  Cities = getObjectFromGUID("3f9ca3"),
+  Edifice = getObjectFromGUID("40916d"),
+  Leaders = getObjectFromGUID("c2dcce")
 }
 
 -- [[BAGS | LEADERS]]

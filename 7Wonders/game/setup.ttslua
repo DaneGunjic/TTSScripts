@@ -75,7 +75,7 @@ function HandleStartGameButtonCo()
 			})
 		end
 
-		-- Checks if "Cities" is used, it adds 1 guild card
+		-- Checks if "Cities" is used, it adds 2 guild cards
 		if bagKey == "Cities" and ExpansionConfig.Cities then
 			bagObject.takeObject({
 				position = DeckZones.Guild.getPosition(),
@@ -84,8 +84,26 @@ function HandleStartGameButtonCo()
 			})
 		end
 
-		-- Checks if "Promo Guilds" is used, it adds 2 guild cards
+		-- Checks if "Promo Guilds" is used, it adds 4 guild cards
 		if bagKey == "Promo" and ExpansionConfig.PromoGuilds then
+			bagObject.takeObject({
+				position = DeckZones.Guild.getPosition(),
+				rotation = DeckZones.Guild.getRotation() + vector(0, 0, 180),
+				smooth = false
+			})
+		end
+
+		-- Checks if "Edifice" is used, it adds 1 guild card
+		if bagKey == "Edifice" and ExpansionConfig.Edifice then
+			bagObject.takeObject({
+				position = DeckZones.Guild.getPosition(),
+				rotation = DeckZones.Guild.getRotation() + vector(0, 0, 180),
+				smooth = false
+			})
+		end
+
+		-- Checks if "Leaders" is used, it adds 1 guild card
+		if bagKey == "Leaders" and ExpansionConfig.Leaders.Base then
 			bagObject.takeObject({
 				position = DeckZones.Guild.getPosition(),
 				rotation = DeckZones.Guild.getRotation() + vector(0, 0, 180),
