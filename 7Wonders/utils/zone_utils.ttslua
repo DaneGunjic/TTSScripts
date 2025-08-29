@@ -7,7 +7,8 @@ function onObjectEnterScriptingZone(zone, enter_object)
 	local data = PlayerCardHolder[color]
 	local cardCount = CountCardsInZone(zone)
 
-	-- Highlight the tile
+	-- Stop blinking and highlight the tile
+	data.Tile.setVar("isBlinking", false)
 	data.Tile.highlightOn(color)
 	enter_object.setVar("highlightedTile", data.Tile)
 

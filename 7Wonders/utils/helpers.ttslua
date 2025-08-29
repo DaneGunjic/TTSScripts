@@ -271,3 +271,30 @@ function GetCoinValue(obj)
 	end
 	return 0 -- Default value if no coin tag found
 end
+
+function BlinkPlayerCardHolders()
+	local seatedPlayers = getSeatedPlayers()
+	for color, data in pairs(PlayerCardHolder) do
+		local isSeated = false
+		for _, seatedColor in ipairs(seatedPlayers) do
+			if seatedColor == color then
+				isSeated = true
+				break
+			end
+		end
+		if data.Tile and isSeated then
+			data.Tile.setVar("isBlinking", true)
+			local function doBlink()
+				if data.Tile.getVar("isBlinking") then
+					data.Tile.highlightOn(color, 1)
+					Wait.time(function()
+						if data.Tile.getVar("isBlinking") then
+							doBlink()
+						end
+					end, 2)
+				end
+			end
+			doBlink()
+		end
+	end
+end

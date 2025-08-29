@@ -1,6 +1,9 @@
 function HandleStartGameButtonCo()
 	updatePhaseUI("Loading", "Please wait")
 
+	-- Hide tutorial panel
+	UI.hide("TutorialPanel")
+
 	NumberOfPlayers = #getSeatedPlayers()
 
 	if NumberOfPlayers < 3 then

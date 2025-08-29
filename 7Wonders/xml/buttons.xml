@@ -1,3 +1,8 @@
+<!-- Tutorial Text - Always visible -->
+<Panel id="TutorialPanel" color="#000000FF" padding="5 5 5 5" width="600" height="50" rectAlignment="MiddleCenter" offsetXY="0 -440">
+  <Text id="TutorialText" text="TUTORIAL IN THE NOTEBOOK" fontSize="32" fontStyle="Bold" color="#FFD700FF"/>
+</Panel>
+
 <!-- Phase Panel - Always visible -->
 <Panel padding="5 5 5 5" id="PhasePanel" color="rgba(0,0,0,1)" width="200" height="80" offsetXY="600 500">
   <VerticalLayout>
@@ -9,25 +14,25 @@
 <!-- Menu Toggle Buttons - Player Specific -->
 
 <!-- WHITE TOGGLE -->
-<Button id="MenuToggleWhite" onClick="ToggleGameMenuWhite" rectAlignment="MiddleRight" offsetXY="-10 0" height="40" width="40" fontSize="20" fontStyle="Bold" color="#444444FF" textColor="#FFFFFFFF" visibility="White">▶
+<Button id="MenuToggleWhite" onClick="ToggleGameMenuWhite" rectAlignment="MiddleRight" offsetXY="-10 0" height="400" width="40" fontSize="20" fontStyle="Bold" color="#FFFFFF80" textColor="#000000FF" visibility="White" textAlignment="MiddleCenter">◀
 </Button>
 <!-- RED TOGGLE -->
-<Button id="MenuToggleRed" onClick="ToggleGameMenuRed" rectAlignment="MiddleRight" offsetXY="-10 0" height="40" width="40" fontSize="20" fontStyle="Bold" color="#444444FF" textColor="#FFFFFFFF" visibility="Red">▶
+<Button id="MenuToggleRed" onClick="ToggleGameMenuRed" rectAlignment="MiddleRight" offsetXY="-10 0" height="400" width="40" fontSize="20" fontStyle="Bold" color="#FF000080" textColor="#000000FF" visibility="Red" textAlignment="MiddleCenter">◀
 </Button>
 <!-- YELLOW TOGGLE -->
-<Button id="MenuToggleYellow" onClick="ToggleGameMenuYellow" rectAlignment="MiddleRight" offsetXY="-10 0" height="40" width="40" fontSize="20" fontStyle="Bold" color="#444444FF" textColor="#FFFFFFFF" visibility="Yellow">▶
+<Button id="MenuToggleYellow" onClick="ToggleGameMenuYellow" rectAlignment="MiddleRight" offsetXY="-10 0" height="400" width="40" fontSize="20" fontStyle="Bold" color="#FFFF0080" textColor="#000000FF" visibility="Yellow" textAlignment="MiddleCenter">◀
 </Button>
 <!-- GREEN TOGGLE -->
-<Button id="MenuToggleGreen" onClick="ToggleGameMenuGreen" rectAlignment="MiddleRight" offsetXY="-10 0" height="40" width="40" fontSize="20" fontStyle="Bold" color="#444444FF" textColor="#FFFFFFFF" visibility="Green">▶
+<Button id="MenuToggleGreen" onClick="ToggleGameMenuGreen" rectAlignment="MiddleRight" offsetXY="-10 0" height="400" width="40" fontSize="20" fontStyle="Bold" color="#00FF0080" textColor="#000000FF" visibility="Green" textAlignment="MiddleCenter">◀
 </Button>
 <!-- BLUE TOGGLE -->
-<Button id="MenuToggleBlue" onClick="ToggleGameMenuBlue" rectAlignment="MiddleRight" offsetXY="-10 0" height="40" width="40" fontSize="20" fontStyle="Bold" color="#444444FF" textColor="#FFFFFFFF" visibility="Blue">▶
+<Button id="MenuToggleBlue" onClick="ToggleGameMenuBlue" rectAlignment="MiddleRight" offsetXY="-10 0" height="400" width="40" fontSize="20" fontStyle="Bold" color="#0000FF80" textColor="#000000FF" visibility="Blue" textAlignment="MiddleCenter">◀
 </Button>
 <!-- PURPLE TOGGLE -->
-<Button id="MenuTogglePurple" onClick="ToggleGameMenuPurple" rectAlignment="MiddleRight" offsetXY="-10 0" height="40" width="40" fontSize="20" fontStyle="Bold" color="#444444FF" textColor="#FFFFFFFF" visibility="Purple">▶
+<Button id="MenuTogglePurple" onClick="ToggleGameMenuPurple" rectAlignment="MiddleRight" offsetXY="-10 0" height="400" width="40" fontSize="20" fontStyle="Bold" color="#80008080" textColor="#000000FF" visibility="Purple" textAlignment="MiddleCenter">◀
 </Button>
 <!-- PINK TOGGLE -->
-<Button id="MenuTogglePink" onClick="ToggleGameMenuPink" rectAlignment="MiddleRight" offsetXY="-10 0" height="40" width="40" fontSize="20" fontStyle="Bold" color="#444444FF" textColor="#FFFFFFFF" visibility="Pink">▶
+<Button id="MenuTogglePink" onClick="ToggleGameMenuPink" rectAlignment="MiddleRight" offsetXY="-10 0" height="400" width="40" fontSize="20" fontStyle="Bold" color="#FFC0CB80" textColor="#000000FF" visibility="Pink" textAlignment="MiddleCenter">◀
 </Button>
 
 <!-- Collapsible Game Menu Panels - Player Specific -->

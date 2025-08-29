@@ -111,6 +111,7 @@ PhaseHandlers = {
         ForceTakePersonalCards()
         Wait.time(function()
           GameState = "LeaderSelectionStage"
+          BlinkPlayerCardHolders()
         end, 0.1)
       end, 0.1)
     end
@@ -495,8 +496,9 @@ function PrepareLeaderStage()
   -- Tag all dealt cards as leaders
   tagPlayerHandObjects("Leader", 1)
 
-  -- Update player tiles with leader image
+  -- Update player tiles with leader image and start blinking
   updatePlayerTiles("https://i.imgur.com/oEisU1I.jpeg")
+  BlinkPlayerCardHolders()
 end
 
 function DoLeaderStage()
@@ -640,8 +642,9 @@ function prepareAgeStage(ageNumber, deckKey, imageUrl, gameState)
     return
   end
 
-  -- Update player tiles with age image
+  -- Update player tiles with age image and start blinking
   updatePlayerTiles(imageUrl)
+  BlinkPlayerCardHolders()
 end
 
 function doAgeStage(ageNumber, rotationDirection, forceTakeDirection, gameState)

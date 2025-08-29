@@ -18,43 +18,50 @@ GameMenuOpen = {
 function ToggleGameMenuWhite()
   GameMenuOpen.White = not GameMenuOpen.White
   UI.setAttribute("GameMenuPanelWhite", "active", tostring(GameMenuOpen.White))
-  UI.setAttribute("MenuToggleWhite", "text", GameMenuOpen.White and "◄" or "▶")
+  UI.setAttribute("MenuToggleWhite", "text", GameMenuOpen.White and "▶" or "◀")
+  UI.setAttribute("MenuToggleWhite", "textColor", "#000000FF")
 end
 
 function ToggleGameMenuRed()
   GameMenuOpen.Red = not GameMenuOpen.Red
   UI.setAttribute("GameMenuPanelRed", "active", tostring(GameMenuOpen.Red))
-  UI.setAttribute("MenuToggleRed", "text", GameMenuOpen.Red and "◄" or "▶")
+  UI.setAttribute("MenuToggleRed", "text", GameMenuOpen.Red and "▶" or "◀")
+  UI.setAttribute("MenuToggleRed", "textColor", "#000000FF")
 end
 
 function ToggleGameMenuYellow()
   GameMenuOpen.Yellow = not GameMenuOpen.Yellow
   UI.setAttribute("GameMenuPanelYellow", "active", tostring(GameMenuOpen.Yellow))
-  UI.setAttribute("MenuToggleYellow", "text", GameMenuOpen.Yellow and "◄" or "▶")
+  UI.setAttribute("MenuToggleYellow", "text", GameMenuOpen.Yellow and "▶" or "◀")
+  UI.setAttribute("MenuToggleYellow", "textColor", "#000000FF")
 end
 
 function ToggleGameMenuGreen()
   GameMenuOpen.Green = not GameMenuOpen.Green
   UI.setAttribute("GameMenuPanelGreen", "active", tostring(GameMenuOpen.Green))
-  UI.setAttribute("MenuToggleGreen", "text", GameMenuOpen.Green and "◄" or "▶")
+  UI.setAttribute("MenuToggleGreen", "text", GameMenuOpen.Green and "▶" or "◀")
+  UI.setAttribute("MenuToggleGreen", "textColor", "#000000FF")
 end
 
 function ToggleGameMenuBlue()
   GameMenuOpen.Blue = not GameMenuOpen.Blue
   UI.setAttribute("GameMenuPanelBlue", "active", tostring(GameMenuOpen.Blue))
-  UI.setAttribute("MenuToggleBlue", "text", GameMenuOpen.Blue and "◄" or "▶")
+  UI.setAttribute("MenuToggleBlue", "text", GameMenuOpen.Blue and "▶" or "◀")
+  UI.setAttribute("MenuToggleBlue", "textColor", "#000000FF")
 end
 
 function ToggleGameMenuPurple()
   GameMenuOpen.Purple = not GameMenuOpen.Purple
   UI.setAttribute("GameMenuPanelPurple", "active", tostring(GameMenuOpen.Purple))
-  UI.setAttribute("MenuTogglePurple", "text", GameMenuOpen.Purple and "◄" or "▶")
+  UI.setAttribute("MenuTogglePurple", "text", GameMenuOpen.Purple and "▶" or "◀")
+  UI.setAttribute("MenuTogglePurple", "textColor", "#000000FF")
 end
 
 function ToggleGameMenuPink()
   GameMenuOpen.Pink = not GameMenuOpen.Pink
   UI.setAttribute("GameMenuPanelPink", "active", tostring(GameMenuOpen.Pink))
-  UI.setAttribute("MenuTogglePink", "text", GameMenuOpen.Pink and "◄" or "▶")
+  UI.setAttribute("MenuTogglePink", "text", GameMenuOpen.Pink and "▶" or "◀")
+  UI.setAttribute("MenuTogglePink", "textColor", "#000000FF")
 end
 
 function DoCoinUI(player, click, id)

@@ -104,12 +104,20 @@ function UnreadyPlayerIfNeeded(color, zone)
 			ReadyList[color] = false
 			NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 			broadcastToAll(Player[color].steam_name .. " is not ready")
+			-- Restart blinking when player becomes unready
+			if PlayerCardHolder[color] and PlayerCardHolder[color].Tile then
+				BlinkPlayerCardHolders()
+			end
 		end
 	elseif GameState == "LeaderSelectionStage" and ReadyList[color] then
 		--print("settings ready to false, second if")
 		ReadyList[color] = false
 		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 		broadcastToAll(Player[color].steam_name .. " is not ready")
+		-- Restart blinking when player becomes unready
+		if PlayerCardHolder[color] and PlayerCardHolder[color].Tile then
+			BlinkPlayerCardHolders()
+		end
 	end
 end
 
