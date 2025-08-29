@@ -1,3 +1,19 @@
+function InitializeReadyStatusCircles()
+	-- Initialize ready status circles based on seated players
+	local allPlayerColors = {"White", "Red", "Yellow", "Green", "Blue", "Purple", "Pink"}
+	local seatedPlayers = getSeatedPlayers()
+
+	-- Hide all circles first
+	for _, color in ipairs(allPlayerColors) do
+		UI.setAttribute("Ready" .. color, "active", "false")
+	end
+
+	-- Show circles only for seated players
+	for _, color in ipairs(seatedPlayers) do
+		UI.setAttribute("Ready" .. color, "active", "true")
+	end
+end
+
 function UnreadyAllPlayers()
 	local seatedPlayers = getSeatedPlayers()
 
@@ -5,6 +21,8 @@ function UnreadyAllPlayers()
 		--print("Setting player " .. color .. " to not ready")
 		ReadyList[color] = false
 		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
+		-- Show all circles when players are unreadied
+		UI.setAttribute("Ready" .. color, "active", "true")
 	end
 end
 
@@ -16,8 +34,12 @@ function ReadyUp(player)
 
 	if ReadyList[player.color] then
 		NumberOfReadyPlayers = NumberOfReadyPlayers + 1
+		-- Hide the circle when player is ready
+		UI.setAttribute("Ready" .. player.color, "active", "false")
 	else
 		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
+		-- Show the circle when player is not ready
+		UI.setAttribute("Ready" .. player.color, "active", "true")
 	end
 
 	TransitionPhase()
@@ -104,6 +126,8 @@ function UnreadyPlayerIfNeeded(color, zone)
 			ReadyList[color] = false
 			NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 			broadcastToAll(Player[color].steam_name .. " is not ready")
+			-- Show the circle when player becomes unready
+			UI.setAttribute("Ready" .. color, "active", "true")
 			-- Restart blinking when player becomes unready
 			if PlayerCardHolder[color] and PlayerCardHolder[color].Tile then
 				BlinkPlayerCardHolders()
@@ -114,6 +138,8 @@ function UnreadyPlayerIfNeeded(color, zone)
 		ReadyList[color] = false
 		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 		broadcastToAll(Player[color].steam_name .. " is not ready")
+		-- Show the circle when player becomes unready
+		UI.setAttribute("Ready" .. color, "active", "true")
 		-- Restart blinking when player becomes unready
 		if PlayerCardHolder[color] and PlayerCardHolder[color].Tile then
 			BlinkPlayerCardHolders()

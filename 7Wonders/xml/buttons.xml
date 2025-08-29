@@ -1,3 +1,16 @@
+<!-- Player Ready Status Panel -->
+<Panel id="ReadyStatusPanel" color="#000000AA" padding="5 5 5 5" width="200" height="40" offsetXY="600 450">
+  <HorizontalLayout spacing="5">
+    <Text id="ReadyWhite" text="●" color="#FFFFFF" outline="#000000" outlineSize="1" fontSize="20" />
+    <Text id="ReadyRed" text="●" color="#FF0000" outline="#000000" outlineSize="1" fontSize="20" />
+    <Text id="ReadyYellow" text="●" color="#FFFF00" outline="#000000" outlineSize="1" fontSize="20" />
+    <Text id="ReadyGreen" text="●" color="#00FF00" outline="#000000" outlineSize="1" fontSize="20" />
+    <Text id="ReadyBlue" text="●" color="#0000FF" outline="#000000" outlineSize="1" fontSize="20" />
+    <Text id="ReadyPurple" text="●" color="#800080" outline="#000000" outlineSize="1" fontSize="20" />
+    <Text id="ReadyPink" text="●" color="#FFC0CB" outline="#000000" outlineSize="1" fontSize="20" />
+  </HorizontalLayout>
+</Panel>
+
 <!-- Tutorial Text - Always visible -->
 <Panel id="TutorialPanel" color="#000000FF" padding="5 5 5 5" width="600" height="50" rectAlignment="MiddleCenter" offsetXY="0 -440">
   <Text id="TutorialText" text="TUTORIAL IN THE NOTEBOOK" fontSize="32" fontStyle="Bold" color="#FFD700FF"/>

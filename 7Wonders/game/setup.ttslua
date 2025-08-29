@@ -1,5 +1,6 @@
 function HandleStartGameButtonCo()
 	updatePhaseUI("Loading", "Please wait")
+	InitializeReadyStatusCircles()
 
 	-- Hide tutorial panel
 	UI.hide("TutorialPanel")
