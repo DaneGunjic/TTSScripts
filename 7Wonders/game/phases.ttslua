@@ -412,7 +412,7 @@ function ResolveBuyAction(color)
   end
 
   if card_object then
-    local new_pos = tile.getPosition() + tile.getTransformForward() * -5
+    local new_pos = tile.getPosition() + tile.getTransformRight() * -3 + Vector(0, 2, 0)
     card_object.setPosition(new_pos)
 
     local new_rot = card_object.getRotation()
