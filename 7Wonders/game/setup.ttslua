@@ -156,6 +156,19 @@ function HandleStartGameButtonCo()
 		end
 	end
 
+	-- [[RUINS DECKS SETUP]]
+	if ExpansionConfig.Ruins then
+		for bagKey, bagObject in pairs(RuinsBags) do
+			if bagKey == "Base" then
+				bagObject.takeObject({
+					position = DeckZones.Ruins.getPosition(),
+					rotation = DeckZones.Ruins.getRotation() + vector(0, 0, 180),
+					smooth = false
+				})
+			end
+		end
+	end
+
 	-- [[CITIES DECKS SETUP]]
 	for bagKey, bagObject in pairs(CitiesBags) do
 		if ExpansionConfig.Cities then
@@ -461,6 +474,13 @@ function HandleStartGameButtonCo()
 
 	-- [[SHUFFLE LEADER DECK]]
 	for _, items in ipairs(DeckZones.Leaders.getObjects()) do
+		if items.randomize then
+			items.randomize()
+		end
+	end
+
+	-- [[SHUFFLE RUINS DECK]]
+	for _, items in ipairs(DeckZones.Ruins.getObjects()) do
 		if items.randomize then
 			items.randomize()
 		end

@@ -81,7 +81,9 @@ PhaseHandlers = {
       FinishWonderStage()
 
       -- Determine next phase based on expansion configuration
-      if ExpansionConfig.Leaders.Base then
+      if ExpansionConfig.Ruins then
+        PrepareRuinsStage()
+      elseif ExpansionConfig.Leaders.Base then
         PrepareLeaderStage()
       else
         PrepareAge1Stage()
@@ -139,6 +141,62 @@ PhaseHandlers = {
       PhaseHandlers[GameState].PhaseBeforeResolving = beforePhase
       ResolvePlayerActions()
       CreateReadyButtons()
+    end
+  },
+
+  RuinsDrafting = {
+    name = "Ruins Drafting",
+    description = "Draft ruins cards",
+    next = function()
+      -- Rotate and force take cards, update UI
+      DoRuinsStage()
+
+      -- Transition to ruins selection after maximum passes
+      if CurrentPasses >= MaximumPasses then
+        PhaseHandlers.RuinsDrafting:transitionToRuinsSelection()
+      end
+    end,
+
+    transitionToRuinsSelection = function(self)
+      updatePhaseUI("Ruins Selection", "Place 3 Ruins cards onto your card holder")
+      CurrentPasses = 0
+      MaximumPasses = 0
+
+      --BlinkPlayerCardHolders()
+    end
+  },
+
+  RuinsStage = {
+    name = "Ruins Selection",
+    description = "Place 3 Ruins cards onto your card holder",
+    next = function()
+      -- Check if all players have placed exactly 3 cards
+      local allPlayersReady = true
+      for _, player in ipairs(Player.getPlayers()) do
+        local handCount = #player.getHandObjects()
+        if handCount ~= 1 then -- Should have 1 card left after placing 3
+          allPlayersReady = false
+          break
+        end
+      end
+
+      if allPlayersReady then
+        -- All players have placed their 3 ruins cards, move to next phase
+        PhaseHandlers.RuinsStage:transitionToNextPhase()
+      end
+    end,
+
+    transitionToNextPhase = function(self)
+      -- Discard remaining cards and proceed to the appropriate age
+      DiscardPlayerHands()
+
+      if CurrentAge == 1 then
+        PrepareAge1Stage()
+      elseif CurrentAge == 2 then
+        PrepareAge2Stage()
+      elseif CurrentAge == 3 then
+        PrepareAge3Stage()
+      end
     end
   },
 
@@ -501,6 +559,31 @@ function PrepareLeaderStage()
   BlinkPlayerCardHolders()
 end
 
+function PrepareRuinsStage()
+  -- Initialize ruins drafting phase
+  GameState = "RuinsDrafting"
+  MaximumPasses = 3
+  CurrentPasses = 0
+
+  updatePhaseUI("Ruins Drafting", string.format("Select 1 ruins card to keep\n%d/%d", CurrentPasses, MaximumPasses))
+
+  -- Deal ruins cards
+  local ruinsDeck = DeckZones.Ruins.getObjects()
+  if ruinsDeck and ruinsDeck[1] then
+    ruinsDeck[1].deal(4)
+  else
+    print("Error: Ruins deck not found")
+    return
+  end
+
+  -- Tag all dealt cards as ruins
+  tagPlayerHandObjects("Ruins", 1)
+
+  -- Update player tiles with ruins image and start blinking
+  updatePlayerTiles("https://i.imgur.com/X9j0RKr.png")
+  BlinkPlayerCardHolders()
+end
+
 function DoLeaderStage()
   -- Check how many passes we did so far
   if CurrentPasses < MaximumPasses then
@@ -520,6 +603,28 @@ function DoLeaderStage()
     -- After 1 second pick up passed Leaders
     -- Passing right means we force take from left
     Wait.time(function() ForceTakeCards("Left") end, 1)
+  end
+end
+
+function DoRuinsStage()
+  -- Check how many passes we did so far
+  if CurrentPasses < MaximumPasses then
+    Wait.time(function()
+      for _, PlayerInstance in ipairs(Player.getPlayers()) do
+        local handObjects = PlayerInstance.getHandObjects()
+        for _, Card in ipairs(handObjects) do
+          RotateHands(Card, PlayerInstance.color, "Left")
+        end
+      end
+    end , 0.1)
+
+    -- Increment how many passes we did so far
+    CurrentPasses = CurrentPasses + 1
+    updatePhaseUI("Ruins Drafting", "Select 1 ruins card to keep\n"..CurrentPasses.."/"..MaximumPasses)
+
+    -- After 1 second pick up passed Ruins
+    -- Passing left means we force take from right
+    Wait.time(function() ForceTakeCards("Right") end, 1)
   end
 end
 

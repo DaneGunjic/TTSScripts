@@ -17,6 +17,7 @@ DeckZones = {
   },
 
   Leaders = getObjectFromGUID("d679f4"),
+  Ruins = getObjectFromGUID("39e789"),
   Guild = getObjectFromGUID("838ee1"),
 
   Discard = getObjectFromGUID("cc6e31"),

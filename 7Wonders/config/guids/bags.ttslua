@@ -44,6 +44,14 @@ LeaderBags = {
   Promo = getObjectFromGUID("a5f906")
 }
 
+-- [[BAGS | RUINS]]
+RuinsBags = {
+  Base = getObjectFromGUID("b34a11"),
+  Leaders = getObjectFromGUID("b14396"),
+  Cities = getObjectFromGUID("bd149a"),
+  Myths = getObjectFromGUID("1c90e1")
+}
+
 -- [[BAGS | CITIES]]
 CitiesBags = {
   Age1 = getObjectFromGUID("e4136a"),
