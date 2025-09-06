@@ -1,0 +1,192 @@
+-- Player Timer System
+-- Tracks how long each player takes when they are not ready
+
+-- Timer data structure
+PlayerTimers = {
+  White = { totalTime = 0, startTime = nil, isRunning = false },
+  Brown = { totalTime = 0, startTime = nil, isRunning = false },
+  Red = { totalTime = 0, startTime = nil, isRunning = false },
+  Orange = { totalTime = 0, startTime = nil, isRunning = false },
+  Yellow = { totalTime = 0, startTime = nil, isRunning = false },
+  Green = { totalTime = 0, startTime = nil, isRunning = false },
+  Blue = { totalTime = 0, startTime = nil, isRunning = false },
+  Purple = { totalTime = 0, startTime = nil, isRunning = false }
+}
+
+-- Game timer state
+GameTimerActive = false
+
+-- Initialize timers at game start
+function InitializePlayerTimers()
+  GameTimerActive = true
+  local currentTime = os.time()
+
+  -- Only initialize timers for seated players
+  for _, color in ipairs(getSeatedPlayers()) do
+    if PlayerTimers[color] then
+      PlayerTimers[color].totalTime = 0
+      PlayerTimers[color].startTime = currentTime
+      PlayerTimers[color].isRunning = true
+    end
+  end
+
+  -- Start the timer update coroutine (background only)
+  startLuaCoroutine(self, "UpdateTimerDisplay")
+end
+
+-- Start timer for a specific player (when they become unready)
+function StartPlayerTimer(playerColor)
+  if not GameTimerActive then return end
+
+  local timer = PlayerTimers[playerColor]
+  if timer and not timer.isRunning then
+    timer.startTime = os.time()
+    timer.isRunning = true
+  end
+end
+
+-- Stop timer for a specific player (when they become ready)
+function StopPlayerTimer(playerColor)
+  if not GameTimerActive then return end
+
+  local timer = PlayerTimers[playerColor]
+  if timer and timer.isRunning then
+    local currentTime = os.time()
+    timer.totalTime = timer.totalTime + (currentTime - timer.startTime)
+    timer.isRunning = false
+    timer.startTime = nil
+  end
+end
+
+-- Get current total time for a player (including running time)
+function GetPlayerTotalTime(playerColor)
+  local timer = PlayerTimers[playerColor]
+  if not timer then return 0 end
+
+  local totalTime = timer.totalTime
+  if timer.isRunning and timer.startTime then
+    totalTime = totalTime + (os.time() - timer.startTime)
+  end
+
+  return totalTime
+end
+
+-- Format time as MM:SS
+function FormatTime(seconds)
+  local minutes = math.floor(seconds / 60)
+  local secs = seconds % 60
+  return string.format("%02d:%02d", minutes, secs)
+end
+
+-- Pause all timers permanently (at game end)
+function PauseAllTimers()
+  GameTimerActive = false
+
+  -- Only pause timers for seated players
+  for _, color in ipairs(getSeatedPlayers()) do
+    local timer = PlayerTimers[color]
+    if timer and timer.isRunning then
+      StopPlayerTimer(color)
+    end
+  end
+end
+
+-- Background timer tracking (no UI updates during gameplay)
+
+-- Update timer display (coroutine function)
+function UpdateTimerDisplay()
+  while GameTimerActive do
+    coroutine.yield(0)
+    Wait.time(function()
+      if GameTimerActive then
+        startLuaCoroutine(self, "UpdateTimerDisplay")
+      end
+    end, 1) -- Update every second
+    return 1
+  end
+end
+
+-- Show timer results after game ends
+function ShowTimerResults()
+  local seatedPlayers = getSeatedPlayers()
+
+  if #seatedPlayers == 0 then
+    return
+  end
+
+  -- Build timer results using the base panel structure
+  local timerXML = '<Panel id="TimerResultsPanel" color="#000000AA" padding="5 5 5 5" width="400" height="120" offsetXY="600 350">'
+  timerXML = timerXML .. '<VerticalLayout spacing="2">'
+  timerXML = timerXML .. '<Text text="Final Player Decision Times" color="#FFFFFF" fontSize="14" fontStyle="Bold" />'
+  timerXML = timerXML .. '<HorizontalLayout spacing="10">'
+
+  -- Split seated players into two columns
+  local halfCount = math.ceil(#seatedPlayers / 2)
+
+  -- Left column
+  timerXML = timerXML .. '<VerticalLayout spacing="1">'
+  for i = 1, halfCount do
+    if seatedPlayers[i] then
+      local color = seatedPlayers[i]
+      local totalTime = GetPlayerTotalTime(color)
+      local formattedTime = FormatTime(totalTime)
+      local colorHex = GetPlayerColorHex(color)
+      timerXML = timerXML .. '<Text text="' .. color .. ': ' .. formattedTime .. '" color="' .. colorHex .. '" fontSize="12" />'
+    end
+  end
+  timerXML = timerXML .. '</VerticalLayout>'
+
+  -- Right column
+  timerXML = timerXML .. '<VerticalLayout spacing="1">'
+  for i = halfCount + 1, #seatedPlayers do
+    local color = seatedPlayers[i]
+    local totalTime = GetPlayerTotalTime(color)
+    local formattedTime = FormatTime(totalTime)
+    local colorHex = GetPlayerColorHex(color)
+    timerXML = timerXML .. '<Text text="' .. color .. ': ' .. formattedTime .. '" color="' .. colorHex .. '" fontSize="12" />'
+  end
+  timerXML = timerXML .. '</VerticalLayout>'
+
+  timerXML = timerXML .. '</HorizontalLayout>'
+  timerXML = timerXML .. '</VerticalLayout>'
+  timerXML = timerXML .. '</Panel>'
+
+  -- Show the results UI
+  UI.setXml(timerXML)
+end
+
+-- Hide timer results panel
+function HideTimerResults()
+  UI.setAttribute("TimerResultsPanel", "active", "false")
+end
+
+-- Get hex color code for player color
+function GetPlayerColorHex(color)
+  local colorMap = {
+    White = "#FFFFFF",
+    Brown = "#8B4513",
+    Red = "#FF0000",
+    Orange = "#FFA500",
+    Yellow = "#FFFF00",
+    Green = "#00FF00",
+    Blue = "#0000FF",
+    Purple = "#800080",
+    Pink = "#FFC0CB"
+  }
+  return colorMap[color] or "#FFFFFF"
+end
+
+-- Reset all timers
+function ResetAllTimers()
+  GameTimerActive = false
+
+  -- Only reset timers for seated players
+  for _, color in ipairs(getSeatedPlayers()) do
+    local timer = PlayerTimers[color]
+    if timer then
+      timer.totalTime = 0
+      timer.startTime = nil
+      timer.isRunning = false
+    end
+  end
+end

@@ -11,6 +11,7 @@
 #include !\7Wonders\modules\wonder_manager.ttslua
 
 #include !\7Wonders\players\ready_system.ttslua
+#include !\7Wonders\players\timer_system.ttslua
 
 #include !\7Wonders\ui\buttons.ttslua
 #include !\7Wonders\ui\xml.ttslua

@@ -11,6 +11,8 @@
   </HorizontalLayout>
 </Panel>
 
+<!-- Timer panel will be created dynamically at game end -->
+
 <!-- Tutorial Text - Always visible -->
 <Panel id="TutorialPanel" color="#000000FF" padding="5 5 5 5" width="600" height="50" rectAlignment="MiddleCenter" offsetXY="0 -440">
   <Text id="TutorialText" text="TUTORIAL IN THE NOTEBOOK" fontSize="32" fontStyle="Bold" color="#FFD700FF"/>

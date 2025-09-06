@@ -778,4 +778,8 @@ end
 
 function EndTheGame()
     updatePhaseUI("End of the game", "GG")
+    -- Pause all player timers permanently
+    PauseAllTimers()
+    -- Show timer results after game ends
+    ShowTimerResults()
 end

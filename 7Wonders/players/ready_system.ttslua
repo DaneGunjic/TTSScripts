@@ -23,6 +23,8 @@ function UnreadyAllPlayers()
 		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 		-- Show all circles when players are unreadied
 		UI.setAttribute("Ready" .. color, "active", "true")
+		-- Start timer when player becomes unready
+		StartPlayerTimer(color)
 	end
 end
 
@@ -36,10 +38,14 @@ function ReadyUp(player)
 		NumberOfReadyPlayers = NumberOfReadyPlayers + 1
 		-- Hide the circle when player is ready
 		UI.setAttribute("Ready" .. player.color, "active", "false")
+		-- Stop timer when player becomes ready
+		StopPlayerTimer(player.color)
 	else
 		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 		-- Show the circle when player is not ready
 		UI.setAttribute("Ready" .. player.color, "active", "true")
+		-- Start timer when player becomes unready
+		StartPlayerTimer(player.color)
 	end
 
 	TransitionPhase()
@@ -128,6 +134,8 @@ function UnreadyPlayerIfNeeded(color, zone)
 			broadcastToAll(Player[color].steam_name .. " is not ready")
 			-- Show the circle when player becomes unready
 			UI.setAttribute("Ready" .. color, "active", "true")
+			-- Start timer when player becomes unready
+			StartPlayerTimer(color)
 			-- Restart blinking when player becomes unready
 			if PlayerCardHolder[color] and PlayerCardHolder[color].Tile then
 				BlinkPlayerCardHolders()
@@ -140,6 +148,8 @@ function UnreadyPlayerIfNeeded(color, zone)
 		broadcastToAll(Player[color].steam_name .. " is not ready")
 		-- Show the circle when player becomes unready
 		UI.setAttribute("Ready" .. color, "active", "true")
+		-- Start timer when player becomes unready
+		StartPlayerTimer(color)
 		-- Restart blinking when player becomes unready
 		if PlayerCardHolder[color] and PlayerCardHolder[color].Tile then
 			BlinkPlayerCardHolders()

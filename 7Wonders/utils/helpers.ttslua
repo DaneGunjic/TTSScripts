@@ -92,44 +92,25 @@ function FindNextColor(Color, Direction)
   end
 end
 
--- function onChat(message, player)
--- 	if message:lower() == "button" then
--- 		CreateReadyButtons()
--- 		return false
--- 	end
---
--- 	if message == "debug" then
--- 		printToAll("Debug mode activated!", {1,1,0})
---
--- 		for i, textObj in ipairs(TextOnSetupBoard) do
--- 			if textObj and textObj.destroy then
--- 				textObj.destroy()
--- 			end
--- 		end
---
--- 		TextOnSetupBoard = {}
--- 		SetupBoard.destruct()
--- 		return false
--- 	end
---
--- 	if message:lower() == "card" then
---
--- 		for _, PlayerInstance in ipairs(Player.getPlayers()) do
--- 			local handObjects = PlayerInstance.getHandObjects()
--- 			for _, Card in ipairs(handObjects) do
--- 				 RotateHands(Card, PlayerInstance.color, "Right")
--- 			end
--- 		end
---
--- 		return false
--- 	end
--- end
+function onChat(message, sender)
+	if message:lower() == "end" then
+		local playerName = "Unknown Player"
+		if sender and sender.steam_name then
+			playerName = sender.steam_name
+		end
+		broadcastToAll("Debug: Game ended by " .. playerName, {1, 0.5, 0})
+		EndTheGame()
+		return false
+	end
+
+	return true
+end
 
 function disableAllTiles()
 	for color, data in pairs(PlayerCardHolder) do
-		if data.Tile then
-			data.Tile.setLock(true)
-			data.Tile.interactable = false
+			if data.Tile then
+				data.Tile.setLock(true)
+				data.Tile.interactable = false
 		end
 	end
 end

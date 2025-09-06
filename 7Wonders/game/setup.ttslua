@@ -575,6 +575,9 @@ function HandleStartGameButtonCo()
 	-- [[DEAL WONDERS]]
 	DealWonders()
 
+	-- Initialize player timers when wonders are dealt
+	InitializePlayerTimers()
+
 	-- [[DEAL RANDOM ARMADA BOARDS AND SHIPS]]
 	if ExpansionConfig.Armada then
 		DealArmada()
