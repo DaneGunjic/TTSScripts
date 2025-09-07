@@ -13,13 +13,13 @@ function onObjectEnterScriptingZone(zone, enter_object)
 	enter_object.setVar("highlightedTile", data.Tile)
 
 	-- Handle game state specific actions
-	if GameState == "LeaderDrafting"
-	and cardCount == CurrentPasses + 1
-	and not ReadyList[color] then
+	if (GameState == "LeaderDrafting" or GameState == "RuinsDrafting") and cardCount == CurrentPasses + 1 and not ReadyList[color] then
 		ReadyUp(Player[color])
 	elseif GameState == "Age1" or GameState == "Age2" or GameState == "Age3" or GameState == "LeaderSelectionStage" then
 		CreateActionButtons(data.Tile)
 		broadcastToColor("Choose your action!", color, color)
+	elseif GameState == "RuinsStage" and CountCardsInZone(zone) == 3 and not ReadyList[color] then
+		ReadyUp(Player[color])
 	end
 end
 

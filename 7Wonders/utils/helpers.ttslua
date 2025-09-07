@@ -51,9 +51,16 @@ function DiscardPlayerHands()
 		local objects = Player[color].getHandObjects()
 		for _, obj in ipairs(objects) do
 			if obj.type == 'Card' then
-			discardZone = DeckZones.Discard
-			obj.setPosition(discardZone.getPosition())
-			obj.setRotation(discardZone.getRotation() + vector(0, 0, 180))
+				local discardZone
+				-- Check memo to determine discard destination
+				if obj.memo == "Ruins" or obj.memo == "Leader" then
+					discardZone = DeckZones.AltDiscard
+				else
+					discardZone = DeckZones.Discard
+				end
+
+				obj.setPosition(discardZone.getPosition())
+				obj.setRotation(discardZone.getRotation() + vector(0, 0, 180))
 			end
 		end
 	end

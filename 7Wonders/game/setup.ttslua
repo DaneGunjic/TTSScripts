@@ -421,6 +421,24 @@ function HandleStartGameButtonCo()
 		end
 	end
 
+	if ExpansionConfig.Edifice then
+		while WonderBags.Edifice.getQuantity() ~= 0 do
+			WonderBags.Edifice.takeObject({
+				position = WonderBags.Base.getPosition() + Vector(0, 2, 0),
+				smooth = false
+			})
+		end
+	end
+
+	if ExpansionConfig.Ruins then
+		while WonderBags.Ruins.getQuantity() ~= 0 do
+			WonderBags.Ruins.takeObject({
+				position = WonderBags.Base.getPosition() + Vector(0, 2, 0),
+				smooth = false
+			})
+		end
+	end
+
 	if WonderExpansionConfig.Promo then
 		while WonderBags.Promo.getQuantity() ~= 0 do
 			WonderBags.Promo.takeObject({

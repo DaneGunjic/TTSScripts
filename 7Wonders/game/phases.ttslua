@@ -162,7 +162,13 @@ PhaseHandlers = {
       CurrentPasses = 0
       MaximumPasses = 0
 
-      --BlinkPlayerCardHolders()
+      Wait.time(function()
+        ForceTakePersonalCards()
+        Wait.time(function()
+          GameState = "RuinsStage"
+          BlinkPlayerCardHolders()
+        end, 0.1)
+      end, 0.1)
     end
   },
 
@@ -170,32 +176,12 @@ PhaseHandlers = {
     name = "Ruins Selection",
     description = "Place 3 Ruins cards onto your card holder",
     next = function()
-      -- Check if all players have placed exactly 3 cards
-      local allPlayersReady = true
-      for _, player in ipairs(Player.getPlayers()) do
-        local handCount = #player.getHandObjects()
-        if handCount ~= 1 then -- Should have 1 card left after placing 3
-          allPlayersReady = false
-          break
-        end
-      end
-
-      if allPlayersReady then
-        -- All players have placed their 3 ruins cards, move to next phase
-        PhaseHandlers.RuinsStage:transitionToNextPhase()
-      end
-    end,
-
-    transitionToNextPhase = function(self)
-      -- Discard remaining cards and proceed to the appropriate age
-      DiscardPlayerHands()
-
-      if CurrentAge == 1 then
+      Wait.time(DiscardPlayerHands, 0.1)
+      RevealRuinCards()
+      if ExpansionConfig.Leaders.Base then
+        PrepareLeaderStage()
+      else
         PrepareAge1Stage()
-      elseif CurrentAge == 2 then
-        PrepareAge2Stage()
-      elseif CurrentAge == 3 then
-        PrepareAge3Stage()
       end
     end
   },
@@ -470,7 +456,7 @@ function DiscardPlayerActionCard(color)
     for _, obj in ipairs(objects) do
       if obj.type == 'Card' or obj.type == 'Deck' then
         -- Non-age cards go to another discard
-        if obj.memo == "Leader" then
+        if obj.memo == "Leader" or obj.memo == "Ruins" then
           discardZone = DeckZones.AltDiscard
         else
           discardZone = DeckZones.Discard
@@ -692,6 +678,53 @@ function PrepareNavalCombat()
 
   CreateReadyButtons()
   updatePhaseUI("Naval combat", "Take victory/defeat tokens")
+end
+
+function RevealRuinCards()
+  -- Reveal all cards from card holders, positioning them face-up to the left
+  for _, color in ipairs(getSeatedPlayers()) do
+    local data = PlayerCardHolder[color]
+    if data and data.Zone and data.Tile then
+      local objects = data.Zone.getObjects()
+      local tile = data.Tile
+      local cardIndex = 0
+
+      -- Process each card/deck in the zone
+      for _, obj in ipairs(objects) do
+        if obj.type == 'Card' then
+          -- Handle single cards
+          local spacing = cardIndex * 2.5
+          local new_pos = tile.getPosition() + tile.getTransformRight() * (3 + spacing) + Vector(0, 2, 0)
+          obj.setPosition(new_pos)
+
+          -- Set rotation to face-up (z = 0)
+          local new_rot = obj.getRotation()
+          new_rot.z = 0
+          obj.setRotation(new_rot)
+
+          cardIndex = cardIndex + 1
+        elseif obj.type == 'Deck' then
+          -- Handle decks by taking individual cards
+          local deckSize = #obj.getObjects()
+          for i = 1, deckSize do
+            local card = obj.takeObject()
+            if card then
+              local spacing = cardIndex * 2.5
+              local new_pos = tile.getPosition() + tile.getTransformRight() * (3 + spacing) + Vector(0, 2, 0)
+              card.setPosition(new_pos)
+
+              -- Set rotation to face-up (z = 0)
+              local new_rot = card.getRotation()
+              new_rot.z = 0
+              card.setRotation(new_rot)
+
+              cardIndex = cardIndex + 1
+            end
+          end
+        end
+      end
+    end
+  end
 end
 
 -- Utility Functions
