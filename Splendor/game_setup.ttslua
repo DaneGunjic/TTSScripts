@@ -1,0 +1,346 @@
+-- Splendor Game Setup
+-- Handles game initialization and setup functions
+
+-- Object references
+objectReferences = {}
+handZones = {}
+gemZones = {}
+goldGemZone = nil
+playerZones = {}
+deckZones = {}
+cardZones = {}
+peopleZone = nil
+peopleCardZones = {}
+rulesZone = nil
+
+-- Setup object references
+function setupObjectReferences()
+    local OBJECT_NAMES = {
+        HAND_ZONES = {
+            RED = 'Red Hand',
+            WHITE = 'White Hand',
+            GREEN = 'Green Hand',
+            BLACK = 'Black Hand',
+            BLUE = 'Blue Hand',
+            YELLOW = 'Yellow Hand'
+        },
+        GEM_ZONES = {
+            RED = 'Red Gem Zone',
+            WHITE = 'White Gem Zone',
+            GREEN = 'Green Gem Zone',
+            BLACK = 'Black Gem Zone',
+            BLUE = 'Blue Gem Zone'
+        },
+        GOLD_GEM_ZONE = 'Gold Gem Zone',
+        PLAYER_ZONES = {
+            RED = {
+                GEMS = {
+                    RED = 'Red Player Red Gem Zone',
+                    WHITE = 'Red Player White Gem Zone',
+                    GREEN = 'Red Player Green Gem Zone',
+                    BLACK = 'Red Player Black Gem Zone',
+                    BLUE = 'Red Player Blue Gem Zone',
+                    GOLD = 'Red Player Gold Gem Zone'
+                },
+                CARDS = 'Red Player Card Zone',
+                RESERVED = 'Red Player Reserved Zone'
+            },
+            WHITE = {
+                GEMS = {
+                    RED = 'White Player Red Gem Zone',
+                    WHITE = 'White Player White Gem Zone',
+                    GREEN = 'White Player Green Gem Zone',
+                    BLACK = 'White Player Black Gem Zone',
+                    BLUE = 'White Player Blue Gem Zone',
+                    GOLD = 'White Player Gold Gem Zone'
+                },
+                CARDS = 'White Player Card Zone',
+                RESERVED = 'White Player Reserved Zone'
+            },
+            GREEN = {
+                GEMS = {
+                    RED = 'Green Player Red Gem Zone',
+                    WHITE = 'Green Player White Gem Zone',
+                    GREEN = 'Green Player Green Gem Zone',
+                    BLACK = 'Green Player Black Gem Zone',
+                    BLUE = 'Green Player Blue Gem Zone',
+                    GOLD = 'Green Player Gold Gem Zone'
+                },
+                CARDS = 'Green Player Card Zone',
+                RESERVED = 'Green Player Reserved Zone'
+            },
+            BLACK = {
+                GEMS = {
+                    RED = 'Black Player Red Gem Zone',
+                    WHITE = 'Black Player White Gem Zone',
+                    GREEN = 'Black Player Green Gem Zone',
+                    BLACK = 'Black Player Black Gem Zone',
+                    BLUE = 'Black Player Blue Gem Zone',
+                    GOLD = 'Black Player Gold Gem Zone'
+                },
+                CARDS = 'Black Player Card Zone',
+                RESERVED = 'Black Player Reserved Zone'
+            },
+            BLUE = {
+                GEMS = {
+                    RED = 'Blue Player Red Gem Zone',
+                    WHITE = 'Blue Player White Gem Zone',
+                    GREEN = 'Blue Player Green Gem Zone',
+                    BLACK = 'Blue Player Black Gem Zone',
+                    BLUE = 'Blue Player Blue Gem Zone',
+                    GOLD = 'Blue Player Gold Gem Zone'
+                },
+                CARDS = 'Blue Player Card Zone',
+                RESERVED = 'Blue Player Reserved Zone'
+            },
+            YELLOW = {
+                GEMS = {
+                    RED = 'Yellow Player Red Gem Zone',
+                    WHITE = 'Yellow Player White Gem Zone',
+                    GREEN = 'Yellow Player Green Gem Zone',
+                    BLACK = 'Yellow Player Black Gem Zone',
+                    BLUE = 'Yellow Player Blue Gem Zone',
+                    GOLD = 'Yellow Player Gold Gem Zone'
+                },
+                CARDS = 'Yellow Player Card Zone',
+                RESERVED = 'Yellow Player Reserved Zone'
+            }
+        },
+        DECK_ZONES = {
+            LEVEL_1 = 'Level 1 Deck Zone',
+            LEVEL_2 = 'Level 2 Deck Zone',
+            LEVEL_3 = 'Level 3 Deck Zone'
+        },
+        CARD_ZONES = {
+            LEVEL_1 = {
+                'Level 1 Card Zone 1',
+                'Level 1 Card Zone 2',
+                'Level 1 Card Zone 3',
+                'Level 1 Card Zone 4'
+            },
+            LEVEL_2 = {
+                'Level 2 Card Zone 1',
+                'Level 2 Card Zone 2',
+                'Level 2 Card Zone 3',
+                'Level 2 Card Zone 4'
+            },
+            LEVEL_3 = {
+                'Level 3 Card Zone 1',
+                'Level 3 Card Zone 2',
+                'Level 3 Card Zone 3',
+                'Level 3 Card Zone 4'
+            }
+        },
+        PEOPLE_ZONE = 'People Zone',
+        PEOPLE_CARD_ZONES = {
+            'People Card Zone 1',
+            'People Card Zone 2',
+            'People Card Zone 3',
+            'People Card Zone 4',
+            'People Card Zone 5'
+        },
+        RULES_ZONE = 'Rules Zone'
+    }
+
+    -- Setup hand zones
+    for colour, name in pairs(OBJECT_NAMES.HAND_ZONES) do
+        handZones[colour:lower()] = getObjectFromGUID(Global.getVar(name))
+    end
+
+    -- Setup gem zones
+    for colour, name in pairs(OBJECT_NAMES.GEM_ZONES) do
+        gemZones[colour:lower()] = getObjectFromGUID(Global.getVar(name))
+        gemZones[colour:lower()].setVar('colour', colour:lower())
+        gemZones[colour:lower()].setVar('name', 'bank')
+    end
+
+    -- Setup gold gem zone
+    goldGemZone = getObjectFromGUID(Global.getVar(OBJECT_NAMES.GOLD_GEM_ZONE))
+    goldGemZone.setVar('colour', 'gold')
+    goldGemZone.setVar('name', 'bank')
+
+    -- Setup player zones
+    for colour, zones in pairs(OBJECT_NAMES.PLAYER_ZONES) do
+        playerZones[colour:lower()] = {
+            gems = {},
+            cards = getObjectFromGUID(Global.getVar(zones.CARDS)),
+            reserved = getObjectFromGUID(Global.getVar(zones.RESERVED))
+        }
+        for gemColour, name in pairs(zones.GEMS) do
+            playerZones[colour:lower()].gems[gemColour:lower()] = getObjectFromGUID(Global.getVar(name))
+            playerZones[colour:lower()].gems[gemColour:lower()].setVar('colour', gemColour:lower())
+            playerZones[colour:lower()].gems[gemColour:lower()].setVar('name', 'player')
+            playerZones[colour:lower()].gems[gemColour:lower()].setVar('player', colour:lower())
+        end
+    end
+
+    -- Setup deck zones
+    for level, name in pairs(OBJECT_NAMES.DECK_ZONES) do
+        deckZones[level:lower()] = getObjectFromGUID(Global.getVar(name))
+    end
+
+    -- Setup card zones
+    for level, zones in pairs(OBJECT_NAMES.CARD_ZONES) do
+        cardZones[level:lower()] = {}
+        for i, name in pairs(zones) do
+            cardZones[level:lower()][i] = getObjectFromGUID(Global.getVar(name))
+        end
+    end
+
+    -- Setup people zones
+    peopleZone = getObjectFromGUID(Global.getVar(OBJECT_NAMES.PEOPLE_ZONE))
+    for i, name in pairs(OBJECT_NAMES.PEOPLE_CARD_ZONES) do
+        peopleCardZones[i] = getObjectFromGUID(Global.getVar(name))
+    end
+
+    -- Setup rules zone
+    rulesZone = getObjectFromGUID(Global.getVar(OBJECT_NAMES.RULES_ZONE))
+end
+
+-- Prepare player zones
+function preparePlayerZones()
+    local ZONE_VARS = {
+        OWNER = 'name',
+        PLAYER = 'player',
+        BANK = 'bank',
+        COUNT = 'count'
+    }
+    
+    for playerColour, playerZone in pairs(playerZones) do
+        for colour, zone in pairs(playerZone.gems) do
+            zone.setVar(ZONE_VARS.COUNT, 0)
+        end
+    end
+end
+
+-- Initialize global variables
+function initGlobalVariables()
+    -- Initialize player data if initializePlayerData is available
+    if initializePlayerData then
+        initializePlayerData()
+    end
+    
+    -- Initialize gem counts
+    local TOKEN_COUNTS_PER_PLAYERS = {nil, 4, 5, 7}
+    local GOLD_TOKEN_COUNT = 5
+    local ZONE_VARS = {
+        OWNER = 'name',
+        PLAYER = 'player',
+        BANK = 'bank',
+        COUNT = 'count'
+    }
+    
+    -- Set gem zone counts
+    for k, zone in pairs(gemZones) do
+        zone.setVar(ZONE_VARS.COUNT, TOKEN_COUNTS_PER_PLAYERS[playerCount])
+    end
+    goldGemZone.setVar(ZONE_VARS.COUNT, GOLD_TOKEN_COUNT)
+    
+    -- Initialize other game variables
+    currentPlayerIndex = 1
+    gameStarted = false
+    gameEnded = false
+end
+
+-- Prepare table (main setup function)
+function prepareTable()
+    setupObjectReferences()
+    preparePlayerZones()
+    
+    -- Shuffle and deal cards if shuffleAndDealCardsFromDecks is available
+    if shuffleAndDealCardsFromDecks then
+        shuffleAndDealCardsFromDecks()
+    end
+    
+    -- Shuffle and deal people if shuffleAndDealPeopleFromBag is available
+    if shuffleAndDealPeopleFromBag then
+        shuffleAndDealPeopleFromBag()
+    end
+    
+    -- Create gem buttons if setZoneReferences is available
+    if setZoneReferences then
+        setZoneReferences(gemZones, goldGemZone, playerZones)
+        createGemButtons(true)
+    end
+    
+    -- Destroy redundant objects
+    destroyRedundantObjects()
+    
+    -- Initialize global variables
+    initGlobalVariables()
+    
+    -- Set players order if setPlayersOrder is available
+    if setPlayersOrder then
+        setPlayersOrder()
+    end
+    
+    -- Update UI if updateTable is available
+    if updateTable then
+        updateTable()
+    end
+    if updateHelper then
+        updateHelper()
+    end
+end
+
+-- Destroy redundant objects
+function destroyRedundantObjects()
+    local allObjects = getAllObjects()
+    for k, obj in pairs(allObjects) do
+        if obj.getName() == 'Card' and obj.getPosition().y < -5 then
+            obj.destruct()
+        end
+    end
+end
+
+-- Get zone references
+function getZoneReferences()
+    return {
+        handZones = handZones,
+        gemZones = gemZones,
+        goldGemZone = goldGemZone,
+        playerZones = playerZones,
+        deckZones = deckZones,
+        cardZones = cardZones,
+        peopleZone = peopleZone,
+        peopleCardZones = peopleCardZones,
+        rulesZone = rulesZone
+    }
+end
+
+-- Get specific zone references
+function getHandZones()
+    return handZones
+end
+
+function getGemZones()
+    return gemZones
+end
+
+function getGoldGemZone()
+    return goldGemZone
+end
+
+function getPlayerZones()
+    return playerZones
+end
+
+function getDeckZones()
+    return deckZones
+end
+
+function getCardZones()
+    return cardZones
+end
+
+function getPeopleZone()
+    return peopleZone
+end
+
+function getPeopleCardZones()
+    return peopleCardZones
+end
+
+function getRulesZone()
+    return rulesZone
+end

@@ -1,0 +1,39 @@
+-- Splendor for Tabletop Simulator
+-- Modular version with separated concerns
+
+-- Import all modules
+#include !\Splendor\constants.ttslua
+#include !\Splendor\utils.ttslua
+#include !\Splendor\player_manager.ttslua
+#include !\Splendor\gem_manager.ttslua
+#include !\Splendor\game_setup.ttslua
+#include !\Splendor\card_manager.ttslua
+#include !\Splendor\game_logic.ttslua
+#include !\Splendor\ui_manager.ttslua
+
+-- Global game state
+playerCount = 0
+gameStarted = false
+gameEnded = false
+
+-- Main game event handlers and core functions
+
+-- Global variables (moved from local to global for #include compatibility)
+noblePickMode = false
+tintHelper = true
+dev = false --tabletop.zonk
+dev2 = false
+xmlTable = {}
+xmlStart = {}
+turns = {}
+soundToggle = 'talk'
+-- TTS Event Handlers
+function onLoad()
+    prepareTable()
+    initializeGame()
+    initializeUI()
+end
+
+-- Game Action Handlers will be included from modules
+
+-- All functions will be included from respective modules via #include directives

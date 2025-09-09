@@ -1,0 +1,425 @@
+-- Splendor Card Manager
+-- Handles all card operations including dealing, parsing, and management
+
+-- Zone references (will be set by game setup)
+deckZones = {}
+cardZones = {}
+peopleZone = nil
+peopleCardZones = {}
+playerZones = {}
+
+-- Card position calculations
+function cardPosition(level, position)
+    local CARD_POSITIONS = {
+        LEVEL_1 = {
+            {-4.5, 1.06, -1.5},
+            {-1.5, 1.06, -1.5},
+            {1.5, 1.06, -1.5},
+            {4.5, 1.06, -1.5}
+        },
+        LEVEL_2 = {
+            {-4.5, 1.06, 0},
+            {-1.5, 1.06, 0},
+            {1.5, 1.06, 0},
+            {4.5, 1.06, 0}
+        },
+        LEVEL_3 = {
+            {-4.5, 1.06, 1.5},
+            {-1.5, 1.06, 1.5},
+            {1.5, 1.06, 1.5},
+            {4.5, 1.06, 1.5}
+        }
+    }
+    return CARD_POSITIONS[level][position]
+end
+
+function playerCardPosition(player)
+    local PLAYER_CARD_POSITIONS = {
+        red = {-7.5, 1.06, -7.5},
+        white = {7.5, 1.06, -7.5},
+        green = {7.5, 1.06, 7.5},
+        black = {-7.5, 1.06, 7.5},
+        blue = {0, 1.06, -10.5},
+        yellow = {0, 1.06, 10.5}
+    }
+    return PLAYER_CARD_POSITIONS[player:lower()]
+end
+
+-- Deal card from deck to position
+function dealCard(deck, position)
+    if deck ~= nil and #deck.getObjects() > 0 then
+        deck.takeObject({
+            position = position,
+            flip = true
+        })
+    end
+end
+
+-- Refresh deck tooltip
+function refreshDeckTooltip(deck)
+    if deck ~= nil then
+        local count = 0
+        if deck.getObjects() ~= nil then
+            count = #deck.getObjects()
+        end
+        deck.tooltip = 'Cards remaining: ' .. count
+    end
+end
+
+-- Shuffle and deal cards from decks
+function shuffleAndDealCardsFromDecks()
+    local levels = {'level_1', 'level_2', 'level_3'}
+
+    for _, level in pairs(levels) do
+        local deck = deckZones[level]
+        if deck ~= nil then
+            deck.shuffle()
+            refreshDeckTooltip(deck)
+
+            -- Deal 4 cards for each level
+            for i = 1, 4 do
+                local position = cardPosition(level:upper(), i)
+                dealCard(deck, position)
+            end
+        end
+    end
+end
+
+-- Shuffle and deal people from bag
+function shuffleAndDealPeopleFromBag()
+    if peopleZone ~= nil then
+        peopleZone.shuffle()
+
+        -- Deal people cards based on player count
+        local peopleCount = playerCount + 1
+        for i = 1, peopleCount do
+            if peopleCardZones[i] ~= nil then
+                peopleZone.takeObject({
+                    position = peopleCardZones[i].getPosition(),
+                    flip = true
+                })
+            end
+        end
+    end
+end
+
+-- Parse card information
+function parseCard(card)
+    local cardData = {
+        points = 0,
+        discount = '',
+        cost = {red = 0, white = 0, green = 0, black = 0, blue = 0}
+    }
+
+    if card == nil then
+        return cardData
+    end
+
+    local description = card.getDescription()
+    if description == '' then
+        return cardData
+    end
+
+    -- Parse points
+    local pointsMatch = string.match(description, 'Points: (%d+)')
+    if pointsMatch then
+        cardData.points = tonumber(pointsMatch)
+    end
+
+    -- Parse discount
+    local discountMatch = string.match(description, 'Discount: (%w+)')
+    if discountMatch then
+        cardData.discount = discountMatch:lower()
+    end
+
+    -- Parse cost
+    local costMatch = string.match(description, 'Cost: (.+)')
+    if costMatch then
+        cardData.cost = parseCostString(costMatch)
+    end
+
+    return cardData
+end
+
+-- Parse cost string
+function parseCostString(costString)
+    local cost = {red = 0, white = 0, green = 0, black = 0, blue = 0}
+
+    -- Parse each color cost
+    for color in pairs(cost) do
+        local pattern = '(%d+) ' .. color
+        local match = string.match(costString, pattern)
+        if match then
+            cost[color] = tonumber(match)
+        end
+    end
+
+    return cost
+end
+
+-- Deal new card in place of taken card
+function dealNewCardInPlaceOf(card)
+    local cardPosition = card.getPosition()
+    local level = nil
+
+    -- Determine which level based on position
+    if cardPosition.z < -0.5 then
+        level = 'level_1'
+    elseif cardPosition.z > 0.5 then
+        level = 'level_3'
+    else
+        level = 'level_2'
+    end
+
+    local deck = deckZones[level]
+    if deck ~= nil and #deck.getObjects() > 0 then
+        dealCard(deck, cardPosition)
+        refreshDeckTooltip(deck)
+    end
+end
+
+-- Check payment for card
+function checkPayment(player, cost)
+    local playerGems = {}
+    if getPlayerGems then
+        playerGems = getPlayerGems(player)
+    else
+        -- Fallback: count gems from zones
+        playerGems = countPlayerGems(player)
+    end
+
+    local totalCost = 0
+    local availableGems = 0
+
+    for color, amount in pairs(cost) do
+        totalCost = totalCost + amount
+        availableGems = availableGems + (playerGems[color] or 0)
+    end
+
+    -- Add gold gems
+    availableGems = availableGems + (playerGems.gold or 0)
+
+    return availableGems >= totalCost
+end
+
+-- Count player gems from zones
+function countPlayerGems(player)
+    local gems = {red = 0, white = 0, green = 0, black = 0, blue = 0, gold = 0}
+
+    if playerZones[player:lower()] then
+        for color, zone in pairs(playerZones[player:lower()].gems) do
+            if getZoneGemCount then
+                gems[color] = getZoneGemCount(zone)
+            else
+                -- Fallback count
+                local objects = zone.getObjects()
+                gems[color] = objects and #objects or 0
+            end
+        end
+    end
+
+    return gems
+end
+
+-- Pay cost for card
+function payCost(player, cost)
+    local playerGems = countPlayerGems(player)
+    local discount = {red = 0, white = 0, green = 0, black = 0, blue = 0}
+
+    -- Calculate discount from owned cards
+    if getPlayerDiscount then
+        discount = getPlayerDiscount(player)
+    end
+
+    -- Apply discount to cost
+    local adjustedCost = considerDiscount(cost, discount)
+
+    -- Pay with gems
+    for color, amount in pairs(adjustedCost) do
+        if amount > 0 then
+            local available = playerGems[color] or 0
+            local toPay = math.min(amount, available)
+
+            if toPay > 0 then
+                -- Move gems back to bank
+                for i = 1, toPay do
+                    if moveToken then
+                        moveToken(
+                            playerZones[player:lower()].gems[color],
+                            bankGemZone(color)
+                        )
+                    end
+                end
+
+                -- Update player gem count
+                if changeGemCount then
+                    changeGemCount(player, color, -toPay)
+                end
+            end
+
+            amount = amount - toPay
+        end
+
+        -- Pay remaining with gold
+        if amount > 0 then
+            local goldAvailable = playerGems.gold or 0
+            local goldToPay = math.min(amount, goldAvailable)
+
+            if goldToPay > 0 then
+                for i = 1, goldToPay do
+                    if moveToken then
+                        moveToken(
+                            playerZones[player:lower()].gems.gold,
+                            bankGemZone('gold')
+                        )
+                    end
+                end
+
+                if changeGemCount then
+                    changeGemCount(player, 'gold', -goldToPay)
+                end
+            end
+        end
+    end
+end
+
+-- Consider discount when calculating cost
+function considerDiscount(cost, discount)
+    local adjustedCost = {}
+
+    for color, amount in pairs(cost) do
+        local discountAmount = discount[color] or 0
+        adjustedCost[color] = math.max(0, amount - discountAmount)
+    end
+
+    return adjustedCost
+end
+
+-- Play card (move to player area and award points)
+function playCard(card, player)
+    local cardData = parseCard(card)
+
+    -- Move card to player area
+    local playerPosition = playerCardPosition(player)
+    card.setPositionSmooth(playerPosition)
+
+    -- Award points
+    if awardPoints then
+        awardPoints(player, cardData.points)
+    end
+
+    -- Add card count for discount
+    if addCardCount then
+        addCardCount(player, cardData.discount)
+    end
+
+    -- Deal new card in place
+    dealNewCardInPlaceOf(card)
+
+    return cardData
+end
+
+-- Reserve card
+function reserveCard(card, player)
+    -- Move card to player's reserved area
+    if playerZones[player:lower()] and playerZones[player:lower()].reserved then
+        local reservedZone = playerZones[player:lower()].reserved
+        card.setPositionSmooth(reservedZone.getPosition())
+
+        -- Give player a gold token if available
+        if getZoneGemCount then
+            local goldZone = bankGemZone('gold')
+            if getZoneGemCount(goldZone) > 0 then
+                moveToken(goldZone, playerZones[player:lower()].gems.gold)
+                if changeGemCount then
+                    changeGemCount(player, 'gold', 1)
+                end
+            end
+        end
+
+        -- Deal new card in place
+        dealNewCardInPlaceOf(card)
+    end
+end
+
+-- Recreate card (for reserved cards)
+function recreateCard(cardData, position)
+    -- This would need to be implemented based on TTS card creation API
+    -- For now, return nil as placeholder
+    return nil
+end
+
+-- Get noble person requirements
+function getNoblePerson(card)
+    local requirements = {red = 0, white = 0, green = 0, black = 0, blue = 0}
+
+    if card == nil then
+        return requirements
+    end
+
+    local description = card.getDescription()
+    if description == '' then
+        return requirements
+    end
+
+    -- Parse requirements from description
+    for color in pairs(requirements) do
+        local pattern = '(%d+) ' .. color
+        local match = string.match(description, pattern)
+        if match then
+            requirements[color] = tonumber(match)
+        end
+    end
+
+    return requirements
+end
+
+-- Check if player meets noble requirements
+function checkPeopleStatus(player)
+    local playerCards = {red = 0, white = 0, green = 0, black = 0, blue = 0}
+
+    if getPlayerCards then
+        playerCards = getPlayerCards(player)
+    end
+
+    -- Check each noble card
+    for i, zone in pairs(peopleCardZones) do
+        local objects = zone.getObjects()
+        if objects and #objects > 0 then
+            local noble = objects[1]
+            local requirements = getNoblePerson(noble)
+
+            local canTake = true
+            for color, required in pairs(requirements) do
+                if (playerCards[color] or 0) < required then
+                    canTake = false
+                    break
+                end
+            end
+
+            if canTake then
+                -- Award noble to player
+                local playerPosition = playerCardPosition(player)
+                noble.setPositionSmooth(playerPosition)
+
+                -- Award points (nobles are worth 3 points)
+                if awardPoints then
+                    awardPoints(player, 3)
+                end
+
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+-- Set zone references
+function setZoneReferences(decks, cards, people, peopleCards, players)
+    deckZones = decks
+    cardZones = cards
+    peopleZone = people
+    peopleCardZones = peopleCards
+    playerZones = players
+end

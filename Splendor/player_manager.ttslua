@@ -1,0 +1,204 @@
+-- Splendor Player Manager
+-- Handles all player-related functionality and data management
+
+-- Player data storage
+players = {}
+playersOrder = {}
+currentPlayer = nil
+
+-- Initialize player data structure
+function getPlayers()
+    local players = {}
+    for k, colour in pairs(Player.getAvailableColors()) do
+        if (contains(getSeatedPlayers(), colour)) then
+            table.insert(players, {
+                colour = colour,
+                score = 0,
+                steamId = Player[colour].steam_id,
+                steamName = Player[colour].steam_name,
+                rCardCount = 0,
+                wCardCount = 0,
+                gCardCount = 0,
+                bCardCount = 0,
+                uCardCount = 0,
+                cardCount = 0,
+                rGemCount = 0,
+                wGemCount = 0,
+                gGemCount = 0,
+                bGemCount = 0,
+                uGemCount = 0,
+                jGemCount = 0
+            })
+        end
+    end
+    return players
+end
+
+-- Get a specific player by color
+function getPlayer(playerColour)
+    for k, player in pairs(players) do
+        if player.colour == playerColour then
+            return player
+        end
+    end
+    broadcastToAll('An error occurred', {r = 1, g = 0.4, b = 0, a = 1})
+end
+
+-- Set the turn order randomly
+function setPlayersOrder()
+    playersOrder = {}
+    local randomIndex = math.random(#players)
+    for k, player in pairs(players) do
+        local index = ((randomIndex + k) % #players) + 1
+        playersOrder[index] = player.colour
+    end
+end
+
+-- Award points to a player
+function awardPoints(playerColour, score)
+    if score == 0 then
+        return
+    end
+    local player = getPlayer(playerColour)
+    player.score = player.score + score
+end
+
+-- Add card count to player
+function addCardCount(playerColour, cardColor)
+    local cardColor = cardColor .. 'CardCount'
+    local player = getPlayer(playerColour)
+    player[cardColor] = player[cardColor] + 1
+    -- Update UI helper if available
+    if updateHelper then
+        updateHelper(playerColour)
+    end
+end
+
+-- Change gem count for a player
+function changeGemCount(playerColour, gemColour, gemCount)
+    local gemColor = 0
+    local player = getPlayer(playerColour)
+    if gemCount == 0 then
+        return
+    end
+    if gemColour == 'gold' then
+        gemColor = 'jGemCount'
+    else
+        local COST_COLOUR_NAMES = {
+            r = 'red',
+            w = 'white',
+            g = 'green',
+            b = 'black',
+            u = 'blue'
+        }
+        gemColor = getKeyForValue(COST_COLOUR_NAMES, gemColour) .. 'GemCount'
+    end
+    player[gemColor] = player[gemColor] + gemCount
+    -- Update UI helper if available
+    if updateHelper then
+        updateHelper(playerColour)
+    end
+end
+
+-- Count current player's tokens
+function countCurrentPlayerTokens(player)
+    local tokenCount = 0
+    local player = getPlayer(player)
+    tokenCount = player['wGemCount'] + player['uGemCount'] + player['gGemCount'] + player['rGemCount'] + player['bGemCount'] + player['jGemCount']
+    return tokenCount
+end
+
+-- Check if player has valid token hand size
+function validTokenHandSize(player)
+    local MAX_TOKEN_COUNT = 10
+    if countCurrentPlayerTokens(player) > MAX_TOKEN_COUNT then
+        return false
+    end
+    return true
+end
+
+-- Set current player turn
+function setPlayerTurn(colour)
+    currentPlayer = colour
+    local CHAT_INFO_COLOR = {r = 153 / 255, g = 255 / 255, b = 51 / 255, a = 255 / 255}
+    Player[colour].broadcast('It is your turn now', CHAT_INFO_COLOR)
+    
+    -- Handle sound effects if available
+    if soundToggle and dingSound then
+        if soundToggle == 'ding' then
+            dingSound.AssetBundle.playTriggerEffect(0)
+        elseif soundToggle == 'talk' then
+            if currentPlayer == "Red" then
+                dingSound.AssetBundle.playTriggerEffect(1)
+            elseif currentPlayer == "Green" then
+                dingSound.AssetBundle.playTriggerEffect(2)
+            elseif currentPlayer == "Pink" then
+                dingSound.AssetBundle.playTriggerEffect(3)
+            elseif currentPlayer == "Blue" then
+                dingSound.AssetBundle.playTriggerEffect(4)
+            end
+        end
+    end
+    
+    -- Update card play helper and table if available
+    if cardPlayHelper then
+        Wait.frames(function() cardPlayHelper(colour) end, 20)
+    end
+    if updateTable then
+        updateTable(colour)
+    end
+end
+
+-- Get current player
+function getCurrentPlayer()
+    return currentPlayer
+end
+
+-- Get players order
+function getPlayersOrder()
+    return playersOrder
+end
+
+-- Set players data
+function setPlayers(playersData)
+    players = playersData
+end
+
+-- Get winners when there's a draw
+function getWinnersWhenDraw(topPlayers)
+    local minCardCount = math.huge
+    for k, player in pairs(topPlayers) do
+        player.cardCount = player.rCardCount + player.wCardCount + player.gCardCount + player.bCardCount + player.uCardCount
+        
+        if player.cardCount < minCardCount then
+            minCardCount = player.cardCount
+        end
+    end
+    local lowestCardCountPlayers = {}
+    for k, player in pairs(topPlayers) do
+        if player.cardCount == minCardCount then
+            table.insert(lowestCardCountPlayers, player)
+        end
+    end
+    return lowestCardCountPlayers
+end
+
+-- Get winners
+function getWinners()
+    local maxScore = 0
+    for k, player in pairs(players) do
+        if player.score > maxScore then
+            maxScore = player.score
+        end
+    end
+    local topPlayers = {}
+    for k, player in pairs(players) do
+        if player.score == maxScore then
+            table.insert(topPlayers, player)
+        end
+    end
+    if #topPlayers > 1 then
+        topPlayers = getWinnersWhenDraw(topPlayers)
+    end
+    return topPlayers
+end

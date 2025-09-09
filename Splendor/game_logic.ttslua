@@ -1,0 +1,368 @@
+-- Splendor Game Logic
+-- Handles turn management, win conditions, and core game flow
+
+local GameLogic = {}
+
+-- Game state variables
+local currentPlayerIndex = 1
+local gameStarted = false
+local gameEnded = false
+local playerCount = 0
+local playersOrder = {}
+
+-- Initialize game logic
+function GameLogic.initialize()
+    currentPlayerIndex = 1
+    gameStarted = false
+    gameEnded = false
+end
+
+-- Set player turn
+function GameLogic.setPlayerTurn(player)
+    if PlayerManager and PlayerManager.getPlayers then
+        local players = PlayerManager.getPlayers()
+        for i, p in pairs(players) do
+            if p:lower() == player:lower() then
+                currentPlayerIndex = i
+                break
+            end
+        end
+    end
+end
+
+-- Get current player
+function GameLogic.getCurrentPlayer()
+    if PlayerManager and PlayerManager.getPlayers then
+        local players = PlayerManager.getPlayers()
+        return players[currentPlayerIndex]
+    end
+    return nil
+end
+
+-- Next turn
+function GameLogic.nextTurn()
+    if gameEnded then
+        return
+    end
+    
+    local players = {}
+    if PlayerManager and PlayerManager.getPlayers then
+        players = PlayerManager.getPlayers()
+    end
+    
+    if #players == 0 then
+        return
+    end
+    
+    currentPlayerIndex = currentPlayerIndex + 1
+    if currentPlayerIndex > #players then
+        currentPlayerIndex = 1
+    end
+    
+    local currentPlayer = players[currentPlayerIndex]
+    
+    -- Check for nobles
+    if CardManager and CardManager.checkPeopleStatus then
+        CardManager.checkPeopleStatus(currentPlayer)
+    end
+    
+    -- Check win conditions
+    GameLogic.checkWinConditions()
+    
+    -- Update UI
+    if UIManager and UIManager.updateTable then
+        UIManager.updateTable()
+    end
+    
+    -- Broadcast turn change
+    local MESSAGES = {
+        TURN_CHANGE = "It's %s's turn"
+    }
+    broadcastToAll(string.format(MESSAGES.TURN_CHANGE, currentPlayer), {1, 1, 1})
+end
+
+-- Check win conditions
+function GameLogic.checkWinConditions()
+    if gameEnded then
+        return
+    end
+    
+    local players = {}
+    if PlayerManager and PlayerManager.getPlayers then
+        players = PlayerManager.getPlayers()
+    end
+    
+    local winners = {}
+    local WINNING_POINTS = 15
+    
+    -- Check if any player has 15+ points
+    for _, player in pairs(players) do
+        local points = 0
+        if PlayerManager and PlayerManager.getPlayerPoints then
+            points = PlayerManager.getPlayerPoints(player)
+        end
+        
+        if points >= WINNING_POINTS then
+            table.insert(winners, {player = player, points = points})
+        end
+    end
+    
+    if #winners > 0 then
+        GameLogic.endGame(winners)
+    end
+end
+
+-- End game
+function GameLogic.endGame(winners)
+    gameEnded = true
+    
+    if #winners == 1 then
+        local MESSAGES = {
+            WINNER = "%s wins with %d points!",
+            GAME_OVER = "Game Over!"
+        }
+        broadcastToAll(string.format(MESSAGES.WINNER, winners[1].player, winners[1].points), {0, 1, 0})
+        broadcastToAll(MESSAGES.GAME_OVER, {1, 1, 1})
+    else
+        -- Handle tie
+        local tieWinners = GameLogic.getWinnersWhenDraw(winners)
+        if #tieWinners == 1 then
+            local MESSAGES = {
+                TIE_WINNER = "%s wins the tiebreaker with %d points and %d cards!",
+                GAME_OVER = "Game Over!"
+            }
+            broadcastToAll(string.format(MESSAGES.TIE_WINNER, tieWinners[1].player, tieWinners[1].points, tieWinners[1].cards), {0, 1, 0})
+            broadcastToAll(MESSAGES.GAME_OVER, {1, 1, 1})
+        else
+            local MESSAGES = {
+                TIE = "It's a tie!",
+                GAME_OVER = "Game Over!"
+            }
+            broadcastToAll(MESSAGES.TIE, {1, 1, 0})
+            broadcastToAll(MESSAGES.GAME_OVER, {1, 1, 1})
+        end
+    end
+end
+
+-- Get winners when there's a draw (tiebreaker by card count)
+function GameLogic.getWinnersWhenDraw(winners)
+    local maxCards = 0
+    local tieWinners = {}
+    
+    -- Find maximum card count among winners
+    for _, winner in pairs(winners) do
+        local cardCount = 0
+        if PlayerManager and PlayerManager.getPlayerCardCount then
+            cardCount = PlayerManager.getPlayerCardCount(winner.player)
+        end
+        winner.cards = cardCount
+        
+        if cardCount > maxCards then
+            maxCards = cardCount
+        end
+    end
+    
+    -- Get all winners with maximum card count
+    for _, winner in pairs(winners) do
+        if winner.cards == maxCards then
+            table.insert(tieWinners, winner)
+        end
+    end
+    
+    return tieWinners
+end
+
+-- Validate token hand size
+function GameLogic.validTokenHandSize(player)
+    local MAX_TOKENS = 10
+    local tokenCount = 0
+    
+    if PlayerManager and PlayerManager.countCurrentPlayerTokens then
+        tokenCount = PlayerManager.countCurrentPlayerTokens(player)
+    end
+    
+    return tokenCount <= MAX_TOKENS
+end
+
+-- Check if play is valid
+function GameLogic.isValidPlay(player, action, data)
+    if gameEnded then
+        return false, "Game has ended"
+    end
+    
+    local currentPlayer = GameLogic.getCurrentPlayer()
+    if player:lower() ~= currentPlayer:lower() then
+        return false, "It's not your turn"
+    end
+    
+    if action == "take_gems" then
+        -- Validate gem taking
+        if GemManager then
+            local selectedGems = data.gems or {}
+            local count = #selectedGems
+            
+            if count == 0 then
+                return false, "No gems selected"
+            elseif count == 1 then
+                return false, "Must take at least 2 gems"
+            elseif count == 2 then
+                -- Taking 2 of same color
+                if selectedGems[1] ~= selectedGems[2] then
+                    return false, "When taking 2 gems, they must be the same color"
+                end
+                
+                local zone = GemManager.bankGemZone(selectedGems[1])
+                if GemManager.getZoneGemCount(zone) < 4 then
+                    return false, "Need at least 4 gems of this color to take 2"
+                end
+            elseif count == 3 then
+                -- Taking 3 different colors
+                local colors = {}
+                for _, gem in pairs(selectedGems) do
+                    if colors[gem] then
+                        return false, "When taking 3 gems, they must be different colors"
+                    end
+                    colors[gem] = true
+                    
+                    local zone = GemManager.bankGemZone(gem)
+                    if GemManager.getZoneGemCount(zone) == 0 then
+                        return false, "Not enough gems of color: " .. gem
+                    end
+                end
+            else
+                return false, "Can only take 2 or 3 gems"
+            end
+            
+            -- Check if player will exceed token limit
+            local currentTokens = 0
+            if PlayerManager and PlayerManager.countCurrentPlayerTokens then
+                currentTokens = PlayerManager.countCurrentPlayerTokens(player)
+            end
+            
+            if currentTokens + count > 10 then
+                return false, "Would exceed maximum token limit (10)"
+            end
+        end
+    elseif action == "buy_card" then
+        -- Validate card purchase
+        local card = data.card
+        if not card then
+            return false, "No card specified"
+        end
+        
+        if CardManager then
+            local cardData = CardManager.parseCard(card)
+            if not CardManager.checkPayment(player, cardData.cost) then
+                return false, "Insufficient gems to buy this card"
+            end
+        end
+    elseif action == "reserve_card" then
+        -- Validate card reservation
+        local card = data.card
+        if not card then
+            return false, "No card specified"
+        end
+        
+        -- Check if player has space for reserved cards (max 3)
+        local reservedCount = 0
+        if PlayerManager and PlayerManager.getPlayerReservedCount then
+            reservedCount = PlayerManager.getPlayerReservedCount(player)
+        end
+        
+        if reservedCount >= 3 then
+            return false, "Cannot reserve more than 3 cards"
+        end
+    end
+    
+    return true, "Valid play"
+end
+
+-- Start game
+function GameLogic.startGame()
+    gameStarted = true
+    gameEnded = false
+    currentPlayerIndex = 1
+    
+    local MESSAGES = {
+        GAME_START = "Game started!",
+        FIRST_TURN = "It's %s's turn"
+    }
+    
+    broadcastToAll(MESSAGES.GAME_START, {0, 1, 0})
+    
+    local currentPlayer = GameLogic.getCurrentPlayer()
+    if currentPlayer then
+        broadcastToAll(string.format(MESSAGES.FIRST_TURN, currentPlayer), {1, 1, 1})
+    end
+end
+
+-- Check if game has started
+function GameLogic.hasGameStarted()
+    return gameStarted
+end
+
+-- Check if game has ended
+function GameLogic.hasGameEnded()
+    return gameEnded
+end
+
+-- Get current player index
+function GameLogic.getCurrentPlayerIndex()
+    return currentPlayerIndex
+end
+
+-- Set current player index
+function GameLogic.setCurrentPlayerIndex(index)
+    currentPlayerIndex = index
+end
+
+-- Get player count
+function GameLogic.getPlayerCount()
+    return playerCount
+end
+
+-- Set player count
+function GameLogic.setPlayerCount(count)
+    playerCount = count
+end
+
+-- Warn all players
+function GameLogic.warnAll(message)
+    local COLORS = {
+        WARNING = {1, 0.4, 0, 1}
+    }
+    broadcastToAll(message, COLORS.WARNING)
+end
+
+-- Process turn action
+function GameLogic.processTurnAction(player, action, data)
+    local isValid, message = GameLogic.isValidPlay(player, action, data)
+    
+    if not isValid then
+        GameLogic.warnAll(message)
+        return false
+    end
+    
+    -- Process the action
+    if action == "take_gems" then
+        if GemManager and GemManager.takeMultiColoredGems then
+            GemManager.takeMultiColoredGems(data.gems, player)
+        end
+    elseif action == "buy_card" then
+        if CardManager then
+            local cardData = CardManager.parseCard(data.card)
+            CardManager.payCost(player, cardData.cost)
+            CardManager.playCard(data.card, player)
+        end
+    elseif action == "reserve_card" then
+        if CardManager and CardManager.reserveCard then
+            CardManager.reserveCard(data.card, player)
+        end
+    end
+    
+    -- End turn
+    GameLogic.nextTurn()
+    return true
+end
+
+return GameLogic

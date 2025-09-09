@@ -1,0 +1,303 @@
+-- Splendor Gem Manager
+-- Handles all gem/token related functionality and movement
+
+-- Global variables for gem management
+selectedGems = {}
+returnMode = false
+
+-- Zone references (will be set by game setup)
+gemZones = {}
+goldGemZone = nil
+playerZones = {}
+
+-- Initialize gem selection state
+function resetSelectedGems()
+    selectedGems = {
+        red = false,
+        white = false,
+        green = false,
+        black = false,
+        blue = false
+    }
+end
+
+-- Count selected gems
+function countSelectedGems()
+    return #getSelectedGemColours()
+end
+
+-- Get selected gem colours
+function getSelectedGemColours()
+    local colours = {}
+    local i = 1
+    for colour, isSelected in pairs(selectedGems) do
+        if isSelected then
+            colours[i] = colour
+            i = i + 1
+        end
+    end
+    return colours
+end
+
+-- Check if can take selected gems
+function canTakeSelectedGems(selectedColours)
+    if countSelectedGems() == 3 then
+        return true
+    end
+    for colour, value in pairs(selectedGems) do
+        if (not value) then
+            if not isZoneEmpty(bankGemZone(colour)) then
+                return false
+            end
+        end
+    end
+    return true
+end
+
+-- Zone utility functions
+function isZoneEmpty(zone)
+    return zone.getObjects() == nil or #zone.getObjects() == 0
+end
+
+function getZoneGemCount(zone)
+    if isZoneEmpty(zone) then
+        return 0
+    else
+        return #zone.getObjects()
+    end
+end
+
+-- Get bank gem zone by colour
+function bankGemZone(colour)
+    if colour == 'gold' then
+        return goldGemZone
+    end
+    return gemZones[colour]
+end
+
+-- Get player gem zone
+function playerGemZone(player, colour)
+    return playerZones[player:lower()].gems[colour]
+end
+
+-- Get player gem zones
+function playerGemZones(player)
+    return playerZones[player:lower()].gems
+end
+
+-- Token movement functions
+function moveTokens(sourceZone, destinationZone, count)
+    if count == nil then
+        count = 1
+    end
+    local yPos = destinationZone.getPosition().y - 0.55
+    local topDestinationToken = getTopTokenFromZone(destinationZone)
+    if topDestinationToken ~= nil then
+        yPos = topDestinationToken.getPosition().y
+    end
+    local topTokens = getTopTokensFromZone(sourceZone, count)
+    for i = 1, count do
+        yPos = yPos + 0.1
+        topTokens[i].setPositionSmooth({destinationZone.getPosition().x, yPos, destinationZone.getPosition().z})
+    end
+    
+    -- Update zone counts
+    local ZONE_VARS = {
+        OWNER = 'name',
+        PLAYER = 'player',
+        BANK = 'bank',
+        COUNT = 'count'
+    }
+    sourceZone.setVar(ZONE_VARS.COUNT, sourceZone.getVar(ZONE_VARS.COUNT) - count)
+    destinationZone.setVar(ZONE_VARS.COUNT, destinationZone.getVar(ZONE_VARS.COUNT) + count)
+    
+    -- Update gem buttons
+    createGemButtonsForZone(sourceZone)
+    createGemButtonsForZone(destinationZone)
+end
+
+function moveToken(sourceZone, destinationZone)
+    moveTokens(sourceZone, destinationZone)
+end
+
+-- Get top tokens from zone
+function getTopTokensFromZone(zone, count)
+    local topTokens = {}
+    if count == 0 or isZoneEmpty(zone) then
+        return topTokens
+    end
+    local yPositions = {}
+    for k, token in pairs(zone.getObjects()) do
+        table.insert(yPositions, token.getPosition().y)
+    end
+    table.sort(yPositions)
+    local skipCount = #zone.getObjects() - count
+    local minY = yPositions[1 + skipCount]
+    for k, token in pairs(zone.getObjects()) do
+        if minY <= token.getPosition().y then
+            table.insert(topTokens, token)
+        end
+    end
+    return topTokens
+end
+
+function getTopTokenFromZone(zone)
+    return getTopTokensFromZone(zone, 1)[1]
+end
+
+-- Gem button creation and management
+function gemButtonParams(tokenCount, mode)
+    local yPos = (tokenCount * 0.1) - 0.2
+    local position = {0, yPos, 0}
+    if mode == 'label' then
+        return {
+            label = tokenCount,
+            click_function = "dummy",
+            position = position,
+            rotation = {0, 180, 0},
+            height = 0,
+            width = 0,
+            font_color = {1, 1, 1, 0.6},
+            font_size = 300
+        }
+    elseif mode == 'get' then
+        return {
+            click_function = "gemButtonClicked",
+            tooltip = 'Select/Take 2',
+            function_owner = self,
+            position = position,
+            height = 400,
+            width = 400,
+            color = {0, 0, 0, 0},
+            hover_color = {0, 1, 0, 0.3}
+        }
+    elseif mode == 'return' then
+        return {
+            click_function = "returnGemClicked",
+            tooltip = 'Return',
+            function_owner = self,
+            position = position,
+            height = 400,
+            width = 400,
+            color = {0, 0, 0, 0},
+            hover_color = {1, 0, 0, 0.3}
+        }
+    else
+        broadcastToAll('An error occurred', {r = 1, g = 0.4, b = 0, a = 1})
+    end
+end
+
+function createGemButtonsForZone(zone, count)
+    if zone.getButtons() ~= nil then
+        local buttonCount = #zone.getButtons()
+        while buttonCount > 0 do
+            zone.removeButton(buttonCount - 1)
+            buttonCount = buttonCount - 1
+        end
+    end
+
+    if count == nil then
+        local ZONE_VARS = {
+            OWNER = 'name',
+            PLAYER = 'player',
+            BANK = 'bank',
+            COUNT = 'count'
+        }
+        count = zone.getVar(ZONE_VARS.COUNT)
+    end
+
+    if count > 0 then
+        zone.createButton(gemButtonParams(count, 'label'))
+        local ZONE_VARS = {
+            OWNER = 'name',
+            PLAYER = 'player',
+            BANK = 'bank',
+            COUNT = 'count'
+        }
+        if not returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.BANK and zone.getVar('colour') ~= 'gold' then
+            zone.createButton(gemButtonParams(count, 'get'))
+        elseif returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.PLAYER then
+            zone.createButton(gemButtonParams(count, 'return'))
+        end
+    end
+end
+
+function createGemButtons(init)
+    resetSelectedGems()
+    local TOKEN_COUNTS_PER_PLAYERS = {nil, 4, 5, 7}
+    local GOLD_TOKEN_COUNT = 5
+    
+    for k, zone in pairs(gemZones) do
+        if init then
+            -- playerCount should be passed or available globally
+            createGemButtonsForZone(zone, TOKEN_COUNTS_PER_PLAYERS[playerCount])
+        else
+            createGemButtonsForZone(zone)
+        end
+    end
+    if init then
+        createGemButtonsForZone(goldGemZone, GOLD_TOKEN_COUNT)
+    else
+        createGemButtonsForZone(goldGemZone)
+        for playerColour, playerZone in pairs(playerZones) do
+            for colour, zone in pairs(playerZone.gems) do
+                createGemButtonsForZone(zone)
+            end
+        end
+    end
+end
+
+-- Token tinting functions
+function changeAllTokensTint()
+    for k, zone in pairs(gemZones) do
+        changeTokensTint(zone)
+    end
+end
+
+function changeTokensTint(zone)
+    local tint = {1, 1, 1}
+    if (selectedGems[zone.getVar('colour')]) then
+        tint = {0.66, 1, 0.66}
+    end
+
+    for k, v in pairs(zone.getObjects()) do
+        v.setColorTint(tint)
+    end
+end
+
+-- Take multi-colored gems
+function takeMultiColoredGems(selectedColours, player)
+    for k, colour in pairs(selectedColours) do
+        moveToken(bankGemZone(colour), playerGemZone(player, colour))
+        -- Update player gem count if changeGemCount is available
+        if changeGemCount then
+            changeGemCount(player, colour, 1)
+        end
+    end
+end
+
+-- Set zone references
+function setZoneReferences(gems, gold, players)
+    gemZones = gems
+    goldGemZone = gold
+    playerZones = players
+end
+
+-- Get/Set return mode
+function setReturnMode(mode)
+    returnMode = mode
+end
+
+function getReturnMode()
+    return returnMode
+end
+
+-- Get selected gems
+function getSelectedGems()
+    return selectedGems
+end
+
+-- Set selected gem
+function setSelectedGem(colour, selected)
+    selectedGems[colour] = selected
+end

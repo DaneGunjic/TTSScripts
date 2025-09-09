@@ -1,0 +1,109 @@
+-- Splendor Game Constants
+-- All game configuration values and constants
+
+-- Colors and UI
+CHAT_WARNING_COLOR = {r = 255 / 255, g = 102 / 255, b = 0 / 255, a = 255 / 255}
+CHAT_INFO_COLOR = {r = 153 / 255, g = 255 / 255, b = 51 / 255, a = 255 / 255}
+ACTIVE_GEM_BUTTON_COLOR = {r = 153 / 255, g = 255 / 255, b = 51 / 255, a = 255 / 255}
+
+-- Game Configuration
+TOKEN_COUNTS_PER_PLAYERS = {nil, 4, 5, 7}
+PEOPLE_TILES_PER_PLAYERS = {nil, 3, 4, 5}
+GOLD_TOKEN_COUNT = 5
+MAX_HAND_SIZE = 3
+MAX_TOKEN_COUNT = 10
+PERSON_SCORE = 3
+SCORE_TO_WIN = 15
+CARDS_COUNT = 4
+
+-- Positions and Layout
+DECK_Z_POSITIONS = {-7, -3, 1}
+CARD_X_POSITIONS = {-3, 0, 3, 6}
+PEOPLE_X_POSITIONS = {-1.8, 0.8, 3.4, -4.5, 6.05}
+PERSON_PARAMS = {position = {-10, 3, nil}, flip = true, rotation = {0, 180, 0}}
+
+-- Messages
+ERROR_MESSAGE = 'An error occured. You can report it at https://steamcommunity.com/workshop/filedetails/discussion/1416487064/1727575977535194558/'
+RETURN_TOKENS_MESSAGE = 'You can only have a maximum of 10 gem tokens. Please return the excess amount.'
+
+-- Game Object Names
+COLOUR_NAME = 'colour'
+GOLD_NAME = 'gold'
+
+-- Zone Variables
+ZONE_VARS = {
+    OWNER = 'name',
+    PLAYER = 'player',
+    BANK = 'bank',
+    COUNT = 'count'
+}
+
+-- Color Mappings
+COST_COLOUR_NAMES = {
+    r = 'red',
+    w = 'white',
+    g = 'green',
+    b = 'black',
+    u = 'blue'
+}
+
+-- Object Type Names
+TYPE_NAMES = {
+    token = 'Custom_Model',
+    deck = 'Deck',
+    card = 'Card'
+}
+
+-- Player Rotations
+PLAYER_Y_ROTATION = {
+    Blue = 0,
+    Pink = 90,
+    Red = 180,
+    Green = 270
+}
+
+-- Button Parameters
+CARD_BUTTON_PARAMS = {
+    click_function = "cardClicked",
+    function_owner = self,
+    position = {0, 0.3, 0},
+    height = 1590,
+    width = 1130,
+    color = {0, 0, 0, 0},
+    hover_color = {0, 1, 0, 0.4},
+    tooltip = "Buy/Reserve"
+}
+
+CARD_TINT_PARAMS = {
+    label = "helperTint",
+    click_function = "cardClicked",
+    position = {0, -0.3, 0},
+    height = 1590,
+    width = 1130,
+    color = {1, 0, 0, 1},
+    hover_color = {0, 1, 0, 0.4},
+    tooltip = "Buy/Reserve"
+}
+
+DECK_BUTTON_PARAMS = {
+    click_function = "deckZoneClicked",
+    function_owner = self,
+    position = {0, 0, 0},
+    rotation = {0, 0, 0},
+    height = 1590,
+    width = 1130,
+    color = {0, 0, 0, 0},
+    hover_color = {0, 1, 0, 0.3},
+    tooltip = "Reserve"
+}
+
+NOBEL_BUTTON_PARAMS = {
+    click_function = "nobelClicked",
+    function_owner = self,
+    position = {0, 0.3, 0},
+    height = 1520,
+    width = 1520,
+    color = {0, 0, 0, 0},
+    hover_color = {0, 1, 0, 0.3},
+    tooltip = "Pick"
+}

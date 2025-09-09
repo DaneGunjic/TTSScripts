@@ -1,0 +1,350 @@
+-- Splendor UI Manager
+-- Handles all UI and XML-related functions
+
+local UIManager = {}
+
+-- UI state variables
+local scoreTableVisible = true
+local helperVisible = true
+local rulesVisible = false
+local soundEnabled = true
+local tintEnabled = true
+
+-- Get XML table for score display
+function UIManager.getXmlTable()
+    local xmlTable = {
+        {
+            tag = 'Panel',
+            attributes = {
+                position = '0 0 -50',
+                rotation = '0 0 0',
+                width = '500',
+                height = '200',
+                color = 'rgba(0,0,0,0.8)'
+            },
+            children = {
+                {
+                    tag = 'Text',
+                    attributes = {
+                        text = 'SPLENDOR SCOREBOARD',
+                        fontSize = '24',
+                        color = 'white',
+                        alignment = 'MiddleCenter',
+                        rectAlignment = 'MiddleCenter',
+                        offsetXY = '0 80'
+                    }
+                }
+            }
+        }
+    }
+    
+    -- Add player scores
+    local players = {}
+    if PlayerManager and PlayerManager.getPlayers then
+        players = PlayerManager.getPlayers()
+    end
+    
+    local yOffset = 40
+    for i, player in pairs(players) do
+        local points = 0
+        local cards = 0
+        
+        if PlayerManager then
+            if PlayerManager.getPlayerPoints then
+                points = PlayerManager.getPlayerPoints(player)
+            end
+            if PlayerManager.getPlayerCardCount then
+                cards = PlayerManager.getPlayerCardCount(player)
+            end
+        end
+        
+        local playerText = string.format('%s: %d points (%d cards)', player, points, cards)
+        
+        table.insert(xmlTable[1].children, {
+            tag = 'Text',
+            attributes = {
+                text = playerText,
+                fontSize = '18',
+                color = 'white',
+                alignment = 'MiddleCenter',
+                rectAlignment = 'MiddleCenter',
+                offsetXY = '0 ' .. yOffset
+            }
+        })
+        
+        yOffset = yOffset - 25
+    end
+    
+    -- Add current turn indicator
+    local currentPlayer = ''
+    if GameLogic and GameLogic.getCurrentPlayer then
+        currentPlayer = GameLogic.getCurrentPlayer() or ''
+    end
+    
+    table.insert(xmlTable[1].children, {
+        tag = 'Text',
+        attributes = {
+            text = 'Current Turn: ' .. currentPlayer,
+            fontSize = '16',
+            color = 'yellow',
+            alignment = 'MiddleCenter',
+            rectAlignment = 'MiddleCenter',
+            offsetXY = '0 ' .. (yOffset - 20)
+        }
+    })
+    
+    return xmlTable
+end
+
+-- Update score table
+function UIManager.updateTable()
+    if scoreTableVisible then
+        UIManager.scoreTable()
+    end
+end
+
+-- Show/hide score table
+function UIManager.scoreTable()
+    if scoreTableVisible then
+        local xmlTable = UIManager.getXmlTable()
+        Global.UI.setXmlTable(xmlTable)
+    else
+        Global.UI.setXmlTable({})
+    end
+end
+
+-- Toggle score table visibility
+function UIManager.scoreTableVisibility()
+    scoreTableVisible = not scoreTableVisible
+    UIManager.scoreTable()
+    
+    local message = scoreTableVisible and 'Score table shown' or 'Score table hidden'
+    broadcastToAll(message, {1, 1, 1})
+end
+
+-- Update helper display
+function UIManager.updateHelper()
+    if not helperVisible then
+        return
+    end
+    
+    local helperText = 'GAME HELPER\n\n'
+    
+    -- Add current player info
+    local currentPlayer = ''
+    if GameLogic and GameLogic.getCurrentPlayer then
+        currentPlayer = GameLogic.getCurrentPlayer() or ''
+    end
+    helperText = helperText .. 'Current Turn: ' .. currentPlayer .. '\n\n'
+    
+    -- Add game rules reminder
+    helperText = helperText .. 'ACTIONS:\n'
+    helperText = helperText .. '• Take 3 different colored gems\n'
+    helperText = helperText .. '• Take 2 gems of the same color (if 4+ available)\n'
+    helperText = helperText .. '• Buy a development card\n'
+    helperText = helperText .. '• Reserve a development card\n\n'
+    
+    helperText = helperText .. 'WIN CONDITION:\n'
+    helperText = helperText .. '• First to 15 points wins\n'
+    helperText = helperText .. '• Tiebreaker: fewest cards\n\n'
+    
+    helperText = helperText .. 'TOKEN LIMIT: 10 per player'
+    
+    -- Update helper UI (this would need to be implemented based on specific UI setup)
+    -- For now, we'll use a simple broadcast
+    -- broadcastToAll(helperText, {0.8, 0.8, 0.8})
+end
+
+-- Show rules
+function UIManager.showRules()
+    rulesVisible = true
+    
+    local rulesText = 'SPLENDOR RULES\n\n'
+    rulesText = rulesText .. 'SETUP:\n'
+    rulesText = rulesText .. '• Each player starts with no gems or cards\n'
+    rulesText = rulesText .. '• 4 development cards of each level are dealt\n'
+    rulesText = rulesText .. '• Noble tiles equal to players + 1 are dealt\n\n'
+    
+    rulesText = rulesText .. 'TURN ACTIONS (choose one):\n'
+    rulesText = rulesText .. '1. Take 3 gems of different colors\n'
+    rulesText = rulesText .. '2. Take 2 gems of the same color (if 4+ in supply)\n'
+    rulesText = rulesText .. '3. Buy a development card\n'
+    rulesText = rulesText .. '4. Reserve a development card (gain 1 gold)\n\n'
+    
+    rulesText = rulesText .. 'DEVELOPMENT CARDS:\n'
+    rulesText = rulesText .. '• Provide permanent gem discounts\n'
+    rulesText = rulesText .. '• Award prestige points\n'
+    rulesText = rulesText .. '• Higher levels cost more but give more points\n\n'
+    
+    rulesText = rulesText .. 'NOBLES:\n'
+    rulesText = rulesText .. '• Automatically awarded when requirements met\n'
+    rulesText = rulesText .. '• Worth 3 prestige points each\n\n'
+    
+    rulesText = rulesText .. 'WINNING:\n'
+    rulesText = rulesText .. '• First player to 15 points triggers end game\n'
+    rulesText = rulesText .. '• All players finish the round\n'
+    rulesText = rulesText .. '• Highest points wins (tiebreaker: fewest cards)\n\n'
+    
+    rulesText = rulesText .. 'LIMITS:\n'
+    rulesText = rulesText .. '• Maximum 10 gems per player\n'
+    rulesText = rulesText .. '• Maximum 3 reserved cards per player'
+    
+    broadcastToAll(rulesText, {0.9, 0.9, 0.9})
+end
+
+-- Hide rules
+function UIManager.hideRules()
+    rulesVisible = false
+    broadcastToAll('Rules hidden', {1, 1, 1})
+end
+
+-- Toggle sound
+function UIManager.soundSwitch()
+    soundEnabled = not soundEnabled
+    
+    local message = soundEnabled and 'Sound enabled' or 'Sound disabled'
+    broadcastToAll(message, {1, 1, 1})
+    
+    -- This would need to be implemented based on TTS sound system
+    -- For now, just store the state
+end
+
+-- Toggle tint helper
+function UIManager.tintHelperSwitch()
+    tintEnabled = not tintEnabled
+    
+    local message = tintEnabled and 'Gem tinting enabled' or 'Gem tinting disabled'
+    broadcastToAll(message, {1, 1, 1})
+    
+    -- Update gem tinting if GemManager is available
+    if GemManager then
+        if tintEnabled then
+            if GemManager.changeAllTokensTint then
+                GemManager.changeAllTokensTint()
+            end
+        else
+            -- Reset all gem tints to normal
+            if GemManager.resetAllTokensTint then
+                GemManager.resetAllTokensTint()
+            end
+        end
+    end
+end
+
+-- Card play helper
+function UIManager.cardPlayHelper(card, player)
+    if not card or not player then
+        return
+    end
+    
+    local cardData = {}
+    if CardManager and CardManager.parseCard then
+        cardData = CardManager.parseCard(card)
+    end
+    
+    local helperText = string.format('Card Info for %s:\n', player)
+    helperText = helperText .. string.format('Points: %d\n', cardData.points or 0)
+    helperText = helperText .. string.format('Discount: %s\n', cardData.discount or 'none')
+    
+    if cardData.cost then
+        helperText = helperText .. 'Cost: '
+        local costParts = {}
+        for color, amount in pairs(cardData.cost) do
+            if amount > 0 then
+                table.insert(costParts, string.format('%d %s', amount, color))
+            end
+        end
+        helperText = helperText .. table.concat(costParts, ', ') .. '\n'
+    end
+    
+    -- Check if player can afford it
+    local canAfford = false
+    if CardManager and CardManager.checkPayment then
+        canAfford = CardManager.checkPayment(player, cardData.cost or {})
+    end
+    
+    helperText = helperText .. string.format('Can afford: %s', canAfford and 'Yes' or 'No')
+    
+    broadcastToColor(helperText, player, {0.8, 0.8, 1})
+end
+
+-- Tint card button
+function UIManager.tintCardButton(card, color)
+    if not tintEnabled then
+        return
+    end
+    
+    if card and card.setColorTint then
+        card.setColorTint(color or {0.8, 1, 0.8})
+    end
+end
+
+-- Remove tint from card button
+function UIManager.removeTintCardButton(card)
+    if card and card.setColorTint then
+        card.setColorTint({1, 1, 1})
+    end
+end
+
+-- Helper click handler
+function UIManager.helperOnClick(player, value, id)
+    if id == 'score_toggle' then
+        UIManager.scoreTableVisibility()
+    elseif id == 'rules_show' then
+        UIManager.showRules()
+    elseif id == 'rules_hide' then
+        UIManager.hideRules()
+    elseif id == 'sound_toggle' then
+        UIManager.soundSwitch()
+    elseif id == 'tint_toggle' then
+        UIManager.tintHelperSwitch()
+    end
+end
+
+-- Get UI state
+function UIManager.getUIState()
+    return {
+        scoreTableVisible = scoreTableVisible,
+        helperVisible = helperVisible,
+        rulesVisible = rulesVisible,
+        soundEnabled = soundEnabled,
+        tintEnabled = tintEnabled
+    }
+end
+
+-- Set UI state
+function UIManager.setUIState(state)
+    if state.scoreTableVisible ~= nil then
+        scoreTableVisible = state.scoreTableVisible
+    end
+    if state.helperVisible ~= nil then
+        helperVisible = state.helperVisible
+    end
+    if state.rulesVisible ~= nil then
+        rulesVisible = state.rulesVisible
+    end
+    if state.soundEnabled ~= nil then
+        soundEnabled = state.soundEnabled
+    end
+    if state.tintEnabled ~= nil then
+        tintEnabled = state.tintEnabled
+    end
+end
+
+-- Initialize UI
+function UIManager.initialize()
+    UIManager.updateTable()
+    UIManager.updateHelper()
+end
+
+-- Check if sound is enabled
+function UIManager.isSoundEnabled()
+    return soundEnabled
+end
+
+-- Check if tint is enabled
+function UIManager.isTintEnabled()
+    return tintEnabled
+end
+
+return UIManager
