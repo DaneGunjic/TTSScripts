@@ -2,9 +2,9 @@
 -- Handles all player-related functionality and data management
 
 -- Player data storage
-players = {}
-playersOrder = {}
-currentPlayer = nil
+local players = {}
+local playersOrder = {}
+local currentPlayer = nil
 
 -- Initialize player data structure
 function getPlayers()

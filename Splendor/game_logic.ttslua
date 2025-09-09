@@ -2,11 +2,11 @@
 -- Handles turn management, win conditions, and core game flow
 
 -- Game state variables
-currentPlayerIndex = 1
-gameStarted = false
-gameEnded = false
-playerCount = 0
-playersOrder = {}
+local currentPlayerIndex = 1
+local gameStarted = false
+local gameEnded = false
+local playerCount = 0
+local playersOrder = {}
 
 -- Initialize game logic
 function initializeGameLogic()

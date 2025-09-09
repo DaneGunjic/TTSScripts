@@ -12,25 +12,34 @@
 #include !\Splendor\ui_manager.ttslua
 
 -- Global game state
-playerCount = 0
-gameStarted = false
-gameEnded = false
+local playerCount = 0
+local gameStarted = false
+local gameEnded = false
 
 -- Main game event handlers and core functions
 
 -- Global variables (moved from local to global for #include compatibility)
-noblePickMode = false
-tintHelper = true
-dev = false --tabletop.zonk
-dev2 = false
-xmlTable = {}
-xmlStart = {}
-turns = {}
-soundToggle = 'talk'
+local noblePickMode = false
+local tintHelper = true
+local dev = false --tabletop.zonk
+local dev2 = false
+local xmlTable = {}
+local xmlStart = {}
+local turns = {}
+local soundToggle = 'talk'
 -- TTS Event Handlers
 function onLoad()
+    -- Option 1: Use this if you have set up Global variables with GUIDs
+    -- setupObjectReferences()
+
+    -- Option 2: Use this to find objects by name (recommended for initial setup)
+    setupObjectReferencesByName()
+
+    -- Option 3: Use this to see what Global variables need to be set
+    -- initializeGlobalVariables()
+
     prepareTable()
-    initializeGame()
+    initializeGameLogic()
     initializeUI()
 end
 

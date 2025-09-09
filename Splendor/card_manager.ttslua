@@ -2,11 +2,11 @@
 -- Handles all card operations including dealing, parsing, and management
 
 -- Zone references (will be set by game setup)
-deckZones = {}
-cardZones = {}
-peopleZone = nil
-peopleCardZones = {}
-playerZones = {}
+local deckZones = {}
+local cardZones = {}
+local peopleZone = nil
+local peopleCardZones = {}
+local playerZones = {}
 
 -- Card position calculations
 function cardPosition(level, position)

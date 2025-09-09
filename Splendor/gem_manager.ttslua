@@ -2,13 +2,13 @@
 -- Handles all gem/token related functionality and movement
 
 -- Global variables for gem management
-selectedGems = {}
-returnMode = false
+local selectedGems = {}
+local returnMode = false
 
 -- Zone references (will be set by game setup)
-gemZones = {}
-goldGemZone = nil
-playerZones = {}
+local gemZones = {}
+local goldGemZone = nil
+local playerZones = {}
 
 -- Initialize gem selection state
 function resetSelectedGems()
@@ -72,21 +72,35 @@ function bankGemZone(colour)
     if colour == 'gold' then
         return goldGemZone
     end
-    return gemZones[colour]
+    if gemZones then
+        return gemZones[colour]
+    end
+    return nil
 end
 
 -- Get player gem zone
 function playerGemZone(player, colour)
-    return playerZones[player:lower()].gems[colour]
+    if playerZones and playerZones[player:lower()] and playerZones[player:lower()].gems then
+        return playerZones[player:lower()].gems[colour]
+    end
+    return nil
 end
 
 -- Get player gem zones
 function playerGemZones(player)
-    return playerZones[player:lower()].gems
+    if playerZones and playerZones[player:lower()] then
+        return playerZones[player:lower()].gems
+    end
+    return nil
 end
 
 -- Token movement functions
 function moveTokens(sourceZone, destinationZone, count)
+    if sourceZone == nil or destinationZone == nil then
+        print('Warning: Attempted to move tokens with nil zone(s)')
+        return
+    end
+
     if count == nil then
         count = 1
     end
@@ -100,7 +114,7 @@ function moveTokens(sourceZone, destinationZone, count)
         yPos = yPos + 0.1
         topTokens[i].setPositionSmooth({destinationZone.getPosition().x, yPos, destinationZone.getPosition().z})
     end
-    
+
     -- Update zone counts
     local ZONE_VARS = {
         OWNER = 'name',
@@ -110,7 +124,7 @@ function moveTokens(sourceZone, destinationZone, count)
     }
     sourceZone.setVar(ZONE_VARS.COUNT, sourceZone.getVar(ZONE_VARS.COUNT) - count)
     destinationZone.setVar(ZONE_VARS.COUNT, destinationZone.getVar(ZONE_VARS.COUNT) + count)
-    
+
     -- Update gem buttons
     createGemButtonsForZone(sourceZone)
     createGemButtonsForZone(destinationZone)
@@ -188,6 +202,11 @@ function gemButtonParams(tokenCount, mode)
 end
 
 function createGemButtonsForZone(zone, count)
+    if zone == nil then
+        print('Warning: Attempted to create buttons for nil zone')
+        return
+    end
+
     if zone.getButtons() ~= nil then
         local buttonCount = #zone.getButtons()
         while buttonCount > 0 do
@@ -226,22 +245,36 @@ function createGemButtons(init)
     resetSelectedGems()
     local TOKEN_COUNTS_PER_PLAYERS = {nil, 4, 5, 7}
     local GOLD_TOKEN_COUNT = 5
-    
-    for k, zone in pairs(gemZones) do
-        if init then
-            -- playerCount should be passed or available globally
-            createGemButtonsForZone(zone, TOKEN_COUNTS_PER_PLAYERS[playerCount])
-        else
-            createGemButtonsForZone(zone)
+
+    if gemZones then
+        for k, zone in pairs(gemZones) do
+            if zone then
+                if init then
+                    -- playerCount should be passed or available globally
+                    createGemButtonsForZone(zone, TOKEN_COUNTS_PER_PLAYERS[playerCount])
+                else
+                    createGemButtonsForZone(zone)
+                end
+            end
         end
     end
-    if init then
-        createGemButtonsForZone(goldGemZone, GOLD_TOKEN_COUNT)
-    else
-        createGemButtonsForZone(goldGemZone)
+
+    if goldGemZone then
+        if init then
+            createGemButtonsForZone(goldGemZone, GOLD_TOKEN_COUNT)
+        else
+            createGemButtonsForZone(goldGemZone)
+        end
+    end
+
+    if not init and playerZones then
         for playerColour, playerZone in pairs(playerZones) do
-            for colour, zone in pairs(playerZone.gems) do
-                createGemButtonsForZone(zone)
+            if playerZone and playerZone.gems then
+                for colour, zone in pairs(playerZone.gems) do
+                    if zone then
+                        createGemButtonsForZone(zone)
+                    end
+                end
             end
         end
     end

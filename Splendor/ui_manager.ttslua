@@ -2,11 +2,11 @@
 -- Handles all UI and XML-related functions
 
 -- UI state variables
-scoreTableVisible = true
-helperVisible = true
-rulesVisible = false
-soundEnabled = true
-tintEnabled = true
+local scoreTableVisible = true
+local helperVisible = true
+local rulesVisible = false
+local soundEnabled = true
+local tintEnabled = true
 
 -- Get XML table for score display
 function getXmlTable()
