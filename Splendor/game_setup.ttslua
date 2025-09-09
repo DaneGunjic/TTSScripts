@@ -1,637 +1,198 @@
--- Splendor Game Setup
--- Handles game initialization and setup functions
-
--- Object references
-local objectReferences = {}
-local handZones = {}
-local gemZones = {}
-local goldGemZone = nil
-local playerZones = {}
-local deckZones = {}
-local cardZones = {}
-local peopleZone = nil
-local peopleCardZones = {}
-local rulesZone = nil
-
--- Initialize global variables with GUIDs
-function initializeGlobalVariables()
-    -- Hand Zones
-    Global.setVar("Red Hand", "your-red-hand-zone-guid")
-    Global.setVar("White Hand", "your-white-hand-zone-guid")
-    Global.setVar("Green Hand", "your-green-hand-zone-guid")
-    Global.setVar("Black Hand", "your-black-hand-zone-guid")
-    Global.setVar("Blue Hand", "your-blue-hand-zone-guid")
-    Global.setVar("Yellow Hand", "your-yellow-hand-zone-guid")
-
-    -- Gem Zones
-    Global.setVar("Red Gem Zone", "your-red-gem-zone-guid")
-    Global.setVar("White Gem Zone", "your-white-gem-zone-guid")
-    Global.setVar("Green Gem Zone", "your-green-gem-zone-guid")
-    Global.setVar("Black Gem Zone", "your-black-gem-zone-guid")
-    Global.setVar("Blue Gem Zone", "your-blue-gem-zone-guid")
-    Global.setVar("Gold Gem Zone", "your-gold-gem-zone-guid")
-
-    -- Player Zones - Red Player
-    Global.setVar("Red Player Red Gem Zone", "your-red-player-red-gem-zone-guid")
-    Global.setVar("Red Player White Gem Zone", "your-red-player-white-gem-zone-guid")
-    Global.setVar("Red Player Green Gem Zone", "your-red-player-green-gem-zone-guid")
-    Global.setVar("Red Player Black Gem Zone", "your-red-player-black-gem-zone-guid")
-    Global.setVar("Red Player Blue Gem Zone", "your-red-player-blue-gem-zone-guid")
-    Global.setVar("Red Player Gold Gem Zone", "your-red-player-gold-gem-zone-guid")
-    Global.setVar("Red Player Card Zone", "your-red-player-card-zone-guid")
-    Global.setVar("Red Player Reserved Zone", "your-red-player-reserved-zone-guid")
-
-    -- Player Zones - White Player
-    Global.setVar("White Player Red Gem Zone", "your-white-player-red-gem-zone-guid")
-    Global.setVar("White Player White Gem Zone", "your-white-player-white-gem-zone-guid")
-    Global.setVar("White Player Green Gem Zone", "your-white-player-green-gem-zone-guid")
-    Global.setVar("White Player Black Gem Zone", "your-white-player-black-gem-zone-guid")
-    Global.setVar("White Player Blue Gem Zone", "your-white-player-blue-gem-zone-guid")
-    Global.setVar("White Player Gold Gem Zone", "your-white-player-gold-gem-zone-guid")
-    Global.setVar("White Player Card Zone", "your-white-player-card-zone-guid")
-    Global.setVar("White Player Reserved Zone", "your-white-player-reserved-zone-guid")
-
-    -- Player Zones - Green Player
-    Global.setVar("Green Player Red Gem Zone", "your-green-player-red-gem-zone-guid")
-    Global.setVar("Green Player White Gem Zone", "your-green-player-white-gem-zone-guid")
-    Global.setVar("Green Player Green Gem Zone", "your-green-player-green-gem-zone-guid")
-    Global.setVar("Green Player Black Gem Zone", "your-green-player-black-gem-zone-guid")
-    Global.setVar("Green Player Blue Gem Zone", "your-green-player-blue-gem-zone-guid")
-    Global.setVar("Green Player Gold Gem Zone", "your-green-player-gold-gem-zone-guid")
-    Global.setVar("Green Player Card Zone", "your-green-player-card-zone-guid")
-    Global.setVar("Green Player Reserved Zone", "your-green-player-reserved-zone-guid")
-
-    -- Player Zones - Black Player
-    Global.setVar("Black Player Red Gem Zone", "your-black-player-red-gem-zone-guid")
-    Global.setVar("Black Player White Gem Zone", "your-black-player-white-gem-zone-guid")
-    Global.setVar("Black Player Green Gem Zone", "your-black-player-green-gem-zone-guid")
-    Global.setVar("Black Player Black Gem Zone", "your-black-player-black-gem-zone-guid")
-    Global.setVar("Black Player Blue Gem Zone", "your-black-player-blue-gem-zone-guid")
-    Global.setVar("Black Player Gold Gem Zone", "your-black-player-gold-gem-zone-guid")
-    Global.setVar("Black Player Card Zone", "your-black-player-card-zone-guid")
-    Global.setVar("Black Player Reserved Zone", "your-black-player-reserved-zone-guid")
-
-    -- Player Zones - Blue Player
-    Global.setVar("Blue Player Red Gem Zone", "your-blue-player-red-gem-zone-guid")
-    Global.setVar("Blue Player White Gem Zone", "your-blue-player-white-gem-zone-guid")
-    Global.setVar("Blue Player Green Gem Zone", "your-blue-player-green-gem-zone-guid")
-    Global.setVar("Blue Player Black Gem Zone", "your-blue-player-black-gem-zone-guid")
-    Global.setVar("Blue Player Blue Gem Zone", "your-blue-player-blue-gem-zone-guid")
-    Global.setVar("Blue Player Gold Gem Zone", "your-blue-player-gold-gem-zone-guid")
-    Global.setVar("Blue Player Card Zone", "your-blue-player-card-zone-guid")
-    Global.setVar("Blue Player Reserved Zone", "your-blue-player-reserved-zone-guid")
-
-    -- Player Zones - Yellow Player
-    Global.setVar("Yellow Player Red Gem Zone", "your-yellow-player-red-gem-zone-guid")
-    Global.setVar("Yellow Player White Gem Zone", "your-yellow-player-white-gem-zone-guid")
-    Global.setVar("Yellow Player Green Gem Zone", "your-yellow-player-green-gem-zone-guid")
-    Global.setVar("Yellow Player Black Gem Zone", "your-yellow-player-black-gem-zone-guid")
-    Global.setVar("Yellow Player Blue Gem Zone", "your-yellow-player-blue-gem-zone-guid")
-    Global.setVar("Yellow Player Gold Gem Zone", "your-yellow-player-gold-gem-zone-guid")
-    Global.setVar("Yellow Player Card Zone", "your-yellow-player-card-zone-guid")
-    Global.setVar("Yellow Player Reserved Zone", "your-yellow-player-reserved-zone-guid")
-
-    -- Deck Zones
-    Global.setVar("Level 1 Deck Zone", "your-level-1-deck-zone-guid")
-    Global.setVar("Level 2 Deck Zone", "your-level-2-deck-zone-guid")
-    Global.setVar("Level 3 Deck Zone", "your-level-3-deck-zone-guid")
-
-    -- Card Zones
-    Global.setVar("Level 1 Card Zone 1", "your-level-1-card-zone-1-guid")
-    Global.setVar("Level 1 Card Zone 2", "your-level-1-card-zone-2-guid")
-    Global.setVar("Level 1 Card Zone 3", "your-level-1-card-zone-3-guid")
-    Global.setVar("Level 1 Card Zone 4", "your-level-1-card-zone-4-guid")
-    Global.setVar("Level 2 Card Zone 1", "your-level-2-card-zone-1-guid")
-    Global.setVar("Level 2 Card Zone 2", "your-level-2-card-zone-2-guid")
-    Global.setVar("Level 2 Card Zone 3", "your-level-2-card-zone-3-guid")
-    Global.setVar("Level 2 Card Zone 4", "your-level-2-card-zone-4-guid")
-    Global.setVar("Level 3 Card Zone 1", "your-level-3-card-zone-1-guid")
-    Global.setVar("Level 3 Card Zone 2", "your-level-3-card-zone-2-guid")
-    Global.setVar("Level 3 Card Zone 3", "your-level-3-card-zone-3-guid")
-    Global.setVar("Level 3 Card Zone 4", "your-level-3-card-zone-4-guid")
-
-    -- People Zones
-    Global.setVar("People Zone", "your-people-zone-guid")
-    Global.setVar("People Card Zone 1", "your-people-card-zone-1-guid")
-    Global.setVar("People Card Zone 2", "your-people-card-zone-2-guid")
-    Global.setVar("People Card Zone 3", "your-people-card-zone-3-guid")
-    Global.setVar("People Card Zone 4", "your-people-card-zone-4-guid")
-    Global.setVar("People Card Zone 5", "your-people-card-zone-5-guid")
-
-    -- Rules Zone
-    Global.setVar("Rules Zone", "your-rules-zone-guid")
-end
-
--- Alternative setup using object names (fallback method)
-function setupObjectReferencesByName()
-    print('Attempting to find objects by name instead of GUIDs...')
-    local allObjects = getAllObjects()
-    local foundObjects = {}
-
-    -- Create a lookup table of all objects by name
-    for _, obj in pairs(allObjects) do
-        local name = obj.getName()
-        if name and name ~= '' then
-            foundObjects[name] = obj
-        end
-    end
-
-    local OBJECT_NAMES = {
-        HAND_ZONES = {
-            RED = 'Red Hand',
-            WHITE = 'White Hand',
-            GREEN = 'Green Hand',
-            BLACK = 'Black Hand',
-            BLUE = 'Blue Hand',
-            YELLOW = 'Yellow Hand'
-        },
-        GEM_ZONES = {
-            RED = 'Red Gem Zone',
-            WHITE = 'White Gem Zone',
-            GREEN = 'Green Gem Zone',
-            BLACK = 'Black Gem Zone',
-            BLUE = 'Blue Gem Zone'
-        },
-        GOLD_GEM_ZONE = 'Gold Gem Zone'
-    }
-
-    -- Setup hand zones by name
-    for colour, name in pairs(OBJECT_NAMES.HAND_ZONES) do
-        local obj = foundObjects[name]
-        if obj then
-            handZones[colour:lower()] = obj
-            print('Found ' .. name .. ' with GUID: ' .. obj.getGUID())
-        else
-            print('Could not find object named: ' .. name)
-        end
-    end
-
-    -- Setup gem zones by name
-    for colour, name in pairs(OBJECT_NAMES.GEM_ZONES) do
-        local obj = foundObjects[name]
-        if obj then
-            gemZones[colour:lower()] = obj
-            gemZones[colour:lower()].setVar('colour', colour:lower())
-            print('Found ' .. name .. ' with GUID: ' .. obj.getGUID())
-        else
-            print('Could not find object named: ' .. name)
-        end
-    end
-
-    -- Setup gold gem zone by name
-    local goldObj = foundObjects[OBJECT_NAMES.GOLD_GEM_ZONE]
-    if goldObj then
-        goldGemZone = goldObj
-        goldGemZone.setVar('colour', 'gold')
-        goldGemZone.setVar('name', 'bank')
-        print('Found ' .. OBJECT_NAMES.GOLD_GEM_ZONE .. ' with GUID: ' .. goldObj.getGUID())
-    else
-        print('Could not find object named: ' .. OBJECT_NAMES.GOLD_GEM_ZONE)
-    end
-
-    print('Object setup by name completed. Check above for any missing objects.')
-end
-
--- Setup object references
 function setupObjectReferences()
-    local OBJECT_NAMES = {
-        HAND_ZONES = {
-            RED = 'Red Hand',
-            WHITE = 'White Hand',
-            GREEN = 'Green Hand',
-            BLACK = 'Black Hand',
-            BLUE = 'Blue Hand',
-            YELLOW = 'Yellow Hand'
-        },
-        GEM_ZONES = {
-            RED = 'Red Gem Zone',
-            WHITE = 'White Gem Zone',
-            GREEN = 'Green Gem Zone',
-            BLACK = 'Black Gem Zone',
-            BLUE = 'Blue Gem Zone'
-        },
-        GOLD_GEM_ZONE = 'Gold Gem Zone',
-        PLAYER_ZONES = {
-            RED = {
-                GEMS = {
-                    RED = 'Red Player Red Gem Zone',
-                    WHITE = 'Red Player White Gem Zone',
-                    GREEN = 'Red Player Green Gem Zone',
-                    BLACK = 'Red Player Black Gem Zone',
-                    BLUE = 'Red Player Blue Gem Zone',
-                    GOLD = 'Red Player Gold Gem Zone'
-                },
-                CARDS = 'Red Player Card Zone',
-                RESERVED = 'Red Player Reserved Zone'
-            },
-            WHITE = {
-                GEMS = {
-                    RED = 'White Player Red Gem Zone',
-                    WHITE = 'White Player White Gem Zone',
-                    GREEN = 'White Player Green Gem Zone',
-                    BLACK = 'White Player Black Gem Zone',
-                    BLUE = 'White Player Blue Gem Zone',
-                    GOLD = 'White Player Gold Gem Zone'
-                },
-                CARDS = 'White Player Card Zone',
-                RESERVED = 'White Player Reserved Zone'
-            },
-            GREEN = {
-                GEMS = {
-                    RED = 'Green Player Red Gem Zone',
-                    WHITE = 'Green Player White Gem Zone',
-                    GREEN = 'Green Player Green Gem Zone',
-                    BLACK = 'Green Player Black Gem Zone',
-                    BLUE = 'Green Player Blue Gem Zone',
-                    GOLD = 'Green Player Gold Gem Zone'
-                },
-                CARDS = 'Green Player Card Zone',
-                RESERVED = 'Green Player Reserved Zone'
-            },
-            BLACK = {
-                GEMS = {
-                    RED = 'Black Player Red Gem Zone',
-                    WHITE = 'Black Player White Gem Zone',
-                    GREEN = 'Black Player Green Gem Zone',
-                    BLACK = 'Black Player Black Gem Zone',
-                    BLUE = 'Black Player Blue Gem Zone',
-                    GOLD = 'Black Player Gold Gem Zone'
-                },
-                CARDS = 'Black Player Card Zone',
-                RESERVED = 'Black Player Reserved Zone'
-            },
-            BLUE = {
-                GEMS = {
-                    RED = 'Blue Player Red Gem Zone',
-                    WHITE = 'Blue Player White Gem Zone',
-                    GREEN = 'Blue Player Green Gem Zone',
-                    BLACK = 'Blue Player Black Gem Zone',
-                    BLUE = 'Blue Player Blue Gem Zone',
-                    GOLD = 'Blue Player Gold Gem Zone'
-                },
-                CARDS = 'Blue Player Card Zone',
-                RESERVED = 'Blue Player Reserved Zone'
-            },
-            YELLOW = {
-                GEMS = {
-                    RED = 'Yellow Player Red Gem Zone',
-                    WHITE = 'Yellow Player White Gem Zone',
-                    GREEN = 'Yellow Player Green Gem Zone',
-                    BLACK = 'Yellow Player Black Gem Zone',
-                    BLUE = 'Yellow Player Blue Gem Zone',
-                    GOLD = 'Yellow Player Gold Gem Zone'
-                },
-                CARDS = 'Yellow Player Card Zone',
-                RESERVED = 'Yellow Player Reserved Zone'
-            }
-        },
-        DECK_ZONES = {
-            LEVEL_1 = 'Level 1 Deck Zone',
-            LEVEL_2 = 'Level 2 Deck Zone',
-            LEVEL_3 = 'Level 3 Deck Zone'
-        },
-        CARD_ZONES = {
-            LEVEL_1 = {
-                'Level 1 Card Zone 1',
-                'Level 1 Card Zone 2',
-                'Level 1 Card Zone 3',
-                'Level 1 Card Zone 4'
-            },
-            LEVEL_2 = {
-                'Level 2 Card Zone 1',
-                'Level 2 Card Zone 2',
-                'Level 2 Card Zone 3',
-                'Level 2 Card Zone 4'
-            },
-            LEVEL_3 = {
-                'Level 3 Card Zone 1',
-                'Level 3 Card Zone 2',
-                'Level 3 Card Zone 3',
-                'Level 3 Card Zone 4'
-            }
-        },
-        PEOPLE_ZONE = 'People Zone',
-        PEOPLE_CARD_ZONES = {
-            'People Card Zone 1',
-            'People Card Zone 2',
-            'People Card Zone 3',
-            'People Card Zone 4',
-            'People Card Zone 5'
-        },
-        RULES_ZONE = 'Rules Zone'
+    gemZones = {
+        white = getObjectFromGUID('1a8069'),
+        blue = getObjectFromGUID('409a8a'),
+        green = getObjectFromGUID('2bd361'),
+        red = getObjectFromGUID('629bcb'),
+        black = getObjectFromGUID('43ec82')
+    }
+    goldGemZone = getObjectFromGUID('f47d76')
+    decks = {
+        getObjectFromGUID("251eb0"),
+        getObjectFromGUID("8dff7a"),
+        getObjectFromGUID("012bb9")
     }
 
-    -- Setup hand zones
-    for colour, name in pairs(OBJECT_NAMES.HAND_ZONES) do
-        local guid = Global.getVar(name)
-        if guid then
-            local zone = getObjectFromGUID(guid)
-            if zone then
-                handZones[colour:lower()] = zone
-            else
-                print('Warning: Could not find object with GUID for ' .. name)
-            end
-        else
-            print('Warning: Global variable ' .. name .. ' is not set')
-        end
-    end
-
-    -- Setup gem zones
-    for colour, name in pairs(OBJECT_NAMES.GEM_ZONES) do
-        local guid = Global.getVar(name)
-        if guid then
-            local zone = getObjectFromGUID(guid)
-            if zone then
-                gemZones[colour:lower()] = zone
-                gemZones[colour:lower()].setVar('colour', colour:lower())
-                gemZones[colour:lower()].setVar('name', 'bank')
-            else
-                print('Warning: Could not find object with GUID for ' .. name)
-            end
-        else
-            print('Warning: Global variable ' .. name .. ' is not set')
-        end
-    end
-
-    -- Setup gold gem zone
-    local goldGuid = Global.getVar(OBJECT_NAMES.GOLD_GEM_ZONE)
-    if goldGuid then
-        goldGemZone = getObjectFromGUID(goldGuid)
-        if goldGemZone then
-            goldGemZone.setVar('colour', 'gold')
-            goldGemZone.setVar('name', 'bank')
-        else
-            print('Warning: Could not find object with GUID for Gold Gem Zone')
-        end
-    else
-        print('Warning: Global variable for Gold Gem Zone is not set')
-    end
-
-    -- Setup player zones
-    for colour, zones in pairs(OBJECT_NAMES.PLAYER_ZONES) do
-        playerZones[colour:lower()] = {
-            gems = {}
-        }
-
-        -- Setup player card zones
-        local cardsGuid = Global.getVar(zones.CARDS)
-        if cardsGuid then
-            local cardsZone = getObjectFromGUID(cardsGuid)
-            if cardsZone then
-                playerZones[colour:lower()].cards = cardsZone
-            else
-                print('Warning: Could not find cards zone for ' .. colour)
-            end
-        else
-            print('Warning: Global variable for ' .. colour .. ' cards zone is not set')
-        end
-
-        -- Setup player reserved zones
-        local reservedGuid = Global.getVar(zones.RESERVED)
-        if reservedGuid then
-            local reservedZone = getObjectFromGUID(reservedGuid)
-            if reservedZone then
-                playerZones[colour:lower()].reserved = reservedZone
-            else
-                print('Warning: Could not find reserved zone for ' .. colour)
-            end
-        else
-            print('Warning: Global variable for ' .. colour .. ' reserved zone is not set')
-        end
-
-        -- Setup player gem zones
-        for gemColour, name in pairs(zones.GEMS) do
-            local gemGuid = Global.getVar(name)
-            if gemGuid then
-                local gemZone = getObjectFromGUID(gemGuid)
-                if gemZone then
-                    playerZones[colour:lower()].gems[gemColour:lower()] = gemZone
-                    gemZone.setVar('colour', gemColour:lower())
-                    gemZone.setVar('name', 'player')
-                    gemZone.setVar('player', colour:lower())
-                else
-                    print('Warning: Could not find ' .. gemColour .. ' gem zone for ' .. colour)
-                end
-            else
-                print('Warning: Global variable for ' .. colour .. ' ' .. gemColour .. ' gem zone is not set')
-            end
-        end
-    end
-
-    -- Setup deck zones
-    for level, name in pairs(OBJECT_NAMES.DECK_ZONES) do
-        local deckGuid = Global.getVar(name)
-        if deckGuid then
-            local deck = getObjectFromGUID(deckGuid)
-            if deck then
-                deckZones[level:lower()] = deck
-            else
-                print('Warning: Could not find deck zone for ' .. level)
-            end
-        else
-            print('Warning: Global variable for ' .. level .. ' deck zone is not set')
-        end
-    end
-
-    -- Setup card zones
-    for level, zones in pairs(OBJECT_NAMES.CARD_ZONES) do
-        cardZones[level:lower()] = {}
-        for i, name in pairs(zones) do
-            local cardGuid = Global.getVar(name)
-            if cardGuid then
-                local cardZone = getObjectFromGUID(cardGuid)
-                if cardZone then
-                    cardZones[level:lower()][i] = cardZone
-                else
-                    print('Warning: Could not find card zone ' .. i .. ' for ' .. level)
-                end
-            else
-                print('Warning: Global variable for ' .. level .. ' card zone ' .. i .. ' is not set')
-            end
-        end
-    end
-
-    -- Setup people zones
-    local peopleGuid = Global.getVar(OBJECT_NAMES.PEOPLE_ZONE)
-    if peopleGuid then
-        peopleZone = getObjectFromGUID(peopleGuid)
-        if not peopleZone then
-            print('Warning: Could not find people zone')
-        end
-    else
-        print('Warning: Global variable for people zone is not set')
-    end
-
-    for i, name in pairs(OBJECT_NAMES.PEOPLE_CARD_ZONES) do
-        local peopleCardGuid = Global.getVar(name)
-        if peopleCardGuid then
-            local peopleCardZone = getObjectFromGUID(peopleCardGuid)
-            if peopleCardZone then
-                peopleCardZones[i] = peopleCardZone
-            else
-                print('Warning: Could not find people card zone ' .. i)
-            end
-        else
-            print('Warning: Global variable for people card zone ' .. i .. ' is not set')
-        end
-    end
-
-    -- Setup rules zone
-    local rulesGuid = Global.getVar(OBJECT_NAMES.RULES_ZONE)
-    if rulesGuid then
-        rulesZone = getObjectFromGUID(rulesGuid)
-        if not rulesZone then
-            print('Warning: Could not find rules zone')
-        end
-    else
-        print('Warning: Global variable for rules zone is not set')
-    end
-end
-
--- Prepare player zones
-function preparePlayerZones()
-    local ZONE_VARS = {
-        OWNER = 'name',
-        PLAYER = 'player',
-        BANK = 'bank',
-        COUNT = 'count'
+    deckZones = {
+        getObjectFromGUID("56be1c"),
+        getObjectFromGUID("008a77"),
+        getObjectFromGUID("ab728f")
     }
 
+    peopleBag = getObjectFromGUID("ee4886")
+    tabletop = getObjectFromGUID("95f736")
+    playmat = getObjectFromGUID("41b86b")
+    cardZone = getObjectFromGUID("4a8c4b")
+    dingSound = getObjectFromGUID("e8f82a")
+
+    playerZones = {
+        red = preparePlayerZones('eec711', '83393c', '3589f4', '51a5a6', '7c0a5b', '686092', 'fb58db', '96b1f2', '2ea149', '2572b7', '206bfd', 'c94c86'),
+        green = preparePlayerZones('b71c55', 'ae8fda', 'bafe9c', '3bf6a5', 'd4d4c7', 'edff68', '4eb556', '9a57a0', '4f4ad1', '49dee6', 'e25046', '60bd21'),
+        blue = preparePlayerZones('5572ef', 'fc149d', 'fd90fb', '006abb', 'edac2b', '9f4184', '846109', '3dfc3f', '0148da', 'ff8fe2', '5a5244', '77dfff'),
+        pink = preparePlayerZones('d9fd6d', 'b5ca51', '8b8e4f', 'fe0a3c', '7f81ba', 'a1546a', 'c38d2d', '54e0ec', 'ff3141', 'da32f2', '18ff34', 'a14c79')
+    }
+
+	handZones = {
+		Red = getObjectFromGUID('caf838'),
+		Blue = getObjectFromGUID('82508f'),
+		Pink = getObjectFromGUID('5437f5'),
+		Green = getObjectFromGUID('902d54'),
+	}
+
+    for colour, zone in pairs(gemZones) do
+        zone.setVar(COLOUR_NAME, colour)
+        zone.setVar(ZONE_VARS.COUNT, 7)
+        zone.setVar(ZONE_VARS.OWNER, ZONE_VARS.BANK)
+    end
+
+    goldGemZone.setVar(COLOUR_NAME, GOLD_NAME)
+    goldGemZone.setVar(ZONE_VARS.COUNT, 5)
+    goldGemZone.setVar(ZONE_VARS.OWNER, ZONE_VARS.BANK)
     for playerColour, playerZone in pairs(playerZones) do
         for colour, zone in pairs(playerZone.gems) do
+            zone.setVar(COLOUR_NAME, colour)
             zone.setVar(ZONE_VARS.COUNT, 0)
+            zone.setVar(ZONE_VARS.OWNER, ZONE_VARS.PLAYER)
         end
     end
+
+    cardToDeckRefferences = {}
+    availablePeople = {}
+    lastRound = false
+    returnMode = false
 end
 
--- Initialize global variables
-function initGlobalVariables()
-    -- Initialize player data if initializePlayerData is available
-    if initializePlayerData then
-        initializePlayerData()
-    end
-
-    -- Initialize gem counts
-    local TOKEN_COUNTS_PER_PLAYERS = {nil, 4, 5, 7}
-    local GOLD_TOKEN_COUNT = 5
-    local ZONE_VARS = {
-        OWNER = 'name',
-        PLAYER = 'player',
-        BANK = 'bank',
-        COUNT = 'count'
-    }
-
-    -- Set gem zone counts
-    for k, zone in pairs(gemZones) do
-        zone.setVar(ZONE_VARS.COUNT, TOKEN_COUNTS_PER_PLAYERS[playerCount])
-    end
-    goldGemZone.setVar(ZONE_VARS.COUNT, GOLD_TOKEN_COUNT)
-
-    -- Initialize other game variables
-    currentPlayerIndex = 1
-    gameStarted = false
-    gameEnded = false
-end
-
--- Prepare table (main setup function)
-function prepareTable()
-    setupObjectReferences()
-    preparePlayerZones()
-
-    -- Shuffle and deal cards if shuffleAndDealCardsFromDecks is available
-    if shuffleAndDealCardsFromDecks then
-        shuffleAndDealCardsFromDecks()
-    end
-
-    -- Shuffle and deal people if shuffleAndDealPeopleFromBag is available
-    if shuffleAndDealPeopleFromBag then
-        shuffleAndDealPeopleFromBag()
-    end
-
-    -- Create gem buttons if setZoneReferences is available
-    if setZoneReferences then
-        setZoneReferences(gemZones, goldGemZone, playerZones)
-        createGemButtons(true)
-    end
-
-    -- Destroy redundant objects
-    destroyRedundantObjects()
-
-    -- Initialize global variables
-    initGlobalVariables()
-
-    -- Set players order if setPlayersOrder is available
-    if setPlayersOrder then
-        setPlayersOrder()
-    end
-
-    -- Update UI if updateTable is available
-    if updateTable then
-        updateTable()
-    end
-    if updateHelper then
-        updateHelper()
-    end
-end
-
--- Destroy redundant objects
-function destroyRedundantObjects()
-    local allObjects = getAllObjects()
-    for k, obj in pairs(allObjects) do
-        if obj.getName() == 'Card' and obj.getPosition().y < -5 then
-            obj.destruct()
-        end
-    end
-end
-
--- Get zone references
-function getZoneReferences()
+function preparePlayerZones(gWhite, gBlue, gGreen, gRed, gBlack, gGold, cWhite, cBlue, cGreen, cRed, cBlack, people)
     return {
-        handZones = handZones,
-        gemZones = gemZones,
-        goldGemZone = goldGemZone,
-        playerZones = playerZones,
-        deckZones = deckZones,
-        cardZones = cardZones,
-        peopleZone = peopleZone,
-        peopleCardZones = peopleCardZones,
-        rulesZone = rulesZone
+        gems = {
+            white = getObjectFromGUID(gWhite),
+            blue = getObjectFromGUID(gBlue),
+            green = getObjectFromGUID(gGreen),
+            red = getObjectFromGUID(gRed),
+            black = getObjectFromGUID(gBlack),
+            gold = getObjectFromGUID(gGold)
+        },
+        cards = {
+            white = getObjectFromGUID(cWhite),
+            blue = getObjectFromGUID(cBlue),
+            green = getObjectFromGUID(cGreen),
+            red = getObjectFromGUID(cRed),
+            black = getObjectFromGUID(cBlack),
+        },
+        people = getObjectFromGUID(people)
     }
 end
 
--- Get specific zone references
-function getHandZones()
-    return handZones
+function prepareTable()
+    players = getPlayers()
+    playerCount = #players
+
+    if dev then
+        playerCount = 4
+    end
+
+	if (playerCount < 2) then
+	   warnAll("Game requires two to four players to be seated")
+	   return
+	elseif (2 <= playerCount and playerCount <= 4) then
+		initGlobalVariables()
+        UI.setAttribute("StartButton", "visibility", "nil")
+        UI.setAttribute("StartButtonNonHost", "visibility", "nil")
+        setPlayersOrder()
+        destroyRedundantObjects()
+        createGemButtons(true)
+        shuffleAndDealCardsFromDecks()
+        shuffleAndDealPeopleFromBag()
+        setPlayerTurn(playersOrder[1])
+
+        Wait.frames(function() scoreTable() end, 50)
+        Wait.frames(function() scoreTableVisibility(players) end, 50)
+    else
+      warnAll("Game requires two to four players to be seated")
+    end
 end
 
-function getGemZones()
-    return gemZones
+function initGlobalVariables()
+    for colour, zone in pairs(gemZones) do
+        zone.setVar(COLOUR_NAME, colour)
+        zone.setVar(ZONE_VARS.COUNT, TOKEN_COUNTS_PER_PLAYERS[playerCount])
+        zone.setVar(ZONE_VARS.OWNER, ZONE_VARS.BANK)
+    end
+    goldGemZone.setVar(COLOUR_NAME, GOLD_NAME)
+    goldGemZone.setVar(ZONE_VARS.COUNT, GOLD_TOKEN_COUNT)
+    goldGemZone.setVar(ZONE_VARS.OWNER, ZONE_VARS.BANK)
+    for playerColour, playerZone in pairs(playerZones) do
+        for colour, zone in pairs(playerZone.gems) do
+            zone.setVar(COLOUR_NAME, colour)
+            zone.setVar(ZONE_VARS.COUNT, 0)
+            zone.setVar(ZONE_VARS.OWNER, ZONE_VARS.PLAYER)
+        end
+    end
+    cardToDeckRefferences = {}
+    availablePeople = {}
+    lastRound = false
+    returnMode = false
 end
 
-function getGoldGemZone()
-    return goldGemZone
+function setPlayersOrder()
+    playersOrder = {}
+    local randomIndex = math.random(#players)
+    for k, player in pairs(players) do
+        local index = ((randomIndex + k) % #players) + 1
+        playersOrder[index] = player.colour
+    end
 end
 
-function getPlayerZones()
-    return playerZones
+function destroyRedundantObjects()
+    local gemsToDestroyCount = 7 - TOKEN_COUNTS_PER_PLAYERS[playerCount]
+    for k, zone in pairs(gemZones) do
+        local gemsToDestroy = getTopTokensFromZone(zone, gemsToDestroyCount)
+        for a, gem in ipairs(gemsToDestroy) do
+            gem.destruct()
+        end
+    end
+    peopleBag.destruct()
 end
 
-function getDeckZones()
-    return deckZones
+function shuffleAndDealCardsFromDecks()
+    for deckIndex, deck in pairs(decks) do
+        deck.shuffle()
+        deckZones[deckIndex].createButton(DECK_BUTTON_PARAMS)
+        for i = 1, CARDS_COUNT do
+            dealCard(deck, cardPosition(CARD_X_POSITIONS[i], DECK_Z_POSITIONS[deckIndex]))
+        end
+    end
 end
 
-function getCardZones()
-    return cardZones
+function shuffleAndDealPeopleFromBag()
+    peopleBag.shuffle()
+    for i = 1, PEOPLE_TILES_PER_PLAYERS[playerCount] do
+        local person = peopleBag.takeObject(personParams(PEOPLE_X_POSITIONS[i]))
+        person.interactable = false
+        table.insert(availablePeople, {object = person, parsed = parsePerson(person)})
+    end
 end
 
-function getPeopleZone()
-    return peopleZone
+function checkHost()
+  nonAdmins = {}
+  for k, playerColor in pairs(getSeatedPlayers()) do
+      if not Player[playerColor].admin then
+        table.insert(nonAdmins, playerColor);
+      end
+  end
+  --warnAll(zonk.. table.concat(nonAdmins ,"|") .. zonk )
+  if #nonAdmins > 0 then
+  Wait.frames(function () UI.setAttribute("StartButtonNonHost", "visibility", table.concat(nonAdmins ,"|")) end, 100)
+  end
 end
 
-function getPeopleCardZones()
-    return peopleCardZones
+function onPlayerChangeColor(player_color)
+  checkHost()
 end
 
-function getRulesZone()
-    return rulesZone
+function scoreTableVisibility (players)
+  for i, player in pairs(players) do
+      UI.setAttribute("helper"..player.colour, "visibility", player.colour)
+      UI.setAttribute("button"..player.colour, "visibility", player.colour)
+  end
 end

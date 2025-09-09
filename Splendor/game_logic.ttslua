@@ -1,364 +1,538 @@
--- Splendor Game Logic
--- Handles turn management, win conditions, and core game flow
-
--- Game state variables
-local currentPlayerIndex = 1
-local gameStarted = false
-local gameEnded = false
-local playerCount = 0
-local playersOrder = {}
-
--- Initialize game logic
-function initializeGameLogic()
-    currentPlayerIndex = 1
-    gameStarted = false
-    gameEnded = false
+function getPlayerGems(player)
+    local playerData = getPlayer(player)
+    return {
+        red = playerData.rGemCount,
+        white = playerData.wGemCount,
+        green = playerData.gGemCount,
+        black = playerData.bGemCount,
+        blue = playerData.uGemCount,
+        gold = playerData.jGemCount
+    }
 end
 
--- Set player turn
-function setPlayerTurn(player)
-    if getPlayers then
-        local players = getPlayers()
-        for i, p in pairs(players) do
-            if p:lower() == player:lower() then
-                currentPlayerIndex = i
-                break
-            end
+function isValidPlay(player, isReturn)
+    local valid = true
+    if currentPlayer != player then
+        valid = false
+        Player[player].broadcast('Please wait for your turn', CHAT_WARNING_COLOR)
+    elseif returnMode and not isReturn then
+        valid = false
+        Player[player].broadcast(RETURN_TOKENS_MESSAGE, CHAT_WARNING_COLOR)
+    end
+    return valid
+end
+
+function getPlayerZones(player)
+    return playerZones[player:lower()]
+end
+
+function playerCardPosition(player, zone, cardIndex)
+    local pos = zone.getPosition()
+    local offset
+    if (cardIndex == nil) then
+        offset = -4 + #zone.getObjects()
+    else
+        offset = -5 + cardIndex
+    end
+    if player == 'Red' then
+        return {pos.x, pos.y, pos.z - offset}
+    elseif player == 'Blue' then
+        return {pos.x, pos.y, pos.z + offset}
+    elseif player == 'Pink' then
+        return {pos.x + offset, pos.y, pos.z}
+    elseif player == 'Green' then
+        return {pos.x - offset, pos.y, pos.z}
+    else
+        warnAll(ERROR_MESSAGE)
+    end
+end
+
+function personParams(xPoz)
+    return {position = { xPoz, 4, 4.4}, flip = true, rotation = {0, 180, 0}}
+end
+
+function getXmlTable()
+  xmlTable = dingSound.getTable('xmlTable')
+  UI.setXmlTable(xmlTable)
+end
+
+function helperOnClick(player, string)
+  if string == "on" then
+      UI.setAttribute("helper"..player.color, "visibility", "nil")
+      UI.setAttribute("button"..player.color, "text", "Show")
+      UI.setAttribute("button"..player.color, "onClick", "helperOnClick(off)")
+  else
+      UI.setAttribute("button"..player.color, "onClick", "helperOnClick(on)")
+      UI.setAttribute("button"..player.color, "text", "Hide")
+      UI.setAttribute("helper"..player.color, "visibility", player.color)
+  end
+end
+
+function updateTable(player)
+    for index, colour in pairs(playersOrder) do
+        UI.setAttribute("scoreRow"..index , "outline", "0")
+        UI.setAttribute("playerScore"..index , "text", getPlayer(colour).score)
+        if colour == player then
+            UI.setAttribute("scoreRow"..index , "outline", "#ffa31a")
         end
     end
 end
 
--- Get current player
-function getCurrentPlayer()
-    if getPlayers then
-        local players = getPlayers()
-        return players[currentPlayerIndex]
+function getPlayers()
+    local players = {}
+    for k, colour in pairs(Player.getAvailableColors()) do
+        if (contains(getSeatedPlayers(), colour)) then
+            table.insert(players, {
+            colour = colour,
+            score = 0,
+            steamId = Player[colour].steam_id,
+            steamName = Player[colour].steam_name,
+            rCardCount = 0,
+            wCardCount = 0,
+            gCardCount = 0,
+            bCardCount = 0,
+            uCardCount = 0,
+            cardCount = 0,
+            rGemCount = 0,
+            wGemCount = 0,
+            gGemCount = 0,
+            bGemCount = 0,
+            uGemCount = 0,
+            jGemCount = 0
+          })
+        end
+    end
+    return players
+end
+
+function awardPoints(playerColour, score)
+    if score == 0 then
+        return
+    end
+    local player = getPlayer(playerColour)
+    player.score = player.score + score
+end
+
+function addCardCount(playerColour, cardColor)
+  local cardColor = cardColor .. 'CardCount'
+  local player = getPlayer(playerColour)
+  player[cardColor] = player[cardColor] + 1
+  updateHelper(playerColour)
+end
+
+function setPlayerTurn(colour)
+    currentPlayer = colour
+    Player[colour].broadcast('It is your turn now', CHAT_INFO_COLOR)
+
+    if soundToggle == 'ding' then
+    dingSound.AssetBundle.playTriggerEffect(0)
+    elseif soundToggle == 'talk' then
+      if currentPlayer == "Red" then
+        dingSound.AssetBundle.playTriggerEffect(1)
+      elseif currentPlayer == "Green" then
+        dingSound.AssetBundle.playTriggerEffect(2)
+      elseif currentPlayer == "Pink" then
+        dingSound.AssetBundle.playTriggerEffect(3)
+      elseif currentPlayer == "Blue" then
+        dingSound.AssetBundle.playTriggerEffect(4)
+      end
+    end
+    Wait.frames(function() cardPlayHelper(colour) end, 20)
+    updateTable(colour)
+end
+
+function validTokenHandSize(player)
+    return countCurrentPlayerTokens(player) <= MAX_TOKEN_COUNT
+end
+
+function checkWinConditions(nextPlayerIndex, currentPlayerIndex)
+    if not lastRound then
+        for k, player in pairs(players) do
+            if player.score >= SCORE_TO_WIN then
+                lastRound = true
+                updateTable(player.colour)
+                warnAll(currentPlayer .. ' has accumulated enough points to win!')
+                if nextPlayerIndex != 1 then
+                    warnAll('The game will end on ' .. playersOrder[1] .. '\'s turn. Last chance to grab some points!')
+                end
+            end
+        end
+    end
+        if lastRound then
+        if nextPlayerIndex == 1 then
+            local winners = getWinners()
+            if #winners > 1 then
+                warnAll('We have a draw!')
+            end
+            for k, winner in pairs(winners) do
+             warnAll('Congratulations ' .. winner.steamName .. '! You win!')
+            end
+            return true
+        end
+
+    end
+    return false
+end
+
+function getWinners()
+    local maxScore = 0
+    for k, player in pairs(players) do
+        if player.score > maxScore then
+            maxScore = player.score
+        end
+    end
+    local topPlayers = {}
+    for k, player in pairs(players) do
+        if player.score == maxScore then
+            table.insert(topPlayers, player)
+        end
+    end
+    if #topPlayers > 1 then
+        topPlayers = getWinnersWhenDraw(topPlayers)
+    end
+    return topPlayers
+end
+
+function getWinnersWhenDraw(topPlayers)
+    local minCardCount = math.huge
+    for k, player in pairs(topPlayers) do
+        player.cardCount = player.rCardCount + player.wCardCount + player.gCardCount + player.bCardCount + player.uCardCount
+
+        if player.cardCount < minCardCount then
+            minCardCount = player.cardCount
+        end
+    end
+    local lowestCardCountPlayers = {}
+    for k, player in pairs(topPlayers) do
+        if player.cardCount == minCardCount then
+            table.insert(lowestCardCountPlayers, player)
+        end
+    end
+    return lowestCardCountPlayers
+end
+
+function warnAll(message)
+    broadcastToAll(message, CHAT_ERROR_COLOR)
+end
+
+function cardPosition(xPos, zPos)
+    return {xPos, 3, zPos}
+end
+
+function dealCard(object, position)
+    if isDeck(object) then
+        local card = object.takeObject({position = position, flip = true})
+        local parsedCard = parseCard(card)
+        cardToDeckRefferences[parsedCard.id] = getIndex(decks, object)
+        card.createButton(CARD_BUTTON_PARAMS)
+        refreshDeckTooltip(object)
+    elseif isCard(object) then
+        object.setPosition(position)
+        object.setRotation({0,180,0})
+        object.createButton(CARD_BUTTON_PARAMS)
+    else
+        warnAll(ERROR_MESSAGE)
+    end
+end
+
+function refreshDeckTooltip(deck)
+    local quantity = 0
+    local deckIndex = getIndex(decks, deck)
+    local button = deckZones[deckIndex].getButtons()[1]
+    if deck.getQuantity() > 0 then
+        quantity = deck.getQuantity()
+      elseif deckZones[deckIndex].getObjects() != nil then
+        quantity = 1
+    end
+    button.tooltip = 'Reserve\n('.. quantity .. ' left) '
+
+    deckZones[deckIndex].editButton(button)
+end
+
+function isToken(object)
+    return object.getName():match('Token')
+end
+
+function isCard(object)
+    return object.getName():match('Card')
+end
+
+function isDeck(object)
+    return object.type == 'Deck'
+end
+
+function tintHelperSwitch(player, string)
+  if string == "off" then
+     tintHelper = false
+    UI.setAttribute("tintHelper", "onClick", "tintHelperSwitch(on)")
+    UI.setAttribute("tintHelper", "icon", "helperOff")
+    removeTintCardButton()
+  else
+    tintHelper = true
+    UI.setAttribute("tintHelper", "onClick", "tintHelperSwitch(off)")
+    UI.setAttribute("tintHelper", "icon", "helperOn")
+    cardPlayHelper(currentPlayer)
+  end
+end
+
+function showRules(player)
+    Player[player].showInfoDialog('Game Rules', RULES_TEXT)
+end
+
+function hideRules()
+    -- Implementation for hiding rules
+end
+
+function soundSwitch(player, string)
+    if soundToggle == 'talk' then
+        soundToggle = 'mute'
+        Player[player].broadcast('Sound effects muted', CHAT_INFO_COLOR)
+    else
+        soundToggle = 'talk'
+        Player[player].broadcast('Sound effects enabled', CHAT_INFO_COLOR)
+    end
+end
+
+function cardPlayHelper(player)
+    local playerData = getPlayer(player)
+    if playerData then
+        playerData.cardPlayHelper = not playerData.cardPlayHelper
+        updateHelper(player)
+    end
+end
+
+function tintCardButton(card)
+    card.setColorTint({0.5, 1, 0.5})
+end
+
+function removeTintCardButton()
+    -- Remove tint from all cards
+end
+
+function contains(tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+    return false
+end
+
+function getIndex(tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return index
+        end
     end
     return nil
 end
 
--- Next turn
-function nextTurn()
-    if gameEnded then
-        return
+function checkPayment(player, cost)
+    local playerGems = getPlayerGems(player)
+    local totalCost = 0
+    local availableGems = 0
+
+    for colour, amount in pairs(cost) do
+        totalCost = totalCost + amount
+        local gemColour = COST_COLOUR_NAMES[colour]
+        availableGems = availableGems + playerGems[gemColour]
     end
-    
-    local players = {}
-    if getPlayers then
-        players = getPlayers()
+
+    availableGems = availableGems + playerGems.gold
+    return availableGems >= totalCost
+end
+
+function considerDiscount(player, cost)
+    local playerData = getPlayer(player)
+    local discountedCost = {}
+
+    for colour, amount in pairs(cost) do
+        local bonusField = colour:sub(1,1):upper() .. 'BonusCount'
+        local discount = playerData[bonusField] or 0
+        discountedCost[colour] = math.max(0, amount - discount)
     end
-    
-    if #players == 0 then
-        return
-    end
-    
-    currentPlayerIndex = currentPlayerIndex + 1
-    if currentPlayerIndex > #players then
-        currentPlayerIndex = 1
-    end
-    
-    local currentPlayer = players[currentPlayerIndex]
-    
-    -- Check for nobles
-    if checkPeopleStatus then
-        checkPeopleStatus(currentPlayer)
-    end
-    
-    -- Check win conditions
-    checkWinConditions()
-    
-    -- Update UI
-    if updateTable then
-        updateTable()
-    end
-    
-    -- Broadcast turn change
-    local MESSAGES = {
-        TURN_CHANGE = "It's %s's turn"
+
+    return discountedCost
+end
+
+function parseCostString(costString)
+    local cost = {}
+      for capture in string.gmatch(costString, '%d+%a+') do
+          local value = costString.match(capture, '%d+')
+          local colour = costString.match(capture, '%a+')
+          cost[colour] = tonumber(value)
+      end
+    return cost
+end
+
+function parseCard(object)
+    local substrings = {}
+      for s in string.gmatch(object.getName(), '%S+') do
+          table.insert(substrings, s)
+      end
+    return {
+        id = substrings[1],
+        score = tonumber(substrings[2]),
+        bonus = substrings[3],
+        cost = parseCostString(substrings[4])
     }
-    broadcastToAll(string.format(MESSAGES.TURN_CHANGE, currentPlayer), {1, 1, 1})
 end
 
--- Check win conditions
-function checkWinConditions()
-    if gameEnded then
+function parsePerson(object)
+    local substrings = {}
+      for s in string.gmatch(object.getName(), '%S+') do
+          table.insert(substrings, s)
+      end
+    return {
+        score = PERSON_SCORE,
+        cost = parseCostString(substrings[1])
+    }
+end
+
+function canAffordNobel(player, cost)
+    local discountedCost = considerDiscount(player, cost)
+    return next(discountedCost) == nil
+end
+
+function getNoblePerson(player, person)
+  local destination = playerCardPosition(player, playerZones[player:lower()].people)
+  local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
+  person.object.setRotationSmooth(rotation, false, false)
+  person.object.setPositionSmooth(destination, false, false)
+  table.remove(availablePeople, getIndex(availablePeople, person))
+  awardPoints(player, 3)
+  nextTurn()
+end
+
+function dealNewCardInPlaceOf(object)
+    local position = object.getPosition()
+    local card = parseCard(object)
+    if cardToDeckRefferences[card.id] then
+      local deck = deckZones[cardToDeckRefferences[card.id]].getObjects()
+        if deck != nil then
+            for i, v in ipairs(deck) do
+            if isDeck(v) then
+                dealCard(v, cardPosition(position.x, position.z))
+            elseif isCard(v) then
+                local deckPosition = v.getPosition()
+                dealCard(v, cardPosition(position.x, position.z))
+                deckZones[cardToDeckRefferences[card.id]].clearButtons()
+            end
+        end
+      end
+    end
+end
+
+function cardClicked(object, player, alt_click)
+    if not isValidPlay(player) then
         return
     end
-    
-    local players = {}
-    if getPlayers then
-        players = getPlayers()
-    end
-    
-    local winners = {}
-    local WINNING_POINTS = 15
-    
-    -- Check if any player has 15+ points
-    for _, player in pairs(players) do
-        local points = 0
-        if getPlayerPoints then
-            points = getPlayerPoints(player)
-        end
-        
-        if points >= WINNING_POINTS then
-            table.insert(winners, {player = player, points = points})
-        end
-    end
-    
-    if #winners > 0 then
-        endGame(winners)
-    end
-end
-
--- End game
-function endGame(winners)
-    gameEnded = true
-    
-    if #winners == 1 then
-        local MESSAGES = {
-            WINNER = "%s wins with %d points!",
-            GAME_OVER = "Game Over!"
-        }
-        broadcastToAll(string.format(MESSAGES.WINNER, winners[1].player, winners[1].points), {0, 1, 0})
-        broadcastToAll(MESSAGES.GAME_OVER, {1, 1, 1})
-    else
-        -- Handle tie
-        local tieWinners = getWinnersWhenDraw(winners)
-        if #tieWinners == 1 then
-            local MESSAGES = {
-                TIE_WINNER = "%s wins the tiebreaker with %d points and %d cards!",
-                GAME_OVER = "Game Over!"
-            }
-            broadcastToAll(string.format(MESSAGES.TIE_WINNER, tieWinners[1].player, tieWinners[1].points, tieWinners[1].cards), {0, 1, 0})
-            broadcastToAll(MESSAGES.GAME_OVER, {1, 1, 1})
+    local playerZone = playerZones[player:lower()]
+    if isCard(object) then
+        if not alt_click then
+            playCard(object, player, true)
         else
-            local MESSAGES = {
-                TIE = "It's a tie!",
-                GAME_OVER = "Game Over!"
-            }
-            broadcastToAll(MESSAGES.TIE, {1, 1, 0})
-            broadcastToAll(MESSAGES.GAME_OVER, {1, 1, 1})
+            reserveCard(player, object, true)
+        end
+    elseif isDeck(object) then
+        reserveCard(player, object, false)
+    end
+end
+
+function deckZoneClicked(zone, player, alt_click)
+    if not isValidPlay(player) then
+        return
+    end
+    local playerZone = playerZones[player:lower()]
+    local deckIndex = getIndex(deckZones, zone)
+    if deckZones[deckIndex].getObjects() != nil then
+        reserveCard(player, deckZones[deckIndex].getObjects()[1], false)
+        if isCard(deckZones[deckIndex].getObjects()[1]) then
+          zone.clearButtons()
         end
     end
 end
 
--- Get winners when there's a draw (tiebreaker by card count)
-function getWinnersWhenDraw(winners)
-    local maxCards = 0
-    local tieWinners = {}
-    
-    -- Find maximum card count among winners
-    for _, winner in pairs(winners) do
-        local cardCount = 0
-        if getPlayerCardCount then
-            cardCount = getPlayerCardCount(winner.player)
-        end
-        winner.cards = cardCount
-        
-        if cardCount > maxCards then
-            maxCards = cardCount
-        end
+function onObjectPickUp(player, object)
+    local position = object.getPosition()
+    if not isValidPlay(player) then
+        recreateCard(object, position)
+        return
     end
-    
-    -- Get all winners with maximum card count
-    for _, winner in pairs(winners) do
-        if winner.cards == maxCards then
-            table.insert(tieWinners, winner)
+    if isCard(object) then
+        if contains(Player[player].getHandObjects(), object) then
+            playCard(object, player, false)
+        else
+          if soundToggle == 'talk' then
+            dingSound.AssetBundle.playTriggerEffect(6)
+            Player[player].broadcast('You can only play your own cards. Duh.', CHAT_WARNING_COLOR)
+          else
+            Player[player].broadcast('You can only play your own cards. Duh.', CHAT_WARNING_COLOR)
+          end
+            recreateCard(object, position)
+            return
         end
-    end
-    
-    return tieWinners
-end
-
--- Validate token hand size
-function validTokenHandSize(player)
-    local MAX_TOKENS = 10
-    local tokenCount = 0
-    
-    if countCurrentPlayerTokens then
-        tokenCount = countCurrentPlayerTokens(player)
-    end
-    
-    return tokenCount <= MAX_TOKENS
-end
-
--- Check if play is valid
-function isValidPlay(player, action, data)
-    if gameEnded then
-        return false, "Game has ended"
-    end
-    
-    local currentPlayer = getCurrentPlayer()
-    if player:lower() ~= currentPlayer:lower() then
-        return false, "It's not your turn"
-    end
-    
-    if action == "take_gems" then
-        -- Validate gem taking
-        if bankGemZone then
-            local selectedGems = data.gems or {}
-            local count = #selectedGems
-            
-            if count == 0 then
-                return false, "No gems selected"
-            elseif count == 1 then
-                return false, "Must take at least 2 gems"
-            elseif count == 2 then
-                -- Taking 2 of same color
-                if selectedGems[1] ~= selectedGems[2] then
-                    return false, "When taking 2 gems, they must be the same color"
-                end
-                
-                local zone = bankGemZone(selectedGems[1])
-                if getZoneGemCount(zone) < 4 then
-                    return false, "Need at least 4 gems of this color to take 2"
-                end
-            elseif count == 3 then
-                -- Taking 3 different colors
-                local colors = {}
-                for _, gem in pairs(selectedGems) do
-                    if colors[gem] then
-                        return false, "When taking 3 gems, they must be different colors"
-                    end
-                    colors[gem] = true
-                    
-                    local zone = bankGemZone(gem)
-                    if getZoneGemCount(zone) == 0 then
-                        return false, "Not enough gems of color: " .. gem
-                    end
-                end
-            else
-                return false, "Can only take 2 or 3 gems"
-            end
-            
-            -- Check if player will exceed token limit
-            local currentTokens = 0
-            if countCurrentPlayerTokens then
-                currentTokens = countCurrentPlayerTokens(player)
-            end
-            
-            if currentTokens + count > 10 then
-                return false, "Would exceed maximum token limit (10)"
-            end
-        end
-    elseif action == "buy_card" then
-        -- Validate card purchase
-        local card = data.card
-        if not card then
-            return false, "No card specified"
-        end
-        
-        if parseCard then
-            local cardData = parseCard(card)
-            if not checkPayment(player, cardData.cost) then
-                return false, "Insufficient gems to buy this card"
-            end
-        end
-    elseif action == "reserve_card" then
-        -- Validate card reservation
-        local card = data.card
-        if not card then
-            return false, "No card specified"
-        end
-        
-        -- Check if player has space for reserved cards (max 3)
-        local reservedCount = 0
-        if getPlayerReservedCount then
-            reservedCount = getPlayerReservedCount(player)
-        end
-        
-        if reservedCount >= 3 then
-            return false, "Cannot reserve more than 3 cards"
-        end
-    end
-    
-    return true, "Valid play"
-end
-
--- Start game
-function startGame()
-    gameStarted = true
-    gameEnded = false
-    currentPlayerIndex = 1
-    
-    local MESSAGES = {
-        GAME_START = "Game started!",
-        FIRST_TURN = "It's %s's turn"
-    }
-    
-    broadcastToAll(MESSAGES.GAME_START, {0, 1, 0})
-    
-    local currentPlayer = getCurrentPlayer()
-    if currentPlayer then
-        broadcastToAll(string.format(MESSAGES.FIRST_TURN, currentPlayer), {1, 1, 1})
     end
 end
 
--- Check if game has started
-function hasGameStarted()
-    return gameStarted
+function serializeTable(val, name, skipnewlines, depth)
+    skipnewlines = skipnewlines or false
+    depth = depth or 0
+    local tmp = string.rep(' ', depth)
+    if name then tmp = tmp .. name .. ' = ' end
+    if type(val) == 'table' then
+        tmp = tmp .. '{' .. (not skipnewlines and '\n' or '')
+        for k, v in pairs(val) do
+            tmp = tmp .. serializeTable(v, k, skipnewlines, depth + 1) .. ',' .. (not skipnewlines and '\n' or '')
+        end
+        tmp = tmp .. string.rep(' ', depth) .. '}'
+    elseif type(val) == 'number' then
+        tmp = tmp .. tostring(val)
+    elseif type(val) == 'string' then
+        tmp = tmp .. string.format('%q', val)
+    elseif type(val) == 'boolean' then
+        tmp = tmp .. (val and 'true' or 'false')
+    else
+        tmp = tmp .. "'[inserializeable datatype:' .. type(val) .. ']"
+    end
+    return tmp
 end
 
--- Check if game has ended
-function hasGameEnded()
-    return gameEnded
+function reserveDeckCallback(object_spawned, params)
+    reserveCard(params.player, object_spawned, false)
 end
 
--- Get current player index
-function getCurrentPlayerIndex()
-    return currentPlayerIndex
+function recreateCard(object, position)
+    local cardData = getCardData(object)
+    object.destruct()
+    -- Recreate card logic would go here
 end
 
--- Set current player index
-function setCurrentPlayerIndex(index)
-    currentPlayerIndex = index
+function recreateCardCallback(card, params)
+    card.setPosition(params.position)
+    card.setRotation({0, 180, 0})
 end
 
--- Get player count
-function getPlayerCount()
-    return playerCount
-end
-
--- Set player count
-function setPlayerCount(count)
-    playerCount = count
-end
-
--- Warn all players
-function warnAll(message)
-    local COLORS = {
-        WARNING = {1, 0.4, 0, 1}
-    }
-    broadcastToAll(message, COLORS.WARNING)
-end
-
--- Process turn action
-function processTurnAction(player, action, data)
-    local isValid, message = isValidPlay(player, action, data)
-    
-    if not isValid then
-        warnAll(message)
+function checkPeopleStatus(player)
+    local peopleAcquired = {}
+      for k, person in pairs(availablePeople) do
+        local cost = considerDiscount(player, person.parsed.cost)
+          if next(cost) == nil then
+            table.insert(peopleAcquired, person)
+          end
+      end
+  if #peopleAcquired > 0 then
+    if #peopleAcquired > 1 then
+        for k, person in pairs(peopleAcquired) do
+          person.object.createButton(NOBEL_BUTTON_PARAMS)
+        end
+        warnAll('Pick nobel person card by clicking on it.')
+        noblePickMode = true
         return false
     end
-    
-    -- Process the action
-    if action == "take_gems" then
-        if takeMultiColoredGems then
-            takeMultiColoredGems(data.gems, player)
-        end
-    elseif action == "buy_card" then
-        if parseCard then
-            local cardData = parseCard(data.card)
-            payCost(player, cardData.cost)
-            playCard(data.card, player)
-        end
-    elseif action == "reserve_card" then
-        if reserveCard then
-            reserveCard(data.card, player)
-        end
+    if noblePickMode == false then
+      getNoblePerson(player, peopleAcquired[1])
     end
-    
-    -- End turn
-    nextTurn()
-    return true
+  end
+  return true
 end

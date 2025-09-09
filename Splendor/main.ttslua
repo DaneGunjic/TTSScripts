@@ -1,48 +1,32 @@
--- Splendor for Tabletop Simulator
--- Modular version with separated concerns
+-- Main game file that includes all other components
 
--- Import all modules
 #include !\Splendor\constants.ttslua
-#include !\Splendor\utils.ttslua
-#include !\Splendor\player_manager.ttslua
-#include !\Splendor\gem_manager.ttslua
 #include !\Splendor\game_setup.ttslua
+#include !\Splendor\gem_manager.ttslua
 #include !\Splendor\card_manager.ttslua
-#include !\Splendor\game_logic.ttslua
+#include !\Splendor\player_manager.ttslua
 #include !\Splendor\ui_manager.ttslua
+#include !\Splendor\utils.ttslua
+#include !\Splendor\game_logic.ttslua
 
--- Global game state
-local playerCount = 0
-local gameStarted = false
-local gameEnded = false
-
--- Main game event handlers and core functions
-
--- Global variables (moved from local to global for #include compatibility)
-local noblePickMode = false
-local tintHelper = true
-local dev = false --tabletop.zonk
-local dev2 = false
-local xmlTable = {}
-local xmlStart = {}
-local turns = {}
-local soundToggle = 'talk'
--- TTS Event Handlers
 function onLoad()
-    -- Option 1: Use this if you have set up Global variables with GUIDs
-    -- setupObjectReferences()
+    Player["White"].changeColor("Red")
+    setupObjectReferences()
+    tabletop.interactable = false
+    playmat.interactable = false
+    peopleBag.interactable = false
+    dingSound.interactable = false
+    for k, deck in pairs(decks) do
+        deck.interactable = true
+    end
+    Wait.frames(function () getXmlTable() end, 50)
+    Wait.frames(function () checkHost() end, 50)
 
-    -- Option 2: Use this to find objects by name (recommended for initial setup)
-    setupObjectReferencesByName()
-
-    -- Option 3: Use this to see what Global variables need to be set
-    -- initializeGlobalVariables()
-
-    prepareTable()
-    initializeGameLogic()
-    initializeUI()
+    if dev2 then
+      local object = peopleBag
+      local table = UI.getXmlTable()
+      table = serializeTable(table)
+      object.setLuaScript(table)
+      object.interactable = true
+    end
 end
-
--- Game Action Handlers will be included from modules
-
--- All functions will be included from respective modules via #include directives

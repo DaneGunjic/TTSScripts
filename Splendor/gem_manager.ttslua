@@ -1,165 +1,15 @@
--- Splendor Gem Manager
--- Handles all gem/token related functionality and movement
-
--- Global variables for gem management
-local selectedGems = {}
-local returnMode = false
-
--- Zone references (will be set by game setup)
-local gemZones = {}
-local goldGemZone = nil
-local playerZones = {}
-
--- Initialize gem selection state
-function resetSelectedGems()
-    selectedGems = {
-        red = false,
-        white = false,
-        green = false,
-        black = false,
-        blue = false
-    }
+function isValidPlay(player, isReturn)
+    local valid = true
+    if currentPlayer != player then
+        valid = false
+        Player[player].broadcast('Please wait for your turn', CHAT_WARNING_COLOR)
+    elseif returnMode and not isReturn then
+        valid = false
+        Player[player].broadcast(RETURN_TOKENS_MESSAGE, CHAT_WARNING_COLOR)
+    end
+    return valid
 end
 
--- Count selected gems
-function countSelectedGems()
-    return #getSelectedGemColours()
-end
-
--- Get selected gem colours
-function getSelectedGemColours()
-    local colours = {}
-    local i = 1
-    for colour, isSelected in pairs(selectedGems) do
-        if isSelected then
-            colours[i] = colour
-            i = i + 1
-        end
-    end
-    return colours
-end
-
--- Check if can take selected gems
-function canTakeSelectedGems(selectedColours)
-    if countSelectedGems() == 3 then
-        return true
-    end
-    for colour, value in pairs(selectedGems) do
-        if (not value) then
-            if not isZoneEmpty(bankGemZone(colour)) then
-                return false
-            end
-        end
-    end
-    return true
-end
-
--- Zone utility functions
-function isZoneEmpty(zone)
-    return zone.getObjects() == nil or #zone.getObjects() == 0
-end
-
-function getZoneGemCount(zone)
-    if isZoneEmpty(zone) then
-        return 0
-    else
-        return #zone.getObjects()
-    end
-end
-
--- Get bank gem zone by colour
-function bankGemZone(colour)
-    if colour == 'gold' then
-        return goldGemZone
-    end
-    if gemZones then
-        return gemZones[colour]
-    end
-    return nil
-end
-
--- Get player gem zone
-function playerGemZone(player, colour)
-    if playerZones and playerZones[player:lower()] and playerZones[player:lower()].gems then
-        return playerZones[player:lower()].gems[colour]
-    end
-    return nil
-end
-
--- Get player gem zones
-function playerGemZones(player)
-    if playerZones and playerZones[player:lower()] then
-        return playerZones[player:lower()].gems
-    end
-    return nil
-end
-
--- Token movement functions
-function moveTokens(sourceZone, destinationZone, count)
-    if sourceZone == nil or destinationZone == nil then
-        print('Warning: Attempted to move tokens with nil zone(s)')
-        return
-    end
-
-    if count == nil then
-        count = 1
-    end
-    local yPos = destinationZone.getPosition().y - 0.55
-    local topDestinationToken = getTopTokenFromZone(destinationZone)
-    if topDestinationToken ~= nil then
-        yPos = topDestinationToken.getPosition().y
-    end
-    local topTokens = getTopTokensFromZone(sourceZone, count)
-    for i = 1, count do
-        yPos = yPos + 0.1
-        topTokens[i].setPositionSmooth({destinationZone.getPosition().x, yPos, destinationZone.getPosition().z})
-    end
-
-    -- Update zone counts
-    local ZONE_VARS = {
-        OWNER = 'name',
-        PLAYER = 'player',
-        BANK = 'bank',
-        COUNT = 'count'
-    }
-    sourceZone.setVar(ZONE_VARS.COUNT, sourceZone.getVar(ZONE_VARS.COUNT) - count)
-    destinationZone.setVar(ZONE_VARS.COUNT, destinationZone.getVar(ZONE_VARS.COUNT) + count)
-
-    -- Update gem buttons
-    createGemButtonsForZone(sourceZone)
-    createGemButtonsForZone(destinationZone)
-end
-
-function moveToken(sourceZone, destinationZone)
-    moveTokens(sourceZone, destinationZone)
-end
-
--- Get top tokens from zone
-function getTopTokensFromZone(zone, count)
-    local topTokens = {}
-    if count == 0 or isZoneEmpty(zone) then
-        return topTokens
-    end
-    local yPositions = {}
-    for k, token in pairs(zone.getObjects()) do
-        table.insert(yPositions, token.getPosition().y)
-    end
-    table.sort(yPositions)
-    local skipCount = #zone.getObjects() - count
-    local minY = yPositions[1 + skipCount]
-    for k, token in pairs(zone.getObjects()) do
-        if minY <= token.getPosition().y then
-            table.insert(topTokens, token)
-        end
-    end
-    return topTokens
-end
-
-function getTopTokenFromZone(zone)
-    return getTopTokensFromZone(zone, 1)[1]
-end
-
--- Gem button creation and management
 function gemButtonParams(tokenCount, mode)
     local yPos = (tokenCount * 0.1) - 0.2
     local position = {0, yPos, 0}
@@ -197,17 +47,33 @@ function gemButtonParams(tokenCount, mode)
             hover_color = {1, 0, 0, 0.3}
         }
     else
-        broadcastToAll('An error occurred', {r = 1, g = 0.4, b = 0, a = 1})
+        warnAll(ERROR_MESSAGE)
+    end
+end
+
+function createGemButtons(init)
+    resetSelectedGems()
+    for k, zone in pairs(gemZones) do
+        if init then
+            createGemButtonsForZone(zone, TOKEN_COUNTS_PER_PLAYERS[playerCount])
+        else
+            createGemButtonsForZone(zone)
+        end
+    end
+    if init then
+        createGemButtonsForZone(goldGemZone, GOLD_TOKEN_COUNT)
+    else
+        createGemButtonsForZone(goldGemZone)
+        for playerColour, playerZone in pairs(playerZones) do
+            for colour, zone in pairs(playerZone.gems) do
+                createGemButtonsForZone(zone)
+            end
+        end
     end
 end
 
 function createGemButtonsForZone(zone, count)
-    if zone == nil then
-        print('Warning: Attempted to create buttons for nil zone')
-        return
-    end
-
-    if zone.getButtons() ~= nil then
+    if zone.getButtons() != nil then
         local buttonCount = #zone.getButtons()
         while buttonCount > 0 do
             zone.removeButton(buttonCount - 1)
@@ -216,71 +82,124 @@ function createGemButtonsForZone(zone, count)
     end
 
     if count == nil then
-        local ZONE_VARS = {
-            OWNER = 'name',
-            PLAYER = 'player',
-            BANK = 'bank',
-            COUNT = 'count'
-        }
         count = zone.getVar(ZONE_VARS.COUNT)
     end
 
     if count > 0 then
         zone.createButton(gemButtonParams(count, 'label'))
-        local ZONE_VARS = {
-            OWNER = 'name',
-            PLAYER = 'player',
-            BANK = 'bank',
-            COUNT = 'count'
-        }
-        if not returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.BANK and zone.getVar('colour') ~= 'gold' then
-            zone.createButton(gemButtonParams(count, 'get'))
-        elseif returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.PLAYER then
-            zone.createButton(gemButtonParams(count, 'return'))
-        end
-    end
+      if not returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.BANK and zone.getVar(COLOUR_NAME) != GOLD_NAME then
+      zone.createButton(gemButtonParams(count, 'get'))
+      elseif returnMode and zone.getVar(ZONE_VARS.OWNER) == ZONE_VARS.PLAYER then
+      zone.createButton(gemButtonParams(count, 'return'))
+		  end
+	  end
 end
 
-function createGemButtons(init)
-    resetSelectedGems()
-    local TOKEN_COUNTS_PER_PLAYERS = {nil, 4, 5, 7}
-    local GOLD_TOKEN_COUNT = 5
+function resetSelectedGems()
+    selectedGems = {
+        red = false,
+        white = false,
+        green = false,
+        black = false,
+        blue = false
+    }
+end
 
-    if gemZones then
-        for k, zone in pairs(gemZones) do
-            if zone then
-                if init then
-                    -- playerCount should be passed or available globally
-                    createGemButtonsForZone(zone, TOKEN_COUNTS_PER_PLAYERS[playerCount])
-                else
-                    createGemButtonsForZone(zone)
-                end
+function countSelectedGems()
+    return #getSelectedGemColours()
+end
+
+function getSelectedGemColours()
+    local colours = {}
+    local i = 1
+    for colour, isSelected in pairs(selectedGems) do
+        if isSelected then
+            colours[i] = colour
+            i = i + 1
+        end
+    end
+    return colours
+end
+
+function canTakeSelectedGems(selectedColours)
+    if countSelectedGems() == 3 then
+        return true
+    end
+    for colour, value in pairs(selectedGems) do
+        if (not value) then
+            if not isZoneEmpty(bankGemZone(colour)) then
+                return false
             end
         end
     end
+    return true
+end
 
-    if goldGemZone then
-        if init then
-            createGemButtonsForZone(goldGemZone, GOLD_TOKEN_COUNT)
+function gemButtonClicked(zone, player, alt_click)
+    if (not isValidPlay(player)) then
+        return
+    end
+
+    local colour = zone.getVar(COLOUR_NAME)
+    if alt_click then
+        if getZoneGemCount(bankGemZone(colour)) >= 4 then
+            moveTokens(bankGemZone(colour), playerGemZone(player, colour), 2)
+            changeGemCount(player, colour, 2)
+            nextTurn()
         else
-            createGemButtonsForZone(goldGemZone)
+          if soundToggle == 'talk' then
+            dingSound.AssetBundle.playTriggerEffect(5)
+            Player[player].broadcast('There need to be at least 4 tokens left in the stack to take 2 of the same colour', CHAT_INFO_COLOR)
+          else
+            Player[player].broadcast('There need to be at least 4 tokens left in the stack to take 2 of the same colour', CHAT_INFO_COLOR)
+          end
+            return
         end
-    end
-
-    if not init and playerZones then
-        for playerColour, playerZone in pairs(playerZones) do
-            if playerZone and playerZone.gems then
-                for colour, zone in pairs(playerZone.gems) do
-                    if zone then
-                        createGemButtonsForZone(zone)
-                    end
-                end
-            end
+    else
+        selectedGems[colour] = not selectedGems[colour]
+        changeTokensTint(zone)
+        if canTakeSelectedGems() then
+            local selectedColours = getSelectedGemColours()
+            takeMultiColoredGems(selectedColours, player)
         end
     end
 end
 
--- Token tinting functions
+function returnGemClicked(zone, player)
+    if (not isValidPlay(player, true)) then
+        return
+    end
+    local colour = zone.getVar(COLOUR_NAME)
+    moveTokens(playerGemZone(player, colour), bankGemZone(colour), 1)
+    changeGemCount(player, colour, -1)
+    if countCurrentPlayerTokens(player) <= MAX_TOKEN_COUNT then
+        returnMode = false
+        createGemButtons()
+        nextTurn()
+    end
+end
+
+function takeMultiColoredGems(selectedColours, player)
+    for k, colour in pairs(selectedColours) do
+        moveToken(bankGemZone(colour), playerGemZone(player, colour))
+        changeGemCount(player, colour, 1)
+    end
+    nextTurn()
+end
+
+function getZoneGemCount(zone)
+    if isZoneEmpty(zone) then
+        return 0
+    else
+        return #zone.getObjects()
+    end
+    warnAll(ERROR_MESSAGE)
+end
+
+function isZoneEmpty(zone)
+    return zone.getObjects() == nil or #zone.getObjects() == 0
+end
+
 function changeAllTokensTint()
     for k, zone in pairs(gemZones) do
         changeTokensTint(zone)
@@ -289,7 +208,7 @@ end
 
 function changeTokensTint(zone)
     local tint = {1, 1, 1}
-    if (selectedGems[zone.getVar('colour')]) then
+    if (selectedGems[zone.getVar(COLOUR_NAME)]) then
         tint = {0.66, 1, 0.66}
     end
 
@@ -298,39 +217,56 @@ function changeTokensTint(zone)
     end
 end
 
--- Take multi-colored gems
-function takeMultiColoredGems(selectedColours, player)
-    for k, colour in pairs(selectedColours) do
-        moveToken(bankGemZone(colour), playerGemZone(player, colour))
-        -- Update player gem count if changeGemCount is available
-        if changeGemCount then
-            changeGemCount(player, colour, 1)
-        end
+function moveTokens(sourceZone, destinationZone, count)
+      if count == nil then
+          count = 1
+      end
+    local yPos = destinationZone.getPosition().y - 0.55
+    local topDestinationToken = getTopTokenFromZone(destinationZone)
+      if topDestinationToken != nil then
+          yPos = topDestinationToken.getPosition().y
+      end
+    local topTokens = getTopTokensFromZone(sourceZone, count)
+      for i = 1, count do
+          yPos = yPos + 0.1
+          topTokens[i].setPositionSmooth({destinationZone.getPosition().x, yPos, destinationZone.getPosition().z})
+      end
+    sourceZone.setVar(ZONE_VARS.COUNT, sourceZone.getVar(ZONE_VARS.COUNT) - count)
+    destinationZone.setVar(ZONE_VARS.COUNT, destinationZone.getVar(ZONE_VARS.COUNT) + count)
+    createGemButtonsForZone(sourceZone)
+    createGemButtonsForZone(destinationZone)
+end
+
+function moveToken(sourceZone, destinationZone)
+    moveTokens(sourceZone, destinationZone)
+end
+
+function playerGemZone(player, colour)
+    return playerZones[player:lower()].gems[colour]
+end
+
+function playerGemZones(player)
+    return getPlayerZones(player).gems
+end
+
+function bankGemZone(colour)
+    if colour == GOLD_NAME then
+        return goldGemZone
     end
+    return gemZones[colour]
 end
 
--- Set zone references
-function setZoneReferences(gems, gold, players)
-    gemZones = gems
-    goldGemZone = gold
-    playerZones = players
-end
-
--- Get/Set return mode
-function setReturnMode(mode)
-    returnMode = mode
-end
-
-function getReturnMode()
-    return returnMode
-end
-
--- Get selected gems
-function getSelectedGems()
-    return selectedGems
-end
-
--- Set selected gem
-function setSelectedGem(colour, selected)
-    selectedGems[colour] = selected
+function changeGemCount(playerColour, gemColour, gemCount)
+  local gemColor = 0
+  local player = getPlayer(playerColour)
+  if gemCount == 0 then
+    return
+  end
+  if gemColour == 'gold' then
+    gemColor = 'jGemCount'
+  else
+    gemColor = getKeyForValue(COST_COLOUR_NAMES, gemColour) .. 'GemCount'
+  end
+  player[gemColor] = player[gemColor] + gemCount
+  updateHelper(playerColour)
 end

@@ -1,45 +1,37 @@
--- Splendor Game Constants
--- All game configuration values and constants
-
--- Colors and UI
-local CHAT_WARNING_COLOR = {r = 255 / 255, g = 102 / 255, b = 0 / 255, a = 255 / 255}
-local CHAT_INFO_COLOR = {r = 153 / 255, g = 255 / 255, b = 51 / 255, a = 255 / 255}
-local ACTIVE_GEM_BUTTON_COLOR = {r = 153 / 255, g = 255 / 255, b = 51 / 255, a = 255 / 255}
-
--- Game Configuration
-local TOKEN_COUNTS_PER_PLAYERS = {nil, 4, 5, 7}
-local PEOPLE_TILES_PER_PLAYERS = {nil, 3, 4, 5}
-local GOLD_TOKEN_COUNT = 5
-local MAX_HAND_SIZE = 3
-local MAX_TOKEN_COUNT = 10
-local PERSON_SCORE = 3
-local SCORE_TO_WIN = 15
-local CARDS_COUNT = 4
-
--- Positions and Layout
-local DECK_Z_POSITIONS = {-7, -3, 1}
-local CARD_X_POSITIONS = {-3, 0, 3, 6}
-local PEOPLE_X_POSITIONS = {-1.8, 0.8, 3.4, -4.5, 6.05}
-local PERSON_PARAMS = {position = {-10, 3, nil}, flip = true, rotation = {0, 180, 0}}
-
--- Messages
-local ERROR_MESSAGE = 'An error occured. You can report it at https://steamcommunity.com/workshop/filedetails/discussion/1416487064/1727575977535194558/'
-local RETURN_TOKENS_MESSAGE = 'You can only have a maximum of 10 gem tokens. Please return the excess amount.'
-
--- Game Object Names
-local COLOUR_NAME = 'colour'
-local GOLD_NAME = 'gold'
-
--- Zone Variables
-local ZONE_VARS = {
+CHAT_WARNING_COLOR = {r = 255 / 255, g = 102 / 255, b = 0 / 255, a = 255 / 255}
+CHAT_INFO_COLOR = {r = 153 / 255, g = 255 / 255, b = 51 / 255, a = 255 / 255}
+ACTIVE_GEM_BUTTON_COLOR = {r = 153 / 255, g = 255 / 255, b = 51 / 255, a = 255 / 255}
+TOKEN_COUNTS_PER_PLAYERS = {nil, 4, 5, 7}
+PEOPLE_TILES_PER_PLAYERS = {nil, 3, 4, 5}
+GOLD_TOKEN_COUNT = 5
+DECK_Z_POSITIONS = { -7, -3, 1}
+CARDS_COUNT = 4
+CARD_X_POSITIONS = { - 3, 0, 3, 6}
+PEOPLE_X_POSITIONS = {-1.8, 0.8, 3.4, -4.5, 6.05}
+PERSON_PARAMS = {position = { - 10, 3, nil}, flip = true, rotation = {0, 180, 0}}
+ERROR_MESSAGE = 'An error occured. You can report it at https://steamcommunity.com/workshop/filedetails/discussion/1416487064/1727575977535194558/'
+RETURN_TOKENS_MESSAGE = 'You can only have a maximum of 10 gem tokens. Please return the excess amount.'
+COLOUR_NAME = 'colour'
+GOLD_NAME = 'gold'
+MAX_HAND_SIZE = 3
+MAX_TOKEN_COUNT = 10
+PERSON_SCORE = 3
+SCORE_TO_WIN = 15
+noblePickMode = false
+tintHelper = true
+dev = true
+dev2 = false
+xmlTable = {}
+xmlStart = {}
+turns = {}
+soundToggle = 'talk'
+ZONE_VARS = {
     OWNER = 'name',
     PLAYER = 'player',
     BANK = 'bank',
     COUNT = 'count'
 }
-
--- Color Mappings
-local COST_COLOUR_NAMES = {
+COST_COLOUR_NAMES = {
     r = 'red',
     w = 'white',
     g = 'green',
@@ -47,23 +39,19 @@ local COST_COLOUR_NAMES = {
     u = 'blue'
 }
 
--- Object Type Names
-local TYPE_NAMES = {
+TYPE_NAMES = {
     token = 'Custom_Model',
     deck = 'Deck',
     card = 'Card'
 }
-
--- Player Rotations
-local PLAYER_Y_ROTATION = {
+PLAYER_Y_ROTATION = {
     Blue = 0,
     Pink = 90,
     Red = 180,
     Green = 270
 }
 
--- Button Parameters
-local CARD_BUTTON_PARAMS = {
+CARD_BUTTON_PARAMS = {
     click_function = "cardClicked",
     function_owner = self,
     position = {0, 0.3, 0},
@@ -74,18 +62,18 @@ local CARD_BUTTON_PARAMS = {
     tooltip = "Buy/Reserve"
 }
 
-local CARD_TINT_PARAMS = {
-    label = "helperTint",
-    click_function = "cardClicked",
-    position = {0, -0.3, 0},
-    height = 1590,
-    width = 1130,
-    color = {1, 0, 0, 1},
-    hover_color = {0, 1, 0, 0.4},
-    tooltip = "Buy/Reserve"
+CARD_TINT_PARAMS = {
+  label = "helperTint",
+  click_function = "cardClicked",
+  position = {0, -0.3, 0},
+  height = 1590,
+  width = 1130,
+  color = {1, 0, 0, 1},
+  hover_color = {0, 1, 0, 0.4},
+  tooltip = "Buy/Reserve"
 }
 
-local DECK_BUTTON_PARAMS = {
+DECK_BUTTON_PARAMS = {
     click_function = "deckZoneClicked",
     function_owner = self,
     position = {0, 0, 0},
@@ -97,7 +85,7 @@ local DECK_BUTTON_PARAMS = {
     tooltip = "Reserve"
 }
 
-local NOBEL_BUTTON_PARAMS = {
+NOBEL_BUTTON_PARAMS = {
     click_function = "nobelClicked",
     function_owner = self,
     position = {0, 0.3, 0},
