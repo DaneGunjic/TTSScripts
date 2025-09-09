@@ -1,17 +1,15 @@
 -- Splendor UI Manager
 -- Handles all UI and XML-related functions
 
-local UIManager = {}
-
 -- UI state variables
-local scoreTableVisible = true
-local helperVisible = true
-local rulesVisible = false
-local soundEnabled = true
-local tintEnabled = true
+scoreTableVisible = true
+helperVisible = true
+rulesVisible = false
+soundEnabled = true
+tintEnabled = true
 
 -- Get XML table for score display
-function UIManager.getXmlTable()
+function getXmlTable()
     local xmlTable = {
         {
             tag = 'Panel',
@@ -40,8 +38,8 @@ function UIManager.getXmlTable()
     
     -- Add player scores
     local players = {}
-    if PlayerManager and PlayerManager.getPlayers then
-        players = PlayerManager.getPlayers()
+    if getPlayers then
+        players = getPlayers()
     end
     
     local yOffset = 40
@@ -49,13 +47,11 @@ function UIManager.getXmlTable()
         local points = 0
         local cards = 0
         
-        if PlayerManager then
-            if PlayerManager.getPlayerPoints then
-                points = PlayerManager.getPlayerPoints(player)
-            end
-            if PlayerManager.getPlayerCardCount then
-                cards = PlayerManager.getPlayerCardCount(player)
-            end
+        if getPlayerPoints then
+            points = getPlayerPoints(player)
+        end
+        if getPlayerCardCount then
+            cards = getPlayerCardCount(player)
         end
         
         local playerText = string.format('%s: %d points (%d cards)', player, points, cards)
@@ -77,8 +73,8 @@ function UIManager.getXmlTable()
     
     -- Add current turn indicator
     local currentPlayer = ''
-    if GameLogic and GameLogic.getCurrentPlayer then
-        currentPlayer = GameLogic.getCurrentPlayer() or ''
+    if getCurrentPlayer then
+        currentPlayer = getCurrentPlayer() or ''
     end
     
     table.insert(xmlTable[1].children, {
@@ -97,16 +93,16 @@ function UIManager.getXmlTable()
 end
 
 -- Update score table
-function UIManager.updateTable()
+function updateTable()
     if scoreTableVisible then
-        UIManager.scoreTable()
+        scoreTable()
     end
 end
 
 -- Show/hide score table
-function UIManager.scoreTable()
+function scoreTable()
     if scoreTableVisible then
-        local xmlTable = UIManager.getXmlTable()
+        local xmlTable = getXmlTable()
         Global.UI.setXmlTable(xmlTable)
     else
         Global.UI.setXmlTable({})
@@ -114,16 +110,16 @@ function UIManager.scoreTable()
 end
 
 -- Toggle score table visibility
-function UIManager.scoreTableVisibility()
+function scoreTableVisibility()
     scoreTableVisible = not scoreTableVisible
-    UIManager.scoreTable()
+    scoreTable()
     
     local message = scoreTableVisible and 'Score table shown' or 'Score table hidden'
     broadcastToAll(message, {1, 1, 1})
 end
 
 -- Update helper display
-function UIManager.updateHelper()
+function updateHelper()
     if not helperVisible then
         return
     end
@@ -132,8 +128,8 @@ function UIManager.updateHelper()
     
     -- Add current player info
     local currentPlayer = ''
-    if GameLogic and GameLogic.getCurrentPlayer then
-        currentPlayer = GameLogic.getCurrentPlayer() or ''
+    if getCurrentPlayer then
+        currentPlayer = getCurrentPlayer() or ''
     end
     helperText = helperText .. 'Current Turn: ' .. currentPlayer .. '\n\n'
     
@@ -156,7 +152,7 @@ function UIManager.updateHelper()
 end
 
 -- Show rules
-function UIManager.showRules()
+function showRules()
     rulesVisible = true
     
     local rulesText = 'SPLENDOR RULES\n\n'
@@ -193,13 +189,13 @@ function UIManager.showRules()
 end
 
 -- Hide rules
-function UIManager.hideRules()
+function hideRules()
     rulesVisible = false
     broadcastToAll('Rules hidden', {1, 1, 1})
 end
 
 -- Toggle sound
-function UIManager.soundSwitch()
+function soundSwitch()
     soundEnabled = not soundEnabled
     
     local message = soundEnabled and 'Sound enabled' or 'Sound disabled'
@@ -210,36 +206,34 @@ function UIManager.soundSwitch()
 end
 
 -- Toggle tint helper
-function UIManager.tintHelperSwitch()
+function tintHelperSwitch()
     tintEnabled = not tintEnabled
     
     local message = tintEnabled and 'Gem tinting enabled' or 'Gem tinting disabled'
     broadcastToAll(message, {1, 1, 1})
     
-    -- Update gem tinting if GemManager is available
-    if GemManager then
-        if tintEnabled then
-            if GemManager.changeAllTokensTint then
-                GemManager.changeAllTokensTint()
-            end
-        else
-            -- Reset all gem tints to normal
-            if GemManager.resetAllTokensTint then
-                GemManager.resetAllTokensTint()
-            end
+    -- Update gem tinting if functions are available
+    if tintEnabled then
+        if changeAllTokensTint then
+            changeAllTokensTint()
+        end
+    else
+        -- Reset all gem tints to normal
+        if resetAllTokensTint then
+            resetAllTokensTint()
         end
     end
 end
 
 -- Card play helper
-function UIManager.cardPlayHelper(card, player)
+function cardPlayHelper(card, player)
     if not card or not player then
         return
     end
     
     local cardData = {}
-    if CardManager and CardManager.parseCard then
-        cardData = CardManager.parseCard(card)
+    if parseCard then
+        cardData = parseCard(card)
     end
     
     local helperText = string.format('Card Info for %s:\n', player)
@@ -259,8 +253,8 @@ function UIManager.cardPlayHelper(card, player)
     
     -- Check if player can afford it
     local canAfford = false
-    if CardManager and CardManager.checkPayment then
-        canAfford = CardManager.checkPayment(player, cardData.cost or {})
+    if checkPayment then
+        canAfford = checkPayment(player, cardData.cost or {})
     end
     
     helperText = helperText .. string.format('Can afford: %s', canAfford and 'Yes' or 'No')
@@ -269,7 +263,7 @@ function UIManager.cardPlayHelper(card, player)
 end
 
 -- Tint card button
-function UIManager.tintCardButton(card, color)
+function tintCardButton(card, color)
     if not tintEnabled then
         return
     end
@@ -280,29 +274,29 @@ function UIManager.tintCardButton(card, color)
 end
 
 -- Remove tint from card button
-function UIManager.removeTintCardButton(card)
+function removeTintCardButton(card)
     if card and card.setColorTint then
         card.setColorTint({1, 1, 1})
     end
 end
 
 -- Helper click handler
-function UIManager.helperOnClick(player, value, id)
+function helperOnClick(player, value, id)
     if id == 'score_toggle' then
-        UIManager.scoreTableVisibility()
+        scoreTableVisibility()
     elseif id == 'rules_show' then
-        UIManager.showRules()
+        showRules()
     elseif id == 'rules_hide' then
-        UIManager.hideRules()
+        hideRules()
     elseif id == 'sound_toggle' then
-        UIManager.soundSwitch()
+        soundSwitch()
     elseif id == 'tint_toggle' then
-        UIManager.tintHelperSwitch()
+        tintHelperSwitch()
     end
 end
 
 -- Get UI state
-function UIManager.getUIState()
+function getUIState()
     return {
         scoreTableVisible = scoreTableVisible,
         helperVisible = helperVisible,
@@ -313,7 +307,7 @@ function UIManager.getUIState()
 end
 
 -- Set UI state
-function UIManager.setUIState(state)
+function setUIState(state)
     if state.scoreTableVisible ~= nil then
         scoreTableVisible = state.scoreTableVisible
     end
@@ -332,19 +326,17 @@ function UIManager.setUIState(state)
 end
 
 -- Initialize UI
-function UIManager.initialize()
-    UIManager.updateTable()
-    UIManager.updateHelper()
+function initializeUI()
+    updateTable()
+    updateHelper()
 end
 
 -- Check if sound is enabled
-function UIManager.isSoundEnabled()
+function isSoundEnabled()
     return soundEnabled
 end
 
 -- Check if tint is enabled
-function UIManager.isTintEnabled()
+function isTintEnabled()
     return tintEnabled
 end
-
-return UIManager

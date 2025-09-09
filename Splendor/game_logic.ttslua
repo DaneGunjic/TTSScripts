@@ -1,26 +1,24 @@
 -- Splendor Game Logic
 -- Handles turn management, win conditions, and core game flow
 
-local GameLogic = {}
-
 -- Game state variables
-local currentPlayerIndex = 1
-local gameStarted = false
-local gameEnded = false
-local playerCount = 0
-local playersOrder = {}
+currentPlayerIndex = 1
+gameStarted = false
+gameEnded = false
+playerCount = 0
+playersOrder = {}
 
 -- Initialize game logic
-function GameLogic.initialize()
+function initializeGameLogic()
     currentPlayerIndex = 1
     gameStarted = false
     gameEnded = false
 end
 
 -- Set player turn
-function GameLogic.setPlayerTurn(player)
-    if PlayerManager and PlayerManager.getPlayers then
-        local players = PlayerManager.getPlayers()
+function setPlayerTurn(player)
+    if getPlayers then
+        local players = getPlayers()
         for i, p in pairs(players) do
             if p:lower() == player:lower() then
                 currentPlayerIndex = i
@@ -31,23 +29,23 @@ function GameLogic.setPlayerTurn(player)
 end
 
 -- Get current player
-function GameLogic.getCurrentPlayer()
-    if PlayerManager and PlayerManager.getPlayers then
-        local players = PlayerManager.getPlayers()
+function getCurrentPlayer()
+    if getPlayers then
+        local players = getPlayers()
         return players[currentPlayerIndex]
     end
     return nil
 end
 
 -- Next turn
-function GameLogic.nextTurn()
+function nextTurn()
     if gameEnded then
         return
     end
     
     local players = {}
-    if PlayerManager and PlayerManager.getPlayers then
-        players = PlayerManager.getPlayers()
+    if getPlayers then
+        players = getPlayers()
     end
     
     if #players == 0 then
@@ -62,16 +60,16 @@ function GameLogic.nextTurn()
     local currentPlayer = players[currentPlayerIndex]
     
     -- Check for nobles
-    if CardManager and CardManager.checkPeopleStatus then
-        CardManager.checkPeopleStatus(currentPlayer)
+    if checkPeopleStatus then
+        checkPeopleStatus(currentPlayer)
     end
     
     -- Check win conditions
-    GameLogic.checkWinConditions()
+    checkWinConditions()
     
     -- Update UI
-    if UIManager and UIManager.updateTable then
-        UIManager.updateTable()
+    if updateTable then
+        updateTable()
     end
     
     -- Broadcast turn change
@@ -82,14 +80,14 @@ function GameLogic.nextTurn()
 end
 
 -- Check win conditions
-function GameLogic.checkWinConditions()
+function checkWinConditions()
     if gameEnded then
         return
     end
     
     local players = {}
-    if PlayerManager and PlayerManager.getPlayers then
-        players = PlayerManager.getPlayers()
+    if getPlayers then
+        players = getPlayers()
     end
     
     local winners = {}
@@ -98,8 +96,8 @@ function GameLogic.checkWinConditions()
     -- Check if any player has 15+ points
     for _, player in pairs(players) do
         local points = 0
-        if PlayerManager and PlayerManager.getPlayerPoints then
-            points = PlayerManager.getPlayerPoints(player)
+        if getPlayerPoints then
+            points = getPlayerPoints(player)
         end
         
         if points >= WINNING_POINTS then
@@ -108,12 +106,12 @@ function GameLogic.checkWinConditions()
     end
     
     if #winners > 0 then
-        GameLogic.endGame(winners)
+        endGame(winners)
     end
 end
 
 -- End game
-function GameLogic.endGame(winners)
+function endGame(winners)
     gameEnded = true
     
     if #winners == 1 then
@@ -125,7 +123,7 @@ function GameLogic.endGame(winners)
         broadcastToAll(MESSAGES.GAME_OVER, {1, 1, 1})
     else
         -- Handle tie
-        local tieWinners = GameLogic.getWinnersWhenDraw(winners)
+        local tieWinners = getWinnersWhenDraw(winners)
         if #tieWinners == 1 then
             local MESSAGES = {
                 TIE_WINNER = "%s wins the tiebreaker with %d points and %d cards!",
@@ -145,15 +143,15 @@ function GameLogic.endGame(winners)
 end
 
 -- Get winners when there's a draw (tiebreaker by card count)
-function GameLogic.getWinnersWhenDraw(winners)
+function getWinnersWhenDraw(winners)
     local maxCards = 0
     local tieWinners = {}
     
     -- Find maximum card count among winners
     for _, winner in pairs(winners) do
         local cardCount = 0
-        if PlayerManager and PlayerManager.getPlayerCardCount then
-            cardCount = PlayerManager.getPlayerCardCount(winner.player)
+        if getPlayerCardCount then
+            cardCount = getPlayerCardCount(winner.player)
         end
         winner.cards = cardCount
         
@@ -173,31 +171,31 @@ function GameLogic.getWinnersWhenDraw(winners)
 end
 
 -- Validate token hand size
-function GameLogic.validTokenHandSize(player)
+function validTokenHandSize(player)
     local MAX_TOKENS = 10
     local tokenCount = 0
     
-    if PlayerManager and PlayerManager.countCurrentPlayerTokens then
-        tokenCount = PlayerManager.countCurrentPlayerTokens(player)
+    if countCurrentPlayerTokens then
+        tokenCount = countCurrentPlayerTokens(player)
     end
     
     return tokenCount <= MAX_TOKENS
 end
 
 -- Check if play is valid
-function GameLogic.isValidPlay(player, action, data)
+function isValidPlay(player, action, data)
     if gameEnded then
         return false, "Game has ended"
     end
     
-    local currentPlayer = GameLogic.getCurrentPlayer()
+    local currentPlayer = getCurrentPlayer()
     if player:lower() ~= currentPlayer:lower() then
         return false, "It's not your turn"
     end
     
     if action == "take_gems" then
         -- Validate gem taking
-        if GemManager then
+        if bankGemZone then
             local selectedGems = data.gems or {}
             local count = #selectedGems
             
@@ -211,8 +209,8 @@ function GameLogic.isValidPlay(player, action, data)
                     return false, "When taking 2 gems, they must be the same color"
                 end
                 
-                local zone = GemManager.bankGemZone(selectedGems[1])
-                if GemManager.getZoneGemCount(zone) < 4 then
+                local zone = bankGemZone(selectedGems[1])
+                if getZoneGemCount(zone) < 4 then
                     return false, "Need at least 4 gems of this color to take 2"
                 end
             elseif count == 3 then
@@ -224,8 +222,8 @@ function GameLogic.isValidPlay(player, action, data)
                     end
                     colors[gem] = true
                     
-                    local zone = GemManager.bankGemZone(gem)
-                    if GemManager.getZoneGemCount(zone) == 0 then
+                    local zone = bankGemZone(gem)
+                    if getZoneGemCount(zone) == 0 then
                         return false, "Not enough gems of color: " .. gem
                     end
                 end
@@ -235,8 +233,8 @@ function GameLogic.isValidPlay(player, action, data)
             
             -- Check if player will exceed token limit
             local currentTokens = 0
-            if PlayerManager and PlayerManager.countCurrentPlayerTokens then
-                currentTokens = PlayerManager.countCurrentPlayerTokens(player)
+            if countCurrentPlayerTokens then
+                currentTokens = countCurrentPlayerTokens(player)
             end
             
             if currentTokens + count > 10 then
@@ -250,9 +248,9 @@ function GameLogic.isValidPlay(player, action, data)
             return false, "No card specified"
         end
         
-        if CardManager then
-            local cardData = CardManager.parseCard(card)
-            if not CardManager.checkPayment(player, cardData.cost) then
+        if parseCard then
+            local cardData = parseCard(card)
+            if not checkPayment(player, cardData.cost) then
                 return false, "Insufficient gems to buy this card"
             end
         end
@@ -265,8 +263,8 @@ function GameLogic.isValidPlay(player, action, data)
         
         -- Check if player has space for reserved cards (max 3)
         local reservedCount = 0
-        if PlayerManager and PlayerManager.getPlayerReservedCount then
-            reservedCount = PlayerManager.getPlayerReservedCount(player)
+        if getPlayerReservedCount then
+            reservedCount = getPlayerReservedCount(player)
         end
         
         if reservedCount >= 3 then
@@ -278,7 +276,7 @@ function GameLogic.isValidPlay(player, action, data)
 end
 
 -- Start game
-function GameLogic.startGame()
+function startGame()
     gameStarted = true
     gameEnded = false
     currentPlayerIndex = 1
@@ -290,44 +288,44 @@ function GameLogic.startGame()
     
     broadcastToAll(MESSAGES.GAME_START, {0, 1, 0})
     
-    local currentPlayer = GameLogic.getCurrentPlayer()
+    local currentPlayer = getCurrentPlayer()
     if currentPlayer then
         broadcastToAll(string.format(MESSAGES.FIRST_TURN, currentPlayer), {1, 1, 1})
     end
 end
 
 -- Check if game has started
-function GameLogic.hasGameStarted()
+function hasGameStarted()
     return gameStarted
 end
 
 -- Check if game has ended
-function GameLogic.hasGameEnded()
+function hasGameEnded()
     return gameEnded
 end
 
 -- Get current player index
-function GameLogic.getCurrentPlayerIndex()
+function getCurrentPlayerIndex()
     return currentPlayerIndex
 end
 
 -- Set current player index
-function GameLogic.setCurrentPlayerIndex(index)
+function setCurrentPlayerIndex(index)
     currentPlayerIndex = index
 end
 
 -- Get player count
-function GameLogic.getPlayerCount()
+function getPlayerCount()
     return playerCount
 end
 
 -- Set player count
-function GameLogic.setPlayerCount(count)
+function setPlayerCount(count)
     playerCount = count
 end
 
 -- Warn all players
-function GameLogic.warnAll(message)
+function warnAll(message)
     local COLORS = {
         WARNING = {1, 0.4, 0, 1}
     }
@@ -335,34 +333,32 @@ function GameLogic.warnAll(message)
 end
 
 -- Process turn action
-function GameLogic.processTurnAction(player, action, data)
-    local isValid, message = GameLogic.isValidPlay(player, action, data)
+function processTurnAction(player, action, data)
+    local isValid, message = isValidPlay(player, action, data)
     
     if not isValid then
-        GameLogic.warnAll(message)
+        warnAll(message)
         return false
     end
     
     -- Process the action
     if action == "take_gems" then
-        if GemManager and GemManager.takeMultiColoredGems then
-            GemManager.takeMultiColoredGems(data.gems, player)
+        if takeMultiColoredGems then
+            takeMultiColoredGems(data.gems, player)
         end
     elseif action == "buy_card" then
-        if CardManager then
-            local cardData = CardManager.parseCard(data.card)
-            CardManager.payCost(player, cardData.cost)
-            CardManager.playCard(data.card, player)
+        if parseCard then
+            local cardData = parseCard(data.card)
+            payCost(player, cardData.cost)
+            playCard(data.card, player)
         end
     elseif action == "reserve_card" then
-        if CardManager and CardManager.reserveCard then
-            CardManager.reserveCard(data.card, player)
+        if reserveCard then
+            reserveCard(data.card, player)
         end
     end
     
     -- End turn
-    GameLogic.nextTurn()
+    nextTurn()
     return true
 end
-
-return GameLogic
