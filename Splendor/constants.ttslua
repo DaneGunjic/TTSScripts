@@ -4,12 +4,12 @@ ACTIVE_GEM_BUTTON_COLOR = {r = 153 / 255, g = 255 / 255, b = 51 / 255, a = 255 /
 TOKEN_COUNTS_PER_PLAYERS = {nil, 4, 5, 7}
 PEOPLE_TILES_PER_PLAYERS = {nil, 3, 4, 5}
 GOLD_TOKEN_COUNT = 5
-DECK_Z_POSITIONS = { -7, -3, 1}
+DECK_Z_POSITIONS = { -6.93, -3.06, 0.88}
 CARDS_COUNT = 4
 CARD_X_POSITIONS = { - 3, 0, 3, 6}
 PEOPLE_X_POSITIONS = {-1.8, 0.8, 3.4, -4.5, 6.05}
 PERSON_PARAMS = {position = { - 10, 3, nil}, flip = true, rotation = {0, 180, 0}}
-ERROR_MESSAGE = 'An error occured. You can report it at https://steamcommunity.com/workshop/filedetails/discussion/1416487064/1727575977535194558/'
+ERROR_MESSAGE = 'An error occured.'
 RETURN_TOKENS_MESSAGE = 'You can only have a maximum of 10 gem tokens. Please return the excess amount.'
 COLOUR_NAME = 'colour'
 GOLD_NAME = 'gold'

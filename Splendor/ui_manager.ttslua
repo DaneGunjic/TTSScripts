@@ -13,8 +13,8 @@ end
 function getNoblePerson(player, person)
     local destination = playerCardPosition(player, playerZones[player:lower()].people)
     local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
-    person.object.setRotationSmooth(rotation, false, false)
-    person.object.setPositionSmooth(destination, false, false)
+    person.object.setRotation(rotation, false, false)
+    person.object.setPosition(destination, false, false)
     table.remove(availablePeople, getIndex(availablePeople, person))
     awardPoints(player, 3)
     nextTurn()

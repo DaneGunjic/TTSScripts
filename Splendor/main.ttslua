@@ -1,9 +1,16 @@
 -- Main game file that includes all other components
 
--- Audio URLs for background music
--- Audio = {
---   Background = "https://drive.google.com/uc?export=download&id=1KH22V6I4D-fVnoJPGAxQu2QGLMUxIi1x"
--- }
+-- Audio playlist for background music
+Playlist = {
+  {
+    url = "https://drive.google.com/uc?export=download&id=1KH22V6I4D-fVnoJPGAxQu2QGLMUxIi1x",
+    title = "Geoff Knorr - England (The Medieval Era)"
+  },
+  {
+    url = "https://drive.google.com/uc?export=download&id=12sx7MsrAPCT4Ldant-IPH0zanTl9Q2Tt",
+    title = "Geoff Knorr  - Ottoman (The Medieval Era)"
+  }
+}
 
 #include !\Splendor\constants.ttslua
 #include !\Splendor\game_setup.ttslua
@@ -18,21 +25,26 @@ function onLoad()
     Player["White"].changeColor("Red")
     setupObjectReferences()
     tabletop.interactable = false
+    tabletop.locked = true
     playmat.interactable = false
+    playmat.locked = true
     peopleBag.interactable = false
-    dingSound.interactable = true
+    peopleBag.locked = true
+    dingSound.interactable = false
 
-    dingSound.setPosition({0, 10, 0})
+    --dingSound.setPosition({0, 0, 0})
 
     for k, deck in pairs(decks) do
         deck.interactable = false
+        deck.locked = true
     end
 
     Wait.frames(function () getXmlTable() end, 50)
     Wait.frames(function () checkHost() end, 50)
-    
-    -- Start background music
-    --MusicPlayer.setCurrentAudioclip({url=Audio.Background, title = "Splendor Background Music"})
+
+    -- Set up and start playlist with shuffle
+    MusicPlayer.setPlaylist(Playlist)
+    MusicPlayer.shuffle = true
     MusicPlayer.play()
 
     -- if dev2 then

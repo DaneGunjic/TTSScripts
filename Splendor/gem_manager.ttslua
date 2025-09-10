@@ -135,12 +135,10 @@ function gemButtonClicked(zone, player, alt_click)
             changeGemCount(player, colour, 2)
             nextTurn()
         else
-          if soundToggle == 'talk' then
-            dingSound.AssetBundle.playTriggerEffect(5)
             Player[player].broadcast('There need to be at least 4 tokens left in the stack to take 2 of the same colour', CHAT_INFO_COLOR)
-          else
-            Player[player].broadcast('There need to be at least 4 tokens left in the stack to take 2 of the same colour', CHAT_INFO_COLOR)
-          end
+            if soundToggle == 'talk' then
+                dingSound.AssetBundle.playTriggerEffect(5)
+            end
             return
         end
     else
@@ -206,19 +204,23 @@ function changeTokensTint(zone)
 end
 
 function moveTokens(sourceZone, destinationZone, count)
-      if count == nil then
-          count = 1
-      end
+    if count == nil then
+        count = 1
+    end
+
     local yPos = destinationZone.getPosition().y - 0.55
     local topDestinationToken = getTopTokenFromZone(destinationZone)
-      if topDestinationToken != nil then
-          yPos = topDestinationToken.getPosition().y
-      end
+
+    if topDestinationToken != nil then
+        yPos = topDestinationToken.getPosition().y
+    end
+
     local topTokens = getTopTokensFromZone(sourceZone, count)
-      for i = 1, count do
-          yPos = yPos + 0.1
-          topTokens[i].setPositionSmooth({destinationZone.getPosition().x, yPos, destinationZone.getPosition().z})
-      end
+    for i = 1, count do
+        yPos = yPos + 0.1
+        topTokens[i].setPosition({destinationZone.getPosition().x, yPos, destinationZone.getPosition().z})
+    end
+
     sourceZone.setVar(ZONE_VARS.COUNT, sourceZone.getVar(ZONE_VARS.COUNT) - count)
     destinationZone.setVar(ZONE_VARS.COUNT, destinationZone.getVar(ZONE_VARS.COUNT) + count)
     createGemButtonsForZone(sourceZone)

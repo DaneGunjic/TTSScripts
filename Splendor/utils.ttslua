@@ -9,13 +9,17 @@ function getTopTokensFromZone(zone, count)
       end
     local yPositions = {}
       for k, token in pairs(zone.getObjects()) do
-          table.insert(yPositions, token.getPosition().y)
+          -- Only consider objects with "Gem" tag, filter out player boards
+          if token.hasTag("Gem") then
+              table.insert(yPositions, token.getPosition().y)
+          end
       end
     table.sort(yPositions)
-    local skipCount = #zone.getObjects() - count
+    local skipCount = #yPositions - count
     local minY = yPositions[1 + skipCount]
       for k, token in pairs(zone.getObjects()) do
-          if minY <= token.getPosition().y then
+          -- Only consider objects with "Gem" tag, filter out player boards
+          if token.hasTag("Gem") and minY <= token.getPosition().y then
               table.insert(topTokens, token)
           end
       end
@@ -42,7 +46,7 @@ function onObjectLeaveScriptingZone(zone, object)
 end
 
 function onObjectSpawn(obj)
-    obj.interactable = false
+    --obj.interactable = false
 end
 
 function dummy()

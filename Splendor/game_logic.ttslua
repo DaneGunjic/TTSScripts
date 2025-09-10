@@ -30,9 +30,30 @@ function playerCardPosition(player, zone, cardIndex)
     local pos = zone.getPosition()
     local offset
     if (cardIndex == nil) then
-        offset = -4 + #zone.getObjects()
+        -- Find which card color zone this is by matching the zone
+        local cardColor = nil
+        local playerZone = playerZones[player:lower()]
+        for color, colorZone in pairs(playerZone.cards) do
+            if colorZone == zone then
+                -- Map color name to card count field using COST_COLOUR_NAMES reverse lookup
+                for code, colorName in pairs(COST_COLOUR_NAMES) do
+                    if colorName == color then
+                        cardColor = code .. 'CardCount'
+                        break
+                    end
+                end
+                break
+            end
+        end
+
+        if cardColor then
+            offset = getPlayer(player)[cardColor] * 0.8
+        else
+            -- Fallback to counting zone objects if zone not found
+            offset = #zone.getObjects() * 0.8
+        end
     else
-        offset = -5 + cardIndex
+        offset = cardIndex
     end
     if player == 'Red' then
         return {pos.x, pos.y, pos.z - offset}
@@ -227,13 +248,20 @@ function warnAll(message)
 end
 
 function cardPosition(xPos, zPos)
-    return {xPos, 3, zPos}
+    return {xPos, 4, zPos}
 end
 
 function dealCard(object, position)
     if isDeck(object) then
-        local card = object.takeObject({position = position, flip = true})
+        local card = object.takeObject({
+            position = position,
+            flip = true,
+            smooth = false,
+            callback_function  = function(object) object.interactable = false end
+        })
+
         local parsedCard = parseCard(card)
+
         cardToDeckRefferences[parsedCard.id] = getIndex(decks, object)
         card.createButton(CARD_BUTTON_PARAMS)
         refreshDeckTooltip(object)
@@ -385,6 +413,8 @@ function checkPayment(player, cost)
           end
       end
     local goldGemCount = player['jGemCount']
+    --print("[DEBUG] Gold gem count: " .. goldGemCount)
+    --print("[DEBUG] Missing tokens count: " .. missingTokensCount)
     return {
         valid = goldGemCount >= missingTokensCount,
         goldCost = missingTokensCount,
@@ -393,16 +423,16 @@ function checkPayment(player, cost)
 end
 
 function considerDiscount(player, cost)
-    local playerData = getPlayer(player)
-    local discountedCost = {}
-
-    for colour, amount in pairs(cost) do
-        local bonusField = colour:sub(1,1):upper() .. 'BonusCount'
-        local discount = playerData[bonusField] or 0
-        discountedCost[colour] = math.max(0, amount - discount)
+    local newCost = {}
+    for colour, value in pairs(cost) do
+        local discount = 0
+        local cardColor = colour .. 'CardCount'
+        local player = getPlayer(player)
+        if cost[colour] - player[cardColor] > 0 then
+            newCost[colour] = cost[colour] - player[cardColor]
+        end
     end
-
-    return discountedCost
+    return newCost
 end
 
 function parseCostString(costString)
@@ -417,9 +447,11 @@ end
 
 function parseCard(object)
     local substrings = {}
-      for s in string.gmatch(object.getName(), '%S+') do
-          table.insert(substrings, s)
-      end
+    for s in string.gmatch(object.getName(), '%S+') do
+        table.insert(substrings, s)
+    end
+
+    local costTable = parseCostString(substrings[4])
     return {
         id = substrings[1],
         score = tonumber(substrings[2]),
@@ -440,13 +472,13 @@ function parsePerson(object)
 end
 
 function getNoblePerson(player, person)
-  local destination = playerCardPosition(player, playerZones[player:lower()].people)
-  local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
-  person.object.setRotationSmooth(rotation, false, false)
-  person.object.setPositionSmooth(destination, false, false)
-  table.remove(availablePeople, getIndex(availablePeople, person))
-  awardPoints(player, 3)
-  nextTurn()
+    local destination = playerCardPosition(player, playerZones[player:lower()].people)
+    local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
+    person.object.setRotation(rotation, false, false)
+    person.object.setPosition(destination, false, false)
+    table.remove(availablePeople, getIndex(availablePeople, person))
+    awardPoints(player, 3)
+    nextTurn()
 end
 
 function dealNewCardInPlaceOf(object)
@@ -468,6 +500,25 @@ function dealNewCardInPlaceOf(object)
     end
 end
 
+function nobelClicked(object, player)
+  local person
+  if currentPlayer != player then
+    Player[player].broadcast('Please wait for your turn', CHAT_WARNING_COLOR)
+  else
+    for k, person in pairs(availablePeople) do
+      if person.object.getButtons() ~= nil then
+        person.object.removeButton(0)
+      end
+    end
+    for k, v in pairs (availablePeople) do
+      if v.object == object then
+        person = availablePeople[k]
+      end
+    end
+  getNoblePerson(player, person)
+  end
+end
+
 function cardClicked(object, player, alt_click)
     if not isValidPlay(player) then
         return
@@ -476,7 +527,6 @@ function cardClicked(object, player, alt_click)
     local playerZone = playerZones[player:lower()]
 
     if isCard(object) then
-
         if not alt_click then
             playCard(object, player, true)
         else

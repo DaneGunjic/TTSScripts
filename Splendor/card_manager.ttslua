@@ -21,6 +21,7 @@ function payCost(player, cost, goldCost)
 end
 
 function playCard(object, player, dealNext)
+    print("Deal next is " .. tostring(dealNext))
     local card = parseCard(object)
     local cost = considerDiscount(player, card.cost)
     local payment = checkPayment(player, cost)
@@ -31,12 +32,13 @@ function playCard(object, player, dealNext)
         local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
         local objectJSON = object.getJSON()
           if dealNext then
-            object.setRotationSmooth(rotation, false, false)
-            object.setPositionSmooth(position, false, false)
             dealNewCardInPlaceOf(object)
+            object.setRotation(rotation, false, false)
+            object.setPosition(position, false, false)
+            object.interactable = false
           elseif not dealNext then
             object.destruct()
-            spawnObjectJSON({json = objectJSON, position = position, rotation = rotation})
+            spawnObjectJSON({json = objectJSON, position = position, rotation = rotation, callback_function = function(obj) obj.interactable = false end})
           end
         awardPoints(player, card.score)
         addCardCount(player, card.bonus)
@@ -49,19 +51,12 @@ function playCard(object, player, dealNext)
     return false
 end
 
-function reserveDeckCallback(object_spawned, params)
-    object_spawned.interactable = true
-    object_spawned.deal(1, params.player)
-end
-
 function reserveCard(player, object, dealNext)
     if #Player[player].getHandObjects() >= MAX_HAND_SIZE then
-      if soundToggle == 'talk' then
-        dingSound.AssetBundle.playTriggerEffect(8)
         Player[player].broadcast('You can only have up to 3 cards reserved at a time', CHAT_INFO_COLOR)
-      else
-        Player[player].broadcast('You can only have up to 3 cards reserved at a time', CHAT_INFO_COLOR)
-      end
+        if soundToggle == 'talk' then
+            dingSound.AssetBundle.playTriggerEffect(8)
+        end
     else
         if isDeck(object) then
             object.takeObject({position = {0, 0, 0}, callback = "reserveDeckCallback", callback_owner = Global, params = {player = player}})
