@@ -142,7 +142,18 @@ function setPlayerTurn(colour)
 end
 
 function validTokenHandSize(player)
-    return countCurrentPlayerTokens(player) <= MAX_TOKEN_COUNT
+    if countCurrentPlayerTokens(player) > MAX_TOKEN_COUNT then
+       returnMode = true
+       createGemButtons()
+       if soundToggle == 'talk' then
+         dingSound.AssetBundle.playTriggerEffect(7)
+         Player[currentPlayer].broadcast(RETURN_TOKENS_MESSAGE, CHAT_WARNING_COLOR)
+       else
+       Player[currentPlayer].broadcast(RETURN_TOKENS_MESSAGE, CHAT_WARNING_COLOR)
+        end
+       return false
+   end
+   return true
 end
 
 function checkWinConditions(nextPlayerIndex, currentPlayerIndex)
@@ -250,15 +261,15 @@ function refreshDeckTooltip(deck)
 end
 
 function isToken(object)
-    return object.getName():match('Token')
+    return object.name == TYPE_NAMES.token
 end
 
 function isCard(object)
-    return object.getName():match('Card')
+    return object.name == TYPE_NAMES.card
 end
 
 function isDeck(object)
-    return object.type == 'Deck'
+    return object.name == TYPE_NAMES.deck
 end
 
 function tintHelperSwitch(player, string)
@@ -276,41 +287,76 @@ function tintHelperSwitch(player, string)
 end
 
 function showRules(player)
-    Player[player].showInfoDialog('Game Rules', RULES_TEXT)
+  UI.setAttribute("rulesBook", "visibility", player.color)
 end
 
 function hideRules()
-    -- Implementation for hiding rules
+  UI.setAttribute("rulesBook", "visibility", "nil")
 end
 
 function soundSwitch(player, string)
-    if soundToggle == 'talk' then
-        soundToggle = 'mute'
-        Player[player].broadcast('Sound effects muted', CHAT_INFO_COLOR)
-    else
-        soundToggle = 'talk'
-        Player[player].broadcast('Sound effects enabled', CHAT_INFO_COLOR)
-    end
+  if string == "ding" then
+     soundToggle = "ding"
+    UI.setAttribute("soundSwitch", "onClick", "soundSwitch(talk)")
+    UI.setAttribute("soundSwitch", "icon", "soundSwitchDing")
+  elseif string == "talk" then
+    soundToggle = "talk"
+    UI.setAttribute("soundSwitch", "onClick", "soundSwitch(mute)")
+    UI.setAttribute("soundSwitch", "icon", "soundSwitchTalk")
+  else
+    soundToggle = "mute"
+    UI.setAttribute("soundSwitch", "onClick", "soundSwitch(ding)")
+    UI.setAttribute("soundSwitch", "icon", "soundSwitchMute")
+  end
 end
 
 function cardPlayHelper(player)
-    local playerData = getPlayer(player)
-    if playerData then
-        playerData.cardPlayHelper = not playerData.cardPlayHelper
-        updateHelper(player)
+  if tintHelper then
+    if not isZoneEmpty(cardZone) then
+        local cardTable = cardZone.getObjects()
+        for i, card in pairs (cardTable) do
+          if isCard(card) then
+          local cardParsed = parseCard(card)
+          local cost = considerDiscount(player, cardParsed.cost)
+          local payment = checkPayment(player, cost)
+            if payment.valid then
+              tintCardButton(card)
+            end
+          end
+        end
     end
+  end
 end
 
 function tintCardButton(card)
-    card.setColorTint({0.5, 1, 0.5})
+  buttonTable = card.getButtons()
+  for i, button in pairs (buttonTable) do
+    if button.label ~= "helperTint" then
+      card.createButton(CARD_TINT_PARAMS)
+    end
+  end
 end
 
 function removeTintCardButton()
-    -- Remove tint from all cards
+  if not isZoneEmpty(cardZone) then
+      local cardTable = cardZone.getObjects()
+      for i, card in pairs (cardTable) do
+          if isCard(card) then
+          buttonTable = card.getButtons()
+            if buttonTable != nil then
+            for i, button in pairs (buttonTable) do
+              if button.label == "helperTint" then
+                card.removeButton(i-1)
+              end
+            end
+            end
+        end
+      end
+  end
 end
 
 function contains(tab, val)
-    for index, value in ipairs(tab) do
+    for index, value in pairs(tab) do
         if value == val then
             return true
         end
@@ -319,27 +365,31 @@ function contains(tab, val)
 end
 
 function getIndex(tab, val)
-    for index, value in ipairs(tab) do
-        if value == val then
-            return index
+    for k, v in pairs(tab) do
+        if (v == val) then
+            return k
         end
     end
-    return nil
 end
 
 function checkPayment(player, cost)
-    local playerGems = getPlayerGems(player)
-    local totalCost = 0
-    local availableGems = 0
-
-    for colour, amount in pairs(cost) do
-        totalCost = totalCost + amount
-        local gemColour = COST_COLOUR_NAMES[colour]
-        availableGems = availableGems + playerGems[gemColour]
-    end
-
-    availableGems = availableGems + playerGems.gold
-    return availableGems >= totalCost
+    local missingTokensCount = 0
+    local newCost = cost
+    local player = getPlayer(player)
+      for colourCode, value in pairs(cost) do
+          local color = colourCode..'GemCount'
+          local gemCount = player[color]
+          if gemCount < value then
+              missingTokensCount = missingTokensCount + (value - gemCount)
+              newCost[colourCode] = value - missingTokensCount
+          end
+      end
+    local goldGemCount = player['jGemCount']
+    return {
+        valid = goldGemCount >= missingTokensCount,
+        goldCost = missingTokensCount,
+        cost = newCost
+    }
 end
 
 function considerDiscount(player, cost)
@@ -389,11 +439,6 @@ function parsePerson(object)
     }
 end
 
-function canAffordNobel(player, cost)
-    local discountedCost = considerDiscount(player, cost)
-    return next(discountedCost) == nil
-end
-
 function getNoblePerson(player, person)
   local destination = playerCardPosition(player, playerZones[player:lower()].people)
   local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
@@ -427,8 +472,11 @@ function cardClicked(object, player, alt_click)
     if not isValidPlay(player) then
         return
     end
+
     local playerZone = playerZones[player:lower()]
+
     if isCard(object) then
+
         if not alt_click then
             playCard(object, player, true)
         else
@@ -478,39 +526,52 @@ end
 function serializeTable(val, name, skipnewlines, depth)
     skipnewlines = skipnewlines or false
     depth = depth or 0
-    local tmp = string.rep(' ', depth)
-    if name then tmp = tmp .. name .. ' = ' end
-    if type(val) == 'table' then
-        tmp = tmp .. '{' .. (not skipnewlines and '\n' or '')
-        for k, v in pairs(val) do
-            tmp = tmp .. serializeTable(v, k, skipnewlines, depth + 1) .. ',' .. (not skipnewlines and '\n' or '')
-        end
-        tmp = tmp .. string.rep(' ', depth) .. '}'
-    elseif type(val) == 'number' then
-        tmp = tmp .. tostring(val)
-    elseif type(val) == 'string' then
-        tmp = tmp .. string.format('%q', val)
-    elseif type(val) == 'boolean' then
-        tmp = tmp .. (val and 'true' or 'false')
-    else
-        tmp = tmp .. "'[inserializeable datatype:' .. type(val) .. ']"
+
+    local tmp = string.rep(" ", depth)
+
+    if name then
+      if type(name) == "number" then
+      tmp = tmp
+      else
+      tmp = tmp .. name .. " = "
+      end
     end
+
+    if type(val) == "table" then
+        tmp = tmp .. "{" .. (not skipnewlines and "\n" or "")
+
+        for k, v in pairs(val) do
+              tmp =  tmp .. serializeTable(v, k, skipnewlines, depth + 1) .. "," .. (not skipnewlines and "\n" or "")
+        end
+
+        tmp = tmp .. string.rep(" ", depth) .. "}"
+    elseif type(val) == "number" then
+        tmp = tmp .. tostring(val)
+    elseif type(val) == "string" then
+        tmp = tmp .. string.format("%q", val)
+    elseif type(val) == "boolean" then
+        tmp = tmp .. (val and "true" or "false")
+    else
+        tmp = tmp .. "\"[inserializeable datatype:" .. type(val) .. "]\""
+    end
+
     return tmp
 end
 
 function reserveDeckCallback(object_spawned, params)
-    reserveCard(params.player, object_spawned, false)
+    object_spawned.interactable = true
+    object_spawned.deal(1, params.player)
 end
 
 function recreateCard(object, position)
-    local cardData = getCardData(object)
-    object.destruct()
-    -- Recreate card logic would go here
+  local objectJSON = object.getJSON()
+	local interactable = object.interactable
+  object.destruct()
+	spawnObjectJSON({json = objectJSON, position = position, rotation = rotation, callback = 'recreateCardCallback', callback_owner = Global, params = {interactable = interactable}})
 end
 
 function recreateCardCallback(card, params)
-    card.setPosition(params.position)
-    card.setRotation({0, 180, 0})
+    card.interactable = params.interactable
 end
 
 function checkPeopleStatus(player)

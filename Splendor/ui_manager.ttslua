@@ -10,41 +10,12 @@ function scoreTable()
 	      updateTable(playersOrder[1])
 end
 
-function canAffordNobel(player, cost)
-    local discountedCost = considerDiscount(player, cost)
-    return next(discountedCost) == nil
-end
-
 function getNoblePerson(player, person)
-  local destination = playerCardPosition(player, playerZones[player:lower()].people)
-  local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
-  person.object.setRotationSmooth(rotation, false, false)
-  person.object.setPositionSmooth(destination, false, false)
-  table.remove(availablePeople, getIndex(availablePeople, person))
-  awardPoints(player, 3)
-  nextTurn()
-end
-
-function nobelClicked(object, player)
-    if not isValidPlay(player) then
-        return
-    end
-    
-    local playerData = getPlayer(player)
-    local nobelData = getNoblePerson(object)
-    
-    if canAffordNobel(player, nobelData.cost) then
-        playerData.points = playerData.points + nobelData.points
-        object.destruct()
-        updateHelper(player)
-        checkWinConditions(1, 1)
-        nextTurn()
-    else
-        if soundToggle == 'talk' then
-            dingSound.AssetBundle.playTriggerEffect(5)
-            Player[player].broadcast('You do not have enough bonuses for this noble', CHAT_INFO_COLOR)
-        else
-            Player[player].broadcast('You do not have enough bonuses for this noble', CHAT_INFO_COLOR)
-        end
-    end
+    local destination = playerCardPosition(player, playerZones[player:lower()].people)
+    local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
+    person.object.setRotationSmooth(rotation, false, false)
+    person.object.setPositionSmooth(destination, false, false)
+    table.remove(availablePeople, getIndex(availablePeople, person))
+    awardPoints(player, 3)
+    nextTurn()
 end

@@ -1,34 +1,24 @@
 function getTopTokenFromZone(zone)
-    local objects = zone.getObjects()
-    if objects == nil or #objects == 0 then
-        return nil
-    end
-    local topToken = objects[1]
-    local highestY = topToken.getPosition().y
-    for i = 2, #objects do
-        local currentY = objects[i].getPosition().y
-        if currentY > highestY then
-            highestY = currentY
-            topToken = objects[i]
-        end
-    end
-    return topToken
+    return getTopTokensFromZone(zone, 1)[1]
 end
 
 function getTopTokensFromZone(zone, count)
-    local objects = zone.getObjects()
-    if objects == nil or #objects == 0 then
-        return {}
-    end
-
-    table.sort(objects, function(a, b)
-        return a.getPosition().y > b.getPosition().y
-    end)
-
     local topTokens = {}
-    for i = 1, math.min(count, #objects) do
-        topTokens[i] = objects[i]
-    end
+      if count == 0 or isZoneEmpty(zone) then
+          return topTokens
+      end
+    local yPositions = {}
+      for k, token in pairs(zone.getObjects()) do
+          table.insert(yPositions, token.getPosition().y)
+      end
+    table.sort(yPositions)
+    local skipCount = #zone.getObjects() - count
+    local minY = yPositions[1 + skipCount]
+      for k, token in pairs(zone.getObjects()) do
+          if minY <= token.getPosition().y then
+              table.insert(topTokens, token)
+          end
+      end
     return topTokens
 end
 
@@ -41,16 +31,6 @@ function getKeyForValue(table, value)
     return nil
 end
 
-function onObjectSpawn(object)
-    if object.getName():match("Card") then
-        object.interactable = false
-        object.setLuaScript(CARD_SCRIPT)
-    elseif object.getName():match("Noble") then
-        object.interactable = false
-        object.setLuaScript(NOBLE_SCRIPT)
-    end
-end
-
 function onObjectLeaveScriptingZone(zone, object)
   if zone == cardZone then
     if isCard(object) then
@@ -59,6 +39,10 @@ function onObjectLeaveScriptingZone(zone, object)
       end
     end
   end
+end
+
+function onObjectSpawn(obj)
+    obj.interactable = false
 end
 
 function dummy()

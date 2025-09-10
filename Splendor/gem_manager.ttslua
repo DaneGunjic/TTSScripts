@@ -1,15 +1,3 @@
-function isValidPlay(player, isReturn)
-    local valid = true
-    if currentPlayer != player then
-        valid = false
-        Player[player].broadcast('Please wait for your turn', CHAT_WARNING_COLOR)
-    elseif returnMode and not isReturn then
-        valid = false
-        Player[player].broadcast(RETURN_TOKENS_MESSAGE, CHAT_WARNING_COLOR)
-    end
-    return valid
-end
-
 function gemButtonParams(tokenCount, mode)
     local yPos = (tokenCount * 0.1) - 0.2
     local position = {0, yPos, 0}
@@ -257,16 +245,16 @@ function bankGemZone(colour)
 end
 
 function changeGemCount(playerColour, gemColour, gemCount)
-  local gemColor = 0
-  local player = getPlayer(playerColour)
-  if gemCount == 0 then
+    local gemColor = 0
+    local player = getPlayer(playerColour)
+    if gemCount == 0 then
     return
-  end
-  if gemColour == 'gold' then
+    end
+    if gemColour == 'gold' then
     gemColor = 'jGemCount'
-  else
+    else
     gemColor = getKeyForValue(COST_COLOUR_NAMES, gemColour) .. 'GemCount'
-  end
-  player[gemColor] = player[gemColor] + gemCount
-  updateHelper(playerColour)
+    end
+    player[gemColor] = player[gemColor] + gemCount
+    updateHelper(playerColour)
 end

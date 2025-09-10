@@ -1,5 +1,10 @@
 -- Main game file that includes all other components
 
+-- Audio URLs for background music
+-- Audio = {
+--   Background = "https://drive.google.com/uc?export=download&id=1KH22V6I4D-fVnoJPGAxQu2QGLMUxIi1x"
+-- }
+
 #include !\Splendor\constants.ttslua
 #include !\Splendor\game_setup.ttslua
 #include !\Splendor\gem_manager.ttslua
@@ -15,18 +20,26 @@ function onLoad()
     tabletop.interactable = false
     playmat.interactable = false
     peopleBag.interactable = false
-    dingSound.interactable = false
+    dingSound.interactable = true
+
+    dingSound.setPosition({0, 10, 0})
+
     for k, deck in pairs(decks) do
-        deck.interactable = true
+        deck.interactable = false
     end
+
     Wait.frames(function () getXmlTable() end, 50)
     Wait.frames(function () checkHost() end, 50)
+    
+    -- Start background music
+    --MusicPlayer.setCurrentAudioclip({url=Audio.Background, title = "Splendor Background Music"})
+    MusicPlayer.play()
 
-    if dev2 then
-      local object = peopleBag
-      local table = UI.getXmlTable()
-      table = serializeTable(table)
-      object.setLuaScript(table)
-      object.interactable = true
-    end
+    -- if dev2 then
+    --   local object = peopleBag
+    --   local table = UI.getXmlTable()
+    --   table = serializeTable(table)
+    --   object.setLuaScript(table)
+    --   object.interactable = true
+    -- end
 end

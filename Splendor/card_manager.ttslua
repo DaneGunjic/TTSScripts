@@ -10,38 +10,17 @@ function getPlayerGems(player)
     }
 end
 
-function payCost(player, cost)
-    local playerGems = getPlayerGems(player)
-    local goldNeeded = 0
-    for colour, amount in pairs(cost) do
-        local gemColour = COST_COLOUR_NAMES[colour]
-        local playerGemCount = playerGems[gemColour]
-        local shortfall = amount - playerGemCount
-        if shortfall > 0 then
-            goldNeeded = goldNeeded + shortfall
-        end
+function payCost(player, cost, goldCost)
+    for colourCode, value in pairs(cost) do
+        local colour = COST_COLOUR_NAMES[colourCode]
+        moveTokens(playerGemZone(player, colour), bankGemZone(colour), value)
+        changeGemCount(player, colour, -value)
     end
-    if playerGems.gold < goldNeeded then
-        return false
-    end
-    for colour, amount in pairs(cost) do
-        local gemColour = COST_COLOUR_NAMES[colour]
-        local playerGemCount = playerGems[gemColour]
-        local gemsToTake = math.min(amount, playerGemCount)
-        if gemsToTake > 0 then
-            moveTokens(playerGemZone(player, gemColour), bankGemZone(gemColour), gemsToTake)
-            changeGemCount(player, gemColour, -gemsToTake)
-        end
-    end
-    if goldNeeded > 0 then
-        moveTokens(playerGemZone(player, GOLD_NAME), bankGemZone(GOLD_NAME), goldNeeded)
-        changeGemCount(player, GOLD_NAME, -goldNeeded)
-    end
-    return true
+    moveTokens(playerGemZone(player, GOLD_NAME), bankGemZone(GOLD_NAME), goldCost)
+    changeGemCount(player, 'gold', -goldCost)
 end
 
 function playCard(object, player, dealNext)
-    print("playCard")
     local card = parseCard(object)
     local cost = considerDiscount(player, card.cost)
     local payment = checkPayment(player, cost)
@@ -66,7 +45,7 @@ function playCard(object, player, dealNext)
     else
         Player[player].broadcast('You dont have enough tokens to play this card', CHAT_INFO_COLOR)
     end
-    
+
     return false
 end
 
