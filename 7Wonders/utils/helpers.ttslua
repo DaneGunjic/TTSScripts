@@ -100,12 +100,25 @@ function FindNextColor(Color, Direction)
 end
 
 function onChat(message, sender)
+	-- Only allow host to use debug commands
+	if not sender or not sender.host then
+		return true
+	end
+
 	if message:lower() == "end" then
 		local playerName = "Unknown Player"
 		if sender and sender.steam_name then
 			playerName = sender.steam_name
 		end
 		broadcastToAll("Debug: Game ended by " .. playerName, {1, 0.5, 0})
+		EndTheGame()
+		return false
+	elseif message:lower() == "time" then
+		local playerName = "Unknown Player"
+		if sender and sender.steam_name then
+			playerName = sender.steam_name
+		end
+		broadcastToAll("Debug: Timer results triggered by " .. playerName, {1, 0.5, 0})
 		EndTheGame()
 		return false
 	end

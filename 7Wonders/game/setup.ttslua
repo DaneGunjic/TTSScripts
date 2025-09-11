@@ -1,4 +1,5 @@
 function HandleStartGameButtonCo()
+	-- Top right UI
 	updatePhaseUI("Loading", "Please wait")
 	InitializeReadyStatusCircles()
 
@@ -13,8 +14,6 @@ function HandleStartGameButtonCo()
 		-- For now we allow starting the game even with less than 3 players
 		NumberOfPlayers = 3
 	end
-
-	-- UnreadyAllPlayers()
 
 	-- Destroy Setup Board
 	SetupBoard.destruct()
