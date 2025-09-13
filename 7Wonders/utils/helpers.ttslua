@@ -79,22 +79,28 @@ function CanBuildWonderStage(color)
 end
 
 function FindNextColor(Color, Direction)
-  local tempAllPlayers = Player.getPlayers()
-  for i, PlayerInstance in ipairs(tempAllPlayers) do
-    if PlayerInstance.color == Color then
-      if Direction == "Left" then
-        -- Move left around the table (next in array)
-        if i == #tempAllPlayers then
-          return tempAllPlayers[1].color
+  -- Use the correct seating order from Players array and only consider seated players
+  for i, PlayerColor in ipairs(Players) do
+    if PlayerColor == Color then
+      local nextIndex = i
+      repeat
+        if Direction == "Left" then
+          -- Move left around the table (next in array)
+          nextIndex = nextIndex + 1
+          if nextIndex > #Players then
+            nextIndex = 1
+          end
+        else -- "Right"
+          -- Move right around the table (previous in array)
+          nextIndex = nextIndex - 1
+          if nextIndex < 1 then
+            nextIndex = #Players
+          end
         end
-        return tempAllPlayers[i+1].color
-    else -- "Right"
-        -- Move right around the table (previous in array)
-        if i == 1 then
-          return tempAllPlayers[#tempAllPlayers].color
-        end
-        return tempAllPlayers[i-1].color
-      end
+        -- Keep looking until we find a seated player
+      until Player[Players[nextIndex]].seated
+      
+      return Players[nextIndex]
     end
   end
 end
@@ -120,6 +126,42 @@ function onChat(message, sender)
 		end
 		broadcastToAll("Debug: Timer results triggered by " .. playerName, {1, 0.5, 0})
 		EndTheGame()
+		return false
+	elseif message:lower() == "left" then
+		local playerName = "Unknown Player"
+		if sender and sender.steam_name then
+			playerName = sender.steam_name
+		end
+		broadcastToAll("Debug: Forcing card pass LEFT by " .. playerName, {1, 0.5, 0})
+		-- Rotate hands to the left first
+		Wait.time(function()
+			for _, PlayerInstance in ipairs(Player.getPlayers()) do
+				local handObjects = PlayerInstance.getHandObjects()
+				for _, Card in ipairs(handObjects) do
+					RotateHands(Card, PlayerInstance.color, "Left")
+				end
+			end
+		end, 0.1)
+		-- Then force take cards from the right after delay
+		Wait.time(function() ForceTakeCards("Right") end, 1)
+		return false
+	elseif message:lower() == "right" then
+		local playerName = "Unknown Player"
+		if sender and sender.steam_name then
+			playerName = sender.steam_name
+		end
+		broadcastToAll("Debug: Forcing card pass RIGHT by " .. playerName, {1, 0.5, 0})
+		-- Rotate hands to the right first
+		Wait.time(function()
+			for _, PlayerInstance in ipairs(Player.getPlayers()) do
+				local handObjects = PlayerInstance.getHandObjects()
+				for _, Card in ipairs(handObjects) do
+					RotateHands(Card, PlayerInstance.color, "Right")
+				end
+			end
+		end, 0.1)
+		-- Then force take cards from the left after delay
+		Wait.time(function() ForceTakeCards("Left") end, 1)
 		return false
 	end
 

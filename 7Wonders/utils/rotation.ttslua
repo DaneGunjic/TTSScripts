@@ -12,16 +12,20 @@ end
 function ForceTakeCards(Direction)
   -- If Direction is "Right" then find the next player's "Right" zone
   -- If Direction is "Left" then find the previous player's "Left" zone
-  for i, PlayerInstance in ipairs(Player.getPlayers()) do
-    local OppositeDirection = (Direction == "Right") and "Left" or "Right"
-    local NextColor = FindNextColor(PlayerInstance.color, Direction)
-    local CardsToTake = PlayerZones[NextColor][OppositeDirection].getObjects()
+  -- Use correct seating order from Players array
+  for i, PlayerColor in ipairs(Players) do
+    -- Only process seated players
+    if Player[PlayerColor].seated then
+      local OppositeDirection = (Direction == "Right") and "Left" or "Right"
+      local NextColor = FindNextColor(PlayerColor, Direction)
+      local CardsToTake = PlayerZones[NextColor][OppositeDirection].getObjects()
 
-    for _, Cards in ipairs(CardsToTake) do
-      if Cards.type == 'Deck' then
-        Cards.deal(#Cards.getObjects(), PlayerInstance.color)
-      elseif Cards.type == 'Card' then
-        Cards.deal(1, PlayerInstance.color)
+      for _, Cards in ipairs(CardsToTake) do
+        if Cards.type == 'Deck' then
+          Cards.deal(#Cards.getObjects(), PlayerColor)
+        elseif Cards.type == 'Card' then
+          Cards.deal(1, PlayerColor)
+        end
       end
     end
   end

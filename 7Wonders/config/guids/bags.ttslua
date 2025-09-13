@@ -151,3 +151,6 @@ DebtBags = {
 
 -- [[BAGS | FRONTIERS]]
 FrontiersBag = getObjectFromGUID("f46e91")
+
+-- [[BAGS | RECONSTRUCTION]]
+ReconstructionTokenBag = getObjectFromGUID("4fb029")

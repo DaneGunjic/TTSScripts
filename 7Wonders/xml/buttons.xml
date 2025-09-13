@@ -56,7 +56,6 @@
     <!-- Coin Buttons Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Coin1" onClick="DoCoinUI" id="Coin1White" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -70,7 +69,6 @@
     <!-- Military Victory/Defeat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Victory1" onClick="DoMilitaryUI" id="Victory1White" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -88,7 +86,6 @@
     <!-- Naval Combat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="NavalVictory1" onClick="DoNavalUI" id="NavalVictory1White" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -110,7 +107,6 @@
     <!-- Debt Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Debt1" onClick="DoDebtUI" id="Debt1White" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -123,14 +119,28 @@
         </GridLayout>
       </VerticalLayout>
     </Panel>
+    <!-- Edifice Section -->
+    <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+      <VerticalLayout>
+        <GridLayout cellSize="55 55" spacing="8 8">
+          <Button icon="EdificeAge1" onClick="DoEdificeUI" id="EdificeAge1White" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge2" onClick="DoEdificeUI" id="EdificeAge2White" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge3" onClick="DoEdificeUI" id="EdificeAge3White" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+        </GridLayout>
+      </VerticalLayout>
+    </Panel>
     <!-- Diplomacy & Boarding Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Diplomacy" onClick="DoOtherUI" id="DiplomacyWhite" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
           <Button icon="Boarding" onClick="DoOtherUI" id="BoardingWhite" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="Reconstruction" onClick="DoOtherUI" id="RuinsWhite" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
         </GridLayout>
       </VerticalLayout>
@@ -142,7 +152,7 @@
     <!-- Coin Buttons Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Coin1" onClick="DoCoinUI" id="Coin1Red" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -156,7 +166,7 @@
     <!-- Military Victory/Defeat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Victory1" onClick="DoMilitaryUI" id="Victory1Red" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -174,7 +184,7 @@
     <!-- Naval Combat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="NavalVictory1" onClick="DoNavalUI" id="NavalVictory1Red" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -196,7 +206,7 @@
     <!-- Debt Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Debt1" onClick="DoDebtUI" id="Debt1Red" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -209,14 +219,30 @@
         </GridLayout>
       </VerticalLayout>
     </Panel>
+    <!-- Edifice Section -->
+    <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+      <VerticalLayout>
+
+        <GridLayout cellSize="55 55" spacing="8 8">
+          <Button icon="EdificeAge1" onClick="DoEdificeUI" id="EdificeAge1Red" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge2" onClick="DoEdificeUI" id="EdificeAge2Red" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge3" onClick="DoEdificeUI" id="EdificeAge3Red" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+        </GridLayout>
+      </VerticalLayout>
+    </Panel>
     <!-- Diplomacy & Boarding Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Diplomacy" onClick="DoOtherUI" id="DiplomacyRed" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
           <Button icon="Boarding" onClick="DoOtherUI" id="BoardingRed" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="Reconstruction" onClick="DoOtherUI" id="RuinsRed" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
         </GridLayout>
       </VerticalLayout>
@@ -228,7 +254,7 @@
     <!-- Coin Buttons Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Coin1" onClick="DoCoinUI" id="Coin1Yellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
           <Button icon="Coin3" onClick="DoCoinUI" id="Coin3Yellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
@@ -239,7 +265,7 @@
     <!-- Military Victory/Defeat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Victory1" onClick="DoMilitaryUI" id="Victory1Yellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
           <Button icon="Victory3" onClick="DoMilitaryUI" id="Victory3Yellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
@@ -252,7 +278,7 @@
     <!-- Naval Combat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="NavalVictory1" onClick="DoNavalUI" id="NavalVictory1Yellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
           <Button icon="NavalVictory3" onClick="DoNavalUI" id="NavalVictory3Yellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
@@ -267,7 +293,7 @@
     <!-- Debt Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Debt1" onClick="DoDebtUI" id="Debt1Yellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
           <Button icon="Debt2" onClick="DoDebtUI" id="Debt2Yellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
@@ -276,13 +302,25 @@
         </GridLayout>
       </VerticalLayout>
     </Panel>
+    <!-- Edifice Section -->
+    <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+      <VerticalLayout>
+
+        <GridLayout cellSize="55 55" spacing="8 8">
+          <Button icon="EdificeAge1" onClick="DoEdificeUI" id="EdificeAge1Yellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
+          <Button icon="EdificeAge2" onClick="DoEdificeUI" id="EdificeAge2Yellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
+          <Button icon="EdificeAge3" onClick="DoEdificeUI" id="EdificeAge3Yellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
+        </GridLayout>
+      </VerticalLayout>
+    </Panel>
     <!-- Diplomacy & Boarding Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Diplomacy" onClick="DoOtherUI" id="DiplomacyYellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
           <Button icon="Boarding" onClick="DoOtherUI" id="BoardingYellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
+          <Button icon="Reconstruction" onClick="DoOtherUI" id="RuinsYellow" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold" />
         </GridLayout>
       </VerticalLayout>
     </Panel>
@@ -293,7 +331,7 @@
     <!-- Coin Buttons Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Coin1" onClick="DoCoinUI" id="Coin1Green" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -307,7 +345,7 @@
     <!-- Military Victory/Defeat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Victory1" onClick="DoMilitaryUI" id="Victory1Green" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -325,7 +363,7 @@
     <!-- Naval Combat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="NavalVictory1" onClick="DoNavalUI" id="NavalVictory1Green" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -347,7 +385,7 @@
     <!-- Debt Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Debt1" onClick="DoDebtUI" id="Debt1Green" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -360,14 +398,30 @@
         </GridLayout>
       </VerticalLayout>
     </Panel>
+    <!-- Edifice Section -->
+    <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+      <VerticalLayout>
+
+        <GridLayout cellSize="55 55" spacing="8 8">
+          <Button icon="EdificeAge1" onClick="DoEdificeUI" id="EdificeAge1Green" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge2" onClick="DoEdificeUI" id="EdificeAge2Green" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge3" onClick="DoEdificeUI" id="EdificeAge3Green" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+        </GridLayout>
+      </VerticalLayout>
+    </Panel>
     <!-- Diplomacy & Boarding Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Diplomacy" onClick="DoOtherUI" id="DiplomacyGreen" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
           <Button icon="Boarding" onClick="DoOtherUI" id="BoardingGreen" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="Reconstruction" onClick="DoOtherUI" id="RuinsGreen" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
         </GridLayout>
       </VerticalLayout>
@@ -379,7 +433,7 @@
     <!-- Coin Buttons Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Coin1" onClick="DoCoinUI" id="Coin1Blue" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -393,7 +447,7 @@
     <!-- Military Victory/Defeat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Victory1" onClick="DoMilitaryUI" id="Victory1Blue" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -411,7 +465,7 @@
     <!-- Naval Combat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="NavalVictory1" onClick="DoNavalUI" id="NavalVictory1Blue" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -433,7 +487,7 @@
     <!-- Debt Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Debt1" onClick="DoDebtUI" id="Debt1Blue" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -446,14 +500,30 @@
         </GridLayout>
       </VerticalLayout>
     </Panel>
+    <!-- Edifice Section -->
+    <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+      <VerticalLayout>
+
+        <GridLayout cellSize="55 55" spacing="8 8">
+          <Button icon="EdificeAge1" onClick="DoEdificeUI" id="EdificeAge1Blue" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge2" onClick="DoEdificeUI" id="EdificeAge2Blue" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge3" onClick="DoEdificeUI" id="EdificeAge3Blue" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+        </GridLayout>
+      </VerticalLayout>
+    </Panel>
     <!-- Diplomacy & Boarding Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Diplomacy" onClick="DoOtherUI" id="DiplomacyBlue" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
           <Button icon="Boarding" onClick="DoOtherUI" id="BoardingBlue" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="Reconstruction" onClick="DoOtherUI" id="RuinsBlue" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
         </GridLayout>
       </VerticalLayout>
@@ -465,7 +535,7 @@
     <!-- Coin Buttons Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Coin1" onClick="DoCoinUI" id="Coin1Purple" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -479,7 +549,7 @@
     <!-- Military Victory/Defeat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Victory1" onClick="DoMilitaryUI" id="Victory1Purple" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -497,7 +567,7 @@
     <!-- Naval Combat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="NavalVictory1" onClick="DoNavalUI" id="NavalVictory1Purple" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -519,7 +589,7 @@
     <!-- Debt Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Debt1" onClick="DoDebtUI" id="Debt1Purple" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -532,14 +602,30 @@
         </GridLayout>
       </VerticalLayout>
     </Panel>
+    <!-- Edifice Section -->
+    <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+      <VerticalLayout>
+
+        <GridLayout cellSize="55 55" spacing="8 8">
+          <Button icon="EdificeAge1" onClick="DoEdificeUI" id="EdificeAge1Purple" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge2" onClick="DoEdificeUI" id="EdificeAge2Purple" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge3" onClick="DoEdificeUI" id="EdificeAge3Purple" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+        </GridLayout>
+      </VerticalLayout>
+    </Panel>
     <!-- Diplomacy & Boarding Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Diplomacy" onClick="DoOtherUI" id="DiplomacyPurple" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
           <Button icon="Boarding" onClick="DoOtherUI" id="BoardingPurple" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="Reconstruction" onClick="DoOtherUI" id="RuinsPurple" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
         </GridLayout>
       </VerticalLayout>
@@ -551,7 +637,7 @@
     <!-- Coin Buttons Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FFD700" fontSize="14" fontStyle="Bold">COINS</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Coin1" onClick="DoCoinUI" id="Coin1Pink" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -565,7 +651,7 @@
     <!-- Military Victory/Defeat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF4444" fontSize="14" fontStyle="Bold">MILITARY CONFLICT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Victory1" onClick="DoMilitaryUI" id="Victory1Pink" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -583,7 +669,7 @@
     <!-- Naval Combat Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#4169E1" fontSize="14" fontStyle="Bold">NAVAL COMBAT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="NavalVictory1" onClick="DoNavalUI" id="NavalVictory1Pink" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -605,7 +691,7 @@
     <!-- Debt Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#FF6B6B" fontSize="14" fontStyle="Bold">DEBT</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Debt1" onClick="DoDebtUI" id="Debt1Pink" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
@@ -618,14 +704,30 @@
         </GridLayout>
       </VerticalLayout>
     </Panel>
+    <!-- Edifice Section -->
+    <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
+      <VerticalLayout>
+
+        <GridLayout cellSize="55 55" spacing="8 8">
+          <Button icon="EdificeAge1" onClick="DoEdificeUI" id="EdificeAge1Pink" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge2" onClick="DoEdificeUI" id="EdificeAge2Pink" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="EdificeAge3" onClick="DoEdificeUI" id="EdificeAge3Pink" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+        </GridLayout>
+      </VerticalLayout>
+    </Panel>
     <!-- Diplomacy & Boarding Section -->
     <Panel color="rgba(0,0,0,0.9)" padding="8 8 8 8">
       <VerticalLayout>
-        <Text color="#9B59B6" fontSize="14" fontStyle="Bold">OTHER</Text>
+
         <GridLayout cellSize="55 55" spacing="8 8">
           <Button icon="Diplomacy" onClick="DoOtherUI" id="DiplomacyPink" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
           <Button icon="Boarding" onClick="DoOtherUI" id="BoardingPink" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
+          </Button>
+          <Button icon="Reconstruction" onClick="DoOtherUI" id="RuinsPink" height="50" width="50" color="#000000" textColor="#FFFFFF" fontSize="12" fontStyle="Bold">
           </Button>
         </GridLayout>
       </VerticalLayout>
