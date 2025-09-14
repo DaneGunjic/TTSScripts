@@ -1,17 +1,5 @@
 -- Main game file that includes all other components
 
--- Audio playlist for background music
-Playlist = {
-  {
-    url = "https://drive.google.com/uc?export=download&id=1KH22V6I4D-fVnoJPGAxQu2QGLMUxIi1x",
-    title = "Geoff Knorr - England (The Medieval Era)"
-  },
-  {
-    url = "https://drive.google.com/uc?export=download&id=12sx7MsrAPCT4Ldant-IPH0zanTl9Q2Tt",
-    title = "Geoff Knorr  - Ottoman (The Medieval Era)"
-  }
-}
-
 #include !\Splendor\constants.ttslua
 #include !\Splendor\game_setup.ttslua
 #include !\Splendor\gem_manager.ttslua
@@ -41,11 +29,6 @@ function onLoad()
 
     Wait.frames(function () getXmlTable() end, 50)
     Wait.frames(function () checkHost() end, 50)
-
-    -- Set up and start playlist with shuffle
-    MusicPlayer.setPlaylist(Playlist)
-    MusicPlayer.shuffle = true
-    MusicPlayer.play()
 
     -- if dev2 then
     --   local object = peopleBag

@@ -21,7 +21,7 @@ function payCost(player, cost, goldCost)
 end
 
 function playCard(object, player, dealNext)
-    print("Deal next is " .. tostring(dealNext))
+    --print("Deal next is " .. tostring(dealNext))
     local card = parseCard(object)
     local cost = considerDiscount(player, card.cost)
     local payment = checkPayment(player, cost)
