@@ -99,7 +99,7 @@ function FindNextColor(Color, Direction)
         end
         -- Keep looking until we find a seated player
       until Player[Players[nextIndex]].seated
-      
+
       return Players[nextIndex]
     end
   end
@@ -111,7 +111,7 @@ function onChat(message, sender)
 		return true
 	end
 
-	if message:lower() == "end" then
+	if message:lower() == ">end" then
 		local playerName = "Unknown Player"
 		if sender and sender.steam_name then
 			playerName = sender.steam_name
@@ -119,7 +119,7 @@ function onChat(message, sender)
 		broadcastToAll("Debug: Game ended by " .. playerName, {1, 0.5, 0})
 		EndTheGame()
 		return false
-	elseif message:lower() == "time" then
+	elseif message:lower() == ">time" then
 		local playerName = "Unknown Player"
 		if sender and sender.steam_name then
 			playerName = sender.steam_name
@@ -127,7 +127,7 @@ function onChat(message, sender)
 		broadcastToAll("Debug: Timer results triggered by " .. playerName, {1, 0.5, 0})
 		EndTheGame()
 		return false
-	elseif message:lower() == "left" then
+	elseif message:lower() == ">left" then
 		local playerName = "Unknown Player"
 		if sender and sender.steam_name then
 			playerName = sender.steam_name
@@ -145,7 +145,7 @@ function onChat(message, sender)
 		-- Then force take cards from the right after delay
 		Wait.time(function() ForceTakeCards("Right") end, 1)
 		return false
-	elseif message:lower() == "right" then
+	elseif message:lower() == ">right" then
 		local playerName = "Unknown Player"
 		if sender and sender.steam_name then
 			playerName = sender.steam_name

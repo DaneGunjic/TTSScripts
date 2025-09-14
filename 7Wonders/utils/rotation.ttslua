@@ -1,4 +1,6 @@
 function RotateHands(Card, Color, Direction)
+  -- We don't need the next color, we always place our cards into the closest zone to the player
+  -- When taking them, we find the next player's appropriate zone
   --local NextColor = FindNextColor(Color, Direction)
   --print("Passing card from "..Color.." to "..NextColor.." ("..Direction..")")
   Card.setPosition(PlayerZones[Color][Direction].getPosition())
@@ -10,8 +12,6 @@ function RotateHands(Card, Color, Direction)
 end
 
 function ForceTakeCards(Direction)
-  -- If Direction is "Right" then find the next player's "Right" zone
-  -- If Direction is "Left" then find the previous player's "Left" zone
   -- Use correct seating order from Players array
   for i, PlayerColor in ipairs(Players) do
     -- Only process seated players
