@@ -87,7 +87,7 @@ function DealWonders()
 	end
 end
 
-function ClearWonderButtons()
+function HideReadyButton()
 	for _, color in ipairs(getSeatedPlayers()) do
 		-- Hide the UI ready button for this player instead of clearing physical buttons
 		UI.setAttribute("ReadyButton" .. color, "active", "false")

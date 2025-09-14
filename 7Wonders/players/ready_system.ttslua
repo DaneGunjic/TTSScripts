@@ -157,7 +157,7 @@ function UnreadyPlayerIfNeeded(color, zone)
 	end
 end
 
-function CreateReadyButtons()
+function ShowReadyButtons()
 	for _, color in ipairs(getSeatedPlayers()) do
 		-- Show the UI ready button for this player instead of creating physical button
 		UI.setAttribute("ReadyButton" .. color, "active", "true")

@@ -56,7 +56,7 @@ PhaseHandlers = {
   ResolveCardAction = {
     name = "Resolve Card Action",
     next = function(self)
-      ClearWonderButtons()
+      HideReadyButton()
 
       -- Execute transition based on phase combination
       local transitionKey = self.PhaseBeforeResolving .. "->" .. self.PhaseAfterResolving
@@ -140,7 +140,7 @@ PhaseHandlers = {
       PhaseHandlers[GameState].PhaseAfterResolving = afterPhase
       PhaseHandlers[GameState].PhaseBeforeResolving = beforePhase
       ResolvePlayerActions()
-      CreateReadyButtons()
+      ShowReadyButtons()
     end
   },
 
@@ -241,7 +241,7 @@ PhaseHandlers = {
     name = "Edifice Resolution",
     description = "Resolve project rewards",
     next = function()
-      ClearWonderButtons()
+      HideReadyButton()
       PrepareConflictResolution()
     end
   },
@@ -250,7 +250,7 @@ PhaseHandlers = {
     name = "Conflict Resolution",
     description = "Take victory/defeat tokens",
     next = function()
-      ClearWonderButtons()
+      HideReadyButton()
       if ExpansionConfig.Armada then
         PrepareNavalCombat()
       elseif ExpansionConfig.Leaders.Base then
@@ -279,7 +279,7 @@ PhaseHandlers = {
     name = "Naval Combat",
     description = "Take victory/defeat tokens",
     next = function()
-      ClearWonderButtons()
+      HideReadyButton()
 
       if ExpansionConfig.Leaders.Base and CurrentAge < 3 then
         -- Leader selection
@@ -648,7 +648,7 @@ function PrepareEdificeStage()
   MusicPlayer.setCurrentAudioclip({url=Audio.Edifice, title = "Edifice"})
   MusicPlayer.pause()
 
-  CreateReadyButtons()
+  ShowReadyButtons()
   updatePhaseUI("Edifice", "Take rewards/penalities")
 end
 
@@ -662,7 +662,7 @@ function PrepareConflictResolution()
   MusicPlayer.setCurrentAudioclip({url=Audio.Conflict, title = "Conflict"})
   MusicPlayer.pause()
 
-  CreateReadyButtons()
+  ShowReadyButtons()
   updatePhaseUI("Conflict", "Take victory/defeat tokens")
 end
 
@@ -676,7 +676,7 @@ function PrepareNavalCombat()
   MusicPlayer.setCurrentAudioclip({url=Audio.NavalCombat, title = "Naval Combat"})
   MusicPlayer.pause()
 
-  CreateReadyButtons()
+  ShowReadyButtons()
   updatePhaseUI("Naval combat", "Take victory/defeat tokens")
 end
 
@@ -748,7 +748,7 @@ function sharedTransitionToCardAction(afterPhase, beforePhase)
   PhaseHandlers[GameState].PhaseAfterResolving = afterPhase
   PhaseHandlers[GameState].PhaseBeforeResolving = beforePhase
   ResolvePlayerActions()
-  CreateReadyButtons()
+  ShowReadyButtons()
 end
 
 function prepareAgeStage(ageNumber, deckKey, imageUrl, gameState)
