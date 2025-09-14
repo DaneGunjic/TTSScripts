@@ -86,6 +86,8 @@ IslandBags = {
   Level3 = getObjectFromGUID("df39ee")
 }
 
+IslandBoardBag = getObjectFromGUID("60b94c")
+
 DockyardBag = getObjectFromGUID("5b9a9c")
 
 -- [[BAGS | EDIFICE]]

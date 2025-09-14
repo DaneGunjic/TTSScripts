@@ -66,18 +66,6 @@ function DiscardPlayerHands()
 	end
 end
 
-function SpendResources(color, cost)
-    -- Resource deduction logic
-end
-
-function AddToTableau(color, card)
-    -- Card placement logic
-end
-
-function CanBuildWonderStage(color)
-    -- Wonder stage validation
-end
-
 function FindNextColor(Color, Direction)
   -- Use the correct seating order from Players array and only consider seated players
   for i, PlayerColor in ipairs(Players) do

@@ -73,7 +73,6 @@ function StorePlayerShip(player, shipType, shipObject)
 end
 
 function DealArmada()
-	--print("DealArmada")
 	for _, player in ipairs(getSeatedPlayers()) do
 		DockyardBag.takeObject({
 			position = PlayerInfo[player].DockyardPos,

@@ -4,11 +4,10 @@
 -- Timer data structure
 PlayerTimers = {
   White = { totalTime = 0, startTime = nil, isRunning = false },
-  Brown = { totalTime = 0, startTime = nil, isRunning = false },
   Red = { totalTime = 0, startTime = nil, isRunning = false },
-  Orange = { totalTime = 0, startTime = nil, isRunning = false },
   Yellow = { totalTime = 0, startTime = nil, isRunning = false },
   Green = { totalTime = 0, startTime = nil, isRunning = false },
+  Pink = { totalTime = 0, startTime = nil, isRunning = false },
   Blue = { totalTime = 0, startTime = nil, isRunning = false },
   Purple = { totalTime = 0, startTime = nil, isRunning = false }
 }

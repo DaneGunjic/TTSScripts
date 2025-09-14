@@ -598,6 +598,7 @@ function HandleStartGameButtonCo()
 	-- [[DEAL RANDOM ARMADA BOARDS AND SHIPS]]
 	if ExpansionConfig.Armada then
 		DealArmada()
+		DealIslandBoards()
 	end
 
 	-- Play a sound

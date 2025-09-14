@@ -159,42 +159,36 @@ end
 
 function CreateReadyButtons()
 	for _, color in ipairs(getSeatedPlayers()) do
-		local flipped = IsPlayerWonderFlipped(color)
-		--print(flipped)
-		local tempPosition = flipped and {0, -0.2, -0.8} or {0, 0.2, -0.8}
-		local tempRotation = flipped and {0, 0, 180} or {0, 0, 0}
-
-		DefaultButtonParams.width = 600
-		DefaultButtonParams.color = {1,1,1,1}
-		DefaultButtonParams.font_color = {0, 0, 0}
-		DefaultButtonParams.label = "Ready"
-		DefaultButtonParams.position = tempPosition
-		DefaultButtonParams.rotation = tempRotation
-		DefaultButtonParams.scale = {0.3, 0.3, 0.3}
-		DefaultButtonParams.font_size = 200
-		DefaultButtonParams.click_function = "ReadyUpManual"
-
-		local debug = GetPlayerCurrentWonder(color)
-		GetPlayerCurrentWonder(color).createButton(DefaultButtonParams)
-		--print("CREATED WONDER READY BUTTON")
+		-- Show the UI ready button for this player instead of creating physical button
+		UI.setAttribute("ReadyButton" .. color, "active", "true")
+		-- Reset button to initial state (Not Ready, red color)
+		UI.setAttribute("ReadyButton" .. color, "text", "Not Ready")
+		UI.setAttribute("ReadyButton" .. color, "color", "#FF0000")
+		--print("SHOWED UI READY BUTTON FOR " .. color)
 	end
 end
 
-function ReadyUpManual(obj, color, alt)
-	if not IsObjectInPlayerWonderZone(obj, color) then
-		broadcastToColor("You can't make other players ready!", color, {1, 0, 0})
-		return
-	end
+-- UI Ready Button Click Handler
+function ToggleReady(player, value, id)
+	TogglePlayerReady(player.color)
+end
 
-	-- Buttons might get removed after we ready up
-	-- So change the value first, based on the opposite of what it is now
-	-- If we aren't ready when we click it will be set to "Undo"
-	-- Only after that will we change to Ready
-	local wonder = GetPlayerCurrentWonder(color)
-	for i, _ in ipairs(wonder.getButtons()) do
-		local newLabel = ReadyList[color] and "Ready" or "Undo"
-		wonder.editButton({index = i-1, label = newLabel})
+-- Helper function to toggle ready state and update UI
+function TogglePlayerReady(color)
+	-- Only allow players to toggle their own ready state
+	if Player[color].seated then
+		-- Toggle the ready state
+		ReadyUp(Player[color])
+		
+		-- Update UI button appearance based on new state
+		if ReadyList[color] then
+			-- Player is now ready - green button
+			UI.setAttribute("ReadyButton" .. color, "text", "Ready")
+			UI.setAttribute("ReadyButton" .. color, "color", "#00AA00")
+		else
+			-- Player is now not ready - red button
+			UI.setAttribute("ReadyButton" .. color, "text", "Not Ready")
+			UI.setAttribute("ReadyButton" .. color, "color", "#FF0000")
+		end
 	end
-
-	ReadyUp(Player[color])
 end

@@ -13,7 +13,7 @@
 
 <!-- Timer panel will be created dynamically at game end -->
 
-<!-- Tutorial Text - Always visible -->
+<!-- Tutorial Text -->
 <Panel id="TutorialPanel" color="#000000FF" padding="5 5 5 5" width="600" height="50" rectAlignment="MiddleCenter" offsetXY="0 -440">
   <Text id="TutorialText" text="TUTORIAL IN THE NOTEBOOK" fontSize="32" fontStyle="Bold" color="#FFD700FF"/>
 </Panel>
@@ -48,6 +48,30 @@
 </Button>
 <!-- PINK TOGGLE -->
 <Button id="MenuTogglePink" onClick="ToggleGameMenuPink" rectAlignment="MiddleRight" offsetXY="-10 0" height="400" width="40" fontSize="20" fontStyle="Bold" color="#FFC0CB80" textColor="#000000FF" visibility="Pink" textAlignment="MiddleCenter">◀
+</Button>
+
+<!-- Ready Buttons - Player Specific (Initially Hidden) -->
+
+<!-- WHITE READY -->
+<Button id="ReadyButtonWhite" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="White" textAlignment="MiddleCenter">Not Ready
+</Button>
+<!-- RED READY -->
+<Button id="ReadyButtonRed" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Red" textAlignment="MiddleCenter">Not Ready
+</Button>
+<!-- YELLOW READY -->
+<Button id="ReadyButtonYellow" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Yellow" textAlignment="MiddleCenter">Not Ready
+</Button>
+<!-- GREEN READY -->
+<Button id="ReadyButtonGreen" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Green" textAlignment="MiddleCenter">Not Ready
+</Button>
+<!-- BLUE READY -->
+<Button id="ReadyButtonBlue" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Blue" textAlignment="MiddleCenter">Not Ready
+</Button>
+<!-- PURPLE READY -->
+<Button id="ReadyButtonPurple" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Purple" textAlignment="MiddleCenter">Not Ready
+</Button>
+<!-- PINK READY -->
+<Button id="ReadyButtonPink" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Pink" textAlignment="MiddleCenter">Not Ready
 </Button>
 
 <!-- Collapsible Game Menu Panels - Player Specific -->
