@@ -179,7 +179,7 @@ function TogglePlayerReady(color)
 	if Player[color].seated then
 		-- Toggle the ready state
 		ReadyUp(Player[color])
-		
+
 		-- Update UI button appearance based on new state
 		if ReadyList[color] then
 			-- Player is now ready - green button

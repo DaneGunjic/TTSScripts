@@ -10,17 +10,17 @@ function MoveShip(player_color, ship_type)
     local ship = PlayerShips[player_color][ship_type]
     if ship then
         ship.setPosition(ship.getPosition() + ship.getTransformForward() * -1.4)
-        broadcastToColor("Ship moved.", player_color, {0.5, 0.5, 0.5})
+        --broadcastToColor("Ship moved.", player_color, {0.5, 0.5, 0.5})
     end
 
     local reward = ShipRewards[ship_type][movement_count + 1]
     if reward then
-        if reward.coins then
-            AddCoins(player_color, reward.coins)
-        end
         if reward.message then
             local message = string.gsub(reward.message, "{player_name}", Player[player_color].steam_name)
-            broadcastToAll(message, {0.5, 0.5, 0.5})
+            printToAll(message, player_color)
+        end
+        if reward.coins then
+            AddCoins(player_color, reward.coins)
         end
     end
 end
@@ -39,7 +39,7 @@ function MoveShipBackward(player_color, ship_type)
         ship.setPosition(ship.getPosition() + ship.getTransformForward() * 1.4)
     end
 
-    broadcastToColor("Ship moved backward.", player_color, {0.5, 0.5, 0.5})
+    printToAll(Player[player_color].steam_name .. " has moved their " .. ship_type:lower() .. " ship backwards", Player[player_color].color)
 end
 
 function StorePlayerShip(player, shipType, shipObject)

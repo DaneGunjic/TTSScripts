@@ -68,9 +68,7 @@ function DealWonders()
 
 	-- [[SET CAMERA POSITIONS]]
 	for _, color in ipairs(getSeatedPlayers()) do
-    -- Verify the player exists in CameraSettings
     if CameraSettings[color] then
-      -- Safely get the wonder position (assuming it exists in _G)
       local wonderPos = nil
       if PlayerInfo[color] then
         wonderPos = PlayerInfo[color].WonderPos

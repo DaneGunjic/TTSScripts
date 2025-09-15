@@ -1,12 +1,34 @@
 ShipRewards = {
-    Red = { message = "{player_name} advanced their red ship!" },
-    Yellow = {
-        [2] = { coins = 2, message = "{player_name} has triggered tax -1!" },
-        [3] = { coins = 3 },
-        [4] = { coins = 4, message = "{player_name} has triggered tax -2!" },
-        [5] = { coins = 5 },
-        [6] = { message = "{player_name} has triggered tax -4!" }
+    Red = {
+        [1] = { message = "{player_name} advanced their red ship!" },
+        [2] = { message = "{player_name} advanced their red ship!" },
+        [3] = { message = "{player_name} advanced their red ship!" },
+        [4] = { message = "{player_name} advanced their red ship!" },
+        [5] = { message = "{player_name} advanced their red ship!" },
+        [6] = { message = "{player_name} advanced their red ship!" }
     },
-    Blue = { message = "{player_name} advanced their blue ship!" },
-    Green = { message = "{player_name} advanced their green ship!" }
+    Yellow = {
+        [1] = { message = "{player_name} advanced their yellow ship!" },
+        [2] = { coins = 2, message = "{player_name} advanced their yellow ship and triggered tax -1!" },
+        [3] = { coins = 3, message = "{player_name} advanced their yellow ship!"},
+        [4] = { coins = 4, message = "{player_name} advanced their yellow ship and triggered tax -2!" },
+        [5] = { coins = 5, message = "{player_name} advanced their yellow ship!" },
+        [6] = { message = "{player_name} advanced their yellow ship and triggered tax -4!" }
+    },
+    Blue = {
+        [1] = { message = "{player_name} advanced their blue ship!" },
+        [2] = { message = "{player_name} advanced their blue ship!" },
+        [3] = { message = "{player_name} advanced their blue ship!" },
+        [4] = { message = "{player_name} advanced their blue ship!" },
+        [5] = { message = "{player_name} advanced their blue ship!" },
+        [6] = { message = "{player_name} advanced their blue ship!" }
+    },
+    Green = {
+        [1] = { message = "{player_name} advanced their green ship!" },
+        [2] = { message = "{player_name} advanced their green ship and is exploring islands level 1!" },
+        [3] = { message = "{player_name} advanced their green ship!" },
+        [4] = { message = "{player_name} advanced their green ship and is exploring islands level 2!" },
+        [5] = { message = "{player_name} advanced their green ship!" },
+        [6] = { message = "{player_name} advanced their green ship and is exploring islands level 3!" }
+    }
 }

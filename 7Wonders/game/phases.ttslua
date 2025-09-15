@@ -311,10 +311,6 @@ function ValidatePhaseHandler(phaseName)
   return true
 end
 
-function LogPhaseTransition(fromPhase, toPhase)
-  print(string.format("Phase transition: %s -> %s", fromPhase or "Unknown", toPhase or "Unknown"))
-end
-
 function TransitionPhase()
   --print(string.format("TransitionPhase: %d/%d players ready", NumberOfReadyPlayers, NumberOfPlayers))
 
@@ -357,7 +353,6 @@ function ResolvePlayerActions()
     --print(string.format("%s selected action: %s", color, action))
 
     local resolver = ActionResolvers[action]
-    print(resolver)
     if resolver then
       local success, error = pcall(resolver, color)
       if not success then
@@ -398,6 +393,10 @@ function ResolveBuyAction(color)
   end
 
   if card_object then
+    -- Add chat message for buy action
+    local card_name = card_object.getName()
+    printToAll(Player[color].steam_name .. " constructed " .. card_name, Player[color].color)
+
     local new_pos = tile.getPosition() + tile.getTransformRight() * -3 + Vector(0, 2, 0)
     card_object.setPosition(new_pos)
 
@@ -410,12 +409,15 @@ function ResolveBuyAction(color)
 end
 
 function ResolveSellAction(color)
-  printToAll(Player[color].steam_name .. " gained 3 coins for selling a card", {r=0.5, g=0.5, b=0.5})
+  printToAll(Player[color].steam_name .. " sold a card", Player[color].color)
   AddCoins(color, 3, true)
   DiscardPlayerActionCard(color)
 end
 
 function ResolveBuildWonderAction(color)
+  -- Add chat message for wonder building
+  printToAll(Player[color].steam_name .. " built a wonder stage", Player[color].color)
+
   local data = PlayerCardHolder[color]
   local objects = data.Zone.getObjects()
 
