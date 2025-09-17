@@ -212,7 +212,8 @@ function HandleFlipButton(obj, color, alt)
 		local tempDefaultRot = {table.unpack(PlayerInfo[color].ComponentRotation)}
 		local tempCurrentRot = RandomWonderObj[color].getRotation()
 
-		-- Flipped object have the same height in-game, but actually offset according to their pivot point, so we add 0.2 so the Wonder keeps its position-
+		-- Flipped object have the same height in-game,
+		-- but actually offset according to their pivot point, so we add 0.2 so the Wonder keeps its position
 		local tempFlippedPos = {
 			RandomWonderObj[color].getPosition().x,
 			RandomWonderObj[color].getPosition().y + 0.2,
@@ -230,12 +231,12 @@ function HandleFlipButton(obj, color, alt)
 			RandomWonderObj[color].setPosition(tempFlippedPos)
 			RandomWonderObj[color].editButton({
 				index          = 0,
-				position       = {0, 0, -0.5},
+				position       = {0, -0.1, -0.5},
 				rotation       = {0, 0, 180}
 			})
 			RandomWonderObj[color].editButton({
 				index          = 1,
-				position       = {0, 0, 0},
+				position       = {0, -0.1, 0},
 				rotation       = {0, 0, 180}
 			})
 		else
@@ -247,12 +248,12 @@ function HandleFlipButton(obj, color, alt)
 			RandomWonderObj[color].setPosition(tempFlippedPos)
 			RandomWonderObj[color].editButton({
 				index          = 0,
-				position       = {0, 0.2, -0.5},
+				position       = {0, 0.3, -0.5},
 				rotation       = {0, 0, 0}
 			})
 			RandomWonderObj[color].editButton({
 				index          = 1,
-				position       = {0, 0.2, 0},
+				position       = {0, 0.3, 0},
 				rotation       = {0, 0, 0}
 			})
 		end
@@ -286,22 +287,22 @@ function HandleFlipButton(obj, color, alt)
 			for i, wonder in ipairs(DraftWonders[color]) do
 				wonder.editButton({
 					index          = 0,
-					position       = {0, 0, -0.5},
+					position       = {0, -0.1, -0.5},
 					rotation       = {0, 0, 180}
 				})
 				wonder.editButton({
 					index          = 1,
-					position       = {0, 0, 0},
+					position       = {0, -0.1, 0},
 					rotation       = {0, 0, 180}
 				})
 				wonder.editButton({
 					index          = 2,
-					position       = {1, 0, 0},
+					position       = {1, -0.1, 0},
 					rotation       = {0, 0, 180}
 				})
 				wonder.editButton({
 					index          = 3,
-					position       = {-1, 0, 0},
+					position       = {-1, -0.1, 0},
 					rotation       = {0, 0, 180}
 				})
 			end
@@ -313,22 +314,22 @@ function HandleFlipButton(obj, color, alt)
 			for i, wonder in ipairs(DraftWonders[color]) do
 				wonder.editButton({
 					index          = 0,
-					position       = {0, 0.2, -0.5},
+					position       = {0, 0.3, -0.5},
 					rotation       = {0, 0, 0}
 				})
 				wonder.editButton({
 					index          = 1,
-					position       = {0, 0.2, 0},
+					position       = {0, 0.3, 0},
 					rotation       = {0, 0, 0}
 				})
 				wonder.editButton({
 					index          = 2,
-					position       = {-1, 0.2, 0},
+					position       = {-1, 0.3, 0},
 					rotation       = {0, 0, 0}
 				})
 				wonder.editButton({
 					index          = 3,
-					position       = {1, 0.2, 0},
+					position       = {1, 0.3, 0},
 					rotation       = {0, 0, 0}
 				})
 			end

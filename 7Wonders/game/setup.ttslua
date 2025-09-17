@@ -1,10 +1,13 @@
 function HandleStartGameButtonCo()
-	-- Top right UI
+	-- Update Phase UI and Ready UI
 	updatePhaseUI("Loading", "Please wait")
 	InitializeReadyStatusCircles()
 
 	-- Hide tutorial panel
 	UI.hide("TutorialPanel")
+
+	-- Show LOADING UI
+	ShowLoadingUI()
 
 	NumberOfPlayers = #getSeatedPlayers()
 
@@ -251,7 +254,12 @@ function HandleStartGameButtonCo()
 		end
 	end
 
-	for i = 0, 200 do
+	for i = 0, 50 do
+		coroutine.yield(0)
+	end
+
+	-- Wait for all assets to load before continuing
+	while not AreAllAssetsLoaded() do
 		coroutine.yield(0)
 	end
 
@@ -295,7 +303,8 @@ function HandleStartGameButtonCo()
 		end
 	end
 
-	for i = 0, 200 do
+	-- Wait for all assets to load before continuing
+	while not AreAllAssetsLoaded() do
 		coroutine.yield(0)
 	end
 
@@ -465,7 +474,12 @@ function HandleStartGameButtonCo()
 		end
 	end
 
-	for i = 0, 200 do
+	for i = 0, 50 do
+		coroutine.yield(0)
+	end
+
+	-- Wait for all assets to load before continuing
+	while not AreAllAssetsLoaded() do
 		coroutine.yield(0)
 	end
 
@@ -524,70 +538,12 @@ function HandleStartGameButtonCo()
 	WonderBags.Base.randomize()
 	DockyardBag.randomize()
 
-	-------------------[[ MOVE ALL UNUSED CARDS TO THE SIDE ]]-------------------
-
-	-- [[MOVE CITIES]]
-	local citiesDecksToMove = {
-		{
-			source = DeckZones.Cities.Age1,
-			destination = FinalDeckZones.Cities.Age1,
-		},
-		{
-			source = DeckZones.Cities.Age2,
-			destination = FinalDeckZones.Cities.Age2,
-		},
-		{
-			source = DeckZones.Cities.Age3,
-			destination = FinalDeckZones.Cities.Age3,
-		}
-	}
-
-	for _, deckConfig in ipairs(citiesDecksToMove) do
-		if deckConfig.source and deckConfig.destination then
-			local deckObjects = deckConfig.source.getObjects()
-			for _, item in ipairs(deckObjects) do
-				item.setPositionSmooth(deckConfig.destination.getPosition(), false, false)
-				item.rotate({0, 90, 0})
-			end
-		end
-	end
-
-	-- [[MOVE ARMADA]]
-	local armadaDecksToMove = {
-		{
-			source = DeckZones.Armada.Age1,
-			destination = FinalDeckZones.Armada.Age1,
-		},
-		{
-			source = DeckZones.Armada.Age2,
-			destination = FinalDeckZones.Armada.Age2,
-		},
-		{
-			source = DeckZones.Armada.Age3,
-			destination = FinalDeckZones.Armada.Age3,
-		}
-	}
-
-	for _, deckConfig in ipairs(armadaDecksToMove) do
-		if deckConfig.source and deckConfig.destination then
-			local deckObjects = deckConfig.source.getObjects()
-			for _, item in ipairs(deckObjects) do
-				item.setPositionSmooth(deckConfig.destination.getPosition(), false, false)
-				item.rotate({0, 90, 0})
-			end
-		end
-	end
-
-	-- [[MOVE GUILDS]]
-	local guildDecksToMove = DeckZones.Guild.getObjects()
-	for _, items in ipairs(guildDecksToMove) do
-		--items.setPositionSmooth(FinalDeckZones.Guild.getPosition(), false, false)
-		--items.setRotation(FinalDeckZones.Guild.getRotation())
-	end
-
-	for i = 0, 200 do
+	-- Wait for all assets to load before continuing
+	while not AreAllAssetsLoaded() do
 		coroutine.yield(0)
 	end
+
+	HideLoadingUI()
 
 	-- [[DEAL WONDERS]]
 	DealWonders()
@@ -603,7 +559,6 @@ function HandleStartGameButtonCo()
 
 	-- Play a sound
 	MusicPlayer.setCurrentAudioclip({url=Audio.ReadyAlt, title = "All Players Ready"})
-	MusicPlayer.pause()
 
 	return 1
 end

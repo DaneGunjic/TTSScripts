@@ -168,38 +168,37 @@ end
 function ForceLoadAllAssets()
   -- Add any bags that should have their contents pre-loaded
   local AllBagsToLoad = {
-		WonderBags.Base,
-		WonderBags.Leaders,
-		WonderBags.Cities,
-		WonderBags.Armada,
-		WonderBags.Edifice,
-		WonderBags.Collection,
-		WonderBags.Promo,
-		WonderBags.Other,
-		DockyardBag,
-		FrontiersBag
+    WonderBags.Base,
+    WonderBags.Leaders,
+    WonderBags.Cities,
+    WonderBags.Armada,
+    WonderBags.Edifice,
+    WonderBags.Collection,
+    WonderBags.Promo,
+    WonderBags.Other,
+    DockyardBag,
+    FrontiersBag
   }
 
   for _, BagToLoad in ipairs(AllBagsToLoad) do
     if BagToLoad and BagToLoad.getObjects then
-			--print(BagToLoad.getName())
       for _, Board in ipairs(BagToLoad.getObjects()) do
         BagToLoad.takeObject({
           position = {68.00, -10, 19.00},
           smooth = false,
           callback_function = function(spawnedObject)
-						--print(spawnedObject.getName())
+            --print(spawnedObject.getName())
             spawnedObject.setLock(true)
 
             -- Define recursive wait function
             local function checkAndReturn()
-                if not spawnedObject.loading_custom then
-                    spawnedObject.setLock(false)
-                    BagToLoad.putObject(spawnedObject)
-                else
-                    -- Still loading, check again in 2 seconds
-                    Wait.time(checkAndReturn, 2)
-                end
+              if not spawnedObject.loading_custom then
+                spawnedObject.setLock(false)
+                BagToLoad.putObject(spawnedObject)
+              else
+                -- Still loading, check again in 2 seconds
+                Wait.time(checkAndReturn, 2)
+              end
             end
 
             -- Start the first check after 2 seconds
@@ -208,7 +207,7 @@ function ForceLoadAllAssets()
         })
       end
     else
-        print("Warning: Bag not found or invalid - " .. tostring(BagToLoad))
+      print("Warning: Bag not found or invalid - " .. tostring(BagToLoad))
     end
   end
 
@@ -217,6 +216,26 @@ end
 
 function LockSpawnedObject(object)
 	object.setLock(true)
+end
+
+function ShowLoadingUI()
+  -- Create loading panel XML
+  local loadingXML = '<Panel id="LoadingPanel" color="#000000CC" padding="20 20 20 20" width="300" height="100" rectAlignment="MiddleCenter" offsetXY="0 0">'
+  loadingXML = loadingXML .. '<Text text="LOADING..." fontSize="36" fontStyle="Bold" color="#FFFFFF" textAlignment="MiddleCenter" />'
+  loadingXML = loadingXML .. '</Panel>'
+
+  -- Get existing XML and append loading panel
+  local existingXML = UI.getXml()
+  if existingXML and existingXML ~= "" then
+    UI.setXml(existingXML .. loadingXML)
+  else
+    UI.setXml(loadingXML)
+  end
+end
+
+function HideLoadingUI()
+  -- Hide the loading panel by setting active to false
+  UI.setAttribute("LoadingPanel", "active", "false")
 end
 
 function printDeckZones()

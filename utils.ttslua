@@ -101,6 +101,33 @@ function pause(waittime)
 end
 
 -------------------[[ OBJECT UTILITIES ]]-------------------
+
+function AreAllAssetsLoaded()
+  -- Check all objects in the game for loading_custom
+  local allObjects = getAllObjects()
+  for _, obj in ipairs(allObjects) do
+    if obj.loading_custom then
+      return false
+    end
+
+    -- Check objects inside containers (bags, decks, etc.)
+    if obj.type == "Bag" then
+      local containedObjects = obj.getObjects()
+      if containedObjects then
+        for _, containedObj in ipairs(containedObjects) do
+          -- Get the actual object reference to check loading_custom
+          local actualObj = getObjectFromGUID(containedObj.guid)
+          if actualObj and actualObj.loading_custom then
+            return false
+          end
+        end
+      end
+    end
+  end
+
+  return true
+end
+
 function LockObject(object)
   if object and object.setLock then
     object.setLock(true)
