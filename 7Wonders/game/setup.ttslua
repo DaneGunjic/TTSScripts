@@ -1,4 +1,6 @@
 function HandleStartGameButtonCo()
+	MusicPlayer.repeat_track = false;
+
 	-- Update Phase UI and Ready UI
 	updatePhaseUI("Loading", "Please wait")
 	InitializeReadyStatusCircles()

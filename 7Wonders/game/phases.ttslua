@@ -317,7 +317,6 @@ function TransitionPhase()
   if NumberOfReadyPlayers >= NumberOfPlayers then
     -- Play ready sound
     MusicPlayer.setCurrentAudioclip({url=Audio.Ready, title = "All Players Ready"})
-    MusicPlayer.pause()
 
     -- Transfer money from money transfer zones before phase transition
     TransferMoneyFromZones()
@@ -648,7 +647,6 @@ function PrepareEdificeStage()
 
   broadcastToAll("Edifice resolution!", {r=0.5, g=1, b=0.5})
   MusicPlayer.setCurrentAudioclip({url=Audio.Edifice, title = "Edifice"})
-  MusicPlayer.pause()
 
   ShowReadyButtons()
   updatePhaseUI("Edifice", "Take rewards/penalities")
@@ -662,7 +660,6 @@ function PrepareConflictResolution()
 
   broadcastToAll("Conflict resolution!", {r=1, g=0.5, b=0.5})
   MusicPlayer.setCurrentAudioclip({url=Audio.Conflict, title = "Conflict"})
-  MusicPlayer.pause()
 
   ShowReadyButtons()
   updatePhaseUI("Conflict", "Take victory/defeat tokens")
@@ -676,7 +673,6 @@ function PrepareNavalCombat()
 
   broadcastToAll("Naval combat!", {r=0.5, g=0.5, b=1})
   MusicPlayer.setCurrentAudioclip({url=Audio.NavalCombat, title = "Naval Combat"})
-  MusicPlayer.pause()
 
   ShowReadyButtons()
   updatePhaseUI("Naval combat", "Take victory/defeat tokens")
@@ -817,4 +813,6 @@ function EndTheGame()
     PauseAllTimers()
     -- Show timer results after game ends
     ShowTimerResults()
+
+    MusicPlayer.setCurrentAudioclip({url=Audio.EndGame, title = "All Players Ready"})
 end
