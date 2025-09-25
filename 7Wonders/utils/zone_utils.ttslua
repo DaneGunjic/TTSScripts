@@ -1,39 +1,156 @@
+ZoneHandlers = {
+  enter = {},
+  leave = {}
+}
+
+-- Zone Type Registry - maps zone GUIDs to their types and handlers
+ZoneRegistry = {}
+
+-- Initialize zone registry with existing zones
+function InitializeZoneRegistry()
+  -- Register PlayerCardHolder zones
+  for color, data in pairs(PlayerCardHolder) do
+    if data.Zone then
+      ZoneRegistry[data.Zone.guid] = {
+        type = "card_holder",
+        color = color,
+        data = data
+      }
+    end
+  end
+  
+  -- Register Wonder zones
+  for color, zone in pairs(WonderZones) do
+    ZoneRegistry[zone.guid] = {
+      type = "wonder",
+      color = color,
+      zone = zone
+    }
+  end
+  
+  -- Register Armada Board zones if they exist
+  if ArmadaBoardZones then
+    for color, zone in pairs(ArmadaBoardZones) do
+      ZoneRegistry[zone.guid] = {
+        type = "armada_board",
+        color = color,
+        zone = zone
+      }
+    end
+  end
+end
+
+-- Register a handler for a specific zone type and event
+function RegisterZoneHandler(zoneType, event, handlerFunction)
+  if not ZoneHandlers[event] then
+    ZoneHandlers[event] = {}
+  end
+  ZoneHandlers[event][zoneType] = handlerFunction
+end
+
+-- Main zone event handlers
 function onObjectEnterScriptingZone(zone, enter_object)
-	if enter_object.type ~= 'Card' and enter_object.type ~= 'Deck' then return end
-
-	local color = GetPlayerColorFromZone(zone)
-	if not color then return end
-
-	local data = PlayerCardHolder[color]
-	local cardCount = CountCardsInZone(zone)
-
-	-- Stop blinking and highlight the tile
-	data.Tile.setVar("isBlinking", false)
-	data.Tile.highlightOn(color)
-	enter_object.setVar("highlightedTile", data.Tile)
-
-	-- Handle game state specific actions
-	if (GameState == "LeaderDrafting" or GameState == "RuinsDrafting") and cardCount == CurrentPasses + 1 and not ReadyList[color] then
-		ReadyUp(Player[color])
-	elseif GameState == "Age1" or GameState == "Age2" or GameState == "Age3" or GameState == "LeaderSelectionStage" then
-		CreateActionButtons(data.Tile)
-		broadcastToColor("Choose your action!", color, color)
-	elseif GameState == "RuinsStage" and CountCardsInZone(zone) == 3 and not ReadyList[color] then
-		ReadyUp(Player[color])
-	end
+  local zoneInfo = ZoneRegistry[zone.guid]
+  if not zoneInfo then return end
+  
+  local handler = ZoneHandlers.enter[zoneInfo.type]
+  if handler then
+    handler(zone, enter_object, zoneInfo)
+  end
 end
 
 function onObjectLeaveScriptingZone(zone, leave_object)
-	if leave_object.type ~= 'Card' and leave_object.type ~= 'Deck' then return end
+  local zoneInfo = ZoneRegistry[zone.guid]
+  if not zoneInfo then return end
+  
+  local handler = ZoneHandlers.leave[zoneInfo.type]
+  if handler then
+    handler(zone, leave_object, zoneInfo)
+  end
+end
 
-	local color = GetPlayerColorFromZone(zone)
-	if not color then return end
+-- Specific zone type handlers
+function HandleCardHolderEnter(zone, enter_object, zoneInfo)
+  if enter_object.type ~= 'Card' and enter_object.type ~= 'Deck' then return end
+  
+  local color = zoneInfo.color
+  local data = zoneInfo.data
+  local cardCount = CountCardsInZone(zone)
 
-	local highlightedTile = leave_object.getVar("highlightedTile")
-	if not highlightedTile then return end
+  -- Stop blinking and highlight the tile
+  data.Tile.setVar("isBlinking", false)
+  data.Tile.highlightOn(color)
+  enter_object.setVar("highlightedTile", data.Tile)
 
-	UnreadyPlayerIfNeeded(color, zone)
-	HandleTileOnCardLeave(highlightedTile, leave_object, zone)
+  -- Handle game state specific actions
+  if (GameState == "LeaderDrafting" or GameState == "RuinsDrafting") and cardCount == CurrentPasses + 1 and not ReadyList[color] then
+    ReadyUp(Player[color])
+  elseif GameState == "Age1" or GameState == "Age2" or GameState == "Age3" or GameState == "LeaderSelectionStage" then
+    CreateActionButtons(data.Tile)
+    broadcastToColor("Choose your action!", color, color)
+  elseif GameState == "RuinsStage" and CountCardsInZone(zone) == 3 and not ReadyList[color] then
+    ReadyUp(Player[color])
+  end
+end
+
+function HandleCardHolderLeave(zone, leave_object, zoneInfo)
+  if leave_object.type ~= 'Card' and leave_object.type ~= 'Deck' then return end
+  
+  local color = zoneInfo.color
+  local highlightedTile = leave_object.getVar("highlightedTile")
+  if not highlightedTile then return end
+
+  UnreadyPlayerIfNeeded(color, zone)
+  HandleTileOnCardLeave(highlightedTile, leave_object, zone)
+end
+
+function HandleWonderZoneEnter(zone, enter_object, zoneInfo)
+  local color = zoneInfo.color
+  
+  if enter_object.hasTag and enter_object.hasTag("Coin") then
+    -- Handle coin logic
+    print("Coin entered " .. color .. "'s wonder zone")
+    -- Add your coin-specific logic here
+  elseif enter_object.type == 'Card' then
+    print("Card entered " .. color .. "'s wonder zone")
+  end
+end
+
+function HandleWonderZoneLeave(zone, leave_object, zoneInfo)
+  local color = zoneInfo.color
+  
+  if leave_object.hasTag and leave_object.hasTag("Coin") then
+    print("Coin left " .. color .. "'s wonder zone")
+    -- Add coin removal logic here
+  elseif leave_object.type == 'Card' then
+    print("Card left " .. color .. "'s wonder zone")
+    -- Add wonder card removal logic here
+  end
+end
+
+function HandleArmadaBoardEnter(zone, enter_object, zoneInfo)
+  local color = zoneInfo.color
+  print("Object entered " .. color .. "'s armada board zone")
+  -- Add armada-specific logic here
+end
+
+function HandleArmadaBoardLeave(zone, leave_object, zoneInfo)
+  local color = zoneInfo.color
+  print("Object left " .. color .. "'s armada board zone")
+  -- Add armada-specific logic here
+end
+
+-- Initialize the system
+function InitializeZoneSystem()
+  InitializeZoneRegistry()
+  
+  -- Register handlers for each zone type
+  RegisterZoneHandler("card_holder", "enter", HandleCardHolderEnter)
+  RegisterZoneHandler("card_holder", "leave", HandleCardHolderLeave)
+  RegisterZoneHandler("wonder", "enter", HandleWonderZoneEnter)
+  RegisterZoneHandler("wonder", "leave", HandleWonderZoneLeave)
+  RegisterZoneHandler("armada_board", "enter", HandleArmadaBoardEnter)
+  RegisterZoneHandler("armada_board", "leave", HandleArmadaBoardLeave)
 end
 
 function IsObjectInPlayerWonderZone(obj, color)

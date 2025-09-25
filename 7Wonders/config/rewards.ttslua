@@ -1,34 +1,35 @@
 ShipRewards = {
     Red = {
-        [1] = { message = "{player_name} advanced their red ship!" },
-        [2] = { message = "{player_name} advanced their red ship!" },
-        [3] = { message = "{player_name} advanced their red ship!" },
-        [4] = { message = "{player_name} advanced their red ship!" },
-        [5] = { message = "{player_name} advanced their red ship!" },
-        [6] = { message = "{player_name} advanced their red ship!" }
+        [1] = { message = "{player_name} advanced their red ship and gained 1 (1) naval strength!" },
+        [2] = { message = "{player_name} advanced their red ship and gained 1 (2) naval strength!" },
+        [3] = { message = "{player_name} advanced their red ship and gained 1 (3) naval strength!" },
+        [4] = { message = "{player_name} advanced their red ship and gained 1 (4) naval strength!" },
+        [5] = { message = "{player_name} advanced their red ship and gained 1 (5) naval strength!" },
+        [6] = { message = "{player_name} advanced their red ship and gained 3 (8) naval strength!" }
     },
     Yellow = {
-        [1] = { message = "{player_name} advanced their yellow ship!" },
-        [2] = { coins = 2, message = "{player_name} advanced their yellow ship and triggered tax -1!" },
-        [3] = { coins = 3, message = "{player_name} advanced their yellow ship!"},
-        [4] = { coins = 4, message = "{player_name} advanced their yellow ship and triggered tax -2!" },
-        [5] = { coins = 5, message = "{player_name} advanced their yellow ship!" },
-        [6] = { message = "{player_name} advanced their yellow ship and triggered tax -4!" }
+      [1] = { message = "{player_name} advanced their yellow ship!" },
+      [2] = { coins = 2, message = "{player_name} advanced their yellow ship, triggering tax -1 and gaining 2 coins!" },
+      [3] = { coins = 3, message = "{player_name} advanced their yellow ship and gained 3 coins!" },
+      [4] = { coins = 4, message = "{player_name} advanced their yellow ship, triggering tax -2 and gaining 4 coins!" },
+      [5] = { coins = 5, message = "{player_name} advanced their yellow ship and gained 5 coins!" },
+      [6] = { message = "{player_name} advanced their yellow ship, triggering tax -4 and gaining 2 naval strength!" }
     },
+
     Blue = {
-        [1] = { message = "{player_name} advanced their blue ship!" },
-        [2] = { message = "{player_name} advanced their blue ship!" },
-        [3] = { message = "{player_name} advanced their blue ship!" },
-        [4] = { message = "{player_name} advanced their blue ship!" },
-        [5] = { message = "{player_name} advanced their blue ship!" },
-        [6] = { message = "{player_name} advanced their blue ship!" }
+        [1] = { message = "{player_name} advanced their blue ship (1 point)!" },
+        [2] = { message = "{player_name} advanced their blue ship (2 points)!" },
+        [3] = { message = "{player_name} advanced their blue ship (4 points)!" },
+        [4] = { message = "{player_name} advanced their blue ship (6 points)!" },
+        [5] = { message = "{player_name} advanced their blue ship (8 points)!" },
+        [6] = { message = "{player_name} advanced their blue ship (10 points) and gained 1 naval strength!" }
     },
     Green = {
         [1] = { message = "{player_name} advanced their green ship!" },
-        [2] = { message = "{player_name} advanced their green ship and is exploring islands level 1!" },
+        [2] = { message = "{player_name} advanced their green ship and is exploring level 1 islands!" },
         [3] = { message = "{player_name} advanced their green ship!" },
-        [4] = { message = "{player_name} advanced their green ship and is exploring islands level 2!" },
+        [4] = { message = "{player_name} advanced their green ship and is exploring level 2 islands!" },
         [5] = { message = "{player_name} advanced their green ship!" },
-        [6] = { message = "{player_name} advanced their green ship and is exploring islands level 3!" }
+        [6] = { message = "{player_name} advanced their green ship and is exploring level 3 islands!" }
     }
 }
