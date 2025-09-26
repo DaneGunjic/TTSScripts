@@ -77,21 +77,21 @@ function DoCoinUI(player, click, id)
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained 1 coin", {r=0.5, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained 1 coin", player.color)
     elseif(string.find(id, "Coin3")) then
       CoinBags.Coin3.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained 3 coins", {r=1, g=1, b=0})
+      broadcastToAll(player.steam_name .. " gained 3 coins", player.color)
     else
       CoinBags.Coin6.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained 6 coins", {r=153/255, g=76/255, b=0})
+      broadcastToAll(player.steam_name .. " gained 6 coins", player.color)
     end
   end
 
@@ -100,19 +100,19 @@ function DoCoinUI(player, click, id)
     for i, obj in ipairs(tempObjects) do
       if obj.hasTag("Coin1") and string.find(id, "Coin1") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost 1 coin", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost 1 coin", player.color)
         return;
       end
 
       if obj.hasTag("Coin3") and string.find(id, "Coin3") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost 3 coins", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost 3 coins", player.color)
         return;
       end
 
       if obj.hasTag("Coin6") and string.find(id, "Coin6") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost 6 coins", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost 6 coins", player.color)
         return;
       end
     end
@@ -132,21 +132,21 @@ function DoEdificeUI(player, click, id)
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained an edifice age 1 token", {r=0.8, g=0.6, b=0.2})
+      broadcastToAll(player.steam_name .. " gained an edifice age 1 token", player.color)
     elseif (string.find(id, "EdificeAge2")) then
       EdificeBags.PawnAge2.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained an edifice age 2 token", {r=0.5, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained an edifice age 2 token", player.color)
     elseif (string.find(id, "EdificeAge3")) then
       EdificeBags.PawnAge3.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained an edifice age 3 token", {r=0.8, g=0.8, b=0})
+      broadcastToAll(player.steam_name .. " gained an edifice age 3 token", player.color)
     end
   end
 
@@ -155,19 +155,19 @@ function DoEdificeUI(player, click, id)
     for i, obj in ipairs(tempObjects) do
       if obj.hasTag("EdificeAge1") and string.find(id, "EdificeAge1") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost an edifice age 1 token", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost an edifice age 1 token", player.color)
         return;
       end
 
       if obj.hasTag("EdificeAge2") and string.find(id, "EdificeAge2") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost an edifice age 2 token", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost an edifice age 2 token", player.color)
         return;
       end
 
       if obj.hasTag("EdificeAge3") and string.find(id, "EdificeAge3") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost an edifice age 3 token", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost an edifice age 3 token", player.color)
         return;
       end
     end
@@ -187,21 +187,21 @@ function DoOtherUI(player, click, id)
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained a diplomacy token", {r=0.6, g=0.4, b=0.8})
+      broadcastToAll(player.steam_name .. " gained a diplomacy token", player.color)
     elseif (string.find(id, "Boarding")) then
       BoardingTokenBag.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained a boarding token", {r=0.8, g=0.6, b=0.2})
+      broadcastToAll(player.steam_name .. " gained a boarding token", player.color)
     elseif (string.find(id, "Ruins")) then
       ReconstructionTokenBag.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained a reconstruction token", {r=0.6, g=0.4, b=0.8})
+      broadcastToAll(player.steam_name .. " gained a reconstruction token", player.color)
     end
   end
 
@@ -210,19 +210,19 @@ function DoOtherUI(player, click, id)
     for i, obj in ipairs(tempObjects) do
       if obj.hasTag("Diplomacy") and string.find(id, "Diplomacy") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost a diplomacy token", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost a diplomacy token", player.color)
         return;
       end
 
       if obj.hasTag("Boarding") and string.find(id, "Boarding") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost a boarding token", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost a boarding token", player.color)
         return;
       end
 
       if obj.hasTag("Reconstruction") and string.find(id, "Ruins") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost a reconstruction token", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost a reconstruction token", player.color)
         return;
       end
     end

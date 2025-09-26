@@ -557,6 +557,10 @@ function HandleStartGameButtonCo()
 
 	HideLoadingUI()
 
+	-- Hide and update UI again, mostly debug
+	InitializeReadyStatusCircles()
+	UI.hide("TutorialPanel")
+
 	-- [[DEAL WONDERS]]
 	DealWonders()
 
@@ -570,7 +574,8 @@ function HandleStartGameButtonCo()
 	end
 
 	-- Play a sound
-	MusicPlayer.setCurrentAudioclip({url=Audio.ReadyAlt, title = "All Players Ready"})
+	MusicPlayer.setCurrentAudioclip({url=Audio.ReadyAlt, title = "GL & HF"})
+	MusicPlayer.repeat_track = false
 
 	return 1
 end
