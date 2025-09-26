@@ -317,9 +317,7 @@ function TransitionPhase()
   if NumberOfReadyPlayers >= NumberOfPlayers then
     -- Play ready sound
     MusicPlayer.setCurrentAudioclip({url=Audio.Ready, title = "All Players Ready"})
-
-    -- Transfer money from money transfer zones before phase transition
-    TransferMoneyFromZones()
+    MusicPlayer.repeat_track = false
 
     --print("TransitionPhase, GameState is " .. GameState)
     local currentHandler = PhaseHandlers[GameState]
@@ -328,6 +326,10 @@ function TransitionPhase()
       printToAll("Everyone is ready! Advancing game state.", "Grey")
       local nextPhase = currentHandler:next()
 
+      -- Transfer money from money transfer zones
+      TransferMoneyFromZones()
+
+      -- New phase started, unready all players
       UnreadyAllPlayers()
     else
       print("Error: Cannot transition from invalid phase: " .. tostring(GameState))
@@ -394,7 +396,7 @@ function ResolveBuyAction(color)
   if card_object then
     -- Add chat message for buy action
     local card_name = card_object.getName()
-    printToAll(Player[color].steam_name .. " constructed " .. card_name, Player[color].color)
+    printToAll(Player[color].steam_name .. " constructed " .. card_name, color)
 
     local new_pos = tile.getPosition() + tile.getTransformRight() * -3 + Vector(0, 2, 0)
     card_object.setPosition(new_pos)
@@ -402,20 +404,22 @@ function ResolveBuyAction(color)
     local new_rot = card_object.getRotation()
     new_rot.z = 0
     card_object.setRotation(new_rot)
+
+    card_object.highlightOn(color, 5)
   else
     print("Error: No card object found for color: " .. color)
   end
 end
 
 function ResolveSellAction(color)
-  printToAll(Player[color].steam_name .. " sold a card", Player[color].color)
+  printToAll(Player[color].steam_name .. " sold a card", color)
   AddCoins(color, 3, true)
   DiscardPlayerActionCard(color)
 end
 
 function ResolveBuildWonderAction(color)
   -- Add chat message for wonder building
-  printToAll(Player[color].steam_name .. " built a wonder stage", Player[color].color)
+  printToAll(Player[color].steam_name .. " built a wonder stage", color)
 
   local data = PlayerCardHolder[color]
   local objects = data.Zone.getObjects()
@@ -433,6 +437,7 @@ function ResolveBuildWonderAction(color)
   if card_object then
     local new_pos = tile.getPosition() + tile.getTransformForward() * 5
     card_object.setPosition(new_pos)
+    card_object.highlightOn(color, 5)
   else
     print("Error: No card object found for color: " .. color)
   end
@@ -636,7 +641,7 @@ function DoAge2Stage()
 end
 
 function DoAge3Stage()
-  doAgeStage(3, "Right", "Left", "Age3")
+  doAgeStage(3, "Left", "Right", "Age3")
 end
 
 function PrepareEdificeStage()
@@ -814,5 +819,5 @@ function EndTheGame()
     -- Show timer results after game ends
     ShowTimerResults()
 
-    MusicPlayer.setCurrentAudioclip({url=Audio.EndGame, title = "All Players Ready"})
+    MusicPlayer.setCurrentAudioclip({url=Audio.EndGame, title = "GG"})
 end

@@ -32,4 +32,5 @@ function onLoad()
   MakeSetupButtons()
   MakeSetupBoardText()
   disableAllTiles()
+  InitializeZoneSystem()
 end

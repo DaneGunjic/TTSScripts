@@ -175,7 +175,6 @@ end
 
 -- Helper function to toggle ready state and update UI
 function TogglePlayerReady(color)
-	-- Only allow players to toggle their own ready state
 	if Player[color].seated then
 		-- Toggle the ready state
 		ReadyUp(Player[color])
@@ -183,11 +182,11 @@ function TogglePlayerReady(color)
 		-- Update UI button appearance based on new state
 		if ReadyList[color] then
 			-- Player is now ready - green button
-			UI.setAttribute("ReadyButton" .. color, "text", "Ready")
+			UI.setAttribute("ReadyButton" .. color, "text", "Unready")
 			UI.setAttribute("ReadyButton" .. color, "color", "#00AA00")
 		else
 			-- Player is now not ready - red button
-			UI.setAttribute("ReadyButton" .. color, "text", "Not Ready")
+			UI.setAttribute("ReadyButton" .. color, "text", "Ready Up")
 			UI.setAttribute("ReadyButton" .. color, "color", "#FF0000")
 		end
 	end

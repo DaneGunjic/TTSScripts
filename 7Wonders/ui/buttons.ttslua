@@ -123,7 +123,7 @@ function HandlePromoWondersButton() -- Button index 11
 	end
 end
 
-function HandleOtherWondersButton()
+function HandleOtherWondersButton() -- Button index 12
 	WonderExpansionConfig.Other = not WonderExpansionConfig.Other
 	if WonderExpansionConfig.Other then
 		SetupBoard.editButton({index = 12, label = "[✓]", font_color={0,1,0}})

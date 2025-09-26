@@ -53,25 +53,25 @@
 <!-- Ready Buttons - Player Specific (Initially Hidden) -->
 
 <!-- WHITE READY -->
-<Button id="ReadyButtonWhite" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="White" textAlignment="MiddleCenter">Not Ready
+<Button id="ReadyButtonWhite" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="White" textAlignment="MiddleCenter">Ready Up
 </Button>
 <!-- RED READY -->
-<Button id="ReadyButtonRed" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Red" textAlignment="MiddleCenter">Not Ready
+<Button id="ReadyButtonRed" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Red" textAlignment="MiddleCenter">Ready Up
 </Button>
 <!-- YELLOW READY -->
-<Button id="ReadyButtonYellow" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Yellow" textAlignment="MiddleCenter">Not Ready
+<Button id="ReadyButtonYellow" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Yellow" textAlignment="MiddleCenter">Ready Up
 </Button>
 <!-- GREEN READY -->
-<Button id="ReadyButtonGreen" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Green" textAlignment="MiddleCenter">Not Ready
+<Button id="ReadyButtonGreen" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Green" textAlignment="MiddleCenter">Ready Up
 </Button>
 <!-- BLUE READY -->
-<Button id="ReadyButtonBlue" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Blue" textAlignment="MiddleCenter">Not Ready
+<Button id="ReadyButtonBlue" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Blue" textAlignment="MiddleCenter">Ready Up
 </Button>
 <!-- PURPLE READY -->
-<Button id="ReadyButtonPurple" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Purple" textAlignment="MiddleCenter">Not Ready
+<Button id="ReadyButtonPurple" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Purple" textAlignment="MiddleCenter">Ready Up
 </Button>
 <!-- PINK READY -->
-<Button id="ReadyButtonPink" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Pink" textAlignment="MiddleCenter">Not Ready
+<Button id="ReadyButtonPink" onClick="ToggleReady" active="false" rectAlignment="MiddleCenter" offsetXY="600 400" height="50" width="120" fontSize="18" fontStyle="Bold" color="#FF0000" textColor="#FFFFFF" visibility="Pink" textAlignment="MiddleCenter">Ready Up
 </Button>
 
 <!-- Collapsible Game Menu Panels - Player Specific -->

@@ -195,6 +195,16 @@ function HandleStartGameButtonCo()
 		end
 	end
 
+	for bagKey, bagObject in pairs(ArmadaBags_4P) do
+		if ExpansionConfig.Armada and NumberOfPlayers >= 4 then
+			bagObject.takeObject({
+				position = DeckZones.Armada[bagKey].getPosition(),
+				rotation = DeckZones.Armada[bagKey].getRotation() + vector(0, 0, 180),
+				smooth = false
+			})
+		end
+	end
+
 	-- [[ISLAND DECKS SETUP]]
 	for bagKey, bagObject in pairs(IslandBags) do
 		if ExpansionConfig.Armada then

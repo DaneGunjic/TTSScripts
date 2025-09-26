@@ -9,8 +9,10 @@ ZoneRegistry = {}
 -- Initialize zone registry with existing zones
 function InitializeZoneRegistry()
   -- Register PlayerCardHolder zones
+  --print("Initializing zone registry")
   for color, data in pairs(PlayerCardHolder) do
     if data.Zone then
+      --print("setting zone " .. data.Zone.guid .. " to type card_holder")
       ZoneRegistry[data.Zone.guid] = {
         type = "card_holder",
         color = color,
@@ -18,30 +20,21 @@ function InitializeZoneRegistry()
       }
     end
   end
-  
+
   -- Register Wonder zones
   for color, zone in pairs(WonderZones) do
+    --print("setting zone " .. zone.guid .. " to type wonder")
     ZoneRegistry[zone.guid] = {
       type = "wonder",
       color = color,
       zone = zone
     }
   end
-  
-  -- Register Armada Board zones if they exist
-  if ArmadaBoardZones then
-    for color, zone in pairs(ArmadaBoardZones) do
-      ZoneRegistry[zone.guid] = {
-        type = "armada_board",
-        color = color,
-        zone = zone
-      }
-    end
-  end
 end
 
 -- Register a handler for a specific zone type and event
 function RegisterZoneHandler(zoneType, event, handlerFunction)
+  print("RegisterZoneHandler: " .. zoneType .. " " .. event)
   if not ZoneHandlers[event] then
     ZoneHandlers[event] = {}
   end
@@ -50,10 +43,12 @@ end
 
 -- Main zone event handlers
 function onObjectEnterScriptingZone(zone, enter_object)
+  --print(zone.guid)
   local zoneInfo = ZoneRegistry[zone.guid]
   if not zoneInfo then return end
-  
+
   local handler = ZoneHandlers.enter[zoneInfo.type]
+  --print(handler)
   if handler then
     handler(zone, enter_object, zoneInfo)
   end
@@ -62,8 +57,9 @@ end
 function onObjectLeaveScriptingZone(zone, leave_object)
   local zoneInfo = ZoneRegistry[zone.guid]
   if not zoneInfo then return end
-  
+
   local handler = ZoneHandlers.leave[zoneInfo.type]
+  --print(handler)
   if handler then
     handler(zone, leave_object, zoneInfo)
   end
@@ -72,7 +68,9 @@ end
 -- Specific zone type handlers
 function HandleCardHolderEnter(zone, enter_object, zoneInfo)
   if enter_object.type ~= 'Card' and enter_object.type ~= 'Deck' then return end
-  
+
+  --print("Object entered " .. zoneInfo.color .. "'s zone")
+
   local color = zoneInfo.color
   local data = zoneInfo.data
   local cardCount = CountCardsInZone(zone)
@@ -95,7 +93,7 @@ end
 
 function HandleCardHolderLeave(zone, leave_object, zoneInfo)
   if leave_object.type ~= 'Card' and leave_object.type ~= 'Deck' then return end
-  
+
   local color = zoneInfo.color
   local highlightedTile = leave_object.getVar("highlightedTile")
   if not highlightedTile then return end
@@ -106,19 +104,18 @@ end
 
 function HandleWonderZoneEnter(zone, enter_object, zoneInfo)
   local color = zoneInfo.color
-  
+
   if enter_object.hasTag and enter_object.hasTag("Coin") then
     -- Handle coin logic
-    print("Coin entered " .. color .. "'s wonder zone")
-    -- Add your coin-specific logic here
+    --print("Coin entered " .. color .. "'s wonder zone")
   elseif enter_object.type == 'Card' then
-    print("Card entered " .. color .. "'s wonder zone")
+    --print("Card entered " .. color .. "'s wonder zone")
   end
 end
 
 function HandleWonderZoneLeave(zone, leave_object, zoneInfo)
   local color = zoneInfo.color
-  
+
   if leave_object.hasTag and leave_object.hasTag("Coin") then
     print("Coin left " .. color .. "'s wonder zone")
     -- Add coin removal logic here
@@ -128,29 +125,15 @@ function HandleWonderZoneLeave(zone, leave_object, zoneInfo)
   end
 end
 
-function HandleArmadaBoardEnter(zone, enter_object, zoneInfo)
-  local color = zoneInfo.color
-  print("Object entered " .. color .. "'s armada board zone")
-  -- Add armada-specific logic here
-end
-
-function HandleArmadaBoardLeave(zone, leave_object, zoneInfo)
-  local color = zoneInfo.color
-  print("Object left " .. color .. "'s armada board zone")
-  -- Add armada-specific logic here
-end
-
--- Initialize the system
+-- Initialize the zone system
 function InitializeZoneSystem()
   InitializeZoneRegistry()
-  
+
   -- Register handlers for each zone type
   RegisterZoneHandler("card_holder", "enter", HandleCardHolderEnter)
   RegisterZoneHandler("card_holder", "leave", HandleCardHolderLeave)
   RegisterZoneHandler("wonder", "enter", HandleWonderZoneEnter)
   RegisterZoneHandler("wonder", "leave", HandleWonderZoneLeave)
-  RegisterZoneHandler("armada_board", "enter", HandleArmadaBoardEnter)
-  RegisterZoneHandler("armada_board", "leave", HandleArmadaBoardLeave)
 end
 
 function IsObjectInPlayerWonderZone(obj, color)
