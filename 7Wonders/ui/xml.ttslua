@@ -242,49 +242,49 @@ function DoNavalUI(player, click, id)
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Naval Victory 1", {r=0, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Naval Victory 1", player.color)
     elseif(string.find(id, "NavalVictory3")) then
       NavalTokenBags.VictoryToken3.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Naval Victory 3", {r=0, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Naval Victory 3", player.color)
     elseif(string.find(id, "NavalVictory5")) then
       NavalTokenBags.VictoryToken5.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Naval Victory 5", {r=0, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Naval Victory 5", player.color)
     elseif(string.find(id, "NavalVictory7")) then
       NavalTokenBags.VictoryToken7.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Naval Victory 7", {r=0, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Naval Victory 7", player.color)
     elseif(string.find(id, "DefeatNaval1")) then
       NavalTokenBags.DefeatToken1.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Naval Defeat 1", {r=0, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Naval Defeat 1", player.color)
     elseif(string.find(id, "DefeatNaval2")) then
       NavalTokenBags.DefeatToken2.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Naval Defeat 2", {r=0, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Naval Defeat 2", player.color)
     elseif(string.find(id, "DefeatNaval3")) then
       NavalTokenBags.DefeatToken3.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Naval Defeat 3", {r=0, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Naval Defeat 3", player.color)
     end
   end
 
@@ -293,43 +293,43 @@ function DoNavalUI(player, click, id)
     for i, obj in ipairs(tempObjects) do
       if obj.hasTag("NavalVictory1") and string.find(id, "NavalVictory1") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Naval Victory 1", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Naval Victory 1", player.color)
         return;
       end
 
       if obj.hasTag("NavalVictory3") and string.find(id, "NavalVictory3") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Naval Victory 3", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Naval Victory 3", player.color)
         return;
       end
 
       if obj.hasTag("NavalVictory5") and string.find(id, "NavalVictory5") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Naval Victory 5", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Naval Victory 5", player.color)
         return;
       end
 
       if obj.hasTag("NavalVictory7") and string.find(id, "NavalVictory7") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Naval Victory 7", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Naval Victory 7", player.color)
         return;
       end
 
       if obj.hasTag("NavalDefeat1") and string.find(id, "DefeatNaval1") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Naval Defeat 1", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Naval Defeat 1", player.color)
         return;
       end
 
       if obj.hasTag("NavalDefeat2") and string.find(id, "DefeatNaval2") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Naval Defeat 2", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Naval Defeat 2", player.color)
         return;
       end
 
       if obj.hasTag("NavalDefeat3") and string.find(id, "DefeatNaval3") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Naval Defeat 3", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Naval Defeat 3", player.color)
         return;
       end
     end
@@ -349,35 +349,35 @@ function DoMilitaryUI(player, click, id)
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Military Victory 1", {r=1, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Military Victory 1", player.color)
     elseif(string.find(id, "Victory3")) then
       ConflictTokenBags.VictoryToken3.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Military Victory 3", {r=1, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Military Victory 3", player.color)
     elseif(string.find(id, "Victory5")) then
       ConflictTokenBags.VictoryToken5.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Military Victory 5", {r=1, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Military Victory 5", player.color)
     elseif(string.find(id, "Victory7")) then
       ConflictTokenBags.VictoryToken7.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Military Victory 7", {r=1, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Military Victory 7", player.color)
     elseif(string.find(id, "DefeatConflict")) then
       ConflictTokenBags.DefeatToken.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained Military Defeat", {r=1, g=0.5, b=0.5})
+      broadcastToAll(player.steam_name .. " gained Military Defeat", player.color)
     end
   end
 
@@ -386,31 +386,31 @@ function DoMilitaryUI(player, click, id)
     for i, obj in ipairs(tempObjects) do
       if obj.hasTag("Military1") and string.find(id, "Victory1") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Military Victory 1", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Military Victory 1", player.color)
         return;
       end
 
       if obj.hasTag("Military3") and string.find(id, "Victory3") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Military Victory 3", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Military Victory 3", player.color)
         return;
       end
 
       if obj.hasTag("Military5") and string.find(id, "Victory5") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Military Victory 5", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Military Victory 5", player.color)
         return;
       end
 
       if obj.hasTag("Military7") and string.find(id, "Victory7") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Military Victory 7", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Military Victory 7", player.color)
         return;
       end
 
       if obj.hasTag("DefeatConflict") and string.find(id, "DefeatConflict") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost Military Defeat", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost Military Defeat", player.color)
         return;
       end
     end
@@ -430,28 +430,28 @@ function DoDebtUI(player, click, id)
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained debt token 1", {r=0.8, g=0.2, b=0.2})
+      broadcastToAll(player.steam_name .. " gained debt token 1", player.color)
     elseif(string.find(id, "Debt2")) then
       DebtBags.DebtToken2.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained debt token 2", {r=0.8, g=0.2, b=0.2})
+      broadcastToAll(player.steam_name .. " gained debt token 2", player.color)
     elseif(string.find(id, "Debt3")) then
       DebtBags.DebtToken3.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained debt token 3", {r=0.8, g=0.2, b=0.2})
+      broadcastToAll(player.steam_name .. " gained debt token 3", player.color)
     elseif(string.find(id, "Debt5")) then
       DebtBags.DebtToken5.takeObject({
         position = tempPost,
         rotation = PlayerInfo[player.color].ComponentRotation,
         smooth = false
       })
-      broadcastToAll(player.steam_name .. " gained debt token 5", {r=0.8, g=0.2, b=0.2})
+      broadcastToAll(player.steam_name .. " gained debt token 5", player.color)
     end
   end
 
@@ -460,25 +460,25 @@ function DoDebtUI(player, click, id)
     for i, obj in ipairs(tempObjects) do
       if obj.hasTag("Debt1") and string.find(id, "Debt1") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost debt token 1", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost debt token 1", player.color)
         return;
       end
 
       if obj.hasTag("Debt2") and string.find(id, "Debt2") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost debt token 2", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost debt token 2", player.color)
         return;
       end
 
       if obj.hasTag("Debt3") and string.find(id, "Debt3") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost debt token 3", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost debt token 3", player.color)
         return;
       end
 
       if obj.hasTag("Debt5") and string.find(id, "Debt5") then
         obj.destruct()
-        broadcastToAll(player.steam_name .. " lost debt token 5", {r=1, g=0, b=0})
+        broadcastToAll(player.steam_name .. " lost debt token 5", player.color)
         return;
       end
     end

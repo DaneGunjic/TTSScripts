@@ -34,7 +34,7 @@ end
 
 -- Register a handler for a specific zone type and event
 function RegisterZoneHandler(zoneType, event, handlerFunction)
-  print("RegisterZoneHandler: " .. zoneType .. " " .. event)
+  --print("RegisterZoneHandler: " .. zoneType .. " " .. event)
   if not ZoneHandlers[event] then
     ZoneHandlers[event] = {}
   end
@@ -117,10 +117,10 @@ function HandleWonderZoneLeave(zone, leave_object, zoneInfo)
   local color = zoneInfo.color
 
   if leave_object.hasTag and leave_object.hasTag("Coin") then
-    print("Coin left " .. color .. "'s wonder zone")
+    --print("Coin left " .. color .. "'s wonder zone")
     -- Add coin removal logic here
   elseif leave_object.type == 'Card' then
-    print("Card left " .. color .. "'s wonder zone")
+    --print("Card left " .. color .. "'s wonder zone")
     -- Add wonder card removal logic here
   end
 end
