@@ -34,4 +34,10 @@ function onLoad()
   MakeSetupBoardText()
   disableAllTiles()
   InitializeZoneSystem()
+
+  -- Set host camera to focus on setup board
+  SetHostCameraToSetupBoard()
+
+  -- Pre-load all game audio files
+  PreloadGameAudio()
 end

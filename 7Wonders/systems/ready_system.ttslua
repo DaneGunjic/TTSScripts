@@ -25,6 +25,8 @@ function UnreadyAllPlayers()
 		UI.setAttribute("Ready" .. color, "active", "true")
 		-- Start timer when player becomes unready
 		StartPlayerTimer(color)
+		-- Remove highlight when player is unready
+		UpdateWonderBoardHighlight(color, false)
 	end
 end
 
@@ -40,12 +42,16 @@ function ReadyUp(player)
 		UI.setAttribute("Ready" .. player.color, "active", "false")
 		-- Stop timer when player becomes ready
 		StopPlayerTimer(player.color)
+		-- Highlight wonder board when player is ready
+		UpdateWonderBoardHighlight(player.color, true)
 	else
 		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
 		-- Show the circle when player is not ready
 		UI.setAttribute("Ready" .. player.color, "active", "true")
 		-- Start timer when player becomes unready
 		StartPlayerTimer(player.color)
+		-- Remove highlight when player is unready
+		UpdateWonderBoardHighlight(player.color, false)
 	end
 
 	TransitionPhase()
@@ -125,35 +131,28 @@ end
 
 function UnreadyPlayerIfNeeded(color, zone)
 	local cardCount = CountCardsInZone(zone)
-	--print("UnreadyPlayerIfNeeded " .. cardCount)
-	if cardCount <= CurrentPasses and GameState == "LeaderDrafting" then
-		if ReadyList[color] then
-			--print("settings ready to false, first if")
-			ReadyList[color] = false
-			NumberOfReadyPlayers = NumberOfReadyPlayers - 1
-			broadcastToAll(Player[color].steam_name .. " is not ready")
-			-- Show the circle when player becomes unready
-			UI.setAttribute("Ready" .. color, "active", "true")
-			-- Start timer when player becomes unready
-			StartPlayerTimer(color)
-			-- Restart blinking when player becomes unready
-			if PlayerCardHolder[color] and PlayerCardHolder[color].Tile then
-				BlinkPlayerCardHolders()
-			end
-		end
-	elseif GameState == "LeaderSelectionStage" and ReadyList[color] then
-		--print("settings ready to false, second if")
-		ReadyList[color] = false
-		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
-		broadcastToAll(Player[color].steam_name .. " is not ready")
-		-- Show the circle when player becomes unready
-		UI.setAttribute("Ready" .. color, "active", "true")
-		-- Start timer when player becomes unready
-		StartPlayerTimer(color)
-		-- Restart blinking when player becomes unready
-		if PlayerCardHolder[color] and PlayerCardHolder[color].Tile then
-			BlinkPlayerCardHolders()
-		end
+
+	-- Determine if player should be unreadied based on game state
+	local shouldUnready = false
+
+	if GameState == "LeaderDrafting" then
+		shouldUnready = (cardCount <= CurrentPasses)
+	elseif GameState == "LeaderSelectionStage" or
+		   GameState == "Age1" or
+		   GameState == "Age2" or
+		   GameState == "Age3" then
+		shouldUnready = true
+	end
+
+	-- If player should be unreadied and is currently ready, unready them
+	if shouldUnready and ReadyList[color] then
+		ReadyUp(Player[color])
+
+		PlayerSelectedAction[color] = nil
+		UpdateActionStatusUI(color, "None")
+
+		-- Blink card holders if available
+		BlinkPlayerCardHolders()
 	end
 end
 

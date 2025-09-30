@@ -553,10 +553,6 @@ function HandleStartGameButtonCo()
 
 	HideLoadingUI()
 
-	-- Hide and update UI again, mostly debug
-	--InitializeReadyStatusCircles()
-	--UI.hide("TutorialPanel")
-
 	-- [[DEAL WONDERS]]
 	DealWonders()
 

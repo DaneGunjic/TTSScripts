@@ -330,3 +330,31 @@ function HandleCycleRightButton(obj, color, alt)
 	DraftWonders[color][PlayerCurrentlyChosenWonder[color]].setPosition(CurrentWonderPos)
 	DraftWonders[color][PlayerCurrentlyChosenWonder[color]].setRotation(CurrentWonderRot)
 end
+
+function HighlightPlayerWonderBoard(color)
+	local wonderObj = GetPlayerCurrentWonder(color)
+	if wonderObj then
+		wonderObj.highlightOn(color)
+		log("Highlighted wonder board for " .. color .. " player")
+	else
+		log("Warning: Could not find wonder board for " .. color .. " player")
+	end
+end
+
+function UnhighlightPlayerWonderBoard(color)
+	local wonderObj = GetPlayerCurrentWonder(color)
+	if wonderObj then
+		wonderObj.highlightOff()
+		log("Removed highlight from wonder board for " .. color .. " player")
+	else
+		log("Warning: Could not find wonder board for " .. color .. " player")
+	end
+end
+
+function UpdateWonderBoardHighlight(color, isReady)
+	if isReady then
+		HighlightPlayerWonderBoard(color)
+	else
+		UnhighlightPlayerWonderBoard(color)
+	end
+end

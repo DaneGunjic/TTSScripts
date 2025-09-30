@@ -190,7 +190,6 @@ end
 
 -- [[CALL WHEN 'PLAY' BUTTON IS PRESSED]]
 function HandleStartGameButton()
-
 	-- Clears all text from the setup board
 	for _, textObject in ipairs(TextOnSetupBoard) do
 	  if textObject and textObject.destroy then
@@ -212,8 +211,6 @@ function HandleStartGameButton()
 	startLuaCoroutine(Global, "HandleStartGameButtonCo")
 end
 
-
-
 function HandleBuyCard(obj, color, alt)
 	-- Get the color of the tile's owner (from your PlayerCardHolder table)
   local tileColor
@@ -230,9 +227,22 @@ function HandleBuyCard(obj, color, alt)
     return
   end
 
+	-- If player is ready and clicking the same action, unready them
+	if ReadyList[tileColor] and PlayerSelectedAction[tileColor] == "Buy" then
+		PlayerSelectedAction[tileColor] = nil
+		UpdateActionStatusUI(tileColor, "None")
+		ReadyUp(Player[tileColor])
+		return
+	end
+
+	-- Update action (player will stay ready if they were already ready)
 	PlayerSelectedAction[tileColor] = "Buy"
 	UpdateActionStatusUI(tileColor, "Buy")
-	ReadyUp(Player[tileColor])
+
+	-- Only ready up if player wasn't already ready
+	if not ReadyList[tileColor] then
+		ReadyUp(Player[tileColor])
+	end
 end
 
 function HandleSellCard(obj, color, alt)
@@ -251,9 +261,22 @@ function HandleSellCard(obj, color, alt)
 		return
 	end
 
+	-- If player is ready and clicking the same action, unready them
+	if ReadyList[tileColor] and PlayerSelectedAction[tileColor] == "Sell" then
+		PlayerSelectedAction[tileColor] = nil
+		UpdateActionStatusUI(tileColor, "None")
+		ReadyUp(Player[tileColor])
+		return
+	end
+
+	-- Update action (player will stay ready if they were already ready)
 	PlayerSelectedAction[tileColor] = "Sell"
 	UpdateActionStatusUI(tileColor, "Sell")
-	ReadyUp(Player[tileColor])
+
+	-- Only ready up if player wasn't already ready
+	if not ReadyList[tileColor] then
+		ReadyUp(Player[tileColor])
+	end
 end
 
 function HandleBuildWonder(obj, color, alt)
@@ -272,9 +295,22 @@ function HandleBuildWonder(obj, color, alt)
 		return
 	end
 
+	-- If player is ready and clicking the same action, unready them
+	if ReadyList[tileColor] and PlayerSelectedAction[tileColor] == "BuildWonder" then
+		PlayerSelectedAction[tileColor] = nil
+		UpdateActionStatusUI(tileColor, "None")
+		ReadyUp(Player[tileColor])
+		return
+	end
+
+	-- Update action (player will stay ready if they were already ready)
 	PlayerSelectedAction[tileColor] = "BuildWonder"
 	UpdateActionStatusUI(tileColor, "Wonder")
-	ReadyUp(Player[tileColor])
+
+	-- Only ready up if player wasn't already ready
+	if not ReadyList[tileColor] then
+		ReadyUp(Player[tileColor])
+	end
 end
 
 function HandleArmadaSellCard(obj, color, alt)
@@ -293,17 +329,22 @@ function HandleArmadaSellCard(obj, color, alt)
 		return
 	end
 
-	-- We're already ready, so we'll just reset the action
-	if ReadyList[tileColor] then
-		PlayerSelectedAction[tileColor] = "None"
+	-- If player is ready and clicking the same action, unready them
+	if ReadyList[tileColor] and PlayerSelectedAction[tileColor] == "ArmadaSell" then
+		PlayerSelectedAction[tileColor] = nil
 		UpdateActionStatusUI(tileColor, "None")
 		ReadyUp(Player[tileColor])
 		return
 	end
 
+	-- Update action (player will stay ready if they were already ready)
 	PlayerSelectedAction[tileColor] = "ArmadaSell"
 	UpdateActionStatusUI(tileColor, "Armada Sell")
-	ReadyUp(Player[tileColor])
+
+	-- Only ready up if player wasn't already ready
+	if not ReadyList[tileColor] then
+		ReadyUp(Player[tileColor])
+	end
 end
 
 -- Function to update the action status UI for a player

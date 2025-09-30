@@ -163,9 +163,9 @@ for i, color in ipairs(Players) do
   end
 
   CameraSettings[color] = {
-    pitch = 70,
+    pitch = 60,
     yaw = (i - 2) * 45 % 360,
-    distance = 20
+    distance = 27
   }
 end
 

@@ -348,3 +348,65 @@ function BlinkPlayerCardHolders()
 		end
 	end
 end
+
+function SetHostCameraToSetupBoard()
+	for _, player in ipairs(Player.getPlayers()) do
+		if player.host then
+			player.lookAt({
+				position = SetupBoard.getPosition(),
+				pitch = 90,
+				yaw = 0,
+				distance = 30
+			})
+			break
+		end
+	end
+end
+
+function PreloadGameAudio()
+	-- Create playlist with all game audio files for pre-loading
+	local gameAudioPlaylist = {}
+
+	-- Add all audio files from the Audio table to the playlist
+	for audioName, audioUrl in pairs(Audio) do
+		table.insert(gameAudioPlaylist, {
+			url = audioUrl,
+			title = "7 Wonders - " .. audioName
+		})
+	end
+
+	-- Set the playlist to trigger loading
+	MusicPlayer.setPlaylist(gameAudioPlaylist)
+
+	-- Start coroutine to pre-load all tracks
+	startLuaCoroutine(Global, "preloadAllAudioTracks")
+end
+
+function preloadAllAudioTracks()
+	local playlist = MusicPlayer.getPlaylist()
+	if not playlist or #playlist == 0 then
+		log("No audio playlist found for pre-loading")
+		return
+	end
+
+	log("Starting audio pre-loading for " .. #playlist .. " tracks...")
+
+	-- Pre-load each track in the playlist
+	for i = 1, #playlist do
+		MusicPlayer.playlist_index = i - 1
+
+		-- Wait for current track to load
+		while MusicPlayer.player_status == "Loading" or not MusicPlayer.loaded do
+			coroutine.yield(0)
+		end
+
+		log("Pre-loaded audio track: " .. playlist[i].title)
+	end
+
+	log("All game audio files pre-loaded successfully!")
+
+	-- Clear the playlist to restore original empty state
+	MusicPlayer.setPlaylist({})
+
+	return 1
+end
