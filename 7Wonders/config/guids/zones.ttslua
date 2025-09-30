@@ -33,29 +33,29 @@ DeckZones = {
 -------------------[[ FINAL DECK ZONE REFERENCES ]]-------------------
 -- These are the destination zones where decks will be placed once setup is complete
 -- nil variables are present but those decks are not moved after setup
-FinalDeckZones = {
-  Age = {
-    Age1 = nil,
-    Age2 = nil,
-    Age3 = nil
-  },
-  Cities = {
-    Age1 = getObjectFromGUID("6047cd"),
-    Age2 = getObjectFromGUID("00cc17"),
-    Age3 = getObjectFromGUID("e32431")
-  },
-  Armada = {
-    Age1 = getObjectFromGUID("2d751f"),
-    Age2 = getObjectFromGUID("389ff8"),
-    Age3 = getObjectFromGUID("48509b")
-  },
+-- FinalDeckZones = {
+--   Age = {
+--     Age1 = nil,
+--     Age2 = nil,
+--     Age3 = nil
+--   },
+--   Cities = {
+--     Age1 = getObjectFromGUID("6047cd"),
+--     Age2 = getObjectFromGUID("00cc17"),
+--     Age3 = getObjectFromGUID("e32431")
+--   },
+--   Armada = {
+--     Age1 = getObjectFromGUID("2d751f"),
+--     Age2 = getObjectFromGUID("389ff8"),
+--     Age3 = getObjectFromGUID("48509b")
+--   },
 
-  Leaders = nil,
-  Guild = getObjectFromGUID("189e24"),
+--   Leaders = nil,
+--   Guild = getObjectFromGUID("189e24"),
 
-  Island = {
-    Level1 = nil,
-    Level2 = nil,
-    Level3 = nil
-  }
-}
+--   Island = {
+--     Level1 = nil,
+--     Level2 = nil,
+--     Level3 = nil
+--   }
+-- }

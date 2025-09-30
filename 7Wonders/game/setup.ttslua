@@ -1,16 +1,6 @@
 function HandleStartGameButtonCo()
 	MusicPlayer.repeat_track = false;
 
-	-- Update Phase UI and Ready UI
-	updatePhaseUI("Loading", "Please wait")
-	InitializeReadyStatusCircles()
-
-	-- Hide tutorial panel
-	UI.hide("TutorialPanel")
-
-	-- Show LOADING UI
-	ShowLoadingUI()
-
 	NumberOfPlayers = #getSeatedPlayers()
 
 	if NumberOfPlayers < 3 then
@@ -131,7 +121,7 @@ function HandleStartGameButtonCo()
 				})
 			end
 
-			-- Checks if "Promo" is used, it adds 1 leader card
+			-- Checks if "Promo" is used
 			if bagKey == "Promo" and ExpansionConfig.Leaders.Promo then
 				bagObject.takeObject({
 					position = DeckZones.Leaders.getPosition(),
@@ -140,7 +130,7 @@ function HandleStartGameButtonCo()
 				})
 			end
 
-			-- Checks if "Expert" is used, it adds 15 leader cards
+			-- Checks if "Expert" is used
 			if bagKey == "Expert" and ExpansionConfig.Leaders.Expert then
 				bagObject.takeObject({
 					position = DeckZones.Leaders.getPosition(),
@@ -149,7 +139,7 @@ function HandleStartGameButtonCo()
 				})
 			end
 
-			-- Checks if "Cities" is used, it adds 6 leader cards
+			-- Checks if "Cities" is used
 			if bagKey == "Cities" and ExpansionConfig.Cities then
 				bagObject.takeObject({
 					position = DeckZones.Leaders.getPosition(),
@@ -174,8 +164,8 @@ function HandleStartGameButtonCo()
 	end
 
 	-- [[CITIES DECKS SETUP]]
-	for bagKey, bagObject in pairs(CitiesBags) do
-		if ExpansionConfig.Cities then
+	if ExpansionConfig.Cities then
+		for bagKey, bagObject in pairs(CitiesBags) do
 			bagObject.takeObject({
 				position = DeckZones.Cities[bagKey].getPosition(),
 				rotation = DeckZones.Cities[bagKey].getRotation() + vector(0, 0, 180),
@@ -185,23 +175,23 @@ function HandleStartGameButtonCo()
 	end
 
 	-- [[ARMADA DECKS SETUP]]
-	for bagKey, bagObject in pairs(ArmadaBags) do
-		if ExpansionConfig.Armada then
+	if ExpansionConfig.Armada then
+		for bagKey, bagObject in pairs(ArmadaBags) do
 			bagObject.takeObject({
 				position = DeckZones.Armada[bagKey].getPosition(),
 				rotation = DeckZones.Armada[bagKey].getRotation() + vector(0, 0, 180),
 				smooth = false
 			})
 		end
-	end
 
-	for bagKey, bagObject in pairs(ArmadaBags_4P) do
-		if ExpansionConfig.Armada and NumberOfPlayers >= 4 then
-			bagObject.takeObject({
-				position = DeckZones.Armada[bagKey].getPosition(),
-				rotation = DeckZones.Armada[bagKey].getRotation() + vector(0, 0, 180),
-				smooth = false
-			})
+		if NumberOfPlayers >= 4 then
+			for bagKey, bagObject in pairs(ArmadaBags_4P) do
+				bagObject.takeObject({
+					position = DeckZones.Armada[bagKey].getPosition(),
+					rotation = DeckZones.Armada[bagKey].getRotation() + vector(0, 0, 180),
+					smooth = false
+				})
+			end
 		end
 	end
 
@@ -234,14 +224,14 @@ function HandleStartGameButtonCo()
 		})
 
 		local function PlayerToPawn(n)
-	    local map = {
-	        [3] = 2,
-	        [4] = 3,
-	        [5] = 3,
-	        [6] = 4,
-	        [7] = 5
-	    }
-	    return map[n]
+			local map = {
+				[3] = 2,
+				[4] = 3,
+				[5] = 3,
+				[6] = 4,
+				[7] = 5
+			}
+			return map[n]
 		end
 
 		local PawnsToSpawn = PlayerToPawn(NumberOfPlayers)
@@ -459,6 +449,15 @@ function HandleStartGameButtonCo()
 		end
 	end
 
+	if ExpansionConfig.Frontiers then
+		while WonderBags.Frontiers.getQuantity() ~= 0 do
+			WonderBags.Frontiers.takeObject({
+				position = WonderBags.Base.getPosition() + Vector(0, 2, 0),
+				smooth = false
+			})
+		end
+	end
+
 	if WonderExpansionConfig.Promo then
 		while WonderBags.Promo.getQuantity() ~= 0 do
 			WonderBags.Promo.takeObject({
@@ -547,9 +546,6 @@ function HandleStartGameButtonCo()
 		end
 	end
 
-	WonderBags.Base.randomize()
-	DockyardBag.randomize()
-
 	-- Wait for all assets to load before continuing
 	while not AreAllAssetsLoaded() do
 		coroutine.yield(0)
@@ -558,20 +554,25 @@ function HandleStartGameButtonCo()
 	HideLoadingUI()
 
 	-- Hide and update UI again, mostly debug
-	InitializeReadyStatusCircles()
-	UI.hide("TutorialPanel")
+	--InitializeReadyStatusCircles()
+	--UI.hide("TutorialPanel")
 
 	-- [[DEAL WONDERS]]
 	DealWonders()
 
-	-- Initialize player timers when wonders are dealt
-	InitializePlayerTimers()
+	-- [[DEAL FRONTIERS]]
+	if ExpansionConfig.Frontiers then
+		DealFrontiers()
+	end
 
 	-- [[DEAL RANDOM ARMADA BOARDS AND SHIPS]]
 	if ExpansionConfig.Armada then
 		DealArmada()
 		DealIslandBoards()
 	end
+
+	-- Initialize player timers when wonders are dealt
+	InitializePlayerTimers()
 
 	-- Play a sound
 	MusicPlayer.setCurrentAudioclip({url=Audio.ReadyAlt, title = "GL & HF"})

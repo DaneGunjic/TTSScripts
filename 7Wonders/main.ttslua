@@ -6,11 +6,12 @@
 #include !\7Wonders\game\phases.ttslua
 #include !\7Wonders\game\setup.ttslua
 
-#include !\7Wonders\modules\armada_manager.ttslua
-#include !\7Wonders\modules\wonder_manager.ttslua
+#include !\7Wonders\managers\armada_manager.ttslua
+#include !\7Wonders\managers\wonder_manager.ttslua
+#include !\7Wonders\managers\frontiers_manager.ttslua
 
-#include !\7Wonders\players\ready_system.ttslua
-#include !\7Wonders\players\timer_system.ttslua
+#include !\7Wonders\systems\ready_system.ttslua
+#include !\7Wonders\systems\timer_system.ttslua
 
 #include !\7Wonders\ui\buttons.ttslua
 #include !\7Wonders\ui\xml.ttslua
@@ -27,7 +28,7 @@ function onLoad()
   #include !\7Wonders\globals_players.ttslua
 
   #include !\7Wonders\config\guids\bags.ttslua
-  #include !\7Wonders\config\guids\decks.ttslua
+  #include !\7Wonders\config\guids\zones.ttslua
 
   MakeSetupButtons()
   MakeSetupBoardText()

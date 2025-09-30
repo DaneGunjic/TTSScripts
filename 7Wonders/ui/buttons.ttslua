@@ -191,218 +191,28 @@ end
 -- [[CALL WHEN 'PLAY' BUTTON IS PRESSED]]
 function HandleStartGameButton()
 
+	-- Clears all text from the setup board
 	for _, textObject in ipairs(TextOnSetupBoard) do
-	  if textObject and textObject.destroy then  -- Check if object exists and has destroy()
-	      textObject.destroy()  -- Remove the text object
+	  if textObject and textObject.destroy then
+	      textObject.destroy()
 	  end
 	end
-	TextOnSetupBoard = {}  -- Clear the table afterward
+	TextOnSetupBoard = {}
+
+	-- Update Phase UI and Ready UI
+	updatePhaseUI("Loading", "Please wait")
+	InitializeReadyStatusCircles()
+
+	-- Hide tutorial panel
+	UI.hide("TutorialPanel")
+
+	-- Show LOADING UI
+	ShowLoadingUI()
 
 	startLuaCoroutine(Global, "HandleStartGameButtonCo")
 end
 
-function HandleFlipButton(obj, color, alt)
-	if not IsObjectInPlayerWonderZone(obj, color) then
-    broadcastToColor("This isn't your wonder!", color, {1, 0, 0})
-    return
-	end
 
-	-- Random Mode
-	if not DraftMode then
-		local tempDefaultRot = {table.unpack(PlayerInfo[color].ComponentRotation)}
-		local tempCurrentRot = RandomWonderObj[color].getRotation()
-
-		-- Flipped object have the same height in-game,
-		-- but actually offset according to their pivot point, so we add 0.2 so the Wonder keeps its position
-		local tempFlippedPos = {
-			RandomWonderObj[color].getPosition().x,
-			RandomWonderObj[color].getPosition().y + 0.2,
-			RandomWonderObj[color].getPosition().z
-		}
-
-		if rotationEquals(tempDefaultRot, tempCurrentRot) then
-			-- Flip to Night Side (B)
-			RandomWonderObj[color].setRotation({
-			  x = tempCurrentRot[1],
-			  y = tempCurrentRot[2],
-			  z = tempCurrentRot[3] + 180
-			})
-
-			RandomWonderObj[color].setPosition(tempFlippedPos)
-			RandomWonderObj[color].editButton({
-				index          = 0,
-				position       = {0, -0.1, -0.5},
-				rotation       = {0, 0, 180}
-			})
-			RandomWonderObj[color].editButton({
-				index          = 1,
-				position       = {0, -0.1, 0},
-				rotation       = {0, 0, 180}
-			})
-		else
-			-- Flip to Day Side (A)
-			-- Offsets the height to match the default one
-			tempFlippedPos[2] = tempFlippedPos[2] - 0.4
-
-			RandomWonderObj[color].setRotation(tempDefaultRot)
-			RandomWonderObj[color].setPosition(tempFlippedPos)
-			RandomWonderObj[color].editButton({
-				index          = 0,
-				position       = {0, 0.3, -0.5},
-				rotation       = {0, 0, 0}
-			})
-			RandomWonderObj[color].editButton({
-				index          = 1,
-				position       = {0, 0.3, 0},
-				rotation       = {0, 0, 0}
-			})
-		end
-	-- Draft Mode
-	else
-		local CurrentWonderObj = DraftWonders[color][PlayerCurrentlyChosenWonder[color]]
-		local tempDefaultRot = PlayerInfo[color].ComponentRotation
-		local tempCurrentRot = 	CurrentWonderObj.getRotation()
-
-		-- Flipped object have the same height in-game, but actually offset according to their pivot point, so we add 0.2 so the Wonder keeps its position
-		local tempFlippedPos = {
-			CurrentWonderObj.getPosition().x,
-			CurrentWonderObj.getPosition().y + 0.2,
-			CurrentWonderObj.getPosition().z}
-
-		local tempNum = PlayerCurrentlyChosenWonder[color]
-
-		if rotationEquals(tempDefaultRot, tempCurrentRot) then
-			local playerWonderTable = PlayerInfo[color]
-			local componentRot = playerWonderTable.ComponentRotation
-
-			-- Add 180 to Z-axis only
-			CurrentWonderObj.setRotation({
-			  x = tempCurrentRot[1],
-			  y = tempCurrentRot[2],
-			  z = tempCurrentRot[3] + 180
-			})
-
-			CurrentWonderObj.setPosition(tempFlippedPos)
-
-			for i, wonder in ipairs(DraftWonders[color]) do
-				wonder.editButton({
-					index          = 0,
-					position       = {0, -0.1, -0.5},
-					rotation       = {0, 0, 180}
-				})
-				wonder.editButton({
-					index          = 1,
-					position       = {0, -0.1, 0},
-					rotation       = {0, 0, 180}
-				})
-				wonder.editButton({
-					index          = 2,
-					position       = {1, -0.1, 0},
-					rotation       = {0, 0, 180}
-				})
-				wonder.editButton({
-					index          = 3,
-					position       = {-1, -0.1, 0},
-					rotation       = {0, 0, 180}
-				})
-			end
-		else
-			tempFlippedPos[2] = tempFlippedPos[2] - 0.4
-			CurrentWonderObj.setRotation(tempDefaultRot)
-			CurrentWonderObj.setPosition(tempFlippedPos)
-
-			for i, wonder in ipairs(DraftWonders[color]) do
-				wonder.editButton({
-					index          = 0,
-					position       = {0, 0.3, -0.5},
-					rotation       = {0, 0, 0}
-				})
-				wonder.editButton({
-					index          = 1,
-					position       = {0, 0.3, 0},
-					rotation       = {0, 0, 0}
-				})
-				wonder.editButton({
-					index          = 2,
-					position       = {-1, 0.3, 0},
-					rotation       = {0, 0, 0}
-				})
-				wonder.editButton({
-					index          = 3,
-					position       = {1, 0.3, 0},
-					rotation       = {0, 0, 0}
-				})
-			end
-		end
-	end
-end
-
-function HandleKeepButton(obj, color, alt)
-	if not IsObjectInPlayerWonderZone(obj, color) then
-    broadcastToColor("This isn't your wonder!", color, {1, 0, 0})
-    return
-	end
-
-	-- Based on rotation we know if it's Day or Night
-	local Side = "Day / A"
-	if IsPlayerWonderFlipped(color) then
-		Side = "Night / B"
-	end
-
-	broadcastToAll(Player[color].steam_name .. " chose " .. GetPlayerCurrentWonder(color).getName() .. " (" .. Side .. ")")
-
-	obj.clearButtons()
-
-	ReadyUp(Player[color])
-end
-
-function HandleCycleLeftButton(obj, color, alt)
-	if not IsObjectInPlayerWonderZone(obj, color) then
-    broadcastToColor("This isn't your wonder!", color, {1, 0, 0})
-    return
-	end
-
-	local tempNum = PlayerCurrentlyChosenWonder[color]
-	-- We might be on Night / B side, so save the location and rotation
-	local CurrentWonderRot = DraftWonders[color][tempNum].getRotation()
-	local CurrentWonderPos = DraftWonders[color][tempNum].getPosition()
-
-	-- Move the current Wonder below the table
-	DraftWonders[color][tempNum].setPosition(PlayerInfo[color].DraftModePos)
-
-	-- Find the previous (left) index
-	PlayerCurrentlyChosenWonder[color] = PlayerCurrentlyChosenWonder[color] - 1
-	if PlayerCurrentlyChosenWonder[color] == 0 then
-		PlayerCurrentlyChosenWonder[color] = DraftModeNumber
-	end
-
-	DraftWonders[color][PlayerCurrentlyChosenWonder[color]].setPosition(CurrentWonderPos)
-	DraftWonders[color][PlayerCurrentlyChosenWonder[color]].setRotation(CurrentWonderRot)
-end
-
-function HandleCycleRightButton(obj, color, alt)
-	if not IsObjectInPlayerWonderZone(obj, color) then
-    broadcastToColor("This isn't your wonder!", color, {1, 0, 0})
-    return
-	end
-
-	local tempNum = PlayerCurrentlyChosenWonder[color]
-	-- We might be on Night / B side, so save the location and rotation
-	local CurrentWonderRot = DraftWonders[color][tempNum].getRotation()
-	local CurrentWonderPos = DraftWonders[color][tempNum].getPosition()
-
-	-- Move the current Wonder below the table
-	DraftWonders[color][tempNum].setPosition(PlayerInfo[color].DraftModePos)
-
-	-- Find the next (right) index
-	PlayerCurrentlyChosenWonder[color] = PlayerCurrentlyChosenWonder[color] + 1
-	if PlayerCurrentlyChosenWonder[color] > DraftModeNumber then
-		PlayerCurrentlyChosenWonder[color] = 1
-	end
-
-	DraftWonders[color][PlayerCurrentlyChosenWonder[color]].setPosition(CurrentWonderPos)
-	DraftWonders[color][PlayerCurrentlyChosenWonder[color]].setRotation(CurrentWonderRot)
-end
 
 function HandleBuyCard(obj, color, alt)
 	-- Get the color of the tile's owner (from your PlayerCardHolder table)

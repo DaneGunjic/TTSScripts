@@ -1,0 +1,182 @@
+function DealFrontiers()
+	-- Deal frontiers to frontier zones for each seated player
+	for _, player in ipairs(getSeatedPlayers()) do
+		local frontierZone = FrontiersZones[player]
+		if frontierZone and FrontiersBag then
+			FrontiersBag.takeObject({
+				position = Vector(frontierZone.getPosition().x, 0.48, frontierZone.getPosition().z),
+				rotation = frontierZone.getRotation(),
+				smooth = false,
+				callback_function = function(obj)
+                    obj.locked = true
+					CreateFrontierButtons(obj, player)
+					CreateFrontierSnapPoints(obj)
+				end
+			})
+            MajorityTokenBag.takeObject({
+                position = Vector(frontierZone.getPosition().x, 1, frontierZone.getPosition().z),
+                rotation = frontierZone.getRotation(),
+                smooth = false
+            })
+		end
+	end
+end
+
+-- Create flip and keep buttons on frontier objects
+function CreateFrontierButtons(frontierObj, playerColor)
+	if not frontierObj then return end
+
+	-- Create Flip button
+	frontierObj.createButton({
+		click_function = "HandleFrontierFlip",
+		function_owner = Global,
+		label = "Flip",
+		position = {-1, 0.2, 0},
+		rotation = {0, 0, 0},
+    scale = {0.3, 0.3, 0.3},
+		font_size = 400,
+		width = 1200,
+		height = 600,
+		color = {1, 1, 1, 1},
+		font_color = {0, 0, 0}
+	})
+
+	-- Create Keep button
+	frontierObj.createButton({
+		click_function = "HandleFrontierKeep",
+		function_owner = Global,
+		label = "Keep",
+		position = {1, 0.2, 0},
+		rotation = {0, 0, 0},
+    scale = {0.3, 0.3, 0.3},
+		font_size = 400,
+		width = 1200,
+		height = 600,
+		color = {1, 1, 1, 1},
+		font_color = {0, 0, 0}
+	})
+
+	-- Store player color on the object for reference in button handlers
+	frontierObj.setVar("ownerColor", playerColor)
+end
+
+-- Handler for frontier flip button
+function HandleFrontierFlip(obj, playerColor, alt_click)
+	-- Check if the player owns this frontier
+	local ownerColor = obj.getVar("ownerColor")
+	if playerColor ~= ownerColor then
+		broadcastToColor("This isn't your frontier!", playerColor, {1, 0, 0})
+		return
+	end
+
+	-- Get current rotation and position
+	local tempCurrentRot = obj.getRotation()
+	local tempDefaultRot = FrontiersZones[playerColor].getRotation()
+	local tempFlippedPos = {
+		obj.getPosition().x,
+		obj.getPosition().y + 0.2,
+		obj.getPosition().z
+	}
+
+	-- Check if currently at default rotation (face up)
+	if rotationEquals(tempDefaultRot, tempCurrentRot) then
+		-- Flip to face down (add 180 to Z-axis)
+		obj.setRotation({
+			x = tempCurrentRot.x,
+			y = tempCurrentRot.y,
+			z = tempCurrentRot.z + 180
+		})
+		obj.setPosition(tempFlippedPos)
+
+		-- Update button positions for B side
+		obj.editButton({
+			index = 0,
+			position = {1, 0, 0},
+			rotation = {0, 0, 180}
+		})
+		obj.editButton({
+			index = 1,
+			position = {-1, 0, 0},
+			rotation = {0, 0, 180}
+		})
+	else
+		-- Flip to face up (return to default rotation)
+		tempFlippedPos[2] = tempFlippedPos[2] - 0.4
+		obj.setRotation(tempDefaultRot)
+		obj.setPosition(tempFlippedPos)
+
+		-- Update button positions for A side
+		obj.editButton({
+			index = 0,
+			position = {-1, 0.2, 0},
+			rotation = {0, 0, 0}
+		})
+		obj.editButton({
+			index = 1,
+			position = {1, 0.2, 0},
+			rotation = {0, 0, 0}
+		})
+	end
+end
+
+-- Handler for frontier keep button
+function HandleFrontierKeep(obj, playerColor, alt_click)
+	local ownerColor = obj.getVar("ownerColor")
+
+	-- Only allow the owner to interact with their frontier
+	if playerColor ~= ownerColor then
+		broadcastToColor("This isn't your frontier!", playerColor, {1, 0, 0})
+		return
+	end
+
+	obj.clearButtons()
+
+	-- Determine which side based on rotation
+	local Side = "Side A"
+	local tempDefaultRot = FrontiersZones[playerColor].getRotation()
+	local tempCurrentRot = obj.getRotation()
+
+	if not rotationEquals(tempDefaultRot, tempCurrentRot) then
+		Side = "Side B"
+	end
+
+	broadcastToAll(Player[playerColor].steam_name .. " kept their frontier: " .. obj.getName() .. " (" .. Side .. ")")
+
+	-- Mark frontier as kept
+	PlayerKeepStatus[playerColor].Frontier = true
+
+	-- Check if both wonder and frontier are kept
+	if PlayerKeepStatus[playerColor].Wonder and PlayerKeepStatus[playerColor].Frontier then
+		ReadyUp(Player[playerColor])
+	else
+		broadcastToColor("Waiting for you to keep your wonder as well...", playerColor, {1, 1, 0})
+	end
+end
+
+-- Create snap points on frontier objects
+function CreateFrontierSnapPoints(frontierObj)
+	if not frontierObj then return end
+
+	local snapPoints = {}
+
+	for i = 1, 5 do
+		local zOffset = 2 + ((i - 1) * 0.5)  -- Start at bottom-left, move downwards by 0.5 each
+		table.insert(snapPoints, {
+			position = {-1.1, 0.1, zOffset},
+			rotation = {0, 0, 0},
+			rotation_snap = true
+		})
+	end
+
+	for i = 1, 5 do
+		local zOffset = 2 + ((i - 1) * 0.5)  -- Start at bottom-right, move downwards by 0.5 each
+		table.insert(snapPoints, {
+			position = {1.1, 0.1, zOffset},
+			rotation = {0, 0, 0},
+			rotation_snap = true
+		})
+	end
+
+	-- Set the snap points on the frontier object
+	frontierObj.setSnapPoints(snapPoints)
+end

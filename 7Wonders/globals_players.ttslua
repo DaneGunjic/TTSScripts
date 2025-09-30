@@ -94,6 +94,7 @@ RandomWonderObj = {}
 DraftWonders = {}
 PlayerCurrentlyChosenWonder = {}
 PlayerSelectedAction = {}
+PlayerKeepStatus = {}
 ReadyList = {}
 PlayerShips = {}
 PlayerShipMovements = {}
@@ -102,6 +103,7 @@ for _, color in ipairs(Players) do
   DraftWonders[color] = {}
   PlayerCurrentlyChosenWonder[color] = 1
   PlayerSelectedAction[color] = nil
+  PlayerKeepStatus[color] = { Wonder = false, Frontier = false }
   PlayerShips[color] = {}
   PlayerShipMovements[color] = { Yellow = 0, Red = 0, Blue = 0, Green = 0 }
   ReadyList[color] = false
@@ -137,6 +139,17 @@ ArmadaBoardZones = {
   Pink = getObjectFromGUID("36feea"),
   Blue = getObjectFromGUID("352aeb"),
   Purple = getObjectFromGUID("13c916")
+}
+
+--------------[[ SCRIPTING ZONES | FRONTIERS ]]--------------
+FrontiersZones = {
+  White = getObjectFromGUID("4ec38b"),
+  Red = getObjectFromGUID("776732"),
+  Yellow = getObjectFromGUID("ec4c73"),
+  Green = getObjectFromGUID("5a00a4"),
+  Pink = getObjectFromGUID("d5adf7"),
+  Blue = getObjectFromGUID("749a20"),
+  Purple = getObjectFromGUID("9e13c4")
 }
 
 -- [[ PLAYER CAMERA SETTINGS ]]

@@ -109,6 +109,7 @@ WonderBags = {
   Edifice = getObjectFromGUID("d9d9c0"),
   Ruins = getObjectFromGUID("695adc"),
   Collection = getObjectFromGUID("7c6699"),
+  Frontiers = getObjectFromGUID("caca98"),
   Promo = getObjectFromGUID("01d275"),
   Other = getObjectFromGUID("3aa2e0")
 }
@@ -153,6 +154,7 @@ DebtBags = {
 
 -- [[BAGS | FRONTIERS]]
 FrontiersBag = getObjectFromGUID("f46e91")
+MajorityTokenBag = getObjectFromGUID("0a4eb4")
 
 -- [[BAGS | RECONSTRUCTION]]
 ReconstructionTokenBag = getObjectFromGUID("4fb029")

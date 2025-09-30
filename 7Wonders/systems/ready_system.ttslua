@@ -162,7 +162,7 @@ function ShowReadyButtons()
 		-- Show the UI ready button for this player instead of creating physical button
 		UI.setAttribute("ReadyButton" .. color, "active", "true")
 		-- Reset button to initial state (Not Ready, red color)
-		UI.setAttribute("ReadyButton" .. color, "text", "Not Ready")
+		UI.setAttribute("ReadyButton" .. color, "text", "Ready Up")
 		UI.setAttribute("ReadyButton" .. color, "color", "#FF0000")
 		--print("SHOWED UI READY BUTTON FOR " .. color)
 	end
