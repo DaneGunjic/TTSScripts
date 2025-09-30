@@ -248,7 +248,7 @@ function HandleSellCard(obj, color, alt)
 	-- Verify permission
 	if color:lower() ~= tileColor:lower() then
 		broadcastToColor("This isn't your button!", color, {1,0,0})
-		return  -- Exit function if wrong player
+		return
 	end
 
 	PlayerSelectedAction[tileColor] = "Sell"
@@ -269,7 +269,7 @@ function HandleBuildWonder(obj, color, alt)
 	-- Verify permission
 	if color:lower() ~= tileColor:lower() then
 		broadcastToColor("This isn't your button!", color, {1,0,0})
-		return  -- Exit function if wrong player
+		return
 	end
 
 	PlayerSelectedAction[tileColor] = "BuildWonder"
@@ -290,7 +290,15 @@ function HandleArmadaSellCard(obj, color, alt)
 	-- Verify permission
 	if color:lower() ~= tileColor:lower() then
 		broadcastToColor("This isn't your button!", color, {1,0,0})
-		return  -- Exit function if wrong player
+		return
+	end
+
+	-- We're already ready, so we'll just reset the action
+	if ReadyList[tileColor] then
+		PlayerSelectedAction[tileColor] = "None"
+		UpdateActionStatusUI(tileColor, "None")
+		ReadyUp(Player[tileColor])
+		return
 	end
 
 	PlayerSelectedAction[tileColor] = "ArmadaSell"

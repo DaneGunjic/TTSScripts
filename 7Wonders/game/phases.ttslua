@@ -589,7 +589,7 @@ function DoLeaderStage()
           RotateHands(Card, PlayerInstance.color, "Right")
         end
       end
-    end , 0.1)
+    end , 0.2)
 
     -- Increment how many passes we did so far
     CurrentPasses = CurrentPasses + 1
@@ -611,7 +611,7 @@ function DoRuinsStage()
           RotateHands(Card, PlayerInstance.color, "Left")
         end
       end
-    end , 0.1)
+    end , 0.2)
 
     -- Increment how many passes we did so far
     CurrentPasses = CurrentPasses + 1
@@ -801,7 +801,7 @@ function doAgeStage(ageNumber, rotationDirection, forceTakeDirection, gameState)
           RotateHands(Card, PlayerInstance.color, rotationDirection)
         end
       end
-    end , 0.1)
+    end , 0.2)
 
     -- Increment how many passes we did so far
     CurrentPasses = CurrentPasses + 1
