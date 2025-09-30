@@ -101,7 +101,6 @@ function pause(waittime)
 end
 
 -------------------[[ OBJECT UTILITIES ]]-------------------
-
 function AreAllAssetsLoaded()
   -- Check all objects in the game for loading_custom
   local allObjects = getAllObjects()

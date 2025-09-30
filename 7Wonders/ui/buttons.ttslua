@@ -231,6 +231,7 @@ function HandleBuyCard(obj, color, alt)
   end
 
 	PlayerSelectedAction[tileColor] = "Buy"
+	UpdateActionStatusUI(tileColor, "Buy")
 	ReadyUp(Player[tileColor])
 end
 
@@ -251,6 +252,7 @@ function HandleSellCard(obj, color, alt)
 	end
 
 	PlayerSelectedAction[tileColor] = "Sell"
+	UpdateActionStatusUI(tileColor, "Sell")
 	ReadyUp(Player[tileColor])
 end
 
@@ -271,6 +273,7 @@ function HandleBuildWonder(obj, color, alt)
 	end
 
 	PlayerSelectedAction[tileColor] = "BuildWonder"
+	UpdateActionStatusUI(tileColor, "Wonder")
 	ReadyUp(Player[tileColor])
 end
 
@@ -291,5 +294,19 @@ function HandleArmadaSellCard(obj, color, alt)
 	end
 
 	PlayerSelectedAction[tileColor] = "ArmadaSell"
+	UpdateActionStatusUI(tileColor, "Armada Sell")
 	ReadyUp(Player[tileColor])
+end
+
+-- Function to update the action status UI for a player
+function UpdateActionStatusUI(color, actionText)
+	local actionStatusId = "ActionStatus" .. color
+	UI.setValue(actionStatusId, "Chosen action: " .. actionText)
+end
+
+-- Function to reset all action status UI to "None"
+function ResetAllActionStatusUI()
+	for _, color in ipairs(getSeatedPlayers()) do
+		UpdateActionStatusUI(color, "None")
+	end
 end

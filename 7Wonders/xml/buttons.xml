@@ -26,6 +26,51 @@
   </VerticalLayout>
 </Panel>
 
+<!-- Action Status Panels - Player Specific -->
+
+<!-- WHITE ACTION -->
+<Panel padding="5 5 5 5" id="ActionPanelWhite" color="rgba(0,0,0,1)" width="200" height="50" offsetXY="-600 525" visibility="White">
+  <VerticalLayout>
+    <Text id="ActionStatusWhite" color="White" fontSize="15">Chosen action: None</Text>
+  </VerticalLayout>
+</Panel>
+<!-- RED ACTION -->
+<Panel padding="5 5 5 5" id="ActionPanelRed" color="rgba(0,0,0,1)" width="200" height="50" offsetXY="-600 525" visibility="Red">
+  <VerticalLayout>
+    <Text id="ActionStatusRed" color="White" fontSize="15">Chosen action: None</Text>
+  </VerticalLayout>
+</Panel>
+<!-- YELLOW ACTION -->
+<Panel padding="5 5 5 5" id="ActionPanelYellow" color="rgba(0,0,0,1)" width="200" height="50" offsetXY="-600 525" visibility="Yellow">
+  <VerticalLayout>
+    <Text id="ActionStatusYellow" color="White" fontSize="15">Chosen action: None</Text>
+  </VerticalLayout>
+</Panel>
+<!-- GREEN ACTION -->
+<Panel padding="5 5 5 5" id="ActionPanelGreen" color="rgba(0,0,0,1)" width="200" height="50" offsetXY="-600 525" visibility="Green">
+  <VerticalLayout>
+    <Text id="ActionStatusGreen" color="White" fontSize="15">Chosen action: None</Text>
+  </VerticalLayout>
+</Panel>
+<!-- BLUE ACTION -->
+<Panel padding="5 5 5 5" id="ActionPanelBlue" color="rgba(0,0,0,1)" width="200" height="50" offsetXY="-600 525" visibility="Blue">
+  <VerticalLayout>
+    <Text id="ActionStatusBlue" color="White" fontSize="15">Chosen action: None</Text>
+  </VerticalLayout>
+</Panel>
+<!-- PURPLE ACTION -->
+<Panel padding="5 5 5 5" id="ActionPanelPurple" color="rgba(0,0,0,1)" width="200" height="50" offsetXY="-600 525" visibility="Purple">
+  <VerticalLayout>
+    <Text id="ActionStatusPurple" color="White" fontSize="15">Chosen action: None</Text>
+  </VerticalLayout>
+</Panel>
+<!-- PINK ACTION -->
+<Panel padding="5 5 5 5" id="ActionPanelPink" color="rgba(0,0,0,1)" width="200" height="50" offsetXY="-600 525" visibility="Pink">
+  <VerticalLayout>
+    <Text id="ActionStatusPink" color="White" fontSize="15">Chosen action: None</Text>
+  </VerticalLayout>
+</Panel>
+
 <!-- Menu Toggle Buttons - Player Specific -->
 
 <!-- WHITE TOGGLE -->

@@ -367,6 +367,9 @@ function ResolvePlayerActions()
     PlayerSelectedAction[color] = nil
   end
 
+  -- Reset action status UI after resolving actions
+  ResetAllActionStatusUI()
+
   return true
 end
 
