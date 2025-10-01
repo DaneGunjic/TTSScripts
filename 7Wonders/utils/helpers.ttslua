@@ -5,7 +5,7 @@ function AddCoins(color, amount, skip_message)
 
 	if not skip_message then
 		local coinText = (amount == 1) and " coin" or " coins"
-		printToAll(Player[color].steam_name .. " gained " .. amount .. coinText, {r=0.5, g=0.5, b=0.5})
+		printToAll(Player[color].steam_name .. " gained " .. amount .. coinText, color)
 	end
 
 	local coinSpawnPosition = Vector(PlayerInfo[color].WonderPos)
@@ -13,7 +13,7 @@ function AddCoins(color, amount, skip_message)
 	coinSpawnPosition.x = coinSpawnPosition.x + math.random(-150, 150) / 100
 	coinSpawnPosition.z = coinSpawnPosition.z + math.random(-100, 100) / 100
 
-	if amount > 15 then
+	if amount > 6 then
 		CoinBags.Coin6.takeObject({
 			position = coinSpawnPosition,
 			rotation = PlayerInfo[color].ComponentRotation,
@@ -23,7 +23,7 @@ function AddCoins(color, amount, skip_message)
 		amountToGive = amount - 6
 		Wait.time(function() AddCoins(color, amountToGive, true) end, 0.1)
 		return
-	elseif amount <= 15 and amount > 6 then
+	elseif amount <= 6 and amount > 3 then
 		CoinBags.Coin3.takeObject({
 			position = coinSpawnPosition,
 			rotation = PlayerInfo[color].ComponentRotation,
@@ -33,7 +33,7 @@ function AddCoins(color, amount, skip_message)
 		amountToGive = amount - 3
 		Wait.time(function() AddCoins(color, amountToGive, true) end, 0.1)
 		return
-	elseif amount <= 6 then
+	elseif amount <= 3 then
 		CoinBags.Coin1.takeObject({
 			position = coinSpawnPosition,
 			rotation = PlayerInfo[color].ComponentRotation,

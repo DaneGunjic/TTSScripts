@@ -272,7 +272,7 @@ function HandleKeepButton(obj, color, alt)
 	local coinButtonParams = {
 		label = "Coins: 0",
 		tooltip = "Victory points: 0",
-		click_function = "none",
+		click_function = "HandleCoinButton",
 		position = {0, 0.2, -0.8},
 		rotation = {0, 0, 0},
 		scale = {0.3, 0.3, 0.3},
@@ -385,5 +385,55 @@ function UpdateWonderBoardHighlight(color, isReady)
 		HighlightPlayerWonderBoard(color)
 	else
 		UnhighlightPlayerWonderBoard(color)
+	end
+end
+
+function HandleCoinButton(obj, color, alt)
+	if alt then
+		local wonderZone = WonderZones[color]
+		if not wonderZone then
+			return
+		end
+
+		local tempObjects = wonderZone.getObjects()
+		local coin1Found = false
+		local coin3Found = false
+		local coin6Found = false
+		local coin1Obj, coin3Obj, coin6Obj
+
+		-- Find available coins
+		for i, coinObj in ipairs(tempObjects) do
+			if coinObj.hasTag("Coin1") and not coin1Found then
+				coin1Found = true
+				coin1Obj = coinObj
+			elseif coinObj.hasTag("Coin3") and not coin3Found then
+				coin3Found = true
+				coin3Obj = coinObj
+			elseif coinObj.hasTag("Coin6") and not coin6Found then
+				coin6Found = true
+				coin6Obj = coinObj
+			end
+		end
+
+		-- Handle coin removal with change-making
+		if coin1Found then
+			coin1Obj.destruct()
+			broadcastToAll(Player[color].steam_name .. " lost 1 coin", color)
+		elseif coin3Found then
+			coin3Obj.destruct()
+			broadcastToAll(Player[color].steam_name .. " lost 1 coin", color)
+
+			AddCoins(color, 2, true)
+		elseif coin6Found then
+			coin6Obj.destruct()
+			broadcastToAll(Player[color].steam_name .. " lost 1 coin", color)
+
+			local basePosition = Vector(PlayerInfo[color].WonderPos)
+			basePosition.y = 2
+
+			AddCoins(color, 5, true)
+		end
+	else
+		AddCoins(color, 1, false)
 	end
 end
