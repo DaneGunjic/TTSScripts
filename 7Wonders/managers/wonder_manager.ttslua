@@ -34,7 +34,8 @@ function DealWonders()
 					smooth = false,
 					position = PlayerInfo[player].DraftModePos,
 					rotation = PlayerInfo[player].ComponentRotation,
-					callback_function = LockSpawnedObject})
+					callback_function = LockSpawnedObject
+				})
 
 				DefaultButtonParams.width = 600
 				DefaultButtonParams.color = {1,1,1,1}
@@ -87,9 +88,8 @@ end
 
 function HideReadyButton()
 	for _, color in ipairs(getSeatedPlayers()) do
-		-- Hide the UI ready button for this player instead of clearing physical buttons
+		-- Hide the UI ready button for this player
 		UI.setAttribute("ReadyButton" .. color, "active", "false")
-		--print("HIDDEN UI READY BUTTON FOR " .. color)
 	end
 end
 
@@ -173,6 +173,7 @@ function HandleFlipButton(obj, color, alt)
 		end
 	-- Draft Mode
 	else
+		-- Draft Mode
 		local CurrentWonderObj = DraftWonders[color][PlayerCurrentlyChosenWonder[color]]
 		local tempDefaultRot = PlayerInfo[color].ComponentRotation
 		local tempCurrentRot = 	CurrentWonderObj.getRotation()
@@ -267,8 +268,42 @@ function HandleKeepButton(obj, color, alt)
 
 	obj.clearButtons()
 
+	-- Create coin tracking button at middle-top of wonder
+	local coinButtonParams = {
+		label = "Coins: 0",
+		tooltip = "Victory points: 0",
+		click_function = "none",
+		position = {0, 0.2, -0.8},
+		rotation = {0, 0, 0},
+		scale = {0.3, 0.3, 0.3},
+		width = 1400,
+		height = 500,
+		font_size = 350,
+		color = {0, 0, 0, 0.9},
+		font_color = {1, 1, 1}
+	}
+
+	-- Adjust button position if wonder is flipped
+	if IsPlayerWonderFlipped(color) then
+		coinButtonParams.position = {0, 0, -0.8}
+		coinButtonParams.rotation = {0, 0, 180}
+	end
+
+	obj.createButton(coinButtonParams)
+
 	-- Mark wonder as kept
 	PlayerKeepStatus[color].Wonder = true
+
+	-- If in Draft mode, destroy all unpicked wonders
+	if DraftMode then
+		for i, wonder in ipairs(DraftWonders[color]) do
+			-- Don't destroy the currently chosen wonder
+			if i ~= PlayerCurrentlyChosenWonder[color] then
+				--print("Destroying wonder " .. i)
+				wonder.destruct()
+			end
+		end
+	end
 
 	-- Check if frontiers are enabled and if both wonder and frontier are kept
 	if ExpansionConfig.Frontiers then
@@ -335,9 +370,6 @@ function HighlightPlayerWonderBoard(color)
 	local wonderObj = GetPlayerCurrentWonder(color)
 	if wonderObj then
 		wonderObj.highlightOn(color)
-		log("Highlighted wonder board for " .. color .. " player")
-	else
-		log("Warning: Could not find wonder board for " .. color .. " player")
 	end
 end
 
@@ -345,9 +377,6 @@ function UnhighlightPlayerWonderBoard(color)
 	local wonderObj = GetPlayerCurrentWonder(color)
 	if wonderObj then
 		wonderObj.highlightOff()
-		log("Removed highlight from wonder board for " .. color .. " player")
-	else
-		log("Warning: Could not find wonder board for " .. color .. " player")
 	end
 end
 

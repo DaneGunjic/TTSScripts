@@ -98,6 +98,7 @@ PlayerKeepStatus = {}
 ReadyList = {}
 PlayerShips = {}
 PlayerShipMovements = {}
+PlayerCoins = {}
 
 for _, color in ipairs(Players) do
   DraftWonders[color] = {}
@@ -107,6 +108,7 @@ for _, color in ipairs(Players) do
   PlayerShips[color] = {}
   PlayerShipMovements[color] = { Yellow = 0, Red = 0, Blue = 0, Green = 0 }
   ReadyList[color] = false
+  PlayerCoins[color] = 0
 end
 
 PlayerCardHolder = {

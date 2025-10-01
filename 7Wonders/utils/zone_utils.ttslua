@@ -105,23 +105,53 @@ end
 function HandleWonderZoneEnter(zone, enter_object, zoneInfo)
   local color = zoneInfo.color
 
-  if enter_object.hasTag and enter_object.hasTag("Coin") then
+  if enter_object.hasTag and (enter_object.hasTag("Coin1") or enter_object.hasTag("Coin3") or enter_object.hasTag("Coin6")) then
     -- Handle coin logic
-    --print("Coin entered " .. color .. "'s wonder zone")
+    local coinValue = 0
+    if enter_object.hasTag("Coin1") then
+      coinValue = 1
+    elseif enter_object.hasTag("Coin3") then
+      coinValue = 3
+    elseif enter_object.hasTag("Coin6") then
+      coinValue = 6
+    end
+
+    -- Update player coin count
+    PlayerCoins[color] = PlayerCoins[color] + coinValue
+
+    -- Update the coin button on the wonder board
+    UpdateWonderCoinButton(color)
+
   elseif enter_object.type == 'Card' then
-    --print("Card entered " .. color .. "'s wonder zone")
   end
 end
 
 function HandleWonderZoneLeave(zone, leave_object, zoneInfo)
   local color = zoneInfo.color
 
-  if leave_object.hasTag and leave_object.hasTag("Coin") then
-    --print("Coin left " .. color .. "'s wonder zone")
-    -- Add coin removal logic here
+  if leave_object.hasTag and (leave_object.hasTag("Coin1") or leave_object.hasTag("Coin3") or leave_object.hasTag("Coin6")) then
+    -- Handle coin removal logic
+    local coinValue = 0
+    if leave_object.hasTag("Coin1") then
+      coinValue = 1
+    elseif leave_object.hasTag("Coin3") then
+      coinValue = 3
+    elseif leave_object.hasTag("Coin6") then
+      coinValue = 6
+    end
+
+    -- Update player coin count
+    PlayerCoins[color] = PlayerCoins[color] - coinValue
+
+    -- Ensure coin count doesn't go below 0
+    if PlayerCoins[color] < 0 then
+      PlayerCoins[color] = 0
+    end
+
+    -- Update the coin button on the wonder board
+    UpdateWonderCoinButton(color)
+
   elseif leave_object.type == 'Card' then
-    --print("Card left " .. color .. "'s wonder zone")
-    -- Add wonder card removal logic here
   end
 end
 
@@ -185,4 +215,34 @@ function GetPlayerColorFromZone(zone)
 		end
 	end
 	return nil
+end
+
+function UpdateWonderCoinButton(color)
+	-- Get the player's current wonder object
+	local wonderObj = nil
+	if DraftMode then
+		wonderObj = DraftWonders[color][PlayerCurrentlyChosenWonder[color]]
+	else
+		wonderObj = RandomWonderObj[color]
+	end
+
+	if not wonderObj then
+		return
+	end
+
+	-- Calculate victory points (coins divided by 3, rounded down)
+	local victoryPoints = math.floor(PlayerCoins[color] / 3)
+
+	-- Update the coin button text and tooltip
+	local buttons = wonderObj.getButtons()
+	for i, button in ipairs(buttons) do
+		if string.find(button.label, "Coins:") then
+			wonderObj.editButton({
+				index = i - 1,
+        label = "Coins: " .. PlayerCoins[color],
+				tooltip = "Victory points: " .. victoryPoints
+			})
+			break
+		end
+	end
 end
