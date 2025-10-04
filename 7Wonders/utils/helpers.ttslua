@@ -5,7 +5,7 @@ function AddCoins(color, amount, skip_message)
 
 	if not skip_message then
 		local coinText = (amount == 1) and " coin" or " coins"
-		printToAll(Player[color].steam_name .. " gained " .. amount .. coinText, color)
+		broadcastToAll(Player[color].steam_name .. " gained " .. amount .. coinText, color)
 	end
 
 	local coinSpawnPosition = Vector(PlayerInfo[color].WonderPos)

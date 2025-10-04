@@ -85,7 +85,19 @@ function HandleCardHolderEnter(zone, enter_object, zoneInfo)
     ReadyUp(Player[color])
   elseif GameState == "Age1" or GameState == "Age2" or GameState == "Age3" or GameState == "LeaderSelectionStage" then
     CreateActionButtons(data.Tile)
-    broadcastToColor("Choose your action!", color, color)
+    local reminder = "Choose your action!"
+    if ExpansionConfig and ExpansionConfig.Armada and enter_object.getTags then
+      local tags = enter_object.getTags()
+      if tags then
+        for _, tag in ipairs(tags) do
+          if tag == "Yellow" or tag == "Red" or tag == "Blue" or tag == "Green" then
+            reminder = reminder .. " (If you buy this card, don't forget you can manually pay and push your " .. tag .. " ship.)"
+            break
+          end
+        end
+      end
+    end
+    broadcastToColor(reminder, color, color)
   elseif GameState == "RuinsStage" and CountCardsInZone(zone) == 3 and not ReadyList[color] then
     ReadyUp(Player[color])
   end

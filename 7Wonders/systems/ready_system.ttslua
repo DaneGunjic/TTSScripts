@@ -75,7 +75,7 @@ function CreateActionButtons(tile)
 	tile.createButton({
 		click_function = "HandleBuyCard",
 		label = "Buy",
-		tooltip = "Reveals the card and places it on your wonder.\nMove it to your tableau and pay manually.",
+		tooltip = "Reveals the card and places it on your wonder.\nMove it to your tableau and pay manually.\nArmada: You can pay for and move your ship of the same color as the card.",
 		position = {-0.95, 0.1, -0.5},
 		rotation = {0, 0 ,0},
 		width = 1000,
@@ -99,7 +99,7 @@ function CreateActionButtons(tile)
 	tile.createButton({
 		click_function = "HandleBuildWonder",
 		label = "Wonder",
-		tooltip = "Will move the card down.\nPay and place it below your wonder stage manually.",
+		tooltip = "Will move the card down.\nPay and place it below your wonder stage manually.\nArmada: You can pay for and move your ship with the wonder icon.",
 		position = {-0.95, 0.1, 0.5},
 		rotation = {0, 0 ,0},
 		width = 1350,
