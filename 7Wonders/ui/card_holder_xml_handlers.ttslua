@@ -1,0 +1,65 @@
+function OnActionBuy(player, click, id)
+  print("OnActionBuy")
+  local color = player.color
+  local holder = PlayerCardHolder[color]
+  if not holder or not holder.Tile then
+    broadcastToColor("No action tile found for your color.", color, {1,0,0})
+    return
+  end
+  HandleBuyCard(holder.Tile, color, click)
+end
+
+function OnActionSell(player, click, id)
+  local color = player.color
+  local holder = PlayerCardHolder[color]
+  if not holder or not holder.Tile then
+    broadcastToColor("No action tile found for your color.", color, {1,0,0})
+    return
+  end
+  HandleSellCard(holder.Tile, color, click)
+end
+
+function OnActionWonder(player, click, id)
+  local color = player.color
+  local holder = PlayerCardHolder[color]
+  if not holder or not holder.Tile then
+    broadcastToColor("No action tile found for your color.", color, {1,0,0})
+    return
+  end
+  HandleBuildWonder(holder.Tile, color, click)
+end
+
+function OnActionArmadaSell(player, click, id)
+  local color = player.color
+  local holder = PlayerCardHolder[color]
+  if not holder or not holder.Tile then
+    broadcastToColor("No action tile found for your color.", color, {1,0,0})
+    return
+  end
+  HandleArmadaSellCard(holder.Tile, color, click)
+end
+
+function OnHolderHoverEnter(player, click, id)
+  local color = player.color
+  local holder = PlayerCardHolder[color]
+  if not holder or not holder.Tile then return end
+  local text = ""
+  if id == "HolderBuy" then
+    text = "Reveals the card and places it on your wonder. Move it to your tableau and pay manually. Armada: You can pay for and move your ship of the same color as the card."
+  elseif id == "HolderSell" then
+    text = "Discards the card and gives you 3 coins."
+  elseif id == "HolderWonder" then
+    text = "Moves the card down. Pay and place it below your wonder stage manually. Armada: You can pay for and move your ship with the wonder icon."
+  elseif id == "HolderArmadaSell" then
+    text = "Discards the card. Moves your yellow ship for free. Automatically grants coins from Armada."
+  end
+  holder.Tile.UI.setAttribute("HolderTooltipText", "text", text)
+  holder.Tile.UI.setAttribute("HolderTooltip", "active", "true")
+end
+
+function OnHolderHoverExit(player, click, id)
+  local color = player.color
+  local holder = PlayerCardHolder[color]
+  if not holder or not holder.Tile then return end
+  holder.Tile.UI.setAttribute("HolderTooltip", "active", "false")
+end

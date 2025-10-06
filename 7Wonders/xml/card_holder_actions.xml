@@ -1,0 +1,18 @@
+<!-- Player Card Holder Action Buttons (Object UI) -->
+<Panel id="HolderActionPanel" active="false" rectAlignment="MiddleCenter" position="170 0 -50" rotation="0 0 180" width="200" height="200" color="rgba(0,0,0,1)" padding="8 8 8 8">
+  <VerticalLayout spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childControlWidth="false" childControlHeight="true" childAlignment="MiddleCenter">
+    <HorizontalLayout height="100" spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childControlWidth="false" childControlHeight="false" childAlignment="MiddleCenter">
+      <Button id="HolderBuy" onClick="Global/OnActionBuy" onMouseEnter="Global/OnHolderHoverEnter" onMouseExit="Global/OnHolderHoverExit" height="50" width="50" fontSize="15" fontStyle="Bold" color="#1E90FF" textColor="#FFFFFF" textAlignment="MiddleCenter">Buy</Button>
+    </HorizontalLayout>
+    <HorizontalLayout height="100" spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childControlWidth="false" childControlHeight="false" childAlignment="MiddleCenter">
+      <Button id="HolderArmadaSell" onClick="Global/OnActionArmadaSell" onMouseEnter="Global/OnHolderHoverEnter" onMouseExit="Global/OnHolderHoverExit" active="false" height="50" width="100" fontSize="15" fontStyle="Bold" color="#FFD700" textColor="#000000" textAlignment="MiddleCenter">Armada Sell</Button>
+      <Button id="HolderSell" onClick="Global/OnActionSell" onMouseEnter="Global/OnHolderHoverEnter" onMouseExit="Global/OnHolderHoverExit" height="50" width="50" fontSize="15" fontStyle="Bold" color="#DC143C" textColor="#FFFFFF" textAlignment="MiddleCenter">Sell</Button>
+    </HorizontalLayout>
+    <HorizontalLayout height="100" spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childControlWidth="false" childControlHeight="false" childAlignment="MiddleCenter">
+      <Button id="HolderWonder" onClick="Global/OnActionWonder" onMouseEnter="Global/OnHolderHoverEnter" onMouseExit="Global/OnHolderHoverExit" height="50" width="75" fontSize="15" fontStyle="Bold" color="#32CD32" textColor="#FFFFFF" textAlignment="MiddleCenter">Wonder</Button>
+    </HorizontalLayout>
+  </VerticalLayout>
+  <Panel id="HolderTooltip" active="false" rectAlignment="UpperCenter" ignoreLayout="true" position="0 -200 0" width="420" height="130" color="rgba(0,0,0,0.85)" padding="10 10 10 10" raycastTarget="false">
+    <Text id="HolderTooltipText" fontSize="18" color="#FFFFFF" alignment="MiddleCenter" horizontalOverflow="Wrap" verticalOverflow="Overflow" resizeTextForBestFit="true" resizeTextMinSize="12" resizeTextMaxSize="22">Tooltip</Text>
+  </Panel>
+</Panel>

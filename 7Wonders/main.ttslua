@@ -15,6 +15,7 @@
 
 #include !\7Wonders\ui\buttons.ttslua
 #include !\7Wonders\ui\xml.ttslua
+#include !\7Wonders\ui\card_holder_xml_handlers.ttslua
 
 #include !\7Wonders\utils\helpers.ttslua
 #include !\7Wonders\utils\rotation.ttslua
@@ -32,7 +33,7 @@ function onLoad()
 
   MakeSetupButtons()
   MakeSetupBoardText()
-  disableAllTiles()
+  --disableAllTiles()
   InitializeZoneSystem()
 
   -- Set host camera to focus on setup board

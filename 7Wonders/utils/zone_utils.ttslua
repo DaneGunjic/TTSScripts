@@ -84,7 +84,13 @@ function HandleCardHolderEnter(zone, enter_object, zoneInfo)
   if (GameState == "LeaderDrafting" or GameState == "RuinsDrafting") and cardCount == CurrentPasses + 1 and not ReadyList[color] then
     ReadyUp(Player[color])
   elseif GameState == "Age1" or GameState == "Age2" or GameState == "Age3" or GameState == "LeaderSelectionStage" then
-    CreateActionButtons(data.Tile)
+    -- Show XML action panel on the player's card holder tile; enable Armada Sell based on config
+    if data.Tile and data.Tile.UI then
+      data.Tile.UI.setAttribute("HolderActionPanel", "active", "true")
+      data.Tile.UI.setAttribute("HolderActionPanel", "visibility", color)
+      local armadaActive = (ExpansionConfig and ExpansionConfig.Armada) and "true" or "false"
+      data.Tile.UI.setAttribute("HolderArmadaSell", "active", armadaActive)
+    end
     local reminder = "Choose your action!"
     if ExpansionConfig and ExpansionConfig.Armada and enter_object.getTags then
       local tags = enter_object.getTags()
@@ -109,6 +115,11 @@ function HandleCardHolderLeave(zone, leave_object, zoneInfo)
   local color = zoneInfo.color
   local highlightedTile = leave_object.getVar("highlightedTile")
   if not highlightedTile then return end
+
+  -- Hide XML action panel when the card leaves the holder zone
+  if CountCardsInZone(zone) == 0 and highlightedTile and highlightedTile.UI then
+    highlightedTile.UI.setAttribute("HolderActionPanel", "active", "false")
+  end
 
   UnreadyPlayerIfNeeded(color, zone)
   HandleTileOnCardLeave(highlightedTile, leave_object, zone)
