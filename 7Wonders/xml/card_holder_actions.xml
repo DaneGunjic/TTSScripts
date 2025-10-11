@@ -1,6 +1,6 @@
 <!-- Player Card Holder Action Buttons (Object UI) -->
-<Panel id="HolderActionPanel" active="false" rectAlignment="MiddleCenter" position="170 0 -50" rotation="0 0 180" width="200" height="200" color="rgba(0,0,0,1)" padding="8 8 8 8">
-  <VerticalLayout spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childControlWidth="false" childControlHeight="true" childAlignment="MiddleCenter">
+<Panel id="HolderActionPanel" active="false" rectAlignment="MiddleCenter" position="170 0 -50" rotation="0 0 180" width="200" height="200" color="rgba(0,0,0,1)" padding="2 2 2 2">
+  <VerticalLayout spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childAlignment="MiddleCenter">
     <HorizontalLayout height="100" spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childControlWidth="false" childControlHeight="false" childAlignment="MiddleCenter">
       <Button id="HolderBuy" onClick="Global/OnActionBuy" onMouseEnter="Global/OnHolderHoverEnter" onMouseExit="Global/OnHolderHoverExit" height="50" width="50" fontSize="15" fontStyle="Bold" color="#1E90FF" textColor="#FFFFFF" textAlignment="MiddleCenter">Buy</Button>
     </HorizontalLayout>
