@@ -13,6 +13,6 @@
     </HorizontalLayout>
   </VerticalLayout>
   <Panel id="HolderTooltip" active="false" rectAlignment="UpperCenter" ignoreLayout="true" position="0 -200 0" width="420" height="130" color="rgba(0,0,0,0.85)" padding="10 10 10 10" raycastTarget="false">
-    <Text id="HolderTooltipText" fontSize="18" color="#FFFFFF" alignment="MiddleCenter" horizontalOverflow="Wrap" verticalOverflow="Overflow" resizeTextForBestFit="true" resizeTextMinSize="12" resizeTextMaxSize="22">Tooltip</Text>
+    <Text id="HolderTooltipText" fontSize="18" color="#FFFFFF" alignment="MiddleCenter" horizontalOverflow="Wrap" verticalOverflow="Overflow">Tooltip</Text>
   </Panel>
 </Panel>

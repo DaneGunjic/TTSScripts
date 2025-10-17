@@ -119,6 +119,11 @@ function HandleCardHolderLeave(zone, leave_object, zoneInfo)
   -- Hide XML action panel when the card leaves the holder zone
   if CountCardsInZone(zone) == 0 and highlightedTile and highlightedTile.UI then
     highlightedTile.UI.setAttribute("HolderActionPanel", "active", "false")
+    -- Also hide and reset tooltip to avoid persistent tooltip when hover exit doesn’t fire
+    highlightedTile.UI.setAttribute("HolderTooltip", "active", "false")
+    highlightedTile.UI.setAttribute("HolderTooltip", "height", "130")
+    highlightedTile.UI.setAttribute("HolderTooltipText", "alignment", "MiddleCenter")
+    highlightedTile.UI.setValue("HolderTooltipText", "")
   end
 
   UnreadyPlayerIfNeeded(color, zone)
@@ -228,6 +233,13 @@ function HandleTileOnCardLeave(highlightedTile, leave_object, zone)
 	end
 
 	highlightedTile.clearButtons()
+  -- Hide and reset tooltip as a safeguard when buttons are cleared
+  if highlightedTile and highlightedTile.UI then
+    highlightedTile.UI.setAttribute("HolderTooltip", "active", "false")
+    highlightedTile.UI.setAttribute("HolderTooltip", "height", "130")
+    highlightedTile.UI.setAttribute("HolderTooltipText", "alignment", "MiddleCenter")
+    highlightedTile.UI.setValue("HolderTooltipText", "")
+  end
 end
 
 function GetPlayerColorFromZone(zone)

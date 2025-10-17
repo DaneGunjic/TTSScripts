@@ -1,5 +1,4 @@
 function OnActionBuy(player, click, id)
-  print("OnActionBuy")
   local color = player.color
   local holder = PlayerCardHolder[color]
   if not holder or not holder.Tile then
@@ -45,15 +44,33 @@ function OnHolderHoverEnter(player, click, id)
   if not holder or not holder.Tile then return end
   local text = ""
   if id == "HolderBuy" then
-    text = "Reveals the card and places it on your wonder. Move it to your tableau and pay manually. Armada: You can pay for and move your ship of the same color as the card."
+    text = "Reveals the card and places it on your wonder.\nMove it to your tableau and pay manually.\n<color=#1E90FF><b>Armada:</b></color> You can pay for and move your ship of the same color as the card."
   elseif id == "HolderSell" then
     text = "Discards the card and gives you 3 coins."
   elseif id == "HolderWonder" then
-    text = "Moves the card down. Pay and place it below your wonder stage manually. Armada: You can pay for and move your ship with the wonder icon."
+    text = "Moves the card down.\nPay and place it below your wonder stage manually.\n<color=#1E90FF><b>Armada:</b></color> You can pay for and move your ship with the wonder icon.\n<color=#FFAA33><b>Edifice:</b></color> You can pay for the current age project to take the participation pawn.\n<color=#DC143C><b>Note:</b></color> You cannot both participate in the <color=#FFAA33>Edifice</color> project and push your <color=#1E90FF>Armada</color> ship in the same action."
   elseif id == "HolderArmadaSell" then
-    text = "Discards the card. Moves your yellow ship for free. Automatically grants coins from Armada."
+    text = "Discards the card.\nMoves your <color=#FFEA00>yellow</color> ship for free.\nAutomatically grants coins from <color=#1E90FF>Armada</color>."
   end
-  holder.Tile.UI.setAttribute("HolderTooltipText", "text", text)
+  -- Hardcoded preset heights per tooltip
+  local presetHeight = 130
+  if id == "HolderBuy" then
+    presetHeight = 120
+  elseif id == "HolderSell" then
+    presetHeight = 60
+  elseif id == "HolderWonder" then
+    presetHeight = 170
+  elseif id == "HolderArmadaSell" then
+    presetHeight = 80
+  end
+  holder.Tile.UI.setAttribute("HolderTooltip", "height", tostring(presetHeight))
+  holder.Tile.UI.setAttribute("HolderTooltipText", "alignment", "MiddleCenter")
+
+  -- Make Wonder tooltip text smaller than the others
+  local fontSize = (id == "HolderWonder") and "16" or "18"
+  holder.Tile.UI.setAttribute("HolderTooltipText", "fontSize", fontSize)
+  
+  holder.Tile.UI.setValue("HolderTooltipText", text)
   holder.Tile.UI.setAttribute("HolderTooltip", "active", "true")
 end
 
@@ -62,4 +79,6 @@ function OnHolderHoverExit(player, click, id)
   local holder = PlayerCardHolder[color]
   if not holder or not holder.Tile then return end
   holder.Tile.UI.setAttribute("HolderTooltip", "active", "false")
+  -- Reset font size to default for next tooltip
+  holder.Tile.UI.setAttribute("HolderTooltipText", "fontSize", "18")
 end
