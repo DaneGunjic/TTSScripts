@@ -51,6 +51,14 @@ function OnHolderHoverEnter(player, click, id)
     text = "Moves the card down.\nPay and place it below your wonder stage manually.\n<color=#1E90FF><b>Armada:</b></color> You can pay for and move your ship with the wonder icon.\n<color=#FFAA33><b>Edifice:</b></color> You can pay for the current age project to take the participation pawn.\n<color=#DC143C><b>Note:</b></color> You cannot both participate in the <color=#FFAA33>Edifice</color> project and push your <color=#1E90FF>Armada</color> ship in the same action."
   elseif id == "HolderArmadaSell" then
     text = "Discards the card.\nMoves your <color=#FFEA00>yellow</color> ship for free.\nAutomatically grants coins from <color=#1E90FF>Armada</color>."
+  elseif id == "HolderLeft" then
+    text = "Buy the card and place it on the <color=#FF6347><b>left</b></color> frontier."
+  elseif id == "HolderMiddle" then
+    text = "Buy the card and place it in <color=#FF6347><b>your city</b></color>."
+  elseif id == "HolderRight" then
+    text = "Buy the card and place it on the <color=#FF6347><b>right</b></color> frontier."
+  elseif id == "HolderBack" then
+    text = "Cancel position selection and return to normal action buttons."
   end
   -- Hardcoded preset heights per tooltip
   local presetHeight = 130
@@ -62,6 +70,12 @@ function OnHolderHoverEnter(player, click, id)
     presetHeight = 170
   elseif id == "HolderArmadaSell" then
     presetHeight = 80
+  elseif id == "HolderLeft" or id == "HolderRight" then
+    presetHeight = 60
+  elseif id == "HolderMiddle" then
+    presetHeight = 80
+  elseif id == "HolderBack" then
+    presetHeight = 60
   end
   holder.Tile.UI.setAttribute("HolderTooltip", "height", tostring(presetHeight))
   holder.Tile.UI.setAttribute("HolderTooltipText", "alignment", "MiddleCenter")
@@ -81,4 +95,45 @@ function OnHolderHoverExit(player, click, id)
   holder.Tile.UI.setAttribute("HolderTooltip", "active", "false")
   -- Reset font size to default for next tooltip
   holder.Tile.UI.setAttribute("HolderTooltipText", "fontSize", "18")
+end
+
+-- Frontiers Position Selection Button Handlers
+function OnFrontiersLeft(player, click, id)
+  local color = player.color
+  local holder = PlayerCardHolder[color]
+  if not holder or not holder.Tile then
+    broadcastToColor("No action tile found for your color.", color, {1,0,0})
+    return
+  end
+  HandleFrontiersLeft(holder.Tile, color, click)
+end
+
+function OnFrontiersMiddle(player, click, id)
+  local color = player.color
+  local holder = PlayerCardHolder[color]
+  if not holder or not holder.Tile then
+    broadcastToColor("No action tile found for your color.", color, {1,0,0})
+    return
+  end
+  HandleFrontiersMiddle(holder.Tile, color, click)
+end
+
+function OnFrontiersRight(player, click, id)
+  local color = player.color
+  local holder = PlayerCardHolder[color]
+  if not holder or not holder.Tile then
+    broadcastToColor("No action tile found for your color.", color, {1,0,0})
+    return
+  end
+  HandleFrontiersRight(holder.Tile, color, click)
+end
+
+function OnFrontiersBack(player, click, id)
+  local color = player.color
+  local holder = PlayerCardHolder[color]
+  if not holder or not holder.Tile then
+    broadcastToColor("No action tile found for your color.", color, {1,0,0})
+    return
+  end
+  HandleFrontiersBack(holder.Tile, color, click)
 end

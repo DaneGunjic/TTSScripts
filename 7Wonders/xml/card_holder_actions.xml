@@ -1,6 +1,7 @@
 <!-- Player Card Holder Action Buttons (Object UI) -->
 <Panel id="HolderActionPanel" active="false" rectAlignment="MiddleCenter" position="170 0 -50" rotation="0 0 180" width="200" height="200" color="rgba(0,0,0,1)" padding="2 2 2 2">
   <VerticalLayout spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childAlignment="MiddleCenter">
+    <!-- Normal Action Buttons -->
     <HorizontalLayout height="100" spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childControlWidth="false" childControlHeight="false" childAlignment="MiddleCenter">
       <Button id="HolderBuy" onClick="Global/OnActionBuy" onMouseEnter="Global/OnHolderHoverEnter" onMouseExit="Global/OnHolderHoverExit" height="50" width="50" fontSize="15" fontStyle="Bold" color="#1E90FF" textColor="#FFFFFF" textAlignment="MiddleCenter">Buy</Button>
     </HorizontalLayout>
@@ -10,6 +11,16 @@
     </HorizontalLayout>
     <HorizontalLayout height="100" spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childControlWidth="false" childControlHeight="false" childAlignment="MiddleCenter">
       <Button id="HolderWonder" onClick="Global/OnActionWonder" onMouseEnter="Global/OnHolderHoverEnter" onMouseExit="Global/OnHolderHoverExit" height="50" width="75" fontSize="15" fontStyle="Bold" color="#32CD32" textColor="#FFFFFF" textAlignment="MiddleCenter">Wonder</Button>
+    </HorizontalLayout>
+
+    <!-- Frontiers Position Selection Buttons (initially hidden) -->
+    <HorizontalLayout height="100" spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childControlWidth="false" childControlHeight="false" childAlignment="MiddleCenter">
+      <Button id="HolderLeft" onClick="Global/OnFrontiersLeft" onMouseEnter="Global/OnHolderHoverEnter" onMouseExit="Global/OnHolderHoverExit" active="false" height="50" width="50" fontSize="15" fontStyle="Bold" color="#FF6347" textColor="#FFFFFF" textAlignment="MiddleCenter">Left</Button>
+      <Button id="HolderMiddle" onClick="Global/OnFrontiersMiddle" onMouseEnter="Global/OnHolderHoverEnter" onMouseExit="Global/OnHolderHoverExit" active="false" height="50" width="60" fontSize="15" fontStyle="Bold" color="#FF6347" textColor="#FFFFFF" textAlignment="MiddleCenter">Middle</Button>
+      <Button id="HolderRight" onClick="Global/OnFrontiersRight" onMouseEnter="Global/OnHolderHoverEnter" onMouseExit="Global/OnHolderHoverExit" active="false" height="50" width="50" fontSize="15" fontStyle="Bold" color="#FF6347" textColor="#FFFFFF" textAlignment="MiddleCenter">Right</Button>
+    </HorizontalLayout>
+    <HorizontalLayout height="100" spacing="8" childForceExpandWidth="false" childForceExpandHeight="false" childControlWidth="false" childControlHeight="false" childAlignment="MiddleCenter">
+      <Button id="HolderBack" onClick="Global/OnFrontiersBack" onMouseEnter="Global/OnHolderHoverEnter" onMouseExit="Global/OnHolderHoverExit" active="false" height="50" width="50" fontSize="15" fontStyle="Bold" color="#808080" textColor="#FFFFFF" textAlignment="MiddleCenter">Back</Button>
     </HorizontalLayout>
   </VerticalLayout>
   <Panel id="HolderTooltip" active="false" rectAlignment="UpperCenter" ignoreLayout="true" position="0 -200 0" width="420" height="130" color="rgba(0,0,0,0.85)" padding="10 10 10 10" raycastTarget="false">

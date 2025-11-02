@@ -1,0 +1,216 @@
+--Concordia Complete script
+--By merovigiam
+--Venus expansion assets by INTVGene
+--Venus setup and fish market by LowerBadge
+--Auto Scoring, selling zone, money counters, buy/sell from bags and other QoL by Unebrion
+--Refactored and modularized for better maintainability
+
+-- Include all module files (TTS style)
+#include !\Concordia\constants.ttslua
+#include !\Concordia\utils.ttslua
+#include !\Concordia\scoring_system.ttslua
+#include !\Concordia\senator_system.ttslua
+#include !\Concordia\game_setup.ttslua
+#include !\Concordia\ui_manager.ttslua
+
+--------TO-DO List----------------
+-- Implement auto setup for forums
+-- Fish board implementation
+-- Venus scripting
+-- Add Solitaria
+
+-- Core game state variables (moved to constants.ttslua)
+local roundCounter = 0 -- this is only used to stop the first restock when the game starts.
+
+----------------Events----------------------------------------------------
+function onSave()
+    local saveData = {}
+    saveData.gameStarted = gameStarted
+    saveData.forum = forum
+    saveData.selectedMap = selectedMap
+    saveData.altWineBoard = altWineBoard
+    saveData.boolSalsa = boolSalsa
+    saveData.venusONNN = venusONNN
+    return JSON.encode(saveData)
+end
+
+function onLoad(savedData)
+    -- Parse saved data
+    if savedData and savedData ~= "" then
+        savedData = JSON.decode(savedData)
+        if savedData and savedData.gameStarted then
+            gameStarted = savedData.gameStarted or false
+            selectedMap = savedData.selectedMap or 4
+            forum = savedData.forum or false
+            altWineBoard = savedData.altWineBoard or false
+            boolSalsa = savedData.boolSalsa or false
+            venusONNN = savedData.venusONNN or 1
+            
+            if forum then
+                btnMove = createButton('576954','Move and Draw','f1llMove',0,0)
+            end
+            return true
+        end
+    end
+    
+    -- Initialize game for first time
+    boardPickerZone = getObjectFromGUID(boardPickerZoneGUID)
+    
+    -- Initialize UI
+    initializeUI()
+    
+    -- Setup senator boards
+    local senatorBoard = getObjectFromGUID(SenatorBoardClothGUID)
+    local senatorBoardWine = getObjectFromGUID(senatorWineBoardGUID)
+    senatorBoard.setSnapPoints(SENATOR_BOARD_SNAPS)
+    senatorBoardWine.setSnapPoints(SENATOR_BOARD_SNAPS)
+end
+
+function onObjectEnterContainer(container, enter_object)
+    if enter_object.getGMNotes() == 'Tribune' then
+        makeTribuneButtons(container)
+    end
+end
+
+function onObjectLeaveContainer(container, leave_object)
+    if leave_object.getGMNotes() == 'Tribune' then
+        container.clearButtons()
+    end
+end
+
+function onPlayerTurn(player, previousPlayer)
+    councilFlag = true
+    if roundCounter ~= 0 then
+        restockSenatorBoard()
+    end
+    roundCounter = roundCounter + 1
+end
+
+----------------End Events -----------------------------------------------
+
+-- Core game logic functions that coordinate between modules
+function startGame()
+    if not gameStarted then
+        placestuff()
+        gameStarted = true
+        hideSetupButtons()
+        hideMapButtons()
+        broadcastToAll('Game Started! Good luck!', 'Green')
+    end
+end
+
+function resetGame()
+    gameStarted = false
+    roundCounter = 0
+    forum = false
+    altWineBoard = false
+    boolSalsa = false
+    venusONNN = 1
+    selectedMap = 4
+    
+    -- Reset all game components
+    resetTables()
+    
+    -- Recreate setup UI
+    initializeUI()
+    
+    broadcastToAll('Game Reset. Ready for new setup.', 'Yellow')
+end
+
+-- Main coordination function for game setup
+function coordinateGameSetup()
+    -- Wait for components to settle
+    Wait.time(function()
+        -- Start main setup
+        placestuff()
+    end, 1)
+end
+
+-- Game state management
+function isGameInProgress()
+    return gameStarted
+end
+
+function getCurrentMap()
+    return selectedMap
+end
+
+function isForumExpansionActive()
+    return boolForum
+end
+
+function isSalsaExpansionActive()
+    return boolSalsa
+end
+
+function getVenusMode()
+    return venusONNN
+end
+
+-- Player management
+function getActivePlayerCount()
+    return numberOfPlayers
+end
+
+function setPlayerCount(count)
+    if count >= 2 and count <= 5 then
+        numberOfPlayers = count
+        return true
+    end
+    return false
+end
+
+-- Game flow control
+function endTurn(player)
+    -- Handle end of turn logic
+    if gameStarted then
+        -- Check for game end conditions
+        -- Update UI as needed
+        -- Trigger any end-of-turn effects
+    end
+end
+
+function checkGameEnd()
+    -- Check if game should end
+    -- Return true if game is over, false otherwise
+    return false
+end
+
+-- Error handling and debugging
+function handleError(errorMsg, functionName)
+    print("Error in " .. (functionName or "unknown function") .. ": " .. errorMsg)
+    broadcastToAll("An error occurred. Check the log for details.", "Red")
+end
+
+-- Utility wrapper functions for cross-module communication
+function broadcastGameMessage(message, color)
+    broadcastMessage(message, color)
+end
+
+function updatePlayerMoney(color, amount)
+    addMoney(color, amount)
+end
+
+function getPlayerMoneyAmount(color)
+    local counter = getObjectFromGUID(playerMoneyCounters[color])
+    if counter then
+        return getMoneyTotal(counter)
+    end
+    return 0
+end
+
+-- Main game initialization
+function initializeGame()
+    -- This function is called when the mod is loaded
+    -- It sets up the initial state and prepares for gameplay
+    
+    -- Initialize all subsystems
+    if not gameStarted then
+        -- Setup is handled in onLoad
+        print("Concordia mod loaded successfully")
+        print("Select a map and player count to begin setup")
+    end
+end
+
+-- Call initialization
+initializeGame()

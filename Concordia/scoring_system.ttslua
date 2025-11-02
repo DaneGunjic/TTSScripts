@@ -1,0 +1,428 @@
+-- Concordia Scoring System
+-- All scoring functions for different gods and game mechanics
+
+-- Main scoring calculation function
+function scoreCalc()
+    if gameStarted == false then return nil end
+    startLuaCoroutine(self, 'scoreCalcCO')
+end
+
+function scoreCalcCO()
+    local seatedPlayers = getSeatedPlayers()
+    UI.setAttribute('scoreboard', 'active', true)
+    
+    for i, playerColor in ipairs(seatedPlayers) do
+        UI.setAttribute('scoreboard' .. playerColor, 'active', true)
+        UI.setAttribute('scoreboard' .. playerColor, 'offsetXY', 170+(i-1)*100 .. ' -140')
+        UI.setValue('name' .. playerColor, getPlayerName(playerColor))
+        
+        takeCards(playerColor)
+        pauseSeconds(0.5)
+        
+        local playerCardTotals = countCards(playerColor)
+        local playerHouseCount = checkForHouses(playerColor)
+        local totalScore = 0
+        
+        -- Calculate scores for each god
+        local mercuryScore = scoreMercury(playerColor, playerCardTotals, playerHouseCount)
+        local marsScore = scoreMars(playerColor, playerCardTotals)
+        local saturnScore = scoreSaturn(playerColor, playerCardTotals.Saturn)
+        local vestaScore = scoreVesta(playerColor)
+        local jupiterScore = scoreJupiter(playerColor, playerCardTotals, playerHouseCount)
+        local minervaScore = scoreMinerva(playerColor, playerHouseCount, playerCardTotals)
+        
+        totalScore = totalScore + mercuryScore + marsScore + saturnScore + vestaScore + jupiterScore + minervaScore
+        
+        -- Update UI with scores
+        UI.setValue('Mercury' .. playerColor, mercuryScore)
+        UI.setValue('Mars' .. playerColor, marsScore)
+        UI.setValue('Saturn' .. playerColor, saturnScore)
+        UI.setValue('Vesta' .. playerColor, vestaScore)
+        UI.setValue('Jupiter' .. playerColor, jupiterScore)
+        UI.setValue('Minerva' .. playerColor, minervaScore)
+        
+        -- Handle Concordia bonus
+        if concordiaOwner == playerColor then
+            UI.setValue('Concordia' .. playerColor, 7)
+            totalScore = totalScore + 7
+        else
+            UI.setValue('Concordia' .. playerColor, 0)
+        end
+        
+        UI.setValue('total' .. playerColor, totalScore)
+    end
+    
+    resetTables()
+    toggleScoreBoardButton()
+    scoreBoardToggle = 1
+    return 1
+end
+
+-- Minerva scoring (city types)
+function bestMinervaCard(color)
+    local bestCard = nil
+    for key, card in pairs(minervaCards) do
+        if card == color then
+            bestCard = key
+        end
+    end
+    if bestCard ~= nil then
+        return bestCard:lower()
+    else
+        return nil
+    end
+end
+
+function scoreMinerva(color, houseTable, playerCardTable)
+    local minervaScores = {
+        Brick = 0,
+        Food = 0,
+        Tool = 0,
+        Wine = 0,
+        Cloth = 0,
+    }
+    local minervaVP = 0
+    
+    -- Handle Salsa expansion salt cities
+    if (boolSalsa) then
+        local bestMinervaCard = bestMinervaCard(color)
+        if bestMinervaCard ~= nil then
+            local cityToAddSaltTo = bestMinervaCard .. 'Cities'
+            houseTable[cityToAddSaltTo] = houseTable[cityToAddSaltTo] + houseTable.saltCities
+        end
+    end
+    
+    -- Calculate Minerva scores for each resource type
+    for key, card in pairs(minervaCards) do
+        if card == color then
+            if key == 'Brick' then
+                minervaScores.Brick = minervaScores.Brick + (3 * houseTable.brickCities)
+                minervaVP = minervaVP + minervaScores.Brick
+                printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Brick .. ' points for brick cities.', color)
+            elseif key =='Food' then
+                minervaScores.Food = minervaScores.Food + (3 * houseTable.foodCities)
+                minervaVP = minervaVP + minervaScores.Food
+                printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Food .. ' points for food cities.', color)
+            elseif key == 'Tool' then
+                minervaScores.Tool = minervaScores.Tool + (3 * houseTable.toolCities)
+                minervaVP = minervaVP + minervaScores.Tool
+                printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Tool .. ' points for tool cities.', color)
+            elseif key == 'Wine' then
+                minervaScores.Wine = minervaScores.Wine + (4 * houseTable.wineCities)
+                minervaVP = minervaVP + minervaScores.Wine
+                printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Wine .. ' points for wine cities.', color)
+            elseif key == 'Cloth'then
+                minervaScores.Cloth = minervaScores.Cloth + (5 * houseTable.clothCities)
+                minervaVP = minervaVP + minervaScores.Cloth
+                printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Cloth .. ' points for cloth cities.', color)
+            end
+        end
+    end
+    
+    -- Reset the table for next player
+    minervaScores = {
+        Brick = 0,
+        Food = 0,
+        Tool = 0,
+        Wine = 0,
+        Cloth = 0,
+    }
+    return minervaVP
+end
+
+-- Vesta scoring (money and goods)
+function scoreVesta(color)
+    local playerColor = color
+    local playerCounterObj = getObjectFromGUID(playerMoneyCounters[playerColor])
+    local playerSupplies = getObjectFromGUID(playerWarehouses[playerColor])
+    local playerMoney = getMoneyTotal(playerCounterObj)
+    local supplies = upCast(playerSupplies)
+    local supplyValue = 0
+    local vestaVP = 0
+    
+    for _, good in pairs(supplies) do
+        for _, tag in ipairs(goodsList) do
+            if good.hasTag(tag) then
+                supplyValue = supplyValue + good.getGMNotes()
+            end
+        end
+        if good.hasTag('Salt') then
+            supplyValue = supplyValue + 7
+        end
+    end
+    
+    vestaVP = playerMoney + supplyValue
+    return (math.floor(vestaVP/10))
+end
+
+-- Saturn scoring (regions)
+function scoreSaturn(color, numSaturnCards)
+    local playerRegions = regionCheck(color)
+    local saturnScore = 0
+    saturnScore = saturnScore + (numSaturnCards * playerRegions)
+    return saturnScore
+end
+
+-- Mercury scoring (good types)
+function scoreMercury(color, cardTable, houseTable)
+    local numMercury = cardTable.Mercury
+    local baseGoodsVP = 0
+    local mercuryScore = 0
+    
+    for key, goodType in pairs(houseTable) do
+        if goodType > 0 and key ~= 'saltCities' then
+            baseGoodsVP = baseGoodsVP + 2
+        end
+    end
+    
+    -- Cap at 10 base points to handle salt cities properly
+    if baseGoodsVP > 10 then
+        baseGoodsVP = 10
+    end
+    
+    mercuryScore = mercuryScore + (numMercury * baseGoodsVP)
+    return mercuryScore
+end
+
+-- Mars scoring (colonists)
+function scoreMars(color, cardTable)
+    local playerColor = color
+    local numMarsCards = cardTable.Mars
+    local marsVP = 4
+    local playerStorage = getObjectFromGUID(playerWarehouses[playerColor])
+    local storageContents = upCast(playerStorage)
+    
+    local numColonists = 0
+    for _, obj in pairs(storageContents) do
+        if obj.hasTag(color .. 'Colonist') then
+            numColonists = numColonists + 1
+        end
+    end
+    
+    marsVP = (marsVP + (8 - (numColonists * 2))) * numMarsCards
+    return marsVP
+end
+
+-- Jupiter scoring (non-brick houses)
+function scoreJupiter(color, cardTable, houseTable)
+    local numJupiter = cardTable.Jupiter
+    local jupiterVP = 0
+    local nonBrickHouseTotal = 0
+    
+    for key, house in pairs(houseTable) do
+        if key ~= 'brickCities' then
+            nonBrickHouseTotal = nonBrickHouseTotal + house
+        end
+    end
+    
+    jupiterVP = jupiterVP + (numJupiter * nonBrickHouseTotal)
+    return jupiterVP
+end
+
+-- Card counting and collection functions
+function countCards(color)
+    local playerDiscardTile = getObjectFromGUID(playerDiscardTiles[color])
+    local discardZoneObjects = upCast(playerDiscardTile)
+    local playerDeck = nil
+    local cardTotals = {
+        Jupiter = 0,
+        Saturn = 0,
+        Mars = 0,
+        Mercury = 0
+    }
+    
+    for _, obj in pairs(discardZoneObjects) do
+        if obj.type == 'Deck' then
+            playerDeck = obj
+        else
+            printToAll('No deck found', 'White')
+        end
+    end
+    
+    if not playerDeck then return cardTotals end
+    
+    local deckToParse = playerDeck.getObjects()
+    local deckPos = playerDeck.getPosition()
+    
+    for _, card in ipairs(deckToParse) do
+        local tempCard = playerDeck.takeObject({position = deckPos})
+        
+        -- Track Minerva cards
+        if tempCard.hasTag('MinervaBrick') then
+            minervaCards.Brick = color
+        elseif tempCard.hasTag('MinervaFood') then
+            minervaCards.Food = color
+        elseif tempCard.hasTag('MinervaTool') then
+            minervaCards.Tool = color
+        elseif tempCard.hasTag('MinervaWine') then
+            minervaCards.Wine = color
+        elseif tempCard.hasTag('MinervaCloth') then
+            minervaCards.Cloth = color
+        elseif tempCard.hasTag('Concordia') then
+            concordiaOwner = color
+        end
+        
+        -- Count god cards
+        for _, tag in ipairs(cardTags) do
+            if tempCard.hasTag(tag) then
+                cardTotals[tag] = cardTotals[tag] + 1
+            end
+        end
+        
+        tempCard.destruct()
+    end
+    
+    return cardTotals
+end
+
+function collectCards(color)
+    local playerDiscardZone = getObjectFromGUID(playerDiscardTiles[color])
+    local playerCards = upCast(playerDiscardZone)
+    local playerDiscardZonePos = playerDiscardZone.getPosition()
+    
+    for _, card in ipairs(playerCards) do
+        card.setPosition(playerDiscardZonePos + Vector(0, 0.1, 0))
+    end
+end
+
+function takeCards(color)
+    startLuaCoroutine(self, 'collectCards')
+end
+
+-- House counting functions
+function checkForHouses(color)
+    local playerHouses = {
+        brickCities = 0,
+        clothCities = 0,
+        wineCities = 0,
+        toolCities = 0,
+        foodCities = 0,
+        saltCities = 0,
+    }
+    
+    local cityTiles = getCityTiles()
+    for _, city in pairs(cityTiles) do
+        local hitObjs = upCast(city)
+        for _, house in pairs(hitObjs) do
+            if house.getGMNotes() == color then
+                updateHouseTypes(city, playerHouses)
+            end
+        end
+    end
+    return playerHouses
+end
+
+function updateHouseTypes(obj, tbl)
+    if obj.hasTag('Brick') then
+        tbl.brickCities = tbl.brickCities + 1
+    elseif obj.hasTag('Cloth') then
+        tbl.clothCities = tbl.clothCities + 1
+    elseif obj.hasTag('Tool') then
+        tbl.toolCities = tbl.toolCities + 1
+    elseif obj.hasTag('Food') then
+        tbl.foodCities = tbl.foodCities + 1
+    elseif obj.hasTag('Wine') then
+        tbl.wineCities = tbl.wineCities + 1
+    elseif obj.hasTag('Salt') then
+        tbl.saltCities = tbl.saltCities + 1
+    end
+end
+
+function getCityTiles()
+    local allObjects = getAllObjects()
+    local cityTiles = {}
+    
+    for _, obj in pairs(allObjects) do
+        if obj.hasTag('City') then
+            table.insert(cityTiles, obj)
+        end
+    end
+    return cityTiles
+end
+
+-- Region checking for Saturn scoring
+function regionCheck(color)
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if not gameBoard then return 0 end
+    
+    local boardState = gameBoard.getStateId()
+    local regionCount = 0
+    
+    -- This would need to be implemented based on the specific board layout
+    -- For now, returning a placeholder value
+    return regionCount
+end
+
+-- Money counting function
+function getMoneyTotal(obj)
+    if not obj then return 0 end
+    
+    local counterValue = obj.getVar('counter_value') or 0
+    return counterValue
+end
+
+-- Reset function for scoring tables
+function resetTables()
+    minervaCards = {
+        Brick = '',
+        Food = '',
+        Tool = '',
+        Wine = '',
+        Cloth = '',
+    }
+    concordiaOwner = ''
+    return nil
+end
+
+-- UI functions for scoreboard
+function createScoreButton()
+    local buttonHolder = getObjectFromGUID('eddaae')
+    if buttonHolder then
+        buttonHolder.createButton({
+            position = {0, 1, 0},
+            label = 'Calculate\nScores',
+            click_function = 'scoreCalc',
+            width = 3500,
+            height = 2000,
+            font_size = 800,
+            rotation = {0, 270, 0},
+            color = 'Purple'
+        })
+    end
+    return 0
+end
+
+function toggleScoreBoardButton()
+    local buttonHolder = getObjectFromGUID('777e0a')
+    if buttonHolder then
+        buttonHolder.createButton({
+            position = {0, 1, 0},
+            label = 'Toggle \nScoreboard',
+            click_function = 'toggleScoreBoard',
+            width = 3500,
+            height = 2000,
+            font_size = 700,
+            rotation = {0, 270, 0},
+            color = 'Orange'
+        })
+    end
+    return 0
+end
+
+function toggleScoreBoard()
+    local seatedPlayers = getSeatedPlayers()
+    if scoreBoardToggle == 0 then
+        UI.setAttribute('scoreboard', 'active', true)
+        for i, playerColor in ipairs(seatedPlayers) do
+            UI.setAttribute('scoreboard' .. playerColor, 'active', true)
+        end
+        scoreBoardToggle = 1
+    elseif scoreBoardToggle == 1 then
+        UI.setAttribute('scoreboard', 'active', false)
+        for i, playerColor in ipairs(seatedPlayers) do
+            UI.setAttribute('scoreboard' .. playerColor, 'active', false)
+        end
+        scoreBoardToggle = 0
+    end
+    return nil
+end

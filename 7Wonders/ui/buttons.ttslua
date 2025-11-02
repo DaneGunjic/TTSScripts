@@ -235,6 +235,15 @@ function HandleBuyCard(obj, color, alt)
 		return
 	end
 
+	-- Check if Frontiers expansion is enabled
+	if ExpansionConfig and ExpansionConfig.Frontiers then
+		-- Show position selection buttons instead of readying up
+		ShowFrontiersPositionButtons(tileColor)
+		PlayerSelectedAction[tileColor] = "Buy"
+		UpdateActionStatusUI(tileColor, "Buy (Choose Position)")
+		return
+	end
+
 	-- Update action (player will stay ready if they were already ready)
 	PlayerSelectedAction[tileColor] = "Buy"
 	UpdateActionStatusUI(tileColor, "Buy")
@@ -358,4 +367,120 @@ function ResetAllActionStatusUI()
 	for _, color in ipairs(getSeatedPlayers()) do
 		UpdateActionStatusUI(color, "None")
 	end
+end
+
+-- Frontiers Expansion Functions
+-- Table to track player position choices for Frontiers expansion
+PlayerFrontiersChoice = {}
+
+-- Function to show Frontiers position selection buttons
+function ShowFrontiersPositionButtons(color)
+	local holder = PlayerCardHolder[color]
+	if not holder or not holder.Tile then return end
+
+	-- Hide normal action buttons and show position selection buttons
+	holder.Tile.UI.setAttribute("HolderBuy", "active", "false")
+	holder.Tile.UI.setAttribute("HolderSell", "active", "false")
+	holder.Tile.UI.setAttribute("HolderWonder", "active", "false")
+	holder.Tile.UI.setAttribute("HolderArmadaSell", "active", "false")
+
+	-- Show position selection buttons
+	holder.Tile.UI.setAttribute("HolderLeft", "active", "true")
+	holder.Tile.UI.setAttribute("HolderMiddle", "active", "true")
+	holder.Tile.UI.setAttribute("HolderRight", "active", "true")
+	holder.Tile.UI.setAttribute("HolderBack", "active", "true")
+end
+
+-- Function to restore normal action buttons
+function RestoreNormalActionButtons(color)
+	local holder = PlayerCardHolder[color]
+	if not holder or not holder.Tile then return end
+
+	-- Hide position selection buttons
+	holder.Tile.UI.setAttribute("HolderLeft", "active", "false")
+	holder.Tile.UI.setAttribute("HolderMiddle", "active", "false")
+	holder.Tile.UI.setAttribute("HolderRight", "active", "false")
+	holder.Tile.UI.setAttribute("HolderBack", "active", "false")
+
+	-- Show normal action buttons
+	holder.Tile.UI.setAttribute("HolderBuy", "active", "true")
+	holder.Tile.UI.setAttribute("HolderSell", "active", "true")
+	holder.Tile.UI.setAttribute("HolderWonder", "active", "true")
+	holder.Tile.UI.setAttribute("HolderArmadaSell", "active", armadaActive)
+end
+
+-- Frontiers position button handlers
+function HandleFrontiersLeft(obj, color, alt)
+	local tileColor = GetTileColorFromObject(obj)
+	if not tileColor or color:lower() ~= tileColor:lower() then
+		broadcastToColor("This isn't your button!", color, {1,0,0})
+		return
+	end
+
+	PlayerFrontiersChoice[tileColor] = "Left"
+	PlayerSelectedAction[tileColor] = "Buy"
+	UpdateActionStatusUI(tileColor, "Buy (Left)")
+
+	-- Ready up the player
+	if not ReadyList[tileColor] then
+		ReadyUp(Player[tileColor])
+	end
+end
+
+function HandleFrontiersMiddle(obj, color, alt)
+	local tileColor = GetTileColorFromObject(obj)
+	if not tileColor or color:lower() ~= tileColor:lower() then
+		broadcastToColor("This isn't your button!", color, {1,0,0})
+		return
+	end
+
+	PlayerFrontiersChoice[tileColor] = "Middle"
+	PlayerSelectedAction[tileColor] = "Buy"
+	UpdateActionStatusUI(tileColor, "Buy (Middle)")
+
+	-- Ready up the player
+	if not ReadyList[tileColor] then
+		ReadyUp(Player[tileColor])
+	end
+end
+
+function HandleFrontiersRight(obj, color, alt)
+	local tileColor = GetTileColorFromObject(obj)
+	if not tileColor or color:lower() ~= tileColor:lower() then
+		broadcastToColor("This isn't your button!", color, {1,0,0})
+		return
+	end
+
+	PlayerFrontiersChoice[tileColor] = "Right"
+	PlayerSelectedAction[tileColor] = "Buy"
+	UpdateActionStatusUI(tileColor, "Buy (Right)")
+
+	-- Ready up the player
+	if not ReadyList[tileColor] then
+		ReadyUp(Player[tileColor])
+	end
+end
+
+function HandleFrontiersBack(obj, color, alt)
+	local tileColor = GetTileColorFromObject(obj)
+	if not tileColor or color:lower() ~= tileColor:lower() then
+		broadcastToColor("This isn't your button!", color, {1,0,0})
+		return
+	end
+
+	-- Restore normal buttons and clear action
+	RestoreNormalActionButtons(tileColor)
+	PlayerSelectedAction[tileColor] = nil
+	PlayerFrontiersChoice[tileColor] = nil
+	UpdateActionStatusUI(tileColor, "None")
+end
+
+-- Helper function to get tile color from object
+function GetTileColorFromObject(obj)
+	for color, data in pairs(PlayerCardHolder) do
+		if data.Tile and data.Tile.guid == obj.guid then
+			return color
+		end
+	end
+	return nil
 end

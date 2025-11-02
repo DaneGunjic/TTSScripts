@@ -1,0 +1,183 @@
+-- Concordia Constants
+-- All GUIDs, configuration variables, and constant values
+
+-- Game State Variables
+gameStarted = false
+forum = false
+altWineBoard = false
+selectedMap = 4
+numberOfPlayers = 2
+venusONNN = 1
+typeSide = 1
+debugCounter = 1
+lockDoubleTrouble = true
+indexLastLocation = 0
+targetBag = 0
+globalWait = 0.5
+roundCounter = 0
+fontsize = 800
+widthsize = 5200
+heightsize = 1200
+
+-- Board and Zone GUIDs
+extraMarketGUID = 'd3d1e9'
+boardPickerZoneGUID = '465f48'
+btnLocationItaliaGUID = 'f26769'
+genericTokenBAGGUID = 'd75bd3'
+deckZoneGUID = 'c57b1a'
+mainDeckZoneGUID = '10a39c'
+onePlayerZoneGUID = 'b82a1f'
+twoPlayerZoneGUID = '62d75d'
+threePlayerZoneGUID = 'fc6103'
+fourPlayerZoneGUID = '501ae3'
+fivePlayerZoneGUID = '51e4ed'
+
+-- Resource Bag Zone GUIDs
+zoneBagBrick = 'c12ce3'
+zoneBagFood = '69a9a8'
+zoneBagTool = '03b9ab'
+zoneBagWine = '76e922'
+zoneBagCloth = '90efb1'
+infSaltGUID = '17a7e5'
+infFoodGUID = '7e0ec3'
+
+-- Senator Board GUIDs
+SenatorBoardClothGUID = '8fb28c'
+senatorWineBoardGUID = '809e43'
+
+-- Player-specific GUIDs
+playerMoneyCounters = {
+    White = '10bdde',
+    Red = '3abac8',
+    Yellow = '955eca',
+    Green = '6c00c1',
+    Blue = '81ac95'
+}
+
+playerWarehouses = {
+    White = 'b03c2c',
+    Red = '454f40',
+    Yellow = 'e9bbce',
+    Green = '35a11d',
+    Blue = 'f5683a',
+}
+
+playerSellZones = {
+    White = 'befbe2',
+    Red = 'e1275e',
+    Yellow = '212fed',
+    Green = 'a05304',
+    Blue = 'eda941'
+}
+
+playerDiscardTiles = {
+    White = '29e881',
+    Red = '2fbfc2',
+    Yellow = 'bc64cc',
+    Green = '9ebccc',
+    Blue = '92e213'
+}
+
+-- Supply and Salt Bag GUIDs
+supplyBags = {
+    'baf452', 'b5d999', '89c2b1', 'b6743e', 'd147ac',
+    '96e463', '513062', 'b7ceb6', '877036', '6ec15d',
+    '62c463', '92ae57', 'db1e67', 'ca3086', '33e83f'
+}
+
+saltBags = {'b34c88', '3cb8df', '4e209c'}
+
+-- Loot Zone Swap GUIDs for Salsa
+lootZoneSwapSalsaGUID = {
+    '81a5ca', 'cf0adb', 'de7734', 
+    '044533', 'c8a902', 'ad0f24'
+}
+
+-- Positions and Rotations
+typeSideRot1 = {0.00, 180.00, 0.00}
+typeSideRot2 = {0.00, 180.00, 180.00}
+typeSidePosCreta = {-0.20, 1.16, 18.93}
+typeSidePosAegyptus = {-28.38, 1.16, 11.47}
+typeSidePosIonivm = {0.22, 1.96, 20.95}
+
+rotBoard0 = {0.00, 0.00, 0.00}
+rotBoard270 = {0.00, 270.00, 0.00}
+rotBoard180 = {0.00, 180.00, 0.00}
+
+mainDeckLocation = {35.28, 1.03, 16.17}
+
+-- Germany Extra Loot Positions
+posGermanyExtraLoot = {
+    {-11.41, 1.82, -1.35}, {-7.92, 1.82, 0.89}, {-5.31, 1.82, -14.06},
+    {-1.72, 1.82, -4.14}, {6.96, 1.82, 0.57}, {11.09, 1.82, -11.94},
+    {13.59, 1.82, 5.09}, {14.14, 1.82, -3.35}, {21.70, 1.82, 8.60},
+    {21.59, 1.82, 2.55}
+}
+
+-- Senator Board Snap Points
+SENATOR_BOARD_SNAPS = {
+    {position = {3.185, 0, -0.15}, rotation_snap = true},
+    {position = {2.13, 0, -0.15}, rotation_snap = true},
+    {position = {1.07, 0, -0.15}, rotation_snap = true},
+    {position = {0, 0, -0.15}, rotation_snap = true},
+    {position = {-1.05, 0, -0.15}, rotation_snap = true},
+    {position = {-2.13, 0, -0.15}, rotation_snap = true},
+    {position = {-3.175, 0, -0.15}, rotation_snap = true}
+}
+
+-- Game Configuration
+goodsList = {'Brick', 'Food', 'Tool', 'Wine', 'Cloth'}
+cardTags = {'Jupiter', 'Saturn', 'Mars', 'Mercury'}
+
+-- Game State Flags
+boolSalsa = false
+boolForum = false
+councilFlag = true
+noSaltFlag = true
+scoreBoardToggle = 0
+
+-- Minerva Cards Tracking
+minervaCards = {
+    Brick = '',
+    Food = '',
+    Tool = '',
+    Wine = '',
+    Cloth = '',
+}
+
+-- Global Variables
+concordiaOwner = ''
+SENATOR_CARD_ZONES = nil
+
+-- Button Objects (initialized as empty tables)
+boardPickerZone = {}
+board = {}
+btnItaly = {}
+btnGaly = {}
+btnHisp = {}
+btnBrit = {}
+btnGerm = {}
+btnByz = {}
+btnEuro = {}
+btnAegyptus = {}
+btnCreta = {}
+btnHellas = {}
+btnCyprvs = {}
+btnIonivm = {}
+btnBalerica = {}
+btnCorsica = {}
+btnSalsa = {}
+btnForum = {}
+btn2p = {}
+btn3p = {}
+btn4p = {}
+btn5p = {}
+btnMove = {}
+btnDisplay = {}
+btnMarket = {}
+btnVenus = {}
+btnRandomSetup = {}
+tokenBagG = {}
+deck = {}
+btnMystery = {}
+btnArray = {}

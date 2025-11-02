@@ -1,0 +1,733 @@
+-- Concordia Game Setup
+-- All functions related to board setup, player setup, and deck management
+
+-- Player setup functions
+function SetupFor2Player()
+    numberOfPlayers = 2
+    DestroyRemaining()
+    startLuaCoroutine(Global, 'placestuff')
+end
+
+function SetupFor3Player()
+    numberOfPlayers = 3
+    DestroyRemaining()
+    startLuaCoroutine(Global, 'placestuff')
+end
+
+function SetupFor4Player()
+    numberOfPlayers = 4
+    DestroyRemaining()
+    startLuaCoroutine(Global, 'placestuff')
+end
+
+function SetupFor5Player()
+    numberOfPlayers = 5
+    DestroyRemaining()
+    startLuaCoroutine(Global, 'placestuff')
+end
+
+-- Random setup function
+function randomMapAndStore()
+    local randomStore = math.random(2)
+    local randomMap = math.random(14)
+    local randomSalsa = math.random(2)
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    local playerCount = getSeatedPlayers()
+    
+    if #playerCount == 1 then
+        broadcastToAll('2 or more players must be seated for random setup', 'Red')
+        return 0
+    end
+    
+    if randomStore == 1 then
+        altWineBoard = true
+    elseif randomStore == 2 then
+        altWineBoard = false
+    end
+    
+    if randomSalsa == 1 then
+        boolSalsa = true
+    elseif randomSalsa == 2 then
+        boolSalsa = false
+    end
+    
+    -- Set random map
+    if randomMap == 1 then
+        CsetBoardToBRITANNIA()
+    elseif randomMap == 2 then
+        CsetBoardToHISPANIA()
+    elseif randomMap == 3 then
+        coroutineItaly()
+    elseif randomMap == 4 then
+        CsetBoardToByzantium()
+    elseif randomMap == 5 then
+        CsetBoardToEuropa()
+    elseif randomMap == 6 then
+        CsetBoardToCorsica()
+    elseif randomMap == 7 then
+        CsetBoardToGALLIA()
+    elseif randomMap == 8 then
+        CsetBoardToGERMANIA()
+    elseif randomMap == 9 then
+        CsetBoardCreta()
+    elseif randomMap == 10 then
+        CsetBoardAegyptus()
+    elseif randomMap == 11 then
+        CsetBoardToIonivm()
+    elseif randomMap == 12 then
+        CsetBoardToCyprvs()
+    elseif randomMap == 13 then
+        CsetBoardToBalearica()
+    elseif randomMap == 14 then
+        CsetBoardToHellas()
+    end
+    
+    -- Set player count
+    if #playerCount == 2 then
+        SetupFor2Player()
+    elseif #playerCount == 3 then
+        SetupFor3Player()
+    elseif #playerCount == 4 then
+        SetupFor4Player()
+    elseif #playerCount == 5 then
+        SetupFor5Player()
+    end
+    return nil
+end
+
+-- Cleanup function for setup buttons
+function DestroyRemaining()
+    destroyObject(btn2p)
+    destroyObject(btn3p)
+    destroyObject(btn4p)
+    destroyObject(btn5p)
+    destroyObject(btnDisplay)
+    destroyObject(btnVenus)
+    
+    if(not boolForum) then
+        destroyObject(btnMove)
+    end
+    
+    destroyObject(btnForum)
+    destroyObject(btnSalsa)
+    destroyObject(btnItaly)
+    destroyObject(btnGaly)
+    destroyObject(btnHisp)
+    destroyObject(btnBrit)
+    destroyObject(btnGerm)
+    destroyObject(btnByz)
+    destroyObject(btnEuro)
+    destroyObject(btnCorsica)
+    destroyObject(btnAegyptus)
+    destroyObject(btnCreta)
+    destroyObject(btnHellas)
+    destroyObject(btnCyprvs)
+    destroyObject(btnIonivm)
+    destroyObject(btnBalerica)
+    destroyObject(btnRandomSetup)
+end
+
+-- Board setup functions
+function coroutineItaly()
+    setBoardToItaly()
+end
+
+function CsetBoardToByzantium()
+    setBoardToByzantium()
+end
+
+function CsetBoardToEuropa()
+    setBoardToEuropa()
+end
+
+function CsetBoardToCorsica()
+    setBoardToCorsica()
+end
+
+function CsetBoardAegyptus()
+    setBoardAegyptus()
+end
+
+function CsetBoardCreta()
+    setBoardCreta()
+end
+
+function CsetBoardToHellas()
+    setBoardHellas()
+end
+
+function CsetBoardToCyprvs()
+    setBoardCyprvs()
+end
+
+function CsetBoardToIonivm()
+    setBoardIonivm()
+end
+
+function CsetBoardToBalearica()
+    setBoardBalearica()
+end
+
+function CsetBoardToGERMANIA()
+    setBoardToGERMANIA()
+end
+
+function CsetBoardToHISPANIA()
+    setBoardToHISPANIA()
+end
+
+function CsetBoardToBRITANNIA()
+    setBoardToBRITANNIA()
+end
+
+function CsetBoardToGALLIA()
+    setBoardToGALLIA()
+end
+
+-- Individual board setup functions
+function setBoardToItaly()
+    selectedMap = 3
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(3)
+    end
+end
+
+function setBoardAegyptus()
+    selectedMap = 10
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(10)
+    end
+end
+
+function setBoardCreta()
+    selectedMap = 9
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(9)
+    end
+end
+
+function setBoardHellas()
+    selectedMap = 14
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(14)
+    end
+end
+
+function setBoardCyprvs()
+    selectedMap = 12
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(12)
+    end
+end
+
+function setBoardIonivm()
+    selectedMap = 11
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(11)
+    end
+end
+
+function setBoardBalearica()
+    selectedMap = 13
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(13)
+    end
+end
+
+function setBoardToGERMANIA()
+    selectedMap = 8
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(8)
+    end
+end
+
+function setBoardToHISPANIA()
+    selectedMap = 2
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(2)
+    end
+end
+
+function setBoardToBRITANNIA()
+    selectedMap = 1
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(1)
+    end
+end
+
+function setBoardToGALLIA()
+    selectedMap = 7
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(7)
+    end
+end
+
+function setBoardToByzantium()
+    selectedMap = 4
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(4)
+    end
+end
+
+function setBoardToEuropa()
+    selectedMap = 5
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(5)
+    end
+end
+
+function setBoardToCorsica()
+    selectedMap = 6
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    if gameBoard then
+        gameBoard.setState(6)
+    end
+end
+
+-- Deck management functions
+function shuffleDeck(dGuid)
+    local deck = getObjectFromGUID(dGuid)
+    if deck and deck.type == 'Deck' then
+        deck.shuffle()
+    end
+end
+
+function swapDecks(zone1, zone2)
+    local deck1 = getDeckFromZone(zone1)
+    local deck2 = getDeckFromZone(zone2)
+    
+    if deck1 and deck2 then
+        local pos1 = deck1.getPosition()
+        local pos2 = deck2.getPosition()
+        deck1.setPosition(pos2)
+        deck2.setPosition(pos1)
+    end
+end
+
+function shufflestuff()
+    local mainDeck = getDeckFromZone(mainDeckZoneGUID)
+    if mainDeck then
+        mainDeck.shuffle()
+    end
+end
+
+function stuffDeck(target, source, ammo, zone)
+    local targetDeck = getObjectFromGUID(target)
+    local sourceDeck = getObjectFromGUID(source)
+    
+    if targetDeck and sourceDeck then
+        for i = 1, ammo do
+            if sourceDeck.type == 'Deck' then
+                local card = sourceDeck.takeObject()
+                if card then
+                    targetDeck.putObject(card)
+                end
+            end
+        end
+    end
+end
+
+function setMainDeck()
+    local mainDeck = getDeckFromZone(mainDeckZoneGUID)
+    if mainDeck then
+        mainDeck.setPosition(mainDeckLocation)
+    end
+end
+
+-- Money and starting setup
+function startingMoney()
+    for color, counterGUID in pairs(playerMoneyCounters) do
+        local counter = getObjectFromGUID(counterGUID)
+        if counter then
+            counter.call('updateVal', 15) -- Starting money
+        end
+    end
+end
+
+function addMoney(color, value)
+    local counter = getObjectFromGUID(playerMoneyCounters[color])
+    if counter then
+        counter.call('updateVal', value)
+    end
+end
+
+-- First player selection
+function randomFirstPlayer()
+    local seatedPlayers = getSeatedPlayers()
+    if #seatedPlayers > 0 then
+        local shuffledPlayers = shuffleList(seatedPlayers)
+        Turns.order = shuffledPlayers
+        Turns.turn_color = shuffledPlayers[1]
+        broadcastToAll('First player: ' .. getPlayerName(shuffledPlayers[1]), 'White')
+    end
+end
+
+-- Salt management for Salsa expansion
+function addSalt()
+    if boolSalsa then
+        -- Add salt tokens to appropriate locations
+        for i, bagGUID in ipairs(saltBags) do
+            local bag = getObjectFromGUID(bagGUID)
+            if bag then
+                -- Implementation for salt placement
+            end
+        end
+    end
+end
+
+function removeSalt()
+    if not boolSalsa then
+        -- Remove salt tokens from the game
+        local allObjects = getAllObjects()
+        for _, obj in pairs(allObjects) do
+            if obj.hasTag('Salt') then
+                obj.destruct()
+            end
+        end
+    end
+end
+
+function swapSaltTokenForFood(zone)
+    local zoneObj = getObjectFromGUID(zone)
+    if zoneObj then
+        local objects = upCast(zoneObj)
+        for _, obj in pairs(objects) do
+            if obj.hasTag('Salt') then
+                local pos = obj.getPosition()
+                obj.destruct()
+                -- Spawn food token at same position
+                local foodBag = getInfBagFromZone(infFoodGUID)
+                if foodBag then
+                    foodBag.takeObject({position = pos})
+                end
+            end
+        end
+    end
+end
+
+-- Germany specific setup
+function placeGermanThings()
+    if selectedMap == 8 then -- Germania
+        for i, pos in ipairs(posGermanyExtraLoot) do
+            local tokenBag = getObjectFromGUID(genericTokenBAGGUID)
+            if tokenBag then
+                tokenBag.takeObject({position = pos})
+            end
+        end
+    end
+end
+
+-- City seeding and region management
+function seedCities(targetArray, cityBits)
+    -- Unebrion Additions
+    local brickTiles = {brickA, brickB, brickC, brickD}
+    local clothTiles = {clothA, clothB, clothC, clothD}
+    local foodTiles = {foodA, foodB, foodC, foodD}
+    local toolTiles = {toolA, toolB, toolC, toolD}
+    local wineTiles = {wineA, wineB, wineC, wineD}
+    local saltTiles = {saltA, saltB, saltC, saltD}
+    
+    if targetArray ~= nil then
+        local count = 1
+        local numMaxArray = #targetArray
+        shuffleArray(cityBits)
+        shuffleArray(cityBits)
+        shuffleArray(cityBits)
+        
+        while count <= numMaxArray do
+            local obj_parameters = {}
+            obj_parameters.type = 'Custom_Model'
+            obj_parameters.position = targetArray[count]
+            obj_parameters.rotation = {0.00, 180.00, 0.00}
+
+            local obj = spawnObject(obj_parameters)
+            obj.setLock(true)
+            local custom = {}
+            custom.mesh = 'http://pastebin.com/raw/CnZMEjc3'
+            custom.diffuse = cityBits[count]
+            custom.material = 1
+            obj.setCustomObject(custom)
+
+            -- Unebrion Additions - Add tags for city types
+            obj.addTag('city_tile')
+            if cityBits[count] == tableChecker(brickTiles, cityBits[count]) then
+                obj.addTag('brick')
+            elseif cityBits[count] == tableChecker(clothTiles, cityBits[count]) then
+                obj.addTag('cloth')
+            elseif cityBits[count] == tableChecker(foodTiles, cityBits[count]) then
+                obj.addTag('food')
+            elseif cityBits[count] == tableChecker(toolTiles, cityBits[count]) then
+                obj.addTag('tool')
+            elseif cityBits[count] == tableChecker(wineTiles, cityBits[count]) then
+                obj.addTag('wine')
+            elseif cityBits[count] == tableChecker(saltTiles, cityBits[count]) then
+                obj.addTag('salt')
+            end
+            
+            cityBits[count] = obj
+            count = count + 1
+        end
+    end
+end
+
+function drawRegionBest(lootSwitcher, pos)
+    if lootSwitcher == 1 then
+        TakeMove(brickBag, pos)
+    elseif lootSwitcher == 2 then
+        TakeMove(foodBag, pos)
+    elseif lootSwitcher == 3 then
+        TakeMove(toolBag, pos)
+    elseif lootSwitcher == 4 then
+        TakeMove(wineBag, pos)
+    elseif lootSwitcher == 5 then
+        TakeMove(clothBag, pos)
+    end
+end
+
+function removeOneGuy(lootSwitcher)
+    if lootSwitcher == 1 then
+        table.remove(stdTOTALISGERMANS, findFirst(1))
+    elseif lootSwitcher == 2 then
+        table.remove(stdTOTALISGERMANS, findFirst(2))
+    elseif lootSwitcher == 3 then
+        table.remove(stdTOTALISGERMANS, findFirst(3))
+    elseif lootSwitcher == 4 then
+        table.remove(stdTOTALISGERMANS, findFirst(4))
+    elseif lootSwitcher == 5 then
+        table.remove(stdTOTALISGERMANS, findFirst(5))
+    end
+end
+
+function shufflestuff()
+    getDeckFromZone(onePlayerZoneGUID).shuffle()
+    getDeckFromZone(twoPlayerZoneGUID).shuffle()
+    getDeckFromZone(threePlayerZoneGUID).shuffle()
+    getDeckFromZone(fourPlayerZoneGUID).shuffle()
+    getDeckFromZone(fivePlayerZoneGUID).shuffle()
+end
+
+function stuffDeck(target, source, ammo, zone)
+    local i = 1
+    while i <= ammo do
+        local params = {}
+        params.position = target.getPosition()
+        source.takeObject(params)
+        i = i + 1
+    end
+end
+
+function setMainDeck()
+    local p1deck = getDeckFromZone(onePlayerZoneGUID)
+    local p2deck = getDeckFromZone(twoPlayerZoneGUID)
+    local p3deck = getDeckFromZone(threePlayerZoneGUID)
+    local p4deck = getDeckFromZone(fourPlayerZoneGUID)
+    local p5deck = getDeckFromZone(fivePlayerZoneGUID)
+    
+    if venusONNN == 1 then -- If Venus is off
+        stuffDeck(p1deck, p2deck, 7, twoPlayerZoneGUID)
+        if numberOfPlayers > 2 then
+            stuffDeck(p1deck, p3deck, 6, threePlayerZoneGUID)
+            if numberOfPlayers > 3 then
+                stuffDeck(p1deck, p4deck, 5, fourPlayerZoneGUID)
+                if numberOfPlayers > 4 then
+                    stuffDeck(p1deck, p5deck, 4, onePlayerZoneGUID)
+                end
+            end
+        end
+    else -- If Venus is on
+        stuffDeck(p1deck, p2deck, 9, twoPlayerZoneGUID)
+        if numberOfPlayers > 2 then
+            stuffDeck(p1deck, p3deck, 7, threePlayerZoneGUID)
+            if numberOfPlayers > 3 then
+                stuffDeck(p1deck, p4deck, 6, fourPlayerZoneGUID)
+                if numberOfPlayers > 4 then
+                    stuffDeck(p1deck, p5deck, 4, onePlayerZoneGUID)
+                end
+            end
+        end
+    end
+    
+    Wait.time(function() restockSenatorBoard() end, 1)
+end
+
+function setupBoardSpecificElements(stateId)
+    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    
+    if boolSalsa then
+        addSalt()
+    else
+        local i = 1
+        while i <= #lootZoneSwapSalsaGUID do
+            swapSaltTokenForFood(lootZoneSwapSalsaGUID[i])
+            i = i + 1
+        end
+    end
+    
+    -- Board-specific setup based on state ID
+    if stateId == 1 then
+        seedCities(BRITTNANIAB, stdBagB)
+        seedCities(BRITTNANIAC, stdBagC)
+        seedCities(BRITTNANIAD, stdBagD)
+        TableConcat(stdBagB, stdBagC)
+        TableConcat(stdBagB, stdBagD)
+        parseRegions(stdBagB, BRITTNANIARegions, BRITTNANIAtiles)
+    elseif stateId == 2 then
+        seedCities(hispaniaa, stdBagASalsa)
+        seedCities(hispaniab, stdBagBSalsa)
+        seedCities(hispaniad, stdBagDSalsa)
+        TableConcat(stdBagASalsa, stdBagBSalsa)
+        TableConcat(stdBagASalsa, stdBagDSalsa)
+        parseRegions(stdBagASalsa, HispaniaRegions, hispaniatiles)
+    elseif stateId == 3 then
+        seedCities(italiaa, stdBagA)
+        seedCities(italiab, stdBagB)
+        seedCities(italiac, stdBagC)
+        TableConcat(stdBagA, stdBagB)
+        TableConcat(stdBagA, stdBagC)
+        parseRegions(stdBagA, ItaliaRegions, italiatiles)
+    -- Add other board states as needed
+    end
+end
+
+function addSalt()
+    -- Implementation for adding salt tokens to the game
+    for i = 1, #saltTokenPositions do
+        TakeMove(saltBag, saltTokenPositions[i])
+    end
+end
+
+function swapSaltTokenForFood(zone)
+    local zoneObj = getObjectFromGUID(zone)
+    if zoneObj then
+        local objects = zoneObj.getObjects()
+        for _, token in ipairs(objects) do
+            if token.getName() == 'Salt' then
+                local params = {}
+                params.position = token.getPosition()
+                destroyObject(token)
+                TakeMove(foodBag, params)
+            end
+        end
+    end
+end
+
+function parseRegions(cityBits, countrySegmentArray, regionArray)
+    if cityBits ~= nil then
+        local countyCounter = 1
+        local maxCountyBoys = #countrySegmentArray
+        shuffleArray(cityBits)
+        shuffleArray(cityBits)
+        shuffleArray(cityBits)
+        
+        while countyCounter <= maxCountyBoys do
+            local bestLoot = whatIsBest(cityBits[1], cityBits[2])
+            if #cityBits > 2 then
+                bestLoot = whatIsBest(bestLoot, cityBits[3])
+            end
+            if #cityBits > 3 then
+                bestLoot = whatIsBest(bestLoot, cityBits[4])
+            end
+            if #cityBits > 4 then
+                bestLoot = whatIsBest(bestLoot, cityBits[5])
+            end
+            
+            drawRegionBest(getValue(bestLoot), regionArray[countyCounter])
+            removeOneGuy(getValue(bestLoot))
+            countyCounter = countyCounter + 1
+        end
+    end
+end
+
+-- Main placement function
+function placestuff()
+    -- This would contain the main setup logic for placing all game components
+    -- Based on the selected map and number of players
+    
+    -- Place senator board
+    placeSenatorBoard()
+    
+    -- Setup money counters
+    startingMoney()
+    
+    -- Setup first player
+    randomFirstPlayer()
+    
+    -- Handle expansions
+    if boolSalsa then
+        addSalt()
+    end
+    
+    if selectedMap == 8 then
+        placeGermanThings()
+    end
+    
+    -- Create score button
+    createScoreButton()
+    
+    gameStarted = true
+end
+
+-- Market setup for Forum expansion
+function RollMarketFORUM(targetDeck, marketZone1GUID, marketZone2GUID, marketZone3GUID, marketZone4GUID,
+    marketZone1Pos, marketZone2Pos, marketZone3Pos, marketZone4Pos)
+    
+    if lockDoubleTrouble then
+        local marketZone1 = getObjectFromGUID(marketZone1GUID).getObjects()
+        local marketZone2 = getObjectFromGUID(marketZone2GUID).getObjects()
+        local marketZone3 = getObjectFromGUID(marketZone3GUID).getObjects()
+        local marketZone4 = getObjectFromGUID(marketZone4GUID).getObjects()
+        
+        local globalFailedMovement = false
+        local push = true
+        
+        -- Market shifting logic for Forum expansion
+        for i, token in ipairs(marketZone1) do
+            if token.getName() ~= 'FORVM' then
+                push = false
+            end
+        end
+        
+        if push then
+            globalFailedMovement = true
+        else
+            push = true
+        end
+        
+        for i, token in ipairs(marketZone2) do
+            if token.getName() ~= 'FORVM' then
+                push = false
+                if globalFailedMovement then
+                    moveTo(token, marketZone1Pos)
+                end
+            end
+        end
+        
+        -- Continue similar logic for other market zones...
+    end
+end
+
+function checkLastCardDeckInzone(locationZone)
+    local zone = getObjectFromGUID(locationZone)
+    if zone then
+        local objects = zone.getObjects()
+        for _, obj in pairs(objects) do
+            if obj.type == 'Deck' or obj.type == 'Card' then
+                return obj
+            end
+        end
+    end
+    return nil
+end

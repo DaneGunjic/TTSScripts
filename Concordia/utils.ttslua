@@ -1,0 +1,368 @@
+-- Concordia Utility Functions
+-- Helper functions used throughout the codebase
+
+-- Ray casting utility for object detection
+function rayCast(position, obj)
+    local hit = Physics.cast({
+        origin = position,
+        direction = {0, -1, 0},
+        type = 1,
+        size = {0.5, 0.5, 0.5},
+        max_distance = 2,
+        debug = false
+    })
+    
+    for _, hitInfo in ipairs(hit) do
+        if hitInfo.hit_object ~= obj then
+            return hitInfo.hit_object
+        end
+    end
+    return nil
+end
+
+-- Enhanced upcast function for getting objects above a zone
+function upCast(obj, dist, offset, multi)
+    local dist = dist or 5
+    local offset = offset or 2
+    local multi = multi or false
+    
+    local pos = obj.getPosition()
+    pos.y = pos.y + offset
+    
+    local hit = Physics.cast({
+        origin = pos,
+        direction = {0, 1, 0},
+        type = 3,
+        size = obj.getBounds().size,
+        max_distance = dist,
+        debug = false
+    })
+    
+    local hitObjects = {}
+    for _, hitInfo in ipairs(hit) do
+        if hitInfo.hit_object ~= obj then
+            table.insert(hitObjects, hitInfo.hit_object)
+        end
+    end
+    
+    if multi then
+        return hitObjects
+    else
+        return hitObjects[1]
+    end
+end
+
+-- Table utility functions
+function tableParser(key, tableToSearch)
+    for _, thing in ipairs(tableToSearch) do
+        if key == thing then
+            return true
+        end
+    end
+    return false
+end
+
+function getTableTotal(tbl)
+    local total = 0
+    for _, thing in pairs(tbl) do
+        total = total + thing
+    end
+    return total
+end
+
+function tableChecker(checkMe, findMe)
+    for _, thing in ipairs(checkMe) do
+        if thing == findMe then
+            return true
+        end
+    end
+    return false
+end
+
+function TableConcat(t1, t2)
+    for i = 1, #t2 do
+        t1[#t1 + 1] = t2[i]
+    end
+    return t1
+end
+
+-- Array manipulation functions
+function shuffleArray(array)
+    local shuffled = {}
+    for i = 1, #array do
+        shuffled[i] = array[i]
+    end
+    
+    for i = #shuffled, 2, -1 do
+        local j = math.random(i)
+        shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
+    end
+    
+    return shuffled
+end
+
+function shuffleList(list)
+    for i = #list, 2, -1 do
+        local j = math.random(i)
+        list[i], list[j] = list[j], list[i]
+    end
+    return list
+end
+
+function createArrayForNCards(start, number)
+    local array = {}
+    for i = start, start + number - 1 do
+        table.insert(array, i)
+    end
+    return array
+end
+
+function swap(array, index1, index2)
+    array[index1], array[index2] = array[index2], array[index1]
+end
+
+function debugArray(array)
+    local output = "Array contents: "
+    for i, value in ipairs(array) do
+        output = output .. tostring(value) .. " "
+    end
+    print(output)
+end
+
+-- Object finding utilities
+function checkForDeckOrCard(objGuid)
+    local objZone = getObjectFromGUID(objGuid)
+    if not objZone then return nil end
+    
+    local zoneContents = objZone.getObjects()
+    for _, thing in ipairs(zoneContents) do
+        if thing.type == 'Deck' or thing.type == 'Card' then
+            return thing
+        end
+    end
+    return nil
+end
+
+function getDeckFromZone(zone)
+    local zoneObj = getObjectFromGUID(zone)
+    if not zoneObj then return nil end
+    
+    local objects = zoneObj.getObjects()
+    for _, obj in ipairs(objects) do
+        if obj.type == 'Deck' then
+            return obj
+        end
+    end
+    return nil
+end
+
+function getBoardFromZone(zone)
+    local zoneObj = getObjectFromGUID(zone)
+    if not zoneObj then return nil end
+    
+    local objects = zoneObj.getObjects()
+    for _, obj in ipairs(objects) do
+        if obj.hasTag('GameBoard') or obj.getName():find('Board') then
+            return obj
+        end
+    end
+    return nil
+end
+
+function getInfBagFromZone(zone)
+    local zoneObj = getObjectFromGUID(zone)
+    if not zoneObj then return nil end
+    
+    local objects = zoneObj.getObjects()
+    for _, obj in ipairs(objects) do
+        if obj.type == 'Infinite' then
+            return obj
+        end
+    end
+    return nil
+end
+
+function getBagFromZone(zone)
+    local zoneObj = getObjectFromGUID(zone)
+    if not zoneObj then return nil end
+    
+    local objects = zoneObj.getObjects()
+    for _, obj in ipairs(objects) do
+        if obj.type == 'Bag' then
+            return obj
+        end
+    end
+    return nil
+end
+
+-- Timing utilities
+function pauseSeconds(s)
+    local start = os.time()
+    repeat until os.time() > start + s
+end
+
+function waitone()
+    return coroutine.yield(0)
+end
+
+function waithalf()
+    return coroutine.yield(0)
+end
+
+function waitsome(some)
+    return coroutine.yield(0)
+end
+
+function waitForUnlock()
+    return coroutine.yield(0)
+end
+
+-- Movement utilities
+function moveTo(object, x1, y1, z1)
+    local targetLocation = {x1, y1, z1}
+    object.setPosition(targetLocation)
+end
+
+function moveToPR(object, x1, y1, z1, r1, r2, r3)
+    local targetLocation = {}
+    targetLocation.position = {x1, y1, z1}
+    targetLocation.rotation = {r1, r2, r3}
+    object.setPosition(targetLocation.position)
+    object.setRotation(targetLocation.rotation)
+end
+
+function moveToPRXXX(object, x1, y1, z1, r1, r2, r3)
+    local targetLocation = {}
+    targetLocation.position = {x1, y1, z1}
+    targetLocation.rotation = {r1, r2, r3}
+    object.setPosition(targetLocation.position)
+    object.setRotation(targetLocation.rotation)
+end
+
+function TakeMoveSimple(targetObjectBag, destinyPosition)
+    local params = {}
+    params.position = destinyPosition
+    targetObjectBag.takeObject(params)
+end
+
+function TakeMove(targetObjectBag, x1, y1, z1, r1, r2, r3)
+    local params = {}
+    params.position = {x1, y1, z1}
+    params.rotation = {r1, r2, r3}
+    return targetObjectBag.takeObject(params)
+end
+
+function TakeMoveCard(targetObjectBag, params)
+    if params ~= nil then
+        if selectedMap == 14 then
+            params.rotation = {0.00, 90.00, 0.00}
+        end
+    end
+    return targetObjectBag.takeObject(params)
+end
+
+function TakeMoveGUID(deck, guide, location)
+    local params = {}
+    params.position = location
+    params.guid = guide
+    return deck.takeObject(params)
+end
+
+function TakeMoveGUIDFlip(deck, guide, location)
+    local params = {}
+    params.position = location
+    params.guid = guide
+    params.flip = true
+    return deck.takeObject(params)
+end
+
+function moveToCard(object, destination)
+    object.setPosition(destination.getPosition())
+end
+
+-- Value comparison utilities
+function getValue(subject)
+    if subject == nil then
+        return 0
+    else
+        return subject
+    end
+end
+
+function whatIsBest(kitty, puppy)
+    if kitty > puppy then
+        return kitty
+    else
+        return puppy
+    end
+end
+
+function findFirst(who)
+    for i = 1, #who do
+        if who[i] ~= 0 then
+            return i
+        end
+    end
+    return nil
+end
+
+-- Player utilities
+function getPlayerName(playerColor)
+    local player = Player[playerColor]
+    if player and player.steam_name then
+        return player.steam_name
+    else
+        return playerColor
+    end
+end
+
+function getSeatedPlayers()
+    local seatedPlayers = {}
+    for _, player in ipairs(Player.getPlayers()) do
+        if player.seated then
+            table.insert(seatedPlayers, player.color)
+        end
+    end
+    return seatedPlayers
+end
+
+-- Message utility
+function getValue(subject)
+    if subject == brickA or subject == brickB or subject == brickC or subject == brickD then
+        return 1
+    elseif subject == foodA or subject == foodB or subject == foodC or subject == foodD then
+        return 2
+    elseif subject == toolA or subject == toolB or subject == toolC or subject == toolD then
+        return 3
+    elseif subject == wineA or subject == wineB or subject == wineC or subject == wineD then
+        return 4
+    elseif subject == clothA or subject == clothB or subject == clothC or subject == clothD then
+        return 5
+    else
+        return 0
+    end
+end
+
+function whatIsBest(kitty, puppy)
+    local kittyValue = getValue(kitty)
+    local puppyValue = getValue(puppy)
+    
+    if kittyValue == puppyValue or kittyValue > puppyValue then
+        return kitty
+    else
+        return puppy
+    end
+end
+
+function findFirst(who)
+    for counter = 1, #stdTOTALISGERMANS do
+        if stdTOTALISGERMANS[counter] == who then
+            return counter
+        end
+    end
+    return 1
+end
+
+function showMessage(stringEs)
+    broadcastToAll(stringEs, 'White')
+end
