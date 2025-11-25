@@ -3,20 +3,19 @@
 
 -- Senator board placement and positioning
 function placeSenatorBoard()
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
     local senatorBoard = nil
     local rot = Vector(0,180,0)
-    
+
     if altWineBoard then
-        senatorBoard = getObjectFromGUID(senatorWineBoardGUID)
+        senatorBoard = senatorWineBoard
     else
-        senatorBoard = getObjectFromGUID(SenatorBoardClothGUID)
+        senatorBoard = SenatorBoardCloth
     end
-    
-    if not gameBoard or not senatorBoard then return end
-    
-    local boardState = gameBoard.getStateId()
-    
+
+    if not MainBoard or not senatorBoard then return end
+
+    local boardState = MainBoard.getStateId()
+
     if boardState == 1 then -- Britannia
         local pos = Vector(-0.07, 1.72, 18.86)
         local scale = Vector(4.00, 1.00, 3.78)
@@ -75,24 +74,24 @@ function placeSenatorBoard()
         local rot = Vector(0.00, 90.00, 0.00)
         positionBoard(senatorBoard, pos, scale, rot)
     end
-    
+
     senatorBoard.setLock(true)
 end
 
 function positionBoard(obj, pos, scale, rot)
-    obj.setPosition(pos)
-    obj.setScale(scale)
-    if rot then
-        obj.setRotation(rot)
-    end
-    return nil
+  obj.setPosition(pos)
+  obj.setScale(scale)
+  if rot then
+    obj.setRotation(rot)
+  end
+  return nil
 end
 
 -- Senator board type switching (cloth/wine)
 function clothOrWineBoard(obj)
     local buttonTable = obj.getButtons()
     local params = ({index = 0})
-    
+
     if buttonTable[1].label == 'Cloth Display' then
         params.label = 'Wine Display'
         altWineBoard = true
@@ -100,59 +99,58 @@ function clothOrWineBoard(obj)
         params.label = 'Cloth Display'
         altWineBoard = false
     end
-    
+
     obj.editButton(params)
     return nil
 end
 
 -- Senator card restocking system
 function restockSenatorBoard()
-    function restockSenatorBoardCoroutine()
-        local senatorBoard = nil
-        local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-        
-        if altWineBoard then
-            senatorBoard = getObjectFromGUID(senatorWineBoardGUID)
-        else
-            senatorBoard = getObjectFromGUID(SenatorBoardClothGUID)
-        end
-        
-        if not senatorBoard then return 1 end
-        
-        local senatorBoardSnaps = senatorBoard.getSnapPoints()
-        for i, point in ipairs(senatorBoardSnaps) do
-            local pos = senatorBoard.positionToWorld(point.position)
-            if not rayCast(pos, senatorBoard) then
-                local nextCard = findNextSenatorCard(i, senatorBoardSnaps, senatorBoard)
-                if nextCard then
-                    nextCard.setPositionSmooth(pos + Vector(0, 0.3, 0))
-                    waitsome(0.3)
-                elseif nextCard == nil then
-                    local drawDeck = checkForDeckOrCard(mainDeckZoneGUID)
-                    if drawDeck == nil then break end
-                    if drawDeck ~= nil then
-                        local params = {
-                            position = pos + Vector(0, 0.3, 0),
-                            flip = true,
-                            smooth = false,
-                        }
-                        if gameBoard and gameBoard.getStateId() == 14 then
-                            params.rotation = {0,90,0}
-                        end
-                        if drawDeck.type == 'Deck' then
-                            drawDeck.takeObject(params)
-                            waitsome(0.1)
-                        elseif drawDeck.type == 'Card' then
-                            drawDeck.setPosition(pos + Vector(0, 4, 0))
-                            drawDeck.flip()
-                        end
-                    end
-                end
-            end
-        end
-        return 1
-    end
-    startLuaCoroutine(self, 'restockSenatorBoardCoroutine')
+    print("Restocking senator board")
+	function restockSenatorBoardCoroutine()
+		local senatorBoard = nil
+		local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+
+    if altWineBoard then
+      senatorBoard = getObjectFromGUID(senatorWineBoardGUID)
+   else
+      senatorBoard = getObjectFromGUID(SenatorBoardClothGUID)
+   end
+
+		local senatorBoardSnaps = senatorBoard.getSnapPoints()
+		for i, point in ipairs(senatorBoardSnaps) do
+			local pos = senatorBoard.positionToWorld(point.position)
+			if not rayCast(pos, senatorBoard) then
+				local nextCard = findNextSenatorCard(i, senatorBoardSnaps, senatorBoard)
+				if nextCard then
+					nextCard.setPositionSmooth(pos + Vector(0, 0.3, 0))
+					waitsome(0.3)
+				elseif nextCard == nil then
+					local drawDeck = checkForDeckOrCard(mainDeckZoneGUID)
+					if drawDeck == nil then break end
+					if drawDeck ~= nil then
+						local params = {
+							position = pos + Vector(0, 0.3, 0),
+							flip = true,
+							smooth = false,
+						}
+						if gameBoard.getStateId() == 14 then
+							params.rotation = {0,90,0}
+						end
+						if drawDeck.type == 'Deck' then
+							drawDeck.takeObject(params)
+							waitsome(0.1)
+						elseif drawDeck.type == 'Card' then
+							drawDeck.setPosition(pos + Vector(0, 4, 0))
+							drawDeck.flip()
+						end
+					end
+				end
+			end
+		end
+		return 1
+	end
+	startLuaCoroutine(self, 'restockSenatorBoardCoroutine')
 end
 
 function findNextSenatorCard(startPos, snapTable, obj)
@@ -178,7 +176,7 @@ function makeSenatorBuyButton(obj)
         click_function = 'buySenatorCard',
         color = 'Purple'
     })
-    
+
     obj.createButton({
         width = 400,
         height = 250,
@@ -196,9 +194,9 @@ function cardPositionFinder(obj)
     else
         senatorBoard = getObjectFromGUID(SenatorBoardClothGUID)
     end
-    
+
     if not senatorBoard then return nil end
-    
+
     for i = 1, 7, 1 do
         local convertedPos = senatorBoard.positionToWorld(SENATOR_BOARD_SNAPS[i].position)
         local hitObj = rayCast(convertedPos, senatorBoard)
@@ -214,7 +212,7 @@ end
 function calculateCardCost(obj)
     local cardTags = obj.getTags()
     local cardCost = {}
-    
+
     for _, tag in ipairs(cardTags) do
         if tag == 'costBrick' then
             cardCost.Brick = 1
@@ -235,19 +233,19 @@ function buySenatorCard(obj, color, alt_click)
     local cardPosition = cardPositionFinder(obj)
     local playerPayment = calculateSenatorPayment(color)
     local playerPaymentZone = getObjectFromGUID(playerSellZones[color])
-    
+
     if not noSaltFlag then
         noSaltFlag = true
         Player[color].pingTable(playerPaymentZone.getPosition())
         playerPaymentZone.highlightOn(color, 3)
         return 0
     end
-    
+
     local cardPrice = calculateCardCost(obj)
     local correctPayment = false
     local totalGoodsNeeded = 0
     local totalPlayerGoods = getTableTotal(playerPayment)
-    
+
     if cardPosition == 1 then
         totalGoodsNeeded = tonumber(obj.getGMNotes())
     elseif cardPosition == 2 or cardPosition == 3 then
@@ -298,13 +296,13 @@ function buySenatorCard(obj, color, alt_click)
             else
                 cardPrice.Cloth = 1
             end
-            
+
             if cardPrice.Wine ~= nil then
                 cardPrice.Wine = cardPrice.Wine + 1
             else
                 cardPrice.Wine = 1
             end
-            
+
             totalGoodsNeeded = totalGoodsNeeded + 2 + obj.getGMNotes()
         else
             if cardPrice.Cloth ~= nil then
@@ -315,7 +313,7 @@ function buySenatorCard(obj, color, alt_click)
             totalGoodsNeeded = totalGoodsNeeded + 2 + obj.getGMNotes()
         end
     end
-    
+
     for good, quantity in pairs(cardPrice) do
         if playerPayment[good] == nil then
             printToAll(Player[color].steam_name .. ' you are missing ' .. good)
@@ -327,7 +325,7 @@ function buySenatorCard(obj, color, alt_click)
             correctPayment = true
         end
     end
-    
+
     if correctPayment and (totalGoodsNeeded == totalPlayerGoods) then
         obj.clearButtons()
         obj.deal(1, color)
@@ -342,7 +340,7 @@ end
 function calculateSenatorPayment(color)
     local playerPaymentZone = getObjectFromGUID(playerSellZones[color])
     local playerPayment = upCast(playerPaymentZone)
-    
+
     local totalPayment = {}
     for _, item in ipairs(playerPayment) do
         if item.getName() == 'Salt' then
@@ -350,7 +348,7 @@ function calculateSenatorPayment(color)
             noSaltFlag = false
             return 0
         end
-        
+
         if item.getName() == 'Brick' then
             if totalPayment.Brick ~= nil then
                 totalPayment.Brick = totalPayment.Brick + 1
@@ -390,22 +388,22 @@ end
 function buyWithCouncilCard(obj, color, alt_click)
     local playerPayment = calculateSenatorPayment(color)
     local playerPaymentZone = getObjectFromGUID(playerSellZones[color])
-    
+
     if not noSaltFlag then
         noSaltFlag = true
         Player[color].pingTable(playerPaymentZone.getPosition())
         playerPaymentZone.highlightOn(color, 3)
         return 0
     end
-    
+
     local cardPrice = calculateCardCost(obj)
     local correctPayment = false
-    
+
     if councilFlag == false then
         printToAll(Player[color].steam_name .. ' you can only buy one card per turn with the council', color)
         return 0
     end
-    
+
     for good, quantity in pairs(playerPayment) do
         if cardPrice[good] == nil then
             printToAll(Player[color].steam_name .. ' you have no goods in your sell zone or something not required')
@@ -429,7 +427,7 @@ function buyWithCouncilCard(obj, color, alt_click)
             correctPayment = true
         end
     end
-    
+
     if correctPayment then
         obj.clearButtons()
         obj.deal(1, color)

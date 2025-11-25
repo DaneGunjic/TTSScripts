@@ -3,6 +3,7 @@
 
 -- Player setup functions
 function SetupFor2Player()
+    print("Setting up for 2 players...")
     numberOfPlayers = 2
     DestroyRemaining()
     startLuaCoroutine(Global, 'placestuff')
@@ -28,29 +29,30 @@ end
 
 -- Random setup function
 function randomMapAndStore()
+    print("Randomizing map and store...")
     local randomStore = math.random(2)
     local randomMap = math.random(14)
     local randomSalsa = math.random(2)
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    local gameBoard = boardPickerZone
     local playerCount = getSeatedPlayers()
-    
+
     if #playerCount == 1 then
         broadcastToAll('2 or more players must be seated for random setup', 'Red')
         return 0
     end
-    
+
     if randomStore == 1 then
         altWineBoard = true
     elseif randomStore == 2 then
         altWineBoard = false
     end
-    
+
     if randomSalsa == 1 then
         boolSalsa = true
     elseif randomSalsa == 2 then
         boolSalsa = false
     end
-    
+
     -- Set random map
     if randomMap == 1 then
         CsetBoardToBRITANNIA()
@@ -81,7 +83,7 @@ function randomMapAndStore()
     elseif randomMap == 14 then
         CsetBoardToHellas()
     end
-    
+
     -- Set player count
     if #playerCount == 2 then
         SetupFor2Player()
@@ -97,34 +99,35 @@ end
 
 -- Cleanup function for setup buttons
 function DestroyRemaining()
-    destroyObject(btn2p)
-    destroyObject(btn3p)
-    destroyObject(btn4p)
-    destroyObject(btn5p)
-    destroyObject(btnDisplay)
-    destroyObject(btnVenus)
-    
-    if(not boolForum) then
-        destroyObject(btnMove)
-    end
-    
-    destroyObject(btnForum)
-    destroyObject(btnSalsa)
-    destroyObject(btnItaly)
-    destroyObject(btnGaly)
-    destroyObject(btnHisp)
-    destroyObject(btnBrit)
-    destroyObject(btnGerm)
-    destroyObject(btnByz)
-    destroyObject(btnEuro)
-    destroyObject(btnCorsica)
-    destroyObject(btnAegyptus)
-    destroyObject(btnCreta)
-    destroyObject(btnHellas)
-    destroyObject(btnCyprvs)
-    destroyObject(btnIonivm)
-    destroyObject(btnBalerica)
-    destroyObject(btnRandomSetup)
+    print("Destroying remaining setup buttons...")
+    -- destroyObject(btn2p)
+    -- destroyObject(btn3p)
+    -- destroyObject(btn4p)
+    -- destroyObject(btn5p)
+    -- destroyObject(btnDisplay)
+    -- destroyObject(btnVenus)
+
+    -- if(not boolForum) then
+    --     destroyObject(btnMove)
+    -- end
+
+    -- destroyObject(btnForum)
+    -- destroyObject(btnSalsa)
+    -- destroyObject(btnItaly)
+    -- destroyObject(btnGaly)
+    -- destroyObject(btnHisp)
+    -- destroyObject(btnBrit)
+    -- destroyObject(btnGerm)
+    -- destroyObject(btnByz)
+    -- destroyObject(btnEuro)
+    -- destroyObject(btnCorsica)
+    -- destroyObject(btnAegyptus)
+    -- destroyObject(btnCreta)
+    -- destroyObject(btnHellas)
+    -- destroyObject(btnCyprvs)
+    -- destroyObject(btnIonivm)
+    -- destroyObject(btnBalerica)
+    -- destroyObject(btnRandomSetup)
 end
 
 -- Board setup functions
@@ -185,116 +188,74 @@ function CsetBoardToGALLIA()
 end
 
 -- Individual board setup functions
-function setBoardToItaly()
-    selectedMap = 3
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(3)
-    end
-end
-
-function setBoardAegyptus()
-    selectedMap = 10
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(10)
-    end
-end
-
-function setBoardCreta()
-    selectedMap = 9
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(9)
-    end
-end
-
-function setBoardHellas()
-    selectedMap = 14
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(14)
-    end
-end
-
-function setBoardCyprvs()
-    selectedMap = 12
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(12)
-    end
-end
-
-function setBoardIonivm()
-    selectedMap = 11
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(11)
-    end
-end
-
-function setBoardBalearica()
-    selectedMap = 13
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(13)
-    end
-end
-
-function setBoardToGERMANIA()
-    selectedMap = 8
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(8)
-    end
+function setBoardToBRITANNIA()
+    selectedMap = 1
+    MainBoard.setState(1)
 end
 
 function setBoardToHISPANIA()
     selectedMap = 2
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(2)
-    end
+    MainBoard.setState(2)
 end
 
-function setBoardToBRITANNIA()
-    selectedMap = 1
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(1)
-    end
-end
-
-function setBoardToGALLIA()
-    selectedMap = 7
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(7)
-    end
+function setBoardToItaly()
+    selectedMap = 3
+    MainBoard.setState(3)
 end
 
 function setBoardToByzantium()
     selectedMap = 4
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(4)
-    end
+    MainBoard.setState(4)
 end
 
 function setBoardToEuropa()
     selectedMap = 5
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(5)
-    end
+    MainBoard.setState(5)
 end
 
 function setBoardToCorsica()
     selectedMap = 6
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    if gameBoard then
-        gameBoard.setState(6)
-    end
+    MainBoard.setState(6)
+end
+
+function setBoardToGALLIA()
+    selectedMap = 7
+    MainBoard.setState(7)
+end
+
+function setBoardToGERMANIA()
+    selectedMap = 8
+    MainBoard.setState(8)
+end
+
+function setBoardCreta()
+    selectedMap = 9
+    MainBoard.setState(9)
+end
+
+function setBoardAegyptus()
+    selectedMap = 10
+    MainBoard.setState(10)
+end
+
+function setBoardIonivm()
+    selectedMap = 11
+    MainBoard.setState(11)
+end
+
+function setBoardCyprvs()
+    selectedMap = 12
+    MainBoard.setState(12)
+end
+
+function setBoardBalearica()
+    selectedMap = 13
+    MainBoard.setState(13)
+end
+
+function setBoardHellas()
+    selectedMap = 14
+    MainBoard.setState(14)
 end
 
 -- Deck management functions
@@ -308,7 +269,7 @@ end
 function swapDecks(zone1, zone2)
     local deck1 = getDeckFromZone(zone1)
     local deck2 = getDeckFromZone(zone2)
-    
+
     if deck1 and deck2 then
         local pos1 = deck1.getPosition()
         local pos2 = deck2.getPosition()
@@ -317,17 +278,10 @@ function swapDecks(zone1, zone2)
     end
 end
 
-function shufflestuff()
-    local mainDeck = getDeckFromZone(mainDeckZoneGUID)
-    if mainDeck then
-        mainDeck.shuffle()
-    end
-end
-
 function stuffDeck(target, source, ammo, zone)
     local targetDeck = getObjectFromGUID(target)
     local sourceDeck = getObjectFromGUID(source)
-    
+
     if targetDeck and sourceDeck then
         for i = 1, ammo do
             if sourceDeck.type == 'Deck' then
@@ -340,21 +294,15 @@ function stuffDeck(target, source, ammo, zone)
     end
 end
 
-function setMainDeck()
-    local mainDeck = getDeckFromZone(mainDeckZoneGUID)
-    if mainDeck then
-        mainDeck.setPosition(mainDeckLocation)
-    end
-end
-
 -- Money and starting setup
 function startingMoney()
-    for color, counterGUID in pairs(playerMoneyCounters) do
-        local counter = getObjectFromGUID(counterGUID)
-        if counter then
-            counter.call('updateVal', 15) -- Starting money
-        end
-    end
+	local turnOrder = Turns.order
+	local startingMoney = 5
+	for _, player in pairs(turnOrder) do
+		local tempCounter = getObjectFromGUID(playerMoneyCounters[player])
+		addMoney(player, startingMoney)
+		startingMoney = startingMoney + 1
+	end
 end
 
 function addMoney(color, value)
@@ -365,27 +313,26 @@ function addMoney(color, value)
 end
 
 -- First player selection
-function randomFirstPlayer()
-    local seatedPlayers = getSeatedPlayers()
-    if #seatedPlayers > 0 then
-        local shuffledPlayers = shuffleList(seatedPlayers)
-        Turns.order = shuffledPlayers
-        Turns.turn_color = shuffledPlayers[1]
-        broadcastToAll('First player: ' .. getPlayerName(shuffledPlayers[1]), 'White')
-    end
+function randomFirstPlayer() -- can't just pick a random first player because tts is shit.
+--Have to get the seated players then shuffle otherwise Turns.order retruns nothing
+  local seatedPlayers = getSeatedPlayers()
+  local shuffledPlayers = shuffleList(seatedPlayers)
+  Turns.order = shuffledPlayers
+  Turns.type = 2 -- type 2 is required for Turns.order to return something. Fuck you tts
+  Turns.enable = true
 end
 
--- Salt management for Salsa expansion
 function addSalt()
-    if boolSalsa then
-        -- Add salt tokens to appropriate locations
-        for i, bagGUID in ipairs(saltBags) do
-            local bag = getObjectFromGUID(bagGUID)
-            if bag then
-                -- Implementation for salt placement
-            end
-        end
-    end
+stdBagA[1] = saltA
+stdBagB[1] = saltB
+stdBagC[1] = saltC
+stdBagD[1] = saltD
+
+stdBagASalsa[1] = saltA
+stdBagBSalsa[1] = saltB
+stdBagCSalsa[1] = saltC
+stdBagDSalsa[1] = saltD
+
 end
 
 function removeSalt()
@@ -430,38 +377,36 @@ function placeGermanThings()
     end
 end
 
--- City seeding and region management
-function seedCities(targetArray, cityBits)
-    -- Unebrion Additions
+function PlaceCities(targetArray, cityBits)
+----------------------Unebrion Additions -----------------------
     local brickTiles = {brickA, brickB, brickC, brickD}
     local clothTiles = {clothA, clothB, clothC, clothD}
     local foodTiles = {foodA, foodB, foodC, foodD}
     local toolTiles = {toolA, toolB, toolC, toolD}
     local wineTiles = {wineA, wineB, wineC, wineD}
     local saltTiles = {saltA, saltB, saltC, saltD}
-    
-    if targetArray ~= nil then
-        local count = 1
-        local numMaxArray = #targetArray
-        shuffleArray(cityBits)
-        shuffleArray(cityBits)
-        shuffleArray(cityBits)
-        
-        while count <= numMaxArray do
-            local obj_parameters = {}
-            obj_parameters.type = 'Custom_Model'
-            obj_parameters.position = targetArray[count]
-            obj_parameters.rotation = {0.00, 180.00, 0.00}
+----------------------------------------------------------------
+	if targetArray ~= nil then
+		local count = 1
+		local numMaxArray = #targetArray
+		shuffleArray(cityBits)
+		shuffleArray(cityBits)
+		shuffleArray(cityBits)
+		while count <= numMaxArray do
+			local obj_parameters = {}
+			obj_parameters.type = 'Custom_Model'
+			obj_parameters.position = targetArray[count]
+			obj_parameters.rotation = {0.00, 180.00, 0.00}
 
-            local obj = spawnObject(obj_parameters)
-            obj.setLock(true)
-            local custom = {}
-            custom.mesh = 'http://pastebin.com/raw/CnZMEjc3'
-            custom.diffuse = cityBits[count]
-            custom.material = 1
-            obj.setCustomObject(custom)
+			obj = spawnObject(obj_parameters)
+			obj.setLock(true)
+			custom = {}
+			custom.mesh = 'http://pastebin.com/raw/CnZMEjc3'
+			custom.diffuse = cityBits[count]
+			custom.material = 1
+			obj.setCustomObject(custom)
 
-            -- Unebrion Additions - Add tags for city types
+---------------------- Unebrion Additions----------------------------------------------------------
             obj.addTag('city_tile')
             if cityBits[count] == tableChecker(brickTiles, cityBits[count]) then
                 obj.addTag('brick')
@@ -476,11 +421,13 @@ function seedCities(targetArray, cityBits)
             elseif cityBits[count] == tableChecker(saltTiles, cityBits[count]) then
                 obj.addTag('salt')
             end
-            
-            cityBits[count] = obj
-            count = count + 1
-        end
-    end
+---------------------------------------------------------------------
+			--obj.setName(debugCounter)
+			cityBits[count] = obj
+			count = count + 1
+			debugCounter = debugCounter+1
+		end
+	end
 end
 
 function drawRegionBest(lootSwitcher, pos)
@@ -512,11 +459,14 @@ function removeOneGuy(lootSwitcher)
 end
 
 function shufflestuff()
-    getDeckFromZone(onePlayerZoneGUID).shuffle()
-    getDeckFromZone(twoPlayerZoneGUID).shuffle()
-    getDeckFromZone(threePlayerZoneGUID).shuffle()
-    getDeckFromZone(fourPlayerZoneGUID).shuffle()
-    getDeckFromZone(fivePlayerZoneGUID).shuffle()
+    print("Shuffling decks...")
+    log(onePlayerZone)
+    --print("onePlayerZone: " .. onePlayerZone)
+    getDeckFromZone(onePlayerZone).shuffle()
+    getDeckFromZone(twoPlayerZone).shuffle()
+    getDeckFromZone(threePlayerZone).shuffle()
+    getDeckFromZone(fourPlayerZone).shuffle()
+    getDeckFromZone(fivePlayerZone).shuffle()
 end
 
 function stuffDeck(target, source, ammo, zone)
@@ -530,42 +480,44 @@ function stuffDeck(target, source, ammo, zone)
 end
 
 function setMainDeck()
-    local p1deck = getDeckFromZone(onePlayerZoneGUID)
-    local p2deck = getDeckFromZone(twoPlayerZoneGUID)
-    local p3deck = getDeckFromZone(threePlayerZoneGUID)
-    local p4deck = getDeckFromZone(fourPlayerZoneGUID)
-    local p5deck = getDeckFromZone(fivePlayerZoneGUID)
-    
-    if venusONNN == 1 then -- If Venus is off
-        stuffDeck(p1deck, p2deck, 7, twoPlayerZoneGUID)
-        if numberOfPlayers > 2 then
-            stuffDeck(p1deck, p3deck, 6, threePlayerZoneGUID)
-            if numberOfPlayers > 3 then
-                stuffDeck(p1deck, p4deck, 5, fourPlayerZoneGUID)
-                if numberOfPlayers > 4 then
-                    stuffDeck(p1deck, p5deck, 4, onePlayerZoneGUID)
-                end
-            end
-        end
-    else -- If Venus is on
-        stuffDeck(p1deck, p2deck, 9, twoPlayerZoneGUID)
-        if numberOfPlayers > 2 then
-            stuffDeck(p1deck, p3deck, 7, threePlayerZoneGUID)
-            if numberOfPlayers > 3 then
-                stuffDeck(p1deck, p4deck, 6, fourPlayerZoneGUID)
-                if numberOfPlayers > 4 then
-                    stuffDeck(p1deck, p5deck, 4, onePlayerZoneGUID)
-                end
-            end
-        end
-    end
-    
-    Wait.time(function() restockSenatorBoard() end, 1)
+	local p1deck = getDeckFromZone(onePlayerZoneGUID  )
+	local p2deck = getDeckFromZone(twoPlayerZoneGUID  )
+	local p3deck = getDeckFromZone(threePlayerZoneGUID )
+	local p4deck = getDeckFromZone(fourPlayerZoneGUID  )
+	local p5deck = getDeckFromZone(fivePlayerZoneGUID  )
+--need to accomodate for venus count of 32 cards in deck
+	p1deck.setPosition(mainDeckLocation)
+	if(VenusONNN == 1) then --If Venus is off, then...
+		stuffDeck(p1deck,p2deck, 7, twoPlayerZoneGUID)
+		if(numberOfPlayers > 2 ) then
+			stuffDeck(p1deck,p3deck, 6, threePlayerZoneGUID)
+			if(numberOfPlayers > 3 ) then
+				stuffDeck(p1deck,p4deck, 5, fourPlayerZoneGUID)
+				if(numberOfPlayers > 4 ) then
+					stuffDeck(p1deck,p5deck, 4, onePlayerZoneGUID)
+				end
+			end
+		end
+	else --If Venus is on, then
+		stuffDeck(p1deck,p2deck, 9, twoPlayerZoneGUID)
+		if(numberOfPlayers > 2 ) then
+			stuffDeck(p1deck,p3deck, 7, threePlayerZoneGUID)
+			if(numberOfPlayers > 3 ) then
+				stuffDeck(p1deck,p4deck, 6, fourPlayerZoneGUID)
+				if(numberOfPlayers > 4 ) then
+					stuffDeck(p1deck,p5deck, 4, onePlayerZoneGUID)
+				end
+			end
+		end
+	end
+	Wait.time(
+		function() restockSenatorBoard() end, 1)
 end
 
 function setupBoardSpecificElements(stateId)
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
-    
+    print("Setting up board specific elements for state ID: " .. stateId)
+    local gameBoard = boardPickerZone
+
     if boolSalsa then
         addSalt()
     else
@@ -575,26 +527,26 @@ function setupBoardSpecificElements(stateId)
             i = i + 1
         end
     end
-    
+
     -- Board-specific setup based on state ID
     if stateId == 1 then
-        seedCities(BRITTNANIAB, stdBagB)
-        seedCities(BRITTNANIAC, stdBagC)
-        seedCities(BRITTNANIAD, stdBagD)
+        PlaceCities(BRITTNANIAB, stdBagB)
+        PlaceCities(BRITTNANIAC, stdBagC)
+        PlaceCities(BRITTNANIAD, stdBagD)
         TableConcat(stdBagB, stdBagC)
         TableConcat(stdBagB, stdBagD)
         parseRegions(stdBagB, BRITTNANIARegions, BRITTNANIAtiles)
     elseif stateId == 2 then
-        seedCities(hispaniaa, stdBagASalsa)
-        seedCities(hispaniab, stdBagBSalsa)
-        seedCities(hispaniad, stdBagDSalsa)
+        PlaceCities(hispaniaa, stdBagASalsa)
+        PlaceCities(hispaniab, stdBagBSalsa)
+        PlaceCities(hispaniad, stdBagDSalsa)
         TableConcat(stdBagASalsa, stdBagBSalsa)
         TableConcat(stdBagASalsa, stdBagDSalsa)
         parseRegions(stdBagASalsa, HispaniaRegions, hispaniatiles)
     elseif stateId == 3 then
-        seedCities(italiaa, stdBagA)
-        seedCities(italiab, stdBagB)
-        seedCities(italiac, stdBagC)
+        PlaceCities(italiaa, stdBagA)
+        PlaceCities(italiab, stdBagB)
+        PlaceCities(italiac, stdBagC)
         TableConcat(stdBagA, stdBagB)
         TableConcat(stdBagA, stdBagC)
         parseRegions(stdBagA, ItaliaRegions, italiatiles)
@@ -602,24 +554,14 @@ function setupBoardSpecificElements(stateId)
     end
 end
 
-function addSalt()
-    -- Implementation for adding salt tokens to the game
-    for i = 1, #saltTokenPositions do
-        TakeMove(saltBag, saltTokenPositions[i])
-    end
-end
-
 function swapSaltTokenForFood(zone)
-    local zoneObj = getObjectFromGUID(zone)
-    if zoneObj then
-        local objects = zoneObj.getObjects()
-        for _, token in ipairs(objects) do
-            if token.getName() == 'Salt' then
-                local params = {}
-                params.position = token.getPosition()
-                destroyObject(token)
-                TakeMove(foodBag, params)
-            end
+    local objects = zone.getObjects()
+    for _, token in ipairs(objects) do
+        if token.getName() == 'Salt' then
+            local params = {}
+            params.position = token.getPosition()
+            destroyObject(token)
+            TakeMove(foodBag, params)
         end
     end
 end
@@ -631,7 +573,7 @@ function parseRegions(cityBits, countrySegmentArray, regionArray)
         shuffleArray(cityBits)
         shuffleArray(cityBits)
         shuffleArray(cityBits)
-        
+
         while countyCounter <= maxCountyBoys do
             local bestLoot = whatIsBest(cityBits[1], cityBits[2])
             if #cityBits > 2 then
@@ -643,7 +585,7 @@ function parseRegions(cityBits, countrySegmentArray, regionArray)
             if #cityBits > 4 then
                 bestLoot = whatIsBest(bestLoot, cityBits[5])
             end
-            
+
             drawRegionBest(getValue(bestLoot), regionArray[countyCounter])
             removeOneGuy(getValue(bestLoot))
             countyCounter = countyCounter + 1
@@ -653,59 +595,264 @@ end
 
 -- Main placement function
 function placestuff()
-    -- This would contain the main setup logic for placing all game components
-    -- Based on the selected map and number of players
-    
-    -- Place senator board
-    placeSenatorBoard()
-    
-    -- Setup money counters
-    startingMoney()
-    
-    -- Setup first player
-    randomFirstPlayer()
-    
-    -- Handle expansions
-    if boolSalsa then
+	prepareVenus()
+	waitone()
+	gameStarted = true
+	shufflestuff()
+
+	if boolSalsa then
         addSalt()
-    end
-    
-    if selectedMap == 8 then
-        placeGermanThings()
-    end
-    
-    -- Create score button
-    createScoreButton()
-    
-    gameStarted = true
+    else
+        local i = 1
+        while i <= #lootZoneSwapSalsa do
+            swapSaltTokenForFood(lootZoneSwapSalsa[i])
+            i = i + 1
+        end
+	end
+
+    print("Setting up board specific elements for state ID: " .. MainBoard.getStateId())
+
+	if(MainBoard.getStateId() == 1) then
+		PlaceCities(BRITTNANIAB, stdBagB)
+		PlaceCities(BRITTNANIAC, stdBagC)
+		PlaceCities(BRITTNANIAD, stdBagD)
+		TableConcat(stdBagB, stdBagC)
+		TableConcat(stdBagB, stdBagD)
+		parseRegions(stdBagB,BRITTNANIARegions, BRITTNANIAtiles)
+
+	elseif(MainBoard.getStateId() == 2)  then
+		PlaceCities(hispaniaa, stdBagASalsa)
+		PlaceCities(hispaniab, stdBagBSalsa)
+		PlaceCities(hispaniad, stdBagDSalsa)
+		TableConcat(stdBagASalsa, stdBagBSalsa)
+		TableConcat(stdBagASalsa, stdBagDSalsa)
+		parseRegions(stdBagASalsa,HispaniaRegions, hispaniatiles)
+
+	elseif(MainBoard.getStateId() == 3) then
+		PlaceCities(italiaa, stdBagA)
+		PlaceCities(italiab, stdBagB)
+		PlaceCities(italiac, stdBagC)
+		TableConcat(stdBagA, stdBagB)
+		TableConcat(stdBagA, stdBagC)
+		parseRegions(stdBagA,ItaliaRegions, italiatiles)
+
+	elseif(MainBoard.getStateId() == 4) then
+		PlaceCities(BYZANTIUMA, stdBagASalsa)
+		PlaceCities(BYZANTIUMB, stdBagBSalsa)
+		PlaceCities(BYZANTIUMC, stdBagCSalsa)
+		TableConcat(stdBagASalsa, stdBagBSalsa)
+		TableConcat(stdBagASalsa, stdBagCSalsa)
+		parseRegions(stdBagASalsa,ByzRegions, BYZANTIUMtiles)
+
+	elseif(MainBoard.getStateId() == 5) then
+		PlaceCities(europaa, stdBagA)
+		PlaceCities(europab, stdBagB)
+		PlaceCities(europac, stdBagC)
+		PlaceCities(europadef, stdBagD)
+		TableConcat(stdBagA, stdBagB)
+		TableConcat(stdBagA, stdBagC)
+		TableConcat(stdBagA, stdBagD)
+		parseRegions(stdBagA,EuropaRegions, europatokens)
+
+	elseif(MainBoard.getStateId() == 6) then
+		PlaceCities(CORSICAA, stdBagA)
+		PlaceCities(CORSICAB, stdBagB)
+		PlaceCities(CORSICAD, stdBagD)
+		TableConcat(stdBagA, stdBagB)
+		TableConcat(stdBagA, stdBagD)
+		parseRegions(stdBagA,corsicaRegions, CORSICAtokens)
+
+	elseif(MainBoard.getStateId() == 7) then
+		PlaceCities(galliaa, stdBagA)
+		PlaceCities(galliab, stdBagB)
+		PlaceCities(galliac, stdBagC)
+		TableConcat(stdBagA, stdBagB)
+		TableConcat(stdBagA, stdBagC)
+		parseRegions(stdBagA,GaliaRegions, galliatokens)
+
+	elseif(MainBoard.getStateId() == 8)  then
+		PlaceCities(germaniaa, stdBagA)
+		PlaceCities(germaniab, stdBagB)
+		PlaceCities(germaniac, stdBagC)
+		PlaceCities(germaniad, stdBagD)
+		TableConcat(stdBagA, stdBagB)
+		TableConcat(stdBagA, stdBagC)
+		TableConcat(stdBagA, stdBagD)
+		parseRegions(stdBagA,GermaniaRegions, germaniatiles)
+
+		placeGermanThings()
+
+	elseif(MainBoard.getStateId() == 9)  then
+		PlaceCities(Cretaa, stdBagA)
+		PlaceCities(Cretab, stdBagB)
+		PlaceCities(Cretad, stdBagD)
+		--table.remove(stdBagA,1)
+		--table.remove(Cretaa,1)
+		--table.remove(Cretatiles,1)
+		TableConcat(stdBagA, stdBagB)
+		TableConcat(stdBagA, stdBagD)
+		parseRegions(stdBagA,CretaRegions, Cretatiles)
+
+	elseif(MainBoard.getStateId() == 10)  then
+		PlaceCities(Aegyptusb, stdBagA)
+		PlaceCities(Aegyptusc, stdBagC)
+		PlaceCities(Aegyptusd, stdBagD)
+		TableConcat(stdBagA, stdBagC)
+		TableConcat(stdBagA, stdBagD)
+		parseRegions(stdBagA,AegyptusRegions, Aegyptustiles)
+		putfood()
+
+	elseif(MainBoard.getStateId() == 11) then
+		PlaceCities(IONIVMA, stdBagA)
+		PlaceCities(IONIVMB, stdBagB)
+		PlaceCities(IONIVMC, stdBagC)
+		PlaceCities(IONIVMD, stdBagD)
+		TableConcat(stdBagA, stdBagB)
+		TableConcat(stdBagA, stdBagC)
+		TableConcat(stdBagA, stdBagD)
+		parseRegions(stdBagA,IONIVMRegions, IONIVMtiles)
+
+    elseif(MainBoard.getStateId() == 12) then
+		PlaceCities(CYPRUSA, stdBagA)
+		PlaceCities(CYPRUSB, stdBagB)
+		PlaceCities(CYPRUSC, stdBagC)
+		PlaceCities(CYPRUSD, stdBagD)
+
+		TableConcat(stdBagA, stdBagB)
+		TableConcat(stdBagA, stdBagC)
+		TableConcat(stdBagA, stdBagD)
+
+		parseRegions(stdBagA,CYPRUSRegions, CYPRUSTiles)
+
+    elseif(MainBoard.getStateId() == 13) then
+        PlaceCities(BALEARICAA, stdBagA)
+        PlaceCities(BALEARICAC, stdBagC)
+        PlaceCities(BALEARICAD, stdBagD)
+
+        TableConcat(stdBagA, stdBagC)
+        TableConcat(stdBagA, stdBagD)
+
+        parseRegions(stdBagA,BALEARICARegions, BALEARICAtiles)
+
+    elseif(MainBoard.getStateId() == 14) then
+        PlaceCities(HELLASA, stdBagA)
+        PlaceCities(HELLASB, stdBagB)
+        PlaceCities(HELLASC, stdBagC)
+
+        TableConcat(stdBagA, stdBagB)
+        TableConcat(stdBagA, stdBagC)
+
+        parseRegions(stdBagA,HELLASRegions, HELLASTiles)
+	end
+
+--------------------------------Unebrion Additions --------------------------------------------
+	BOARD_STATE = MainBoard.getStateId()
+	if BOARD_STATE == 2 or BOARD_STATE == 3 or BOARD_STATE == 5 then
+		SENATOR_CARD_ZONES = senatorZone1
+	elseif BOARD_STATE == 1 or BOARD_STATE == 4 or BOARD_STATE == 6 or BOARD_STATE == 7 or BOARD_STATE == 9 or BOARD_STATE == 11 or BOARD_STATE == 12 then
+		SENATOR_CARD_ZONES = senatorZone2
+	elseif BOARD_STATE == 8 then
+		SENATOR_CARD_ZONES = senatorZone3
+	elseif BOARD_STATE == 10 then
+		SENATOR_CARD_ZONES = senatorZone4
+	elseif BOARD_STATE == 14 then
+		SENATOR_CARD_ZONES = senatorZone5
+	elseif BOARD_STATE == 13 then
+		SENATOR_CARD_ZONES = senatorZone6
+	end
+
+	MainBoard.interactable = false
+
+    randomFirstPlayer()
+    startingMoney()
+    setMainDeck()
+    placeSenatorBoard()
+
+	return true
+end
+
+function prepareVenus()
+	if( venusOn == 2) then
+        --"market cards"
+		destroyObject(getObjectFromGUID('5a2ea0'))
+		destroyObject(getObjectFromGUID('a1b156'))
+		destroyObject(getObjectFromGUID('ca27d7'))
+		destroyObject(getObjectFromGUID('b48e37'))
+		destroyObject(getObjectFromGUID('2f7b6f'))
+		--"player decks"
+		destroyObject(getObjectFromGUID('16a471'))
+		destroyObject(getObjectFromGUID('284c5e'))
+		destroyObject(getObjectFromGUID('a16957'))
+		destroyObject(getObjectFromGUID('0c85d8'))
+		destroyObject(getObjectFromGUID('3999a6'))
+		--"market cards"
+		getObjectFromGUID('014d72').setPosition({57.33, 0.71, 33.81})
+		getObjectFromGUID('430fe0').setPosition( {61.00, 0.71, 33.08})
+		getObjectFromGUID('c33836').setPosition( {57.33, 0.71, 27.93})
+		getObjectFromGUID('4d2f34').setPosition({61.00, 0.71, 27.20})
+		getObjectFromGUID('cba63e').setPosition({57.33, 0.72, 22.05})
+		--"player decks"
+		getObjectFromGUID('edc9d2').setPosition({21.60, 1.02, -27.50})
+		getObjectFromGUID('6f2023').setPosition({-23.10, 1.02, -27.34})
+		getObjectFromGUID('134eac').setPosition({-40.81, 1.02, -7.85})
+		getObjectFromGUID('546dab').setPosition({-21.34, 1.02, 27.35})
+		getObjectFromGUID('7381f9').setPosition({22.75, 1.02, 27.46})
+		getObjectFromGUID('1441ba').setPosition({57.77, 0.94, -7.66})
+	elseif( venusOn == 3) then --if Venus Teams is on
+		--"market cards"
+		destroyObject(getObjectFromGUID('5a2ea0'))
+		destroyObject(getObjectFromGUID('a1b156'))
+		destroyObject(getObjectFromGUID('ca27d7'))
+		destroyObject(getObjectFromGUID('b48e37'))
+		destroyObject(getObjectFromGUID('2f7b6f'))
+		--"player decks"
+		destroyObject(getObjectFromGUID('16a471'))
+		destroyObject(getObjectFromGUID('284c5e'))
+		destroyObject(getObjectFromGUID('a16957'))
+		destroyObject(getObjectFromGUID('0c85d8'))
+		destroyObject(getObjectFromGUID('3999a6'))
+		--"market cards"
+		getObjectFromGUID('85c408').setPosition({57.33, 0.71, 33.81})
+		getObjectFromGUID('bb5e38').setPosition( {61.00, 0.71, 33.08})
+		getObjectFromGUID('454b3d').setPosition( {57.33, 0.71, 27.93})
+		getObjectFromGUID('d89fc9').setPosition({61.00, 0.71, 27.20})
+		getObjectFromGUID('d0ff3f').setPosition({57.33, 0.72, 22.05})
+		--"player decks"
+		getObjectFromGUID('0acab8').setPosition({21.60, 1.02, -27.50})
+        getObjectFromGUID('8b489e').setPosition({-23.10, 1.02, -27.34})
+		getObjectFromGUID('8bd73e').setPosition({-40.81, 1.02, -7.85})
+		getObjectFromGUID('bb68f0').setPosition({-21.34, 1.02, 27.35})
+		getObjectFromGUID('d8d757').setPosition({22.75, 1.02, 27.46})
+		getObjectFromGUID('f1c9e5').setPosition({57.77, 0.94, -7.66})
+	end
 end
 
 -- Market setup for Forum expansion
 function RollMarketFORUM(targetDeck, marketZone1GUID, marketZone2GUID, marketZone3GUID, marketZone4GUID,
     marketZone1Pos, marketZone2Pos, marketZone3Pos, marketZone4Pos)
-    
+
     if lockDoubleTrouble then
         local marketZone1 = getObjectFromGUID(marketZone1GUID).getObjects()
         local marketZone2 = getObjectFromGUID(marketZone2GUID).getObjects()
         local marketZone3 = getObjectFromGUID(marketZone3GUID).getObjects()
         local marketZone4 = getObjectFromGUID(marketZone4GUID).getObjects()
-        
+
         local globalFailedMovement = false
         local push = true
-        
+
         -- Market shifting logic for Forum expansion
         for i, token in ipairs(marketZone1) do
             if token.getName() ~= 'FORVM' then
                 push = false
             end
         end
-        
+
         if push then
             globalFailedMovement = true
         else
             push = true
         end
-        
+
         for i, token in ipairs(marketZone2) do
             if token.getName() ~= 'FORVM' then
                 push = false
@@ -714,7 +861,7 @@ function RollMarketFORUM(targetDeck, marketZone1GUID, marketZone2GUID, marketZon
                 end
             end
         end
-        
+
         -- Continue similar logic for other market zones...
     end
 end

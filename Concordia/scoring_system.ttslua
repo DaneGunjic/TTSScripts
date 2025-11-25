@@ -342,7 +342,7 @@ end
 
 -- Region checking for Saturn scoring
 function regionCheck(color)
-    local gameBoard = getBoardFromZone(boardPickerZoneGUID)
+    local gameBoard = boardPickerZone
     if not gameBoard then return 0 end
     
     local boardState = gameBoard.getStateId()

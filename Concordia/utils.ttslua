@@ -1,34 +1,30 @@
--- Concordia Utility Functions
--- Helper functions used throughout the codebase
-
--- Ray casting utility for object detection
-function rayCast(position, obj)
+function rayCast(StartPosition, obj)
     local hit = Physics.cast({
-        origin = position,
+        origin = StartPosition,
+        type = 3,
+        size = {0.6, 0.6, 0.6},
         direction = {0, -1, 0},
-        type = 1,
-        size = {0.5, 0.5, 0.5},
-        max_distance = 2,
-        debug = false
+        max_distance = 0.1,
+        debug = true
     })
-    
+
     for _, hitInfo in ipairs(hit) do
         if hitInfo.hit_object ~= obj then
             return hitInfo.hit_object
         end
     end
+
     return nil
 end
 
--- Enhanced upcast function for getting objects above a zone
 function upCast(obj, dist, offset, multi)
     local dist = dist or 5
     local offset = offset or 2
     local multi = multi or false
-    
+
     local pos = obj.getPosition()
     pos.y = pos.y + offset
-    
+
     local hit = Physics.cast({
         origin = pos,
         direction = {0, 1, 0},
@@ -37,14 +33,14 @@ function upCast(obj, dist, offset, multi)
         max_distance = dist,
         debug = false
     })
-    
+
     local hitObjects = {}
     for _, hitInfo in ipairs(hit) do
         if hitInfo.hit_object ~= obj then
             table.insert(hitObjects, hitInfo.hit_object)
         end
     end
-    
+
     if multi then
         return hitObjects
     else
@@ -88,17 +84,15 @@ end
 
 -- Array manipulation functions
 function shuffleArray(array)
-    local shuffled = {}
-    for i = 1, #array do
-        shuffled[i] = array[i]
+    local counter = #array * 10
+	local maxIndex = #array
+    while counter > 1 do
+        local index = math.random(maxIndex)
+		local index2 = math.random(maxIndex)
+        swap(array, index, index2)
+        counter = counter - 1
     end
-    
-    for i = #shuffled, 2, -1 do
-        local j = math.random(i)
-        shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
-    end
-    
-    return shuffled
+	return array
 end
 
 function shuffleList(list)
@@ -133,7 +127,7 @@ end
 function checkForDeckOrCard(objGuid)
     local objZone = getObjectFromGUID(objGuid)
     if not objZone then return nil end
-    
+
     local zoneContents = objZone.getObjects()
     for _, thing in ipairs(zoneContents) do
         if thing.type == 'Deck' or thing.type == 'Card' then
@@ -144,35 +138,23 @@ function checkForDeckOrCard(objGuid)
 end
 
 function getDeckFromZone(zone)
-    local zoneObj = getObjectFromGUID(zone)
-    if not zoneObj then return nil end
-    
-    local objects = zoneObj.getObjects()
+    print("Searching zone " .. zone.getGUID() .. " for a deck...")
+    local objects = zone.getObjects()
     for _, obj in ipairs(objects) do
         if obj.type == 'Deck' then
+            print("Found deck: " .. obj.name)
             return obj
         end
     end
+    print("No deck found in zone " .. zone)
     return nil
 end
 
-function getBoardFromZone(zone)
-    local zoneObj = getObjectFromGUID(zone)
-    if not zoneObj then return nil end
-    
-    local objects = zoneObj.getObjects()
-    for _, obj in ipairs(objects) do
-        if obj.hasTag('GameBoard') or obj.getName():find('Board') then
-            return obj
-        end
-    end
-    return nil
-end
 
 function getInfBagFromZone(zone)
     local zoneObj = getObjectFromGUID(zone)
     if not zoneObj then return nil end
-    
+
     local objects = zoneObj.getObjects()
     for _, obj in ipairs(objects) do
         if obj.type == 'Infinite' then
@@ -185,7 +167,7 @@ end
 function getBagFromZone(zone)
     local zoneObj = getObjectFromGUID(zone)
     if not zoneObj then return nil end
-    
+
     local objects = zoneObj.getObjects()
     for _, obj in ipairs(objects) do
         if obj.type == 'Bag' then
@@ -202,7 +184,10 @@ function pauseSeconds(s)
 end
 
 function waitone()
-    return coroutine.yield(0)
+    local Time = os.clock() + 1
+    while os.clock() < Time do
+        coroutine.yield(0)
+    end
 end
 
 function waithalf()
@@ -246,10 +231,14 @@ function TakeMoveSimple(targetObjectBag, destinyPosition)
 end
 
 function TakeMove(targetObjectBag, x1, y1, z1, r1, r2, r3)
-    local params = {}
-    params.position = {x1, y1, z1}
-    params.rotation = {r1, r2, r3}
-    return targetObjectBag.takeObject(params)
+	local params = {}
+    params.position = { x1, y1, z1}
+    params.rotation = { r1, r2, r3}
+	return targetObjectBag.takeObject(params)
+end
+
+function TakeMove(targetObjectBag, params)
+	return targetObjectBag.takeObject(params)
 end
 
 function TakeMoveCard(targetObjectBag, params)
@@ -346,7 +335,7 @@ end
 function whatIsBest(kitty, puppy)
     local kittyValue = getValue(kitty)
     local puppyValue = getValue(puppy)
-    
+
     if kittyValue == puppyValue or kittyValue > puppyValue then
         return kitty
     else

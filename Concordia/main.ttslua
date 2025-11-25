@@ -3,10 +3,7 @@
 --Venus expansion assets by INTVGene
 --Venus setup and fish market by LowerBadge
 --Auto Scoring, selling zone, money counters, buy/sell from bags and other QoL by Unebrion
---Refactored and modularized for better maintainability
 
--- Include all module files (TTS style)
-#include !\Concordia\constants.ttslua
 #include !\Concordia\utils.ttslua
 #include !\Concordia\scoring_system.ttslua
 #include !\Concordia\senator_system.ttslua
@@ -19,7 +16,6 @@
 -- Venus scripting
 -- Add Solitaria
 
--- Core game state variables (moved to constants.ttslua)
 local roundCounter = 0 -- this is only used to stop the first restock when the game starts.
 
 ----------------Events----------------------------------------------------
@@ -35,35 +31,31 @@ function onSave()
 end
 
 function onLoad(savedData)
+    #include !\Concordia\constants.ttslua
     -- Parse saved data
-    if savedData and savedData ~= "" then
-        savedData = JSON.decode(savedData)
-        if savedData and savedData.gameStarted then
-            gameStarted = savedData.gameStarted or false
-            selectedMap = savedData.selectedMap or 4
-            forum = savedData.forum or false
-            altWineBoard = savedData.altWineBoard or false
-            boolSalsa = savedData.boolSalsa or false
-            venusONNN = savedData.venusONNN or 1
-            
-            if forum then
-                btnMove = createButton('576954','Move and Draw','f1llMove',0,0)
-            end
-            return true
-        end
-    end
-    
-    -- Initialize game for first time
-    boardPickerZone = getObjectFromGUID(boardPickerZoneGUID)
-    
+    -- if savedData and savedData ~= "" then
+    --     savedData = JSON.decode(savedData)
+    --     if savedData and savedData.gameStarted then
+    --         gameStarted = savedData.gameStarted or false
+    --         selectedMap = savedData.selectedMap or 4
+    --         forum = savedData.forum or false
+    --         altWineBoard = savedData.altWineBoard or false
+    --         boolSalsa = savedData.boolSalsa or false
+    --         venusOn = savedData.venusOn or 1
+
+    --         if forum then
+    --             btnMove = createButton('576954','Move and Draw','f1llMove',0,0)
+    --         end
+    --         return true
+    --     end
+    -- end
+
     -- Initialize UI
     initializeUI()
-    
+
     -- Setup senator boards
-    local senatorBoard = getObjectFromGUID(SenatorBoardClothGUID)
-    local senatorBoardWine = getObjectFromGUID(senatorWineBoardGUID)
-    senatorBoard.setSnapPoints(SENATOR_BOARD_SNAPS)
-    senatorBoardWine.setSnapPoints(SENATOR_BOARD_SNAPS)
+    SenatorBoardCloth.setSnapPoints(SENATOR_BOARD_SNAPS)
+    senatorWineBoard.setSnapPoints(SENATOR_BOARD_SNAPS)
 end
 
 function onObjectEnterContainer(container, enter_object)
@@ -79,6 +71,7 @@ function onObjectLeaveContainer(container, leave_object)
 end
 
 function onPlayerTurn(player, previousPlayer)
+    print("Player: " .. player.steam_name .. " start of turn")
     councilFlag = true
     if roundCounter ~= 0 then
         restockSenatorBoard()
@@ -91,6 +84,7 @@ end
 -- Core game logic functions that coordinate between modules
 function startGame()
     if not gameStarted then
+        print9("Starting game setup...")
         placestuff()
         gameStarted = true
         hideSetupButtons()
@@ -105,15 +99,15 @@ function resetGame()
     forum = false
     altWineBoard = false
     boolSalsa = false
-    venusONNN = 1
+    venusOn = 1
     selectedMap = 4
-    
+
     -- Reset all game components
     resetTables()
-    
+
     -- Recreate setup UI
     initializeUI()
-    
+
     broadcastToAll('Game Reset. Ready for new setup.', 'Yellow')
 end
 
@@ -203,7 +197,7 @@ end
 function initializeGame()
     -- This function is called when the mod is loaded
     -- It sets up the initial state and prepares for gameplay
-    
+
     -- Initialize all subsystems
     if not gameStarted then
         -- Setup is handled in onLoad

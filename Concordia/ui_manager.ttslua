@@ -1,62 +1,63 @@
--- Concordia UI Manager
--- All functions related to button creation, UI management, and user interactions
-
--- Button creation and management
 function CreateButtons()
-    btnItaly = createButton('f26769','ITALIA','coroutineItaly',0,0)
-    btnGaly = createButton('6246be','GALLIA','CsetBoardToGALLIA',0,0)
-    btnHisp = createButton('0818d6','HISPANIA','CsetBoardToHISPANIA',0,0)
-    btnBrit = createButton('415bba','BRITANNIA','CsetBoardToBRITANNIA',0,0)
-    btnGerm = createButton('02e4ab','GERMANIA','CsetBoardToGERMANIA',0,0)
-    btnByz = createButton('bb3fdd','BYZANTIVM','CsetBoardToByzantium',0,0)
-    btnEuro = createButton('380db7','IMPERIVM','CsetBoardToEuropa',0,0)
-    btnAegyptus = createButton('2319fc','AEGYPTUS','CsetBoardAegyptus',0,0)
-    btnCreta = createButton('394685','CRETA','CsetBoardCreta',0,0)
-    btnCorsica = createButton('fbb015','CORSICA','CsetBoardToCorsica',0,0)
-    btnSalsa = createButton('8b85c5','SALSA Exp: Off','turnOnOffSalsa',0,0)
-    btnForum = createButton('e9232d','FORVM Exp: Off','turnOnOffForum',0,0)
-    btn2p = createButton('7355e3','Setup 2 Players','SetupFor2Player',0,0)
-    btn3p = createButton('16c414','Setup 3 Players','SetupFor3Player',0,0)
-    btn4p = createButton('18dea7','Setup 4 Players','SetupFor4Player',0,0)
-    btn5p = createButton('f3edd5','Setup 5 Players','SetupFor5Player',0,0)
-    btnMove = createButton('576954','Move and Draw','f1llMove',0,0)
-    btnDisplay = createButton('0da9bb','Cloth Display','clothOrWineBoard',0,0)
-    btnVenus = createButton('bd8fe4','Venus OFF','turnSwapVenus',0,0)
-    btnHellas = createButton('bb8d8e','HELLAS','CsetBoardToHellas',0,0)
-    btnCyprvs = createButton('a4b652','CYPRVS','CsetBoardToCyprvs',0,0)
-    btnIonivm = createButton('cd82d2','IONIVM','CsetBoardToIonivm',0,0)
-    btnBalerica = createButton('2ff54d','BALEARICA','CsetBoardToBalearica',0,0)
-    btnRandomSetup = createButton('9269e2', 'Random Setup', 'randomMapAndStore',800,0, 'Pink')
+    --print('CreateButtons')
+    btnItaly = createButton('4ee1f2', 'ITALIA', 'coroutineItaly', 0, 0, 'Blue', -15, 15)
+    btnGaly = createButton('4ee1f2', 'GALLIA', 'CsetBoardToGALLIA', 0, 0,'Blue',-15, 14.5)
+    btnHisp = createButton('4ee1f2', 'HISPANIA', 'CsetBoardToHISPANIA', 0, 0,'Blue', -15, 14)
+    btnBrit = createButton('4ee1f2', 'BRITANNIA', 'CsetBoardToBRITANNIA', 0, 0, 'Blue', -15, 13.5)
+    btnGerm = createButton('4ee1f2', 'GERMANIA', 'CsetBoardToGERMANIA', 0, 0, 'Blue', -15, 13)
+    btnByz = createButton('4ee1f2', 'BYZANTIVM', 'CsetBoardToByzantium', 0, 100, 'Blue', -15, 12.5)
+    btnEuro = createButton('4ee1f2', 'IMPERIVM', 'CsetBoardToEuropa', 0, 100, 'Blue', -15, 12)
+    btnAegyptus = createButton('4ee1f2', 'AEGYPTS', 'CsetBoardAegyptus', 0, 100, 'Blue', -15, 11.5)
+    btnCreta = createButton('4ee1f2', 'CRETA', 'CsetBoardCreta', 0, 100, 'Blue', -15, 11)
+    btnCorsica = createButton('4ee1f2', 'CORSICA', 'CsetBoardToCorsica', 0, 0, 'Blue', -15, 10.5)
+    btnSalsa = createButton('4ee1f2', 'SALSA [OFF]', 'turnOnOffSalsa', 0, 500, 'Green', -15, 10)
+    btnForum = createButton('4ee1f2', 'FORVM [OFF]', 'turnOnOffForum', 0, 500, 'Green', -15, 9.5)
+    btn2p = createButton('4ee1f2', '2 Players', 'SetupFor2Player', 0, 0, 'White', -15, 9)
+    -- btn3p = createButton('4ee1f2','Setup 3 Players','SetupFor3Player',0,0,'Blue', -15, 2)
+    -- btn4p = createButton('4ee1f2','Setup 4 Players','SetupFor4Player',0,0,'Blue', -15, 1)
+    -- btn5p = createButton('4ee1f2','Setup 5 Players','SetupFor5Player',0,0,'Blue', -15, 0)
+    -- btnMove = createButton('4ee1f2','Move and Draw','f1llMove',0,0,'Blue', -15, -1)
+    -- btnDisplay = createButton('4ee1f2','Cloth Display','clothOrWineBoard',0,0,'Blue', -15, -2)
+    -- btnVenus = createButton('4ee1f2','Venus OFF','turnSwapVenus',0,0,'Blue',0,0)
+    -- btnHellas = createButton('4ee1f2','HELLAS','CsetBoardToHellas',0,0,'Blue',0,0)
+    -- btnCyprvs = createButton('4ee1f2','CYPRVS','CsetBoardToCyprvs',0,0,'Blue',0,0)
+    -- btnIonivm = createButton('4ee1f2','IONIVM','CsetBoardToIonivm',0,0,'Blue',0,0)
+    -- btnBalerica = createButton('4ee1f2','BALEARICA','CsetBoardToBalearica',0,0,'Blue',0,0)
+    -- btnRandomSetup = createButton('4ee1f2', 'Random Setup', 'randomMapAndStore',800,0, 'Pink', 0,0)
 end
 
--- Generic button creation function
-function createButton(objectGuid, name, method, plusH, plusW, color)
+function createButton(objectGuid, label, clickFunction, heightOffset, widthOffset, buttonColor, offsetX, offsetZ)
+    --print('createButton ' .. objectGuid .. " " .. label .. " " .. clickFunction .. " " .. heightOffset .. " " .. widthOffset .. " " .. buttonColor .. " " .. offsetX .. " " .. offsetZ)
     local button = getObjectFromGUID(objectGuid)
     local button_parameters = {}
-    button_parameters.click_function = method
-    button_parameters.label = name
+    button_parameters.font_size = 500
+    button_parameters.scale = {x = 0.2, y = 0.2, z = 0.2}
+    button_parameters.click_function = clickFunction
+    button_parameters.label = label
     button_parameters.function_owner = nil
-    button_parameters.position = {0, 0.2, 0}
+    button_parameters.position = {offsetX or 0, 12, offsetZ or 0}
     button_parameters.rotation = {0, 180, 0}
-    button_parameters.width = widthsize + plusW
-    button_parameters.height = heightsize + plusH
+    button_parameters.width = widthsize + (widthOffset or 0)
+    --print("button_parameters.width " .. button_parameters.width)
+    button_parameters.height = heightsize + (heightOffset or 0)
+    --print("button_parameters.height " .. button_parameters.height)
     button_parameters.font_size = fontsize
-    if color then
-        button_parameters.color = color
+    if buttonColor then
+        button_parameters.color = buttonColor
     end
     button.createButton(button_parameters)
     return button
 end
 
--- Sell button creation for warehouses
 function makeSellButton(guidTable)
     for key, thing in pairs(guidTable) do
-        local tempObj = getObjectFromGUID(thing)
+        local tempObj = (type(thing) == 'string') and getObjectFromGUID(thing) or thing
         tempObj.createButton({
             label = 'Sell',
-            width = 500,
-            height = 200,
-            fontsize = 500,
+            width = 2000,
+            height = 1000,
+            font_size = 500,
+            scale = {x = 0.2, y = 0.2, z = 0.2},
             position = {-0.6, 0.1, -0.8},
             click_function = 'sellItems',
             color = 'Green'
@@ -64,8 +65,10 @@ function makeSellButton(guidTable)
 
         tempObj.createButton({
             label = 'Delete',
-            width = '500',
-            height = 200,
+            width = 2000,
+            height = 1000,
+            font_size = 500,
+            scale = {x = 0.2, y = 0.2, z = 0.2},
             position = {0.6, 0.1, -0.8},
             click_function = 'deleteItems',
             color = 'Red'
@@ -74,54 +77,54 @@ function makeSellButton(guidTable)
     return nil
 end
 
--- Salt bag buttons for Salsa expansion
-function makeSaltBagButtons(tblSalt)
-    local prefectParams = {
-        width = 550,
-        height = 200,
-        fontsize = 800,
-        position = {0, 0.3, 0.2},
-        click_function = 'prefectFree',
-        label = 'Prefect',
-        color = 'Green'
-    }
-
-    for _, oGuid in ipairs(tblSalt) do
-        local tempObj = getObjectFromGUID(oGuid)
-        tempObj.createButton(prefectParams)
-    end
-end
-
--- Supply buttons for resource bags
-function makeSupplyButtons(guidTable)
+function makeSupplyButtons(bagObjects)
+    print("makeSupplyButtons")
     local buyParams = {
-        width = 550,
-        height = 200,
-        position = {0, 0.4, -0.2},
-        fontsize = 800,
+        width = 2000,
+        height = 1000,
+        font_size = 500,
+        scale = {x = 0.2, y = 0.2, z = 0.2},
+        position = {0, 0.3, -0.3},
         click_function = 'buyOne',
         label = 'Buy',
         color = {r = 212/255, g = 175/255, b = 55/255}
     }
 
     local prefectParams = {
-        width = 550,
-        height = 200,
-        fontsize = 800,
+        width = 2000,
+        height = 1000,
+        font_size = 500,
+        scale = {x = 0.2, y = 0.2, z = 0.2},
+        position = {0, 0.3, 0.3},
+        click_function = 'prefectFree',
+        label = 'Prefect',
+        color = 'Green'
+    }
+
+    for _, entry in ipairs(bagObjects) do
+        entry.createButton(buyParams)
+        entry.createButton(prefectParams)
+    end
+end
+
+function makeSaltBagButtons(tblSalt)
+    local prefectParams = {
+        width = 2000,
+        height = 1000,
+        font_size = 500,
+        scale = {x = 0.2, y = 0.2, z = 0.2},
         position = {0, 0.3, 0.2},
         click_function = 'prefectFree',
         label = 'Prefect',
         color = 'Green'
     }
 
-    for _, oGuid in ipairs(guidTable) do
-        local tempObj = getObjectFromGUID(oGuid)
-        tempObj.createButton(buyParams)
+    for _, entry in ipairs(tblSalt) do
+        local tempObj = (type(entry) == 'string') and getObjectFromGUID(entry) or entry
         tempObj.createButton(prefectParams)
     end
 end
 
--- Tribune buttons
 function makeTribuneButtons(obj)
     obj.createButton({
         click_function = 'tribuneAction',
@@ -268,25 +271,40 @@ function buyOne(obj, color, altClick)
 end
 
 function prefectFree(obj, color, alt_click)
-    local playerStorageObj = getObjectFromGUID(playerWarehouses[color])
+    local playerStorageObj = playerWarehouses[color]
     local warehouseSnaps = playerStorageObj.getSnapPoints()
 
+    -- Debug: summarize context before scanning snaps
+    do
+        local snapCount = 0
+        for _ in pairs(warehouseSnaps) do snapCount = snapCount + 1 end
+        print(string.format('[WarehouseDebug] Start scan: color=%s obj=%s snaps=%d', tostring(color), tostring(obj and obj.getName() or 'nil'), snapCount))
+    end
+
     for _, snap in pairs(warehouseSnaps) do
-        local oPosition = playerStorageObj.positionToWorld(snap.position)
-        if not rayCast(oPosition, playerStorageObj) then
+        local oPosition = playerStorageObj.positionToWorld(snap.position) + Vector(0, 0.5, 0)
+
+        local blocker = rayCast(oPosition, playerStorageObj)
+        --print(string.format('[WarehouseDebug] Evaluating snap world pos=(%.2f, %.2f, %.2f), blocker=%s', oPosition.x or 0, oPosition.y or 0, oPosition.z or 0, tostring(blocker and blocker.getName() or 'nil')))
+        if not blocker then
             local params = {rotation = {0,180,0},
                             smooth = false,
                             position = oPosition,
                         }
             if color == 'Blue' or color == 'Green' then
                 params.rotation = {0,0,0}
+                --print('[WarehouseDebug] Rotation adjusted for color ' .. tostring(color))
             end
+            --print(string.format('[WarehouseDebug] takeObject params: pos=(%.2f, %.2f, %.2f) rot={%d,%d,%d}', params.position.x or 0, params.position.y or 0, params.position.z or 0, params.rotation[1], params.rotation[2], params.rotation[3]))
             obj.takeObject(params)
             printToAll(Player[color].steam_name .. ' got a ' .. obj.getName() .. ' for free', color)
+            --print('[WarehouseDebug] takeObject executed for ' .. tostring(obj.getName()))
             return nil
+        else
+            --print('[WarehouseDebug] Snap occupied, skipping')
         end
     end
-    printToAll(Player[color].steam_name .. ' your warehouse may be full', color)
+    --printToAll(Player[color].steam_name .. ' your warehouse may be full', color)
     return nil
 end
 
@@ -296,25 +314,25 @@ function sellItems(obj, color, alt_click)
     local playerMoney = tonumber(getMoneyTotal(moneyCounterObj))
     local goodsSold = {}
     local totalValue = 0
-    
+
     local objectsInWarehouse = upCast(obj)
     for _, item in pairs(objectsInWarehouse) do
         local itemName = item.getName()
         local itemValue = tonumber(item.getGMNotes()) or 1
-        
+
         if goodsSold[itemName] then
             goodsSold[itemName] = goodsSold[itemName] + 1
         else
             goodsSold[itemName] = 1
         end
-        
+
         totalValue = totalValue + itemValue
         item.destruct()
     end
-    
+
     moneyCounterObj.setVar('money', (playerMoney + totalValue))
     moneyCounterObj.call('updateTotal')
-    
+
     printToAll(Player[color].steam_name .. ' has sold the following for ' .. totalValue .. ' sestertii:', color)
     for key, value in pairs(goodsSold) do
         printToAll(key .. ': ' .. value, color)
@@ -324,7 +342,7 @@ end
 function deleteItems(obj, color, alt_click)
     local goodsSold = {}
     local objectsInWarehouse = upCast(obj)
-    
+
     for _, item in pairs(objectsInWarehouse) do
         local itemName = item.getName()
         if goodsSold[itemName] then
@@ -334,7 +352,7 @@ function deleteItems(obj, color, alt_click)
         end
         item.destruct()
     end
-    
+
     printToAll(Player[color].steam_name .. ' has deleted the following: ', color)
     for key, value in pairs(goodsSold) do
         printToAll(key .. ': ' .. value, color)
@@ -393,13 +411,9 @@ function hideExpansionButtons()
     if btnVenus then btnVenus.destruct() end
 end
 
--- Initialize UI
 function initializeUI()
     CreateButtons()
     makeSupplyButtons(supplyBags)
-    makeSellButton(playerWarehouses)
-    
-    if boolSalsa then
-        makeSaltBagButtons(saltBags)
-    end
+    makeSellButton(playerSellZones)
+    makeSaltBagButtons(saltBags)
 end
