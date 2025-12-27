@@ -4,7 +4,7 @@ Players = {"White", "Red", "Yellow", "Green", "Pink", "Blue", "Purple"}
 -- [[ PLAYER COMPONENT INFORMATION ]]
 PlayerInfo = {
   White = {
-    WonderPos = {31.82, 1.00, -31.82},
+    WonderPos = {31.82, 1.10, -31.82},
     ComponentRotation = {0.00, 135.00, 0.00},
     DraftModePos = {26.75, -20, -24.25},
     DockyardPos = {35.64, 1.00, -24.54},
@@ -16,7 +16,7 @@ PlayerInfo = {
     }
   },
   Red = {
-    WonderPos = {0.00, 1.00, -45.00},
+    WonderPos = {0.00, 1.10, -45.00},
     ComponentRotation = {0.00, 180.00, 0.00},
     DraftModePos = {2, -20, -22},
     DockyardPos = {8.00, 1.00, -42.35},
@@ -28,7 +28,7 @@ PlayerInfo = {
     }
   },
   Yellow = {
-    WonderPos = {-31.82, 1.00, -31.82},
+    WonderPos = {-31.82, 1.10, -31.82},
     ComponentRotation = {0.00, 225.00, 0.00},
     DraftModePos = {-28, -20, -22},
     DockyardPos = {-24.52, 1.00, -35.58},
@@ -40,7 +40,7 @@ PlayerInfo = {
     }
   },
   Green = {
-    WonderPos = {-45.00, 1.00, 0.00},
+    WonderPos = {-45.00, 1.10, 0.00},
     ComponentRotation = {0.00, 270.00, 0.00},
     DraftModePos = {-38, -20, -22},
     DockyardPos = {-42.50, 1.00, -7.75},
@@ -52,7 +52,7 @@ PlayerInfo = {
     }
   },
   Pink = {
-    WonderPos = {-31.82, 1.00, 31.82},
+    WonderPos = {-31.82, 1.10, 31.82},
     ComponentRotation = {0.00, 315.00, 0.00},
     DraftModePos = {-32, -20, -22},
     DockyardPos = {-35.48, 1.00, 24.38},
@@ -64,7 +64,7 @@ PlayerInfo = {
     }
   },
   Blue = {
-    WonderPos = {0.00, 1.00, 45.00},
+    WonderPos = {0.00, 1.10, 45.00},
     ComponentRotation = {0.00, 0.00, 0.00},
     DraftModePos = {-2, -20, -22},
     DockyardPos = {-7.75, 1.00, 42.50},
@@ -76,7 +76,7 @@ PlayerInfo = {
     }
   },
   Purple = {
-    WonderPos = {31.82, 1.00, 31.82},
+    WonderPos = {31.82, 1.10, 31.82},
     ComponentRotation = {0.00, 45.00, 0.00},
     DraftModePos = {28, -20, -22},
     DockyardPos = {24.57, 1.00, 35.55},
