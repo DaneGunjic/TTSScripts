@@ -198,12 +198,8 @@ function HandleStartGameButton()
 	end
 	TextOnSetupBoard = {}
 
-	-- Update Phase UI and Ready UI
+	-- Update Phase UI
 	updatePhaseUI("Loading", "Please wait")
-	InitializeReadyStatusCircles()
-
-	-- Hide tutorial panel
-	UI.hide("TutorialPanel")
 
 	-- Show LOADING UI
 	ShowLoadingUI()

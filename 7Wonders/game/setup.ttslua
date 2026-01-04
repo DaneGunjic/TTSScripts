@@ -563,8 +563,6 @@ function HandleStartGameButtonCo()
 		coroutine.yield(0)
 	end
 
-	HideLoadingUI()
-
 	for i = 0, 200 do
 		coroutine.yield(0)
 	end
@@ -589,6 +587,15 @@ function HandleStartGameButtonCo()
 	-- Play a sound
 	MusicPlayer.setCurrentAudioclip({url=Audio.ReadyAlt, title = "GL & HF"})
 	MusicPlayer.repeat_track = false
+
+	-- Hide LOADING UI
+	HideLoadingUI()
+
+	-- Update Ready UI
+	InitializeReadyStatusCircles()
+
+	-- Hide tutorial panel
+	UI.hide("TutorialPanel")
 
 	return 1
 end
