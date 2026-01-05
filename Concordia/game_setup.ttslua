@@ -2,29 +2,11 @@
 -- All functions related to board setup, player setup, and deck management
 
 -- Player setup functions
-function SetupFor2Player()
-    print("Setting up for 2 players...")
-    numberOfPlayers = 2
+function StartGame()
+    print("Starting game...")
+    numberOfPlayers = #getSeatedPlayers()
     DestroyRemaining()
-    startLuaCoroutine(Global, 'placestuff')
-end
-
-function SetupFor3Player()
-    numberOfPlayers = 3
-    DestroyRemaining()
-    startLuaCoroutine(Global, 'placestuff')
-end
-
-function SetupFor4Player()
-    numberOfPlayers = 4
-    DestroyRemaining()
-    startLuaCoroutine(Global, 'placestuff')
-end
-
-function SetupFor5Player()
-    numberOfPlayers = 5
-    DestroyRemaining()
-    startLuaCoroutine(Global, 'placestuff')
+    startLuaCoroutine(Global, 'runInitialSetup')
 end
 
 -- Random setup function
@@ -59,7 +41,7 @@ function randomMapAndStore()
     elseif randomMap == 2 then
         CsetBoardToHISPANIA()
     elseif randomMap == 3 then
-        coroutineItaly()
+        CsetBoardToItaly()
     elseif randomMap == 4 then
         CsetBoardToByzantium()
     elseif randomMap == 5 then
@@ -130,132 +112,32 @@ function DestroyRemaining()
     -- destroyObject(btnRandomSetup)
 end
 
--- Board setup functions
-function coroutineItaly()
-    setBoardToItaly()
-end
+function SelectBoardBritannia() setBoard(1) end
+function SelectBoardHispania() setBoard(2) end
+function SelectBoardItalia() setBoard(3) end
+function SelectBoardByzantivm() setBoard(4) end
+function SelectBoardImperivm() setBoard(5) end
+function SelectBoardCorsica() setBoard(6) end
+function SelectBoardGallia() setBoard(7) end
+function SelectBoardGermania() setBoard(8) end
+function SelectBoardCreta() setBoard(9) end
+function SelectBoardAegyptus() setBoard(10) end
+function SelectBoardIonivm() setBoard(11) end
+function SelectBoardCyprvs() setBoard(12) end
+function SelectBoardBalearica() setBoard(13) end
+function SelectBoardHellas() setBoard(14) end
 
-function CsetBoardToByzantium()
-    setBoardToByzantium()
-end
-
-function CsetBoardToEuropa()
-    setBoardToEuropa()
-end
-
-function CsetBoardToCorsica()
-    setBoardToCorsica()
-end
-
-function CsetBoardAegyptus()
-    setBoardAegyptus()
-end
-
-function CsetBoardCreta()
-    setBoardCreta()
-end
-
-function CsetBoardToHellas()
-    setBoardHellas()
-end
-
-function CsetBoardToCyprvs()
-    setBoardCyprvs()
-end
-
-function CsetBoardToIonivm()
-    setBoardIonivm()
-end
-
-function CsetBoardToBalearica()
-    setBoardBalearica()
-end
-
-function CsetBoardToGERMANIA()
-    setBoardToGERMANIA()
-end
-
-function CsetBoardToHISPANIA()
-    setBoardToHISPANIA()
-end
-
-function CsetBoardToBRITANNIA()
-    setBoardToBRITANNIA()
-end
-
-function CsetBoardToGALLIA()
-    setBoardToGALLIA()
-end
-
--- Individual board setup functions
-function setBoardToBRITANNIA()
-    selectedMap = 1
-    MainBoard.setState(1)
-end
-
-function setBoardToHISPANIA()
-    selectedMap = 2
-    MainBoard.setState(2)
-end
-
-function setBoardToItaly()
-    selectedMap = 3
-    MainBoard.setState(3)
-end
-
-function setBoardToByzantium()
-    selectedMap = 4
-    MainBoard.setState(4)
-end
-
-function setBoardToEuropa()
-    selectedMap = 5
-    MainBoard.setState(5)
-end
-
-function setBoardToCorsica()
-    selectedMap = 6
-    MainBoard.setState(6)
-end
-
-function setBoardToGALLIA()
-    selectedMap = 7
-    MainBoard.setState(7)
-end
-
-function setBoardToGERMANIA()
-    selectedMap = 8
-    MainBoard.setState(8)
-end
-
-function setBoardCreta()
-    selectedMap = 9
-    MainBoard.setState(9)
-end
-
-function setBoardAegyptus()
-    selectedMap = 10
-    MainBoard.setState(10)
-end
-
-function setBoardIonivm()
-    selectedMap = 11
-    MainBoard.setState(11)
-end
-
-function setBoardCyprvs()
-    selectedMap = 12
-    MainBoard.setState(12)
-end
-
-function setBoardBalearica()
-    selectedMap = 13
-    MainBoard.setState(13)
-end
-
-function setBoardHellas()
-    selectedMap = 14
-    MainBoard.setState(14)
+function setBoard(stateId)
+    selectedMap = stateId
+    if not MainBoard then
+        -- Attempt to resolve if not yet set
+        if MainBoardGUID then MainBoard = getObjectFromGUID(MainBoardGUID) end
+    end
+    if MainBoard and MainBoard.setState then
+        MainBoard.setState(stateId)
+    else
+        print('[game_setup] WARN: MainBoard not available or not stateful')
+    end
 end
 
 -- Deck management functions
@@ -593,8 +475,8 @@ function parseRegions(cityBits, countrySegmentArray, regionArray)
     end
 end
 
--- Main placement function
-function placestuff()
+-- Main setup coroutine
+function runInitialSetup()
 	prepareVenus()
 	waitone()
 	gameStarted = true

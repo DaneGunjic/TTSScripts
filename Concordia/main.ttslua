@@ -85,7 +85,7 @@ end
 function startGame()
     if not gameStarted then
         print9("Starting game setup...")
-        placestuff()
+        runInitialSetup()
         gameStarted = true
         hideSetupButtons()
         hideMapButtons()
@@ -116,7 +116,7 @@ function coordinateGameSetup()
     -- Wait for components to settle
     Wait.time(function()
         -- Start main setup
-        placestuff()
+        runInitialSetup()
     end, 1)
 end
 

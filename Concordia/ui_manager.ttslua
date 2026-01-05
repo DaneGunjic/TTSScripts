@@ -1,27 +1,29 @@
 function CreateButtons()
     --print('CreateButtons')
-    btnItaly = createButton('4ee1f2', 'ITALIA', 'coroutineItaly', 0, 0, 'Blue', -15, 15)
-    btnGaly = createButton('4ee1f2', 'GALLIA', 'CsetBoardToGALLIA', 0, 0,'Blue',-15, 14.5)
-    btnHisp = createButton('4ee1f2', 'HISPANIA', 'CsetBoardToHISPANIA', 0, 0,'Blue', -15, 14)
-    btnBrit = createButton('4ee1f2', 'BRITANNIA', 'CsetBoardToBRITANNIA', 0, 0, 'Blue', -15, 13.5)
-    btnGerm = createButton('4ee1f2', 'GERMANIA', 'CsetBoardToGERMANIA', 0, 0, 'Blue', -15, 13)
-    btnByz = createButton('4ee1f2', 'BYZANTIVM', 'CsetBoardToByzantium', 0, 100, 'Blue', -15, 12.5)
-    btnEuro = createButton('4ee1f2', 'IMPERIVM', 'CsetBoardToEuropa', 0, 100, 'Blue', -15, 12)
-    btnAegyptus = createButton('4ee1f2', 'AEGYPTS', 'CsetBoardAegyptus', 0, 100, 'Blue', -15, 11.5)
-    btnCreta = createButton('4ee1f2', 'CRETA', 'CsetBoardCreta', 0, 100, 'Blue', -15, 11)
-    btnCorsica = createButton('4ee1f2', 'CORSICA', 'CsetBoardToCorsica', 0, 0, 'Blue', -15, 10.5)
-    btnSalsa = createButton('4ee1f2', 'SALSA [OFF]', 'turnOnOffSalsa', 0, 500, 'Green', -15, 10)
-    btnForum = createButton('4ee1f2', 'FORVM [OFF]', 'turnOnOffForum', 0, 500, 'Green', -15, 9.5)
-    btn2p = createButton('4ee1f2', '2 Players', 'SetupFor2Player', 0, 0, 'White', -15, 9)
-    -- btn3p = createButton('4ee1f2','Setup 3 Players','SetupFor3Player',0,0,'Blue', -15, 2)
-    -- btn4p = createButton('4ee1f2','Setup 4 Players','SetupFor4Player',0,0,'Blue', -15, 1)
-    -- btn5p = createButton('4ee1f2','Setup 5 Players','SetupFor5Player',0,0,'Blue', -15, 0)
+    btnBrit = createButton('4ee1f2', 'BRITANNIA', 'SelectBoardBritannia', 0, 0, 'Blue', -15, 15)
+    btnHisp = createButton('4ee1f2', 'HISPANIA', 'SelectBoardHispania', 0, 0,'Blue', -15, 14.5)
+    btnItaly = createButton('4ee1f2', 'ITALIA', 'SelectBoardItalia', 0, 0, 'Blue', -15, 14)
+    btnByz = createButton('4ee1f2', 'BYZANTIVM', 'SelectBoardByzantivm', 0, 0, 'Blue', -15, 13.5)
+    btnEuro = createButton('4ee1f2', 'IMPERIVM', 'SelectBoardImperivm', 0, 0, 'Blue', -15, 13)
+    btnCorsica = createButton('4ee1f2', 'CORSICA', 'SelectBoardCorsica', 0, 0, 'Blue', -15, 12.5)
+    btnGaly = createButton('4ee1f2', 'GALLIA', 'SelectBoardGallia', 0, 0, 'Blue', -15, 12)
+    btnGerm = createButton('4ee1f2', 'GERMANIA', 'SelectBoardGermania', 0, 0, 'Blue', -15, 11.5)
+    btnCreta = createButton('4ee1f2', 'CRETA', 'SelectBoardCreta', 0, 0, 'Blue', -15, 11)
+    btnAegyptus = createButton('4ee1f2', 'AEGYPTS', 'SelectBoardAegyptus', 0, 0, 'Blue', -15, 10.5)
+    btnIonivm = createButton('4ee1f2','IONIVM','SelectBoardIonivm', 0, 0, 'Blue', -15, 10)
+    btnCyprvs = createButton('4ee1f2','CYPRVS','SelectBoardCyprvs', 0, 0, 'Blue', -15, 9.5)
+    btnBelearica = createButton('4ee1f2','BALEARICA','SelectBoardBalearica', 0, 0, 'Blue', -15, 9)
+    btnHellas = createButton('4ee1f2','HELLAS','SelectBoardHellas', 0, 0, 'Blue', -15, 8.5)
+
+    btnSalsa = createButton('4ee1f2', 'SALSA [OFF]', 'ToggleSalsa', 0, 500, 'Green', -13.5, 10)
+    btnForum = createButton('4ee1f2', 'FORVM [OFF]', 'turnOnOffForum', 0, 500, 'Green', -13.5, 9.5)
+
+    btnStartGame = createButton('4ee1f2', 'Start Game', 'StartGame', 0, 0, 'White', -15, 9)
+
     -- btnMove = createButton('4ee1f2','Move and Draw','f1llMove',0,0,'Blue', -15, -1)
     -- btnDisplay = createButton('4ee1f2','Cloth Display','clothOrWineBoard',0,0,'Blue', -15, -2)
     -- btnVenus = createButton('4ee1f2','Venus OFF','turnSwapVenus',0,0,'Blue',0,0)
-    -- btnHellas = createButton('4ee1f2','HELLAS','CsetBoardToHellas',0,0,'Blue',0,0)
-    -- btnCyprvs = createButton('4ee1f2','CYPRVS','CsetBoardToCyprvs',0,0,'Blue',0,0)
-    -- btnIonivm = createButton('4ee1f2','IONIVM','CsetBoardToIonivm',0,0,'Blue',0,0)
+
     -- btnBalerica = createButton('4ee1f2','BALEARICA','CsetBoardToBalearica',0,0,'Blue',0,0)
     -- btnRandomSetup = createButton('4ee1f2', 'Random Setup', 'randomMapAndStore',800,0, 'Pink', 0,0)
 end
@@ -162,18 +164,31 @@ function turnOnOffForum()
     btnForum.editButton(button_parameters)
 end
 
-function turnOnOffSalsa()
+function ToggleSalsa()
+    print("[ToggleSalsa] invoked")
+    local prev = boolSalsa
+    print("[ToggleSalsa] previous boolSalsa: " .. tostring(prev))
     local button_parameters = {}
-    button_parameters.index = 0
     if boolSalsa then
         boolSalsa = false
-        button_parameters.label = "SALSA Exp: Off"
+        button_parameters.label = "SALSA[OFF]"
+        print("[ToggleSalsa] set boolSalsa=false, label=" .. button_parameters.label)
     else
         boolSalsa = true
-        button_parameters.label = "SALSA Exp: On"
+        button_parameters.label = "SALSA[ON]"
+        print("[ToggleSalsa] set boolSalsa=true, label=" .. button_parameters.label)
         broadcastToAll('Salsa expansion enabled - Salt tokens will be added to the game',{r = 1, g = 1, b = 1})
     end
-    btnSalsa.editButton(button_parameters)
+    if btnSalsa == nil then
+        print("[ToggleSalsa] WARN: btnSalsa is nil; cannot editButton")
+        return
+    end
+    local ok, err = pcall(function() btnSalsa.editButton(button_parameters) end)
+    if not ok then
+        print("[ToggleSalsa] ERROR editing button: " .. tostring(err))
+    else
+        print("[ToggleSalsa] button updated")
+    end
 end
 
 function turnSwapVenus()
