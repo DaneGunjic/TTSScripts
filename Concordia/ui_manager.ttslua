@@ -30,7 +30,7 @@ end
 
 function createButton(objectGuid, label, clickFunction, heightOffset, widthOffset, buttonColor, offsetX, offsetZ)
     --print('createButton ' .. objectGuid .. " " .. label .. " " .. clickFunction .. " " .. heightOffset .. " " .. widthOffset .. " " .. buttonColor .. " " .. offsetX .. " " .. offsetZ)
-    local button = getObjectFromGUID(objectGuid)
+    local Obj = getObjectFromGUID(objectGuid)
     local button_parameters = {}
     button_parameters.font_size = 500
     button_parameters.scale = {x = 0.2, y = 0.2, z = 0.2}
@@ -44,11 +44,13 @@ function createButton(objectGuid, label, clickFunction, heightOffset, widthOffse
     button_parameters.height = heightsize + (heightOffset or 0)
     --print("button_parameters.height " .. button_parameters.height)
     button_parameters.font_size = fontsize
+
     if buttonColor then
         button_parameters.color = buttonColor
     end
-    button.createButton(button_parameters)
-    return button
+
+    Obj.createButton(button_parameters)
+    return Obj
 end
 
 function makeSellButton(guidTable)
@@ -80,7 +82,7 @@ function makeSellButton(guidTable)
 end
 
 function makeSupplyButtons(bagObjects)
-    print("makeSupplyButtons")
+    --print("makeSupplyButtons")
     local buyParams = {
         width = 2000,
         height = 1000,
@@ -147,10 +149,25 @@ function fixButtons()
     end
 end
 
+function findButtonIndex(obj, funcName)
+    if obj == nil then return nil end
+    local buttons = obj.getButtons()
+    if buttons == nil then return nil end
+    for _, btn in ipairs(buttons) do
+        if btn.click_function == funcName then
+            return btn.index
+        end
+    end
+    return nil
+end
+
 -- Expansion toggle functions
 function turnOnOffForum()
+    local idx = findButtonIndex(btnForum, 'turnOnOffForum')
+    if idx == nil then return end
+
     local button_parameters = {}
-    button_parameters.index = 0
+    button_parameters.index = idx
     if boolForum then
         boolForum = false
         button_parameters.label = "Forum Exp: Off"
@@ -165,35 +182,46 @@ function turnOnOffForum()
 end
 
 function ToggleSalsa()
-    print("[ToggleSalsa] invoked")
+    --print("[ToggleSalsa] invoked")
+    local idx = findButtonIndex(btnSalsa, 'ToggleSalsa')
+    if idx == nil then
+        print("Error: Could not find Salsa button index")
+        return
+    end
+
     local prev = boolSalsa
-    print("[ToggleSalsa] previous boolSalsa: " .. tostring(prev))
+    --print("[ToggleSalsa] previous boolSalsa: " .. tostring(prev))
     local button_parameters = {}
+    button_parameters.index = idx
+
     if boolSalsa then
         boolSalsa = false
         button_parameters.label = "SALSA[OFF]"
-        print("[ToggleSalsa] set boolSalsa=false, label=" .. button_parameters.label)
+        --print("[ToggleSalsa] set boolSalsa=false, label=" .. button_parameters.label)
     else
         boolSalsa = true
         button_parameters.label = "SALSA[ON]"
-        print("[ToggleSalsa] set boolSalsa=true, label=" .. button_parameters.label)
+        --print("[ToggleSalsa] set boolSalsa=true, label=" .. button_parameters.label)
         broadcastToAll('Salsa expansion enabled - Salt tokens will be added to the game',{r = 1, g = 1, b = 1})
     end
     if btnSalsa == nil then
-        print("[ToggleSalsa] WARN: btnSalsa is nil; cannot editButton")
+        --print("[ToggleSalsa] WARN: btnSalsa is nil; cannot editButton")
         return
     end
     local ok, err = pcall(function() btnSalsa.editButton(button_parameters) end)
     if not ok then
-        print("[ToggleSalsa] ERROR editing button: " .. tostring(err))
+        --print("[ToggleSalsa] ERROR editing button: " .. tostring(err))
     else
-        print("[ToggleSalsa] button updated")
+        --print("[ToggleSalsa] button updated")
     end
 end
 
 function turnSwapVenus()
+    local idx = findButtonIndex(btnVenus, 'turnSwapVenus')
+    if idx == nil then return end
+
     local button_parameters = {}
-    button_parameters.index = 0
+    button_parameters.index = idx
     if venusONNN == 3 then
         venusONNN = 1
         button_parameters.label = "Venus OFF"
@@ -209,8 +237,11 @@ function turnSwapVenus()
 end
 
 function turnSwapDisplay()
+    local idx = findButtonIndex(btnDisplay, 'clothOrWineBoard')
+    if idx == nil then return end
+
     local button_parameters = {}
-    button_parameters.index = 0
+    button_parameters.index = idx
     if button_parameters.label == 'Cloth Display' then
         button_parameters.label = 'Wine Display'
     else
@@ -253,28 +284,22 @@ end
 
 -- Buying and selling functions
 function buyOne(obj, color, altClick)
-    local playerMoneyGuid = playerMoneyCounters[color]
-    local moneyCounterObj = getObjectFromGUID(playerMoneyGuid)
-    local playerMoney = tonumber(getMoneyTotal(moneyCounterObj))
-    local playerStorageObj = getObjectFromGUID(playerWarehouses[color])
-    local warehouseSnaps = playerStorageObj.getSnapPoints()
+    local playerMoney = playerMoneyValues[color] or 0
+    local warehouseSnaps = playerWarehouses[color].getSnapPoints()
     local goodCost = tonumber(obj.getGMNotes())
 
     if playerMoney >= goodCost then
         for _, snap in pairs(warehouseSnaps) do
-            local oPosition = playerStorageObj.positionToWorld(snap.position)
-            if not rayCast(oPosition, playerStorageObj) then
+            -- Use same raycast logic as prefectFree (with offset)
+            local oPosition = playerWarehouses[color].positionToWorld(snap.position) + Vector(0, 0.5, 0)
+            if not rayCast(oPosition, playerWarehouses[color]) then
                 local params = {rotation = {0,180,0},
                                 smooth = false,
                                 position = oPosition,
                             }
-                if color == 'Blue' or color == 'Green' then
-                    params.rotation = {0,0,0}
-                end
                 obj.takeObject(params)
                 printToAll(Player[color].steam_name .. ' bought a ' .. obj.getName(), color)
-                moneyCounterObj.setVar('money', (playerMoney - goodCost))
-                moneyCounterObj.call('updateTotal')
+                addMoney(color, -goodCost)
                 return nil
             end
         end
@@ -286,20 +311,19 @@ function buyOne(obj, color, altClick)
 end
 
 function prefectFree(obj, color, alt_click)
-    local playerStorageObj = playerWarehouses[color]
-    local warehouseSnaps = playerStorageObj.getSnapPoints()
+    local warehouseSnaps = playerWarehouses[color].getSnapPoints()
 
     -- Debug: summarize context before scanning snaps
     do
         local snapCount = 0
         for _ in pairs(warehouseSnaps) do snapCount = snapCount + 1 end
-        print(string.format('[WarehouseDebug] Start scan: color=%s obj=%s snaps=%d', tostring(color), tostring(obj and obj.getName() or 'nil'), snapCount))
+        --print(string.format('[WarehouseDebug] Start scan: color=%s obj=%s snaps=%d', tostring(color), tostring(obj and obj.getName() or 'nil'), snapCount))
     end
 
     for _, snap in pairs(warehouseSnaps) do
-        local oPosition = playerStorageObj.positionToWorld(snap.position) + Vector(0, 0.5, 0)
+        local oPosition = playerWarehouses[color].positionToWorld(snap.position) + Vector(0, 0.5, 0)
 
-        local blocker = rayCast(oPosition, playerStorageObj)
+        local blocker = rayCast(oPosition, playerWarehouses[color])
         --print(string.format('[WarehouseDebug] Evaluating snap world pos=(%.2f, %.2f, %.2f), blocker=%s', oPosition.x or 0, oPosition.y or 0, oPosition.z or 0, tostring(blocker and blocker.getName() or 'nil')))
         if not blocker then
             local params = {rotation = {0,180,0},
@@ -325,29 +349,32 @@ end
 
 function sellItems(obj, color, alt_click)
     local playerMoneyObject = playerMoneyCounters[color]
-    local playerMoney = playerMoneyValues[color]
+    local playerMoney = playerMoneyValues[color] or 0
     local goodsSold = {}
     local totalValue = 0
 
     local objectsInSellZone = upCast(obj, 5, 0.1, true)
     for _, item in pairs(objectsInSellZone) do
         local itemName = item.getName()
-        local itemValue = tonumber(item.getGMNotes()) or 1
+        if itemName ~= "Salt" then
+            local itemValue = tonumber(item.getGMNotes()) or 1
 
-        if goodsSold[itemName] then
-            goodsSold[itemName] = goodsSold[itemName] + 1
-        else
-            goodsSold[itemName] = 1
+            if goodsSold[itemName] then
+                goodsSold[itemName] = goodsSold[itemName] + 1
+            else
+                goodsSold[itemName] = 1
+            end
+
+            totalValue = totalValue + itemValue
+            item.destruct()
         end
-
-        totalValue = totalValue + itemValue
-        item.destruct()
     end
 
     printToAll(Player[color].steam_name .. ' has sold the following for ' .. totalValue .. ' sestertii:', color)
     for key, value in pairs(goodsSold) do
         printToAll(key .. ': ' .. value, color)
     end
+    addMoney(color, totalValue)
 end
 
 function deleteItems(obj, color, alt_click)
@@ -377,19 +404,6 @@ function tribuneAction(obj, color, alt_click)
     -- Add specific tribune logic here
 end
 
--- UI helper functions
-function showMessage(message, color)
-    if color then
-        printToColor(message, color)
-    else
-        printToAll(message)
-    end
-end
-
-function broadcastMessage(message, messageColor)
-    broadcastToAll(message, messageColor or 'White')
-end
-
 -- Button visibility management
 function hideSetupButtons()
     if btn2p then btn2p.destruct() end
@@ -397,34 +411,196 @@ function hideSetupButtons()
     if btn4p then btn4p.destruct() end
     if btn5p then btn5p.destruct() end
     if btnRandomSetup then btnRandomSetup.destruct() end
+    if btnStartGame then
+        local idx = findButtonIndex(btnStartGame, 'StartGame')
+        if idx then btnStartGame.removeButton(idx) end
+    end
 end
 
 function hideMapButtons()
-    if btnItaly then btnItaly.destruct() end
-    if btnGaly then btnGaly.destruct() end
-    if btnHisp then btnHisp.destruct() end
-    if btnBrit then btnBrit.destruct() end
-    if btnGerm then btnGerm.destruct() end
-    if btnByz then btnByz.destruct() end
-    if btnEuro then btnEuro.destruct() end
-    if btnAegyptus then btnAegyptus.destruct() end
-    if btnCreta then btnCreta.destruct() end
-    if btnCorsica then btnCorsica.destruct() end
-    if btnHellas then btnHellas.destruct() end
-    if btnCyprvs then btnCyprvs.destruct() end
-    if btnIonivm then btnIonivm.destruct() end
-    if btnBalerica then btnBalerica.destruct() end
+    local mapButtons = {
+        {btnItaly, 'SelectBoardItalia'},
+        {btnGaly, 'SelectBoardGallia'},
+        {btnHisp, 'SelectBoardHispania'},
+        {btnBrit, 'SelectBoardBritannia'},
+        {btnGerm, 'SelectBoardGermania'},
+        {btnByz, 'SelectBoardByzantivm'},
+        {btnEuro, 'SelectBoardImperivm'},
+        {btnAegyptus, 'SelectBoardAegyptus'},
+        {btnCreta, 'SelectBoardCreta'},
+        {btnCorsica, 'SelectBoardCorsica'},
+        {btnHellas, 'SelectBoardHellas'},
+        {btnCyprvs, 'SelectBoardCyprvs'},
+        {btnIonivm, 'SelectBoardIonivm'},
+        {btnBelearica, 'SelectBoardBalearica'}
+    }
+
+    for _, btnData in ipairs(mapButtons) do
+        local obj = btnData[1]
+        local func = btnData[2]
+        if obj then
+            local idx = findButtonIndex(obj, func)
+            if idx then obj.removeButton(idx) end
+        end
+    end
 end
 
 function hideExpansionButtons()
-    if btnSalsa then btnSalsa.destruct() end
-    if btnForum then btnForum.destruct() end
-    if btnVenus then btnVenus.destruct() end
+    if btnSalsa then
+        local idx = findButtonIndex(btnSalsa, 'ToggleSalsa')
+        if idx then btnSalsa.removeButton(idx) end
+    end
+    if btnForum then
+        local idx = findButtonIndex(btnForum, 'turnOnOffForum')
+        if idx then btnForum.removeButton(idx) end
+    end
+    if btnVenus then
+        local idx = findButtonIndex(btnVenus, 'turnSwapVenus')
+        if idx then btnVenus.removeButton(idx) end
+    end
 end
+
+function getMoneyColor(obj)
+    local guid = obj.getGUID()
+    for color, counterObj in pairs(playerMoneyCounters) do
+        if counterObj and counterObj.getGUID() == guid then return color end
+    end
+    return nil
+end
+
+function moneyIncreaseOne(obj, player_clicker_color)
+    local color = getMoneyColor(obj)
+    if color then addMoney(color, 1) end
+end
+
+function moneyIncreaseFive(obj, player_clicker_color)
+    local color = getMoneyColor(obj)
+    if color then addMoney(color, 5) end
+end
+
+function moneyIncreaseTen(obj, player_clicker_color)
+    local color = getMoneyColor(obj)
+    if color then addMoney(color, 10) end
+end
+
+function moneyDecreaseOne(obj, player_clicker_color)
+    local color = getMoneyColor(obj)
+    if color then addMoney(color, -1) end
+end
+
+function moneyDecreaseFive(obj, player_clicker_color)
+    local color = getMoneyColor(obj)
+    if color then addMoney(color, -5) end
+end
+
+function moneyDecreaseTen(obj, player_clicker_color)
+    local color = getMoneyColor(obj)
+    if color then addMoney(color, -10) end
+end
+
+function addMoney(color, amount)
+    --print('Adding ' .. amount .. ' money to ' .. color)
+    if not playerMoneyValues[color] then playerMoneyValues[color] = 0 end
+    playerMoneyValues[color] = playerMoneyValues[color] + amount
+    if playerMoneyValues[color] < 0 then playerMoneyValues[color] = 0 end
+    updateMoneyDisplay(color)
+end
+
+function setMoney(color, amount)
+    playerMoneyValues[color] = amount
+    if playerMoneyValues[color] < 0 then playerMoneyValues[color] = 0 end
+    updateMoneyDisplay(color)
+end
+
+function updateMoneyDisplay(color)
+    local obj = playerMoneyCounters[color]
+    if obj then
+        -- Assuming the first button (index 0) is the display label
+        obj.editButton({index=0, label=tostring(playerMoneyValues[color])})
+    end
+end
+
+function createMoneyButtons(obj, color)
+    obj.clearButtons()
+    -- Display Button (index 0)
+    --print('Creating money buttons for ' .. color)
+    obj.createButton({
+        label = tostring(playerMoneyValues[color] or 0),
+        click_function = 'doNothing',
+        function_owner = self,
+        position = {0, 0.3, 0},
+        height = 0,
+        width = 0,
+        font_size = 500,
+        font_color = 'White'
+    })
+
+    -- +1
+    obj.createButton({
+        click_function = 'moneyIncreaseOne',
+        function_owner = self,
+        label = '+1',
+        position = {1.5, 0.3, -1},
+        width = 800, height = 700, font_size = 400, scale = {0.5, 1, 0.5}
+    })
+    -- +5
+    obj.createButton({
+        click_function = 'moneyIncreaseFive',
+        function_owner = self,
+        label = '+5',
+        position = {2, 0.3, 0},
+        width = 800, height = 700, font_size = 400, scale = {0.5, 1, 0.5}
+    })
+    -- +10
+    obj.createButton({
+        click_function = 'moneyIncreaseTen',
+        function_owner = self,
+        label = '+10',
+        position = {1.5, 0.3, 1},
+        width = 800, height = 700, font_size = 400, scale = {0.5, 1, 0.5}
+    })
+    -- -1
+    obj.createButton({
+        click_function = 'moneyDecreaseOne',
+        function_owner = self,
+        label = '-1',
+        position = {-1.5, 0.3, -1},
+        width = 800, height = 700, font_size = 400, scale = {0.5, 1, 0.5}
+    })
+    -- -5
+    obj.createButton({
+        click_function = 'moneyDecreaseFive',
+        function_owner = self,
+        label = '-5',
+        position = {-2, 0.3, 0},
+        width = 800, height = 700, font_size = 400, scale = {0.5, 1, 0.5}
+    })
+    -- -10
+    obj.createButton({
+        click_function = 'moneyDecreaseTen',
+        function_owner = self,
+        label = '-10',
+        position = {-1.5, 0.3, 1},
+        width = 800, height = 700, font_size = 400, scale = {0.5, 1, 0.5}
+    })
+end
+
+function initMoneyCounters()
+    for color, obj in pairs(playerMoneyCounters) do
+        if obj then
+            if not playerMoneyValues[color] then playerMoneyValues[color] = 0 end
+            --print('Initializing money counter for ' .. color .. ' with value ' .. playerMoneyValues[color])
+            createMoneyButtons(obj, color)
+        end
+    end
+end
+
+function doNothing() end
 
 function initializeUI()
     CreateButtons()
     makeSupplyButtons(supplyBags)
     makeSellButton(playerSellZones)
     makeSaltBagButtons(saltBags)
+    initMoneyCounters()
 end

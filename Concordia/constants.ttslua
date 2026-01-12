@@ -25,11 +25,6 @@ btnLocationItalia = getObjectFromGUID('f26769')
 genericTokenBAG = getObjectFromGUID('d75bd3')
 deckZone = getObjectFromGUID('c57b1a')
 mainDeckZone = getObjectFromGUID('10a39c')
-onePlayerZone = getObjectFromGUID('60970b')
-twoPlayerZone = getObjectFromGUID('4a16d5')
-threePlayerZone = getObjectFromGUID('0c96b5')
-fourPlayerZone = getObjectFromGUID('2ed924')
-fivePlayerZone = getObjectFromGUID('c25847')
 
 -- Resource Bag Zone GUIDs
 zoneBagBrick = getObjectFromGUID('c12ce3')
@@ -53,8 +48,8 @@ playerMoneyCounters = {
     White = getObjectFromGUID('f282c6'),
     Red = getObjectFromGUID('3eade4'),
     Green = getObjectFromGUID('dd8233'),
-    Yellow = getObjectFromGUID('955eca'),
-    Blue = getObjectFromGUID('81ac95'),
+    Yellow = getObjectFromGUID('a42320'),
+    Blue = getObjectFromGUID('30e24c'),
     Black = getObjectFromGUID('9de0d6')
 }
 
@@ -100,17 +95,17 @@ supplyBags = {
     getObjectFromGUID('ca3086'),
     getObjectFromGUID('db1e67'),
     getObjectFromGUID('33e83f'),
-    getObjectFromGUID('4e209c'),
     getObjectFromGUID('96e463'),
     getObjectFromGUID('513062'),
     getObjectFromGUID('b7ceb6'),
     getObjectFromGUID('877036'),
-    getObjectFromGUID('6ec15d'),
-    getObjectFromGUID('3cb8df')
-
+    getObjectFromGUID('6ec15d')
 }
 
-saltBags = {getObjectFromGUID('b34c88'), getObjectFromGUID('3cb8df'), getObjectFromGUID('4e209c')}
+saltBags = {
+    getObjectFromGUID('4e209c'),
+    getObjectFromGUID('3cb8df')
+}
 
 lootZoneSwapSalsa = {
     getObjectFromGUID('81a5ca'), getObjectFromGUID('cf0adb'), getObjectFromGUID('de7734'),
@@ -172,39 +167,6 @@ minervaCards = {
 -- Global Variables
 concordiaOwner = ''
 SENATOR_CARD_ZONES = nil
-
--- Button Objects (initialized as empty tables)
-boardPickerZone = {}
-board = {}
-btnItaly = {}
-btnGaly = {}
-btnHisp = {}
-btnBrit = {}
-btnGerm = {}
-btnByz = {}
-btnEuro = {}
-btnAegyptus = {}
-btnCreta = {}
-btnHellas = {}
-btnCyprvs = {}
-btnIonivm = {}
-btnBalerica = {}
-btnCorsica = {}
-btnSalsa = {}
-btnForum = {}
-btn2p = {}
-btn3p = {}
-btn4p = {}
-btn5p = {}
-btnMove = {}
-btnDisplay = {}
-btnMarket = {}
-btnVenus = {}
-btnRandomSetup = {}
-tokenBagG = {}
-deck = {}
-btnMystery = {}
-btnArray = {}
 
 brickA = 'https://i.imgur.com/xdRTdaK.jpg'
 foodA = 'https://i.imgur.com/IQp55Ls.jpg'

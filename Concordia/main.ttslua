@@ -75,16 +75,16 @@ end
 ----------------End Events -----------------------------------------------
 
 -- Core game logic functions that coordinate between modules
-function startGame()
-    if not gameStarted then
-        print9("Starting game setup...")
-        runInitialSetup()
-        gameStarted = true
-        hideSetupButtons()
-        hideMapButtons()
-        broadcastToAll('Game Started! Good luck!', 'Green')
-    end
-end
+-- function startGame()
+--     if not gameStarted then
+--         print9("Starting game setup...")
+--         runInitialSetup()
+--         gameStarted = true
+--         hideSetupButtons()
+--         hideMapButtons()
+--         broadcastToAll('Game Started! Good luck!', 'Green')
+--     end
+-- end
 
 function resetGame()
     gameStarted = false

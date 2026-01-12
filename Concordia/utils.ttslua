@@ -36,7 +36,17 @@ function upCast(obj, dist, offset, multi)
 
     local hitObjects = {}
     for _, hitInfo in ipairs(hit) do
-        if hitInfo.hit_object ~= obj then
+        local isMoneyCounter = false
+        if playerMoneyCounters then
+            for _, counter in pairs(playerMoneyCounters) do
+                if hitInfo.hit_object == counter then
+                    isMoneyCounter = true
+                    break
+                end
+            end
+        end
+
+        if hitInfo.hit_object ~= obj and not isMoneyCounter then
             table.insert(hitObjects, hitInfo.hit_object)
         end
     end

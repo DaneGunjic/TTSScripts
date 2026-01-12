@@ -5,7 +5,7 @@
 function StartGame()
     print("Starting game...")
     numberOfPlayers = #getSeatedPlayers()
-    DestroyRemaining()
+    DestroySetupButtons()
     startLuaCoroutine(Global, 'runInitialSetup')
 end
 
@@ -80,36 +80,10 @@ function randomMapAndStore()
 end
 
 -- Cleanup function for setup buttons
-function DestroyRemaining()
+function DestroySetupButtons()
     print("Destroying remaining setup buttons...")
-    -- destroyObject(btn2p)
-    -- destroyObject(btn3p)
-    -- destroyObject(btn4p)
-    -- destroyObject(btn5p)
-    -- destroyObject(btnDisplay)
-    -- destroyObject(btnVenus)
-
-    -- if(not boolForum) then
-    --     destroyObject(btnMove)
-    -- end
-
-    -- destroyObject(btnForum)
-    -- destroyObject(btnSalsa)
-    -- destroyObject(btnItaly)
-    -- destroyObject(btnGaly)
-    -- destroyObject(btnHisp)
-    -- destroyObject(btnBrit)
-    -- destroyObject(btnGerm)
-    -- destroyObject(btnByz)
-    -- destroyObject(btnEuro)
-    -- destroyObject(btnCorsica)
-    -- destroyObject(btnAegyptus)
-    -- destroyObject(btnCreta)
-    -- destroyObject(btnHellas)
-    -- destroyObject(btnCyprvs)
-    -- destroyObject(btnIonivm)
-    -- destroyObject(btnBalerica)
-    -- destroyObject(btnRandomSetup)
+    hideExpansionButtons()
+    hideMapButtons()
 end
 
 function SelectBoardBritannia() setBoard(1) end
@@ -150,8 +124,8 @@ function setBoard(stateId)
     if not MainBoard then
         print('[game_setup] WARN: MainBoard not set; stateId = ' .. stateId)
         -- Attempt to resolve if not yet set
-        if MainBoardGUID then 
-            MainBoard = getObjectFromGUID(MainBoardGUID) 
+        if MainBoardGUID then
+            MainBoard = getObjectFromGUID(MainBoardGUID)
         else
             MainBoard = getObjectFromGUID('0e1994')
         end
@@ -159,7 +133,7 @@ function setBoard(stateId)
     if MainBoard and MainBoard.setState then
         print('[game_setup] INFO: Setting board to stateId = ' .. stateId)
         MainBoard = MainBoard.setState(stateId)
-        
+
         local targetRotation = mapRotations[stateId] or 0
         local currentRot = MainBoard.getRotation()
         MainBoard.setRotation({currentRot.x, targetRotation, currentRot.z})
@@ -366,7 +340,6 @@ end
 
 function shufflestuff()
     print("Shuffling decks...")
-    log(onePlayerZone)
     --print("onePlayerZone: " .. onePlayerZone)
     getDeckFromZone(onePlayerZone).shuffle()
     getDeckFromZone(twoPlayerZone).shuffle()
@@ -501,8 +474,8 @@ end
 
 -- Main setup coroutine
 function runInitialSetup()
-	prepareVenus()
-	waitone()
+	--prepareVenus()
+	--waitone()
 	gameStarted = true
 	shufflestuff()
 
