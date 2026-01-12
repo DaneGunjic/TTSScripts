@@ -133,9 +133,8 @@ end
 -- Vesta scoring (money and goods)
 function scoreVesta(color)
     local playerColor = color
-    local playerCounterObj = getObjectFromGUID(playerMoneyCounters[playerColor])
     local playerSupplies = getObjectFromGUID(playerWarehouses[playerColor])
-    local playerMoney = getMoneyTotal(playerCounterObj)
+    local playerMoney = playerMoneyValues[playerColor] or 0
     local supplies = upCast(playerSupplies)
     local supplyValue = 0
     local vestaVP = 0
@@ -355,10 +354,18 @@ end
 
 -- Money counting function
 function getMoneyTotal(obj)
+    -- Deprecated: Money is now tracked in playerMoneyValues
     if not obj then return 0 end
     
-    local counterValue = obj.getVar('counter_value') or 0
-    return counterValue
+    -- Try to find color from obj GUID
+    local guid = obj.getGUID()
+    for color, moneyGuid in pairs(playerMoneyCounters) do
+        if moneyGuid == guid then
+            return playerMoneyValues[color] or 0
+        end
+    end
+    
+    return 0
 end
 
 -- Reset function for scoring tables

@@ -18,7 +18,7 @@ function CreateButtons()
     btnSalsa = createButton('4ee1f2', 'SALSA [OFF]', 'ToggleSalsa', 0, 500, 'Green', -13.5, 10)
     btnForum = createButton('4ee1f2', 'FORVM [OFF]', 'turnOnOffForum', 0, 500, 'Green', -13.5, 9.5)
 
-    btnStartGame = createButton('4ee1f2', 'Start Game', 'StartGame', 0, 0, 'White', -15, 9)
+    btnStartGame = createButton('4ee1f2', 'Start Game', 'StartGame', 0, 0, 'White', -15, 8)
 
     -- btnMove = createButton('4ee1f2','Move and Draw','f1llMove',0,0,'Blue', -15, -1)
     -- btnDisplay = createButton('4ee1f2','Cloth Display','clothOrWineBoard',0,0,'Blue', -15, -2)
@@ -324,14 +324,13 @@ function prefectFree(obj, color, alt_click)
 end
 
 function sellItems(obj, color, alt_click)
-    local playerMoneyGuid = playerMoneyCounters[color]
-    local moneyCounterObj = getObjectFromGUID(playerMoneyGuid)
-    local playerMoney = tonumber(getMoneyTotal(moneyCounterObj))
+    local playerMoneyObject = playerMoneyCounters[color]
+    local playerMoney = playerMoneyValues[color]
     local goodsSold = {}
     local totalValue = 0
 
-    local objectsInWarehouse = upCast(obj)
-    for _, item in pairs(objectsInWarehouse) do
+    local objectsInSellZone = upCast(obj, 5, 0.1, true)
+    for _, item in pairs(objectsInSellZone) do
         local itemName = item.getName()
         local itemValue = tonumber(item.getGMNotes()) or 1
 
@@ -345,9 +344,6 @@ function sellItems(obj, color, alt_click)
         item.destruct()
     end
 
-    moneyCounterObj.setVar('money', (playerMoney + totalValue))
-    moneyCounterObj.call('updateTotal')
-
     printToAll(Player[color].steam_name .. ' has sold the following for ' .. totalValue .. ' sestertii:', color)
     for key, value in pairs(goodsSold) do
         printToAll(key .. ': ' .. value, color)
@@ -355,21 +351,21 @@ function sellItems(obj, color, alt_click)
 end
 
 function deleteItems(obj, color, alt_click)
-    local goodsSold = {}
-    local objectsInWarehouse = upCast(obj)
+    local goodsDeleted = {}
+    local objectsInSellZone = upCast(obj, 5, 0.1, true)
 
-    for _, item in pairs(objectsInWarehouse) do
+    for _, item in pairs(objectsInSellZone) do
         local itemName = item.getName()
-        if goodsSold[itemName] then
-            goodsSold[itemName] = goodsSold[itemName] + 1
+        if goodsDeleted[itemName] then
+            goodsDeleted[itemName] = goodsDeleted[itemName] + 1
         else
-            goodsSold[itemName] = 1
+            goodsDeleted[itemName] = 1
         end
         item.destruct()
     end
 
     printToAll(Player[color].steam_name .. ' has deleted the following: ', color)
-    for key, value in pairs(goodsSold) do
+    for key, value in pairs(goodsDeleted) do
         printToAll(key .. ': ' .. value, color)
     end
 end

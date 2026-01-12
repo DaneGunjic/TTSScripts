@@ -128,13 +128,45 @@ function SelectBoardBalearica() setBoard(13) end
 function SelectBoardHellas() setBoard(14) end
 
 function setBoard(stateId)
+    if selectedMap == stateId then
+        return
+    end
+
+    local mapRotations = {
+        [2] = 180, -- Hispania
+        [4] = 90,  -- Byzantium
+        [6] = 90,  -- Corsica
+        [7] = 90,  -- Gallia
+        [8] = 180, -- Germania
+        [9] = 180, -- Creta
+        [10] = 90, -- Aegyptus
+        [11] = 180, -- Ionium
+        [12] = 180, -- Cyprus
+        [13] = 180, -- Balearica
+        [14] = 180  -- Hellas
+    }
+
     selectedMap = stateId
     if not MainBoard then
+        print('[game_setup] WARN: MainBoard not set; stateId = ' .. stateId)
         -- Attempt to resolve if not yet set
-        if MainBoardGUID then MainBoard = getObjectFromGUID(MainBoardGUID) end
+        if MainBoardGUID then 
+            MainBoard = getObjectFromGUID(MainBoardGUID) 
+        else
+            MainBoard = getObjectFromGUID('0e1994')
+        end
     end
     if MainBoard and MainBoard.setState then
-        MainBoard.setState(stateId)
+        print('[game_setup] INFO: Setting board to stateId = ' .. stateId)
+        MainBoard = MainBoard.setState(stateId)
+        
+        local targetRotation = mapRotations[stateId] or 0
+        local currentRot = MainBoard.getRotation()
+        MainBoard.setRotation({currentRot.x, targetRotation, currentRot.z})
+        MainBoard.locked = true
+        MainBoard.interactable = false
+
+        print('[game_setup] INFO: Board set to stateId = ' .. stateId .. ' with rotation ' .. targetRotation)
     else
         print('[game_setup] WARN: MainBoard not available or not stateful')
     end
@@ -181,17 +213,9 @@ function startingMoney()
 	local turnOrder = Turns.order
 	local startingMoney = 5
 	for _, player in pairs(turnOrder) do
-		local tempCounter = getObjectFromGUID(playerMoneyCounters[player])
 		addMoney(player, startingMoney)
 		startingMoney = startingMoney + 1
 	end
-end
-
-function addMoney(color, value)
-    local counter = getObjectFromGUID(playerMoneyCounters[color])
-    if counter then
-        counter.call('updateVal', value)
-    end
 end
 
 -- First player selection
@@ -369,7 +393,7 @@ function setMainDeck()
 	local p5deck = getDeckFromZone(fivePlayerZoneGUID  )
 --need to accomodate for venus count of 32 cards in deck
 	p1deck.setPosition(mainDeckLocation)
-	if(VenusONNN == 1) then --If Venus is off, then...
+	if(venusMode == 1) then --If Venus is off, then...
 		stuffDeck(p1deck,p2deck, 7, twoPlayerZoneGUID)
 		if(numberOfPlayers > 2 ) then
 			stuffDeck(p1deck,p3deck, 6, threePlayerZoneGUID)
@@ -654,7 +678,7 @@ function runInitialSetup()
 end
 
 function prepareVenus()
-	if( venusOn == 2) then
+	if( venusMode == 2) then
         --"market cards"
 		destroyObject(getObjectFromGUID('5a2ea0'))
 		destroyObject(getObjectFromGUID('a1b156'))
@@ -680,7 +704,7 @@ function prepareVenus()
 		getObjectFromGUID('546dab').setPosition({-21.34, 1.02, 27.35})
 		getObjectFromGUID('7381f9').setPosition({22.75, 1.02, 27.46})
 		getObjectFromGUID('1441ba').setPosition({57.77, 0.94, -7.66})
-	elseif( venusOn == 3) then --if Venus Teams is on
+	elseif( venusMode == 3) then --if Venus Teams is on
 		--"market cards"
 		destroyObject(getObjectFromGUID('5a2ea0'))
 		destroyObject(getObjectFromGUID('a1b156'))

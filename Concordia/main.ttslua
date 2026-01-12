@@ -10,12 +10,6 @@
 #include !\Concordia\game_setup.ttslua
 #include !\Concordia\ui_manager.ttslua
 
---------TO-DO List----------------
--- Implement auto setup for forums
--- Fish board implementation
--- Venus scripting
--- Add Solitaria
-
 local roundCounter = 0 -- this is only used to stop the first restock when the game starts.
 
 ----------------Events----------------------------------------------------
@@ -26,29 +20,28 @@ function onSave()
     saveData.selectedMap = selectedMap
     saveData.altWineBoard = altWineBoard
     saveData.boolSalsa = boolSalsa
-    saveData.venusONNN = venusONNN
+    saveData.venusMode = venusMode
+    saveData.playerMoneyValues = playerMoneyValues
     return JSON.encode(saveData)
 end
 
 function onLoad(savedData)
     #include !\Concordia\constants.ttslua
     -- Parse saved data
-    -- if savedData and savedData ~= "" then
-    --     savedData = JSON.decode(savedData)
-    --     if savedData and savedData.gameStarted then
-    --         gameStarted = savedData.gameStarted or false
-    --         selectedMap = savedData.selectedMap or 4
-    --         forum = savedData.forum or false
-    --         altWineBoard = savedData.altWineBoard or false
-    --         boolSalsa = savedData.boolSalsa or false
-    --         venusOn = savedData.venusOn or 1
-
-    --         if forum then
-    --             btnMove = createButton('576954','Move and Draw','f1llMove',0,0)
-    --         end
-    --         return true
-    --     end
-    -- end
+    if savedData and savedData ~= "" then
+        local data = JSON.decode(savedData)
+        if data then
+            gameStarted = data.gameStarted or false
+            selectedMap = data.selectedMap or 4
+            forum = data.forum or false
+            altWineBoard = data.altWineBoard or false
+            boolSalsa = data.boolSalsa or false
+            venusMode = data.venusMode or 1
+            if data.playerMoneyValues then
+                playerMoneyValues = data.playerMoneyValues
+            end
+        end
+    end
 
     -- Initialize UI
     initializeUI()
@@ -99,7 +92,7 @@ function resetGame()
     forum = false
     altWineBoard = false
     boolSalsa = false
-    venusOn = 1
+    venusMode = 1
     selectedMap = 4
 
     -- Reset all game components
@@ -118,32 +111,6 @@ function coordinateGameSetup()
         -- Start main setup
         runInitialSetup()
     end, 1)
-end
-
--- Game state management
-function isGameInProgress()
-    return gameStarted
-end
-
-function getCurrentMap()
-    return selectedMap
-end
-
-function isForumExpansionActive()
-    return boolForum
-end
-
-function isSalsaExpansionActive()
-    return boolSalsa
-end
-
-function getVenusMode()
-    return venusONNN
-end
-
--- Player management
-function getActivePlayerCount()
-    return numberOfPlayers
 end
 
 function setPlayerCount(count)

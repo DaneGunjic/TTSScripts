@@ -4,7 +4,7 @@ forum = false
 altWineBoard = false
 selectedMap = 4
 numberOfPlayers = 2
-venusOn = 1
+venusMode = 1
 typeSide = 1
 debugCounter = 1
 lockDoubleTrouble = true
@@ -50,11 +50,21 @@ senatorWineBoard = getObjectFromGUID('809e43')
 
 -- Player-specific GUIDs
 playerMoneyCounters = {
-    White = getObjectFromGUID('10bdde'),
-    Red = getObjectFromGUID('3abac8'),
+    White = getObjectFromGUID('f282c6'),
+    Red = getObjectFromGUID('3eade4'),
+    Green = getObjectFromGUID('dd8233'),
     Yellow = getObjectFromGUID('955eca'),
-    Green = getObjectFromGUID('6c00c1'),
-    Blue = getObjectFromGUID('81ac95')
+    Blue = getObjectFromGUID('81ac95'),
+    Black = getObjectFromGUID('9de0d6')
+}
+
+playerMoneyValues = {
+    White = 0,
+    Red = 0,
+    Green = 0,
+    Yellow = 0,
+    Blue = 0,
+    Black = 0
 }
 
 playerWarehouses = {
@@ -97,6 +107,7 @@ supplyBags = {
     getObjectFromGUID('877036'),
     getObjectFromGUID('6ec15d'),
     getObjectFromGUID('3cb8df')
+
 }
 
 saltBags = {getObjectFromGUID('b34c88'), getObjectFromGUID('3cb8df'), getObjectFromGUID('4e209c')}

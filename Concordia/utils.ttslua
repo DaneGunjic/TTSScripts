@@ -31,7 +31,7 @@ function upCast(obj, dist, offset, multi)
         type = 3,
         size = obj.getBounds().size,
         max_distance = dist,
-        debug = false
+        debug = true
     })
 
     local hitObjects = {}
