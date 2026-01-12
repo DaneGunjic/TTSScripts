@@ -147,182 +147,61 @@ function checkForDeckOrCard(objGuid)
     return nil
 end
 
-function getDeckFromZone(zone)
-    print("Searching zone " .. zone.getGUID() .. " for a deck...")
-    local objects = zone.getObjects()
-    for _, obj in ipairs(objects) do
-        if obj.type == 'Deck' then
-            print("Found deck: " .. obj.name)
-            return obj
+function AddRemoveResource(color, add, resource)
+    local warehouse = playerWarehouses[color]
+    if not warehouse then return end
+
+    local warehouseSnaps = warehouse.getSnapPoints()
+
+    if add then
+        -- Find the correct bag
+        local bag = nil
+        if resource == "Brick" then bag = supplyBags.BrickTop or supplyBags.BrickBottom
+        elseif resource == "Food" then bag = supplyBags.FoodTop or supplyBags.FoodBottom
+        elseif resource == "Tool" then bag = supplyBags.ToolTop or supplyBags.ToolBottom
+        elseif resource == "Wine" then bag = supplyBags.WineTop or supplyBags.WineBottom
+        elseif resource == "Cloth" then bag = supplyBags.ClothTop or supplyBags.ClothBottom
+        elseif resource == "Salt" then bag = saltBags.SaltTop or saltBags.SaltBottom
         end
-    end
-    print("No deck found in zone " .. zone)
-    return nil
-end
 
-
-function getInfBagFromZone(zone)
-    local zoneObj = getObjectFromGUID(zone)
-    if not zoneObj then return nil end
-
-    local objects = zoneObj.getObjects()
-    for _, obj in ipairs(objects) do
-        if obj.type == 'Infinite' then
-            return obj
+        if not bag then
+            print("Error: Could not find bag for resource " .. tostring(resource))
+            return false
         end
-    end
-    return nil
-end
 
-function getBagFromZone(zone)
-    local zoneObj = getObjectFromGUID(zone)
-    if not zoneObj then return nil end
+        -- Find empty spot
+        for _, snap in pairs(warehouseSnaps) do
+            local oPosition = warehouse.positionToWorld(snap.position) + Vector(0, 0.5, 0)
+            local blocker = rayCast(oPosition, warehouse)
 
-    local objects = zoneObj.getObjects()
-    for _, obj in ipairs(objects) do
-        if obj.type == 'Bag' then
-            return obj
+            if not blocker then
+                bag.takeObject({
+                    position = oPosition,
+                    rotation = {0, 180, 0},
+                    smooth = false
+                })
+                printToAll(Player[color].steam_name .. ' added ' .. resource, color)
+                return true
+            end
         end
-    end
-    return nil
-end
+        printToAll(Player[color].steam_name .. ' warehouse is full!', color)
+        return false
 
--- Timing utilities
-function pauseSeconds(s)
-    local start = os.time()
-    repeat until os.time() > start + s
-end
-
-function waitone()
-    local Time = os.clock() + 1
-    while os.clock() < Time do
-        coroutine.yield(0)
-    end
-end
-
-function waithalf()
-    return coroutine.yield(0)
-end
-
-function waitsome(some)
-    return coroutine.yield(0)
-end
-
-function waitForUnlock()
-    return coroutine.yield(0)
-end
-
--- Movement utilities
-function moveTo(object, x1, y1, z1)
-    local targetLocation = {x1, y1, z1}
-    object.setPosition(targetLocation)
-end
-
-function moveToPR(object, x1, y1, z1, r1, r2, r3)
-    local targetLocation = {}
-    targetLocation.position = {x1, y1, z1}
-    targetLocation.rotation = {r1, r2, r3}
-    object.setPosition(targetLocation.position)
-    object.setRotation(targetLocation.rotation)
-end
-
-function moveToPRXXX(object, x1, y1, z1, r1, r2, r3)
-    local targetLocation = {}
-    targetLocation.position = {x1, y1, z1}
-    targetLocation.rotation = {r1, r2, r3}
-    object.setPosition(targetLocation.position)
-    object.setRotation(targetLocation.rotation)
-end
-
-function TakeMoveSimple(targetObjectBag, destinyPosition)
-    local params = {}
-    params.position = destinyPosition
-    targetObjectBag.takeObject(params)
-end
-
-function TakeMove(targetObjectBag, x1, y1, z1, r1, r2, r3)
-	local params = {}
-    params.position = { x1, y1, z1}
-    params.rotation = { r1, r2, r3}
-	return targetObjectBag.takeObject(params)
-end
-
-function TakeMove(targetObjectBag, params)
-	return targetObjectBag.takeObject(params)
-end
-
-function TakeMoveCard(targetObjectBag, params)
-    if params ~= nil then
-        if selectedMap == 14 then
-            params.rotation = {0.00, 90.00, 0.00}
-        end
-    end
-    return targetObjectBag.takeObject(params)
-end
-
-function TakeMoveGUID(deck, guide, location)
-    local params = {}
-    params.position = location
-    params.guid = guide
-    return deck.takeObject(params)
-end
-
-function TakeMoveGUIDFlip(deck, guide, location)
-    local params = {}
-    params.position = location
-    params.guid = guide
-    params.flip = true
-    return deck.takeObject(params)
-end
-
-function moveToCard(object, destination)
-    object.setPosition(destination.getPosition())
-end
-
--- Value comparison utilities
-function getValue(subject)
-    if subject == nil then
-        return 0
     else
-        return subject
-    end
-end
+        -- Remove resource
+        for _, snap in pairs(warehouseSnaps) do
+            local oPosition = warehouse.positionToWorld(snap.position) + Vector(0, 0.5, 0)
+            local blocker = rayCast(oPosition, warehouse)
 
-function whatIsBest(kitty, puppy)
-    if kitty > puppy then
-        return kitty
-    else
-        return puppy
-    end
-end
-
-function findFirst(who)
-    for i = 1, #who do
-        if who[i] ~= 0 then
-            return i
+            if blocker and blocker.getName() == resource then
+                blocker.destruct()
+                printToAll(Player[color].steam_name .. ' removed ' .. resource, color)
+                return true
+            end
         end
+        printToAll(Player[color].steam_name .. ' does not have ' .. resource .. ' to remove!', color)
+        return false
     end
-    return nil
-end
-
--- Player utilities
-function getPlayerName(playerColor)
-    local player = Player[playerColor]
-    if player and player.steam_name then
-        return player.steam_name
-    else
-        return playerColor
-    end
-end
-
-function getSeatedPlayers()
-    local seatedPlayers = {}
-    for _, player in ipairs(Player.getPlayers()) do
-        if player.seated then
-            table.insert(seatedPlayers, player.color)
-        end
-    end
-    return seatedPlayers
 end
 
 -- Message utility
@@ -340,28 +219,4 @@ function getValue(subject)
     else
         return 0
     end
-end
-
-function whatIsBest(kitty, puppy)
-    local kittyValue = getValue(kitty)
-    local puppyValue = getValue(puppy)
-
-    if kittyValue == puppyValue or kittyValue > puppyValue then
-        return kitty
-    else
-        return puppy
-    end
-end
-
-function findFirst(who)
-    for counter = 1, #stdTOTALISGERMANS do
-        if stdTOTALISGERMANS[counter] == who then
-            return counter
-        end
-    end
-    return 1
-end
-
-function showMessage(stringEs)
-    broadcastToAll(stringEs, 'White')
 end

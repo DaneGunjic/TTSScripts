@@ -121,15 +121,6 @@ function setBoard(stateId)
     }
 
     selectedMap = stateId
-    if not MainBoard then
-        print('[game_setup] WARN: MainBoard not set; stateId = ' .. stateId)
-        -- Attempt to resolve if not yet set
-        if MainBoardGUID then
-            MainBoard = getObjectFromGUID(MainBoardGUID)
-        else
-            MainBoard = getObjectFromGUID('0e1994')
-        end
-    end
     if MainBoard and MainBoard.setState then
         print('[game_setup] INFO: Setting board to stateId = ' .. stateId)
         MainBoard = MainBoard.setState(stateId)
@@ -146,346 +137,22 @@ function setBoard(stateId)
     end
 end
 
--- Deck management functions
-function shuffleDeck(dGuid)
-    local deck = getObjectFromGUID(dGuid)
-    if deck and deck.type == 'Deck' then
-        deck.shuffle()
-    end
-end
-
-function swapDecks(zone1, zone2)
-    local deck1 = getDeckFromZone(zone1)
-    local deck2 = getDeckFromZone(zone2)
-
-    if deck1 and deck2 then
-        local pos1 = deck1.getPosition()
-        local pos2 = deck2.getPosition()
-        deck1.setPosition(pos2)
-        deck2.setPosition(pos1)
-    end
-end
-
-function stuffDeck(target, source, ammo, zone)
-    local targetDeck = getObjectFromGUID(target)
-    local sourceDeck = getObjectFromGUID(source)
-
-    if targetDeck and sourceDeck then
-        for i = 1, ammo do
-            if sourceDeck.type == 'Deck' then
-                local card = sourceDeck.takeObject()
-                if card then
-                    targetDeck.putObject(card)
-                end
-            end
-        end
-    end
-end
-
--- Money and starting setup
-function startingMoney()
-	local turnOrder = Turns.order
-	local startingMoney = 5
-	for _, player in pairs(turnOrder) do
-		addMoney(player, startingMoney)
-		startingMoney = startingMoney + 1
-	end
-end
-
--- First player selection
-function randomFirstPlayer() -- can't just pick a random first player because tts is shit.
---Have to get the seated players then shuffle otherwise Turns.order retruns nothing
-  local seatedPlayers = getSeatedPlayers()
-  local shuffledPlayers = shuffleList(seatedPlayers)
-  Turns.order = shuffledPlayers
-  Turns.type = 2 -- type 2 is required for Turns.order to return something. Fuck you tts
-  Turns.enable = true
-end
-
-function addSalt()
-stdBagA[1] = saltA
-stdBagB[1] = saltB
-stdBagC[1] = saltC
-stdBagD[1] = saltD
-
-stdBagASalsa[1] = saltA
-stdBagBSalsa[1] = saltB
-stdBagCSalsa[1] = saltC
-stdBagDSalsa[1] = saltD
-
-end
-
-function removeSalt()
-    if not boolSalsa then
-        -- Remove salt tokens from the game
-        local allObjects = getAllObjects()
-        for _, obj in pairs(allObjects) do
-            if obj.hasTag('Salt') then
-                obj.destruct()
-            end
-        end
-    end
-end
-
-function swapSaltTokenForFood(zone)
-    local zoneObj = getObjectFromGUID(zone)
-    if zoneObj then
-        local objects = upCast(zoneObj)
-        for _, obj in pairs(objects) do
-            if obj.hasTag('Salt') then
-                local pos = obj.getPosition()
-                obj.destruct()
-                -- Spawn food token at same position
-                local foodBag = getInfBagFromZone(infFoodGUID)
-                if foodBag then
-                    foodBag.takeObject({position = pos})
-                end
-            end
-        end
-    end
-end
-
--- Germany specific setup
-function placeGermanThings()
-    if selectedMap == 8 then -- Germania
-        for i, pos in ipairs(posGermanyExtraLoot) do
-            local tokenBag = getObjectFromGUID(genericTokenBAGGUID)
-            if tokenBag then
-                tokenBag.takeObject({position = pos})
-            end
-        end
-    end
-end
-
-function PlaceCities(targetArray, cityBits)
-----------------------Unebrion Additions -----------------------
-    local brickTiles = {brickA, brickB, brickC, brickD}
-    local clothTiles = {clothA, clothB, clothC, clothD}
-    local foodTiles = {foodA, foodB, foodC, foodD}
-    local toolTiles = {toolA, toolB, toolC, toolD}
-    local wineTiles = {wineA, wineB, wineC, wineD}
-    local saltTiles = {saltA, saltB, saltC, saltD}
-----------------------------------------------------------------
-	if targetArray ~= nil then
-		local count = 1
-		local numMaxArray = #targetArray
-		shuffleArray(cityBits)
-		shuffleArray(cityBits)
-		shuffleArray(cityBits)
-		while count <= numMaxArray do
-			local obj_parameters = {}
-			obj_parameters.type = 'Custom_Model'
-			obj_parameters.position = targetArray[count]
-			obj_parameters.rotation = {0.00, 180.00, 0.00}
-
-			obj = spawnObject(obj_parameters)
-			obj.setLock(true)
-			custom = {}
-			custom.mesh = 'http://pastebin.com/raw/CnZMEjc3'
-			custom.diffuse = cityBits[count]
-			custom.material = 1
-			obj.setCustomObject(custom)
-
----------------------- Unebrion Additions----------------------------------------------------------
-            obj.addTag('city_tile')
-            if cityBits[count] == tableChecker(brickTiles, cityBits[count]) then
-                obj.addTag('brick')
-            elseif cityBits[count] == tableChecker(clothTiles, cityBits[count]) then
-                obj.addTag('cloth')
-            elseif cityBits[count] == tableChecker(foodTiles, cityBits[count]) then
-                obj.addTag('food')
-            elseif cityBits[count] == tableChecker(toolTiles, cityBits[count]) then
-                obj.addTag('tool')
-            elseif cityBits[count] == tableChecker(wineTiles, cityBits[count]) then
-                obj.addTag('wine')
-            elseif cityBits[count] == tableChecker(saltTiles, cityBits[count]) then
-                obj.addTag('salt')
-            end
----------------------------------------------------------------------
-			--obj.setName(debugCounter)
-			cityBits[count] = obj
-			count = count + 1
-			debugCounter = debugCounter+1
-		end
-	end
-end
-
-function drawRegionBest(lootSwitcher, pos)
-    if lootSwitcher == 1 then
-        TakeMove(brickBag, pos)
-    elseif lootSwitcher == 2 then
-        TakeMove(foodBag, pos)
-    elseif lootSwitcher == 3 then
-        TakeMove(toolBag, pos)
-    elseif lootSwitcher == 4 then
-        TakeMove(wineBag, pos)
-    elseif lootSwitcher == 5 then
-        TakeMove(clothBag, pos)
-    end
-end
-
-function removeOneGuy(lootSwitcher)
-    if lootSwitcher == 1 then
-        table.remove(stdTOTALISGERMANS, findFirst(1))
-    elseif lootSwitcher == 2 then
-        table.remove(stdTOTALISGERMANS, findFirst(2))
-    elseif lootSwitcher == 3 then
-        table.remove(stdTOTALISGERMANS, findFirst(3))
-    elseif lootSwitcher == 4 then
-        table.remove(stdTOTALISGERMANS, findFirst(4))
-    elseif lootSwitcher == 5 then
-        table.remove(stdTOTALISGERMANS, findFirst(5))
-    end
-end
-
-function shufflestuff()
-    print("Shuffling decks...")
-    --print("onePlayerZone: " .. onePlayerZone)
-    getDeckFromZone(onePlayerZone).shuffle()
-    getDeckFromZone(twoPlayerZone).shuffle()
-    getDeckFromZone(threePlayerZone).shuffle()
-    getDeckFromZone(fourPlayerZone).shuffle()
-    getDeckFromZone(fivePlayerZone).shuffle()
-end
-
-function stuffDeck(target, source, ammo, zone)
-    local i = 1
-    while i <= ammo do
-        local params = {}
-        params.position = target.getPosition()
-        source.takeObject(params)
-        i = i + 1
-    end
-end
-
-function setMainDeck()
-	local p1deck = getDeckFromZone(onePlayerZoneGUID  )
-	local p2deck = getDeckFromZone(twoPlayerZoneGUID  )
-	local p3deck = getDeckFromZone(threePlayerZoneGUID )
-	local p4deck = getDeckFromZone(fourPlayerZoneGUID  )
-	local p5deck = getDeckFromZone(fivePlayerZoneGUID  )
---need to accomodate for venus count of 32 cards in deck
-	p1deck.setPosition(mainDeckLocation)
-	if(venusMode == 1) then --If Venus is off, then...
-		stuffDeck(p1deck,p2deck, 7, twoPlayerZoneGUID)
-		if(numberOfPlayers > 2 ) then
-			stuffDeck(p1deck,p3deck, 6, threePlayerZoneGUID)
-			if(numberOfPlayers > 3 ) then
-				stuffDeck(p1deck,p4deck, 5, fourPlayerZoneGUID)
-				if(numberOfPlayers > 4 ) then
-					stuffDeck(p1deck,p5deck, 4, onePlayerZoneGUID)
-				end
-			end
-		end
-	else --If Venus is on, then
-		stuffDeck(p1deck,p2deck, 9, twoPlayerZoneGUID)
-		if(numberOfPlayers > 2 ) then
-			stuffDeck(p1deck,p3deck, 7, threePlayerZoneGUID)
-			if(numberOfPlayers > 3 ) then
-				stuffDeck(p1deck,p4deck, 6, fourPlayerZoneGUID)
-				if(numberOfPlayers > 4 ) then
-					stuffDeck(p1deck,p5deck, 4, onePlayerZoneGUID)
-				end
-			end
-		end
-	end
-	Wait.time(
-		function() restockSenatorBoard() end, 1)
-end
-
-function setupBoardSpecificElements(stateId)
-    print("Setting up board specific elements for state ID: " .. stateId)
-    local gameBoard = boardPickerZone
-
-    if boolSalsa then
-        addSalt()
-    else
-        local i = 1
-        while i <= #lootZoneSwapSalsaGUID do
-            swapSaltTokenForFood(lootZoneSwapSalsaGUID[i])
-            i = i + 1
-        end
-    end
-
-    -- Board-specific setup based on state ID
-    if stateId == 1 then
-        PlaceCities(BRITTNANIAB, stdBagB)
-        PlaceCities(BRITTNANIAC, stdBagC)
-        PlaceCities(BRITTNANIAD, stdBagD)
-        TableConcat(stdBagB, stdBagC)
-        TableConcat(stdBagB, stdBagD)
-        parseRegions(stdBagB, BRITTNANIARegions, BRITTNANIAtiles)
-    elseif stateId == 2 then
-        PlaceCities(hispaniaa, stdBagASalsa)
-        PlaceCities(hispaniab, stdBagBSalsa)
-        PlaceCities(hispaniad, stdBagDSalsa)
-        TableConcat(stdBagASalsa, stdBagBSalsa)
-        TableConcat(stdBagASalsa, stdBagDSalsa)
-        parseRegions(stdBagASalsa, HispaniaRegions, hispaniatiles)
-    elseif stateId == 3 then
-        PlaceCities(italiaa, stdBagA)
-        PlaceCities(italiab, stdBagB)
-        PlaceCities(italiac, stdBagC)
-        TableConcat(stdBagA, stdBagB)
-        TableConcat(stdBagA, stdBagC)
-        parseRegions(stdBagA, ItaliaRegions, italiatiles)
-    -- Add other board states as needed
-    end
-end
-
-function swapSaltTokenForFood(zone)
-    local objects = zone.getObjects()
-    for _, token in ipairs(objects) do
-        if token.getName() == 'Salt' then
-            local params = {}
-            params.position = token.getPosition()
-            destroyObject(token)
-            TakeMove(foodBag, params)
-        end
-    end
-end
-
-function parseRegions(cityBits, countrySegmentArray, regionArray)
-    if cityBits ~= nil then
-        local countyCounter = 1
-        local maxCountyBoys = #countrySegmentArray
-        shuffleArray(cityBits)
-        shuffleArray(cityBits)
-        shuffleArray(cityBits)
-
-        while countyCounter <= maxCountyBoys do
-            local bestLoot = whatIsBest(cityBits[1], cityBits[2])
-            if #cityBits > 2 then
-                bestLoot = whatIsBest(bestLoot, cityBits[3])
-            end
-            if #cityBits > 3 then
-                bestLoot = whatIsBest(bestLoot, cityBits[4])
-            end
-            if #cityBits > 4 then
-                bestLoot = whatIsBest(bestLoot, cityBits[5])
-            end
-
-            drawRegionBest(getValue(bestLoot), regionArray[countyCounter])
-            removeOneGuy(getValue(bestLoot))
-            countyCounter = countyCounter + 1
-        end
-    end
-end
-
 -- Main setup coroutine
 function runInitialSetup()
-	--prepareVenus()
-	--waitone()
+    print("Run initial setup")
 	gameStarted = true
 	shufflestuff()
 
 	if boolSalsa then
         addSalt()
+        local seatedPlayers = getSeatedPlayers()
+        for _, color in ipairs(seatedPlayers) do
+            AddRemoveResource(color, true, "Salt")
+        end
     else
-        local i = 1
-        while i <= #lootZoneSwapSalsa do
-            swapSaltTokenForFood(lootZoneSwapSalsa[i])
-            i = i + 1
+        local seatedPlayers = getSeatedPlayers()
+        for _, color in ipairs(seatedPlayers) do
+            AddRemoveResource(color, true, "Food")
         end
 	end
 
@@ -648,6 +315,301 @@ function runInitialSetup()
     placeSenatorBoard()
 
 	return true
+end
+
+-- Deck management functions
+function shuffleDeck(dGuid)
+    local deck = getObjectFromGUID(dGuid)
+    if deck and deck.type == 'Deck' then
+        deck.shuffle()
+    end
+end
+
+function swapDecks(zone1, zone2)
+    local deck1 = getDeckFromZone(zone1)
+    local deck2 = getDeckFromZone(zone2)
+
+    if deck1 and deck2 then
+        local pos1 = deck1.getPosition()
+        local pos2 = deck2.getPosition()
+        deck1.setPosition(pos2)
+        deck2.setPosition(pos1)
+    end
+end
+
+function stuffDeck(target, source, ammo, zone)
+    local targetDeck = getObjectFromGUID(target)
+    local sourceDeck = getObjectFromGUID(source)
+
+    if targetDeck and sourceDeck then
+        for i = 1, ammo do
+            if sourceDeck.type == 'Deck' then
+                local card = sourceDeck.takeObject()
+                if card then
+                    targetDeck.putObject(card)
+                end
+            end
+        end
+    end
+end
+
+-- Money and starting setup
+function startingMoney()
+	local turnOrder = Turns.order
+	local startingMoney = 5
+	for _, player in pairs(turnOrder) do
+		addMoney(player, startingMoney)
+		startingMoney = startingMoney + 1
+	end
+end
+
+-- First player selection
+function randomFirstPlayer() -- can't just pick a random first player because tts is shit.
+--Have to get the seated players then shuffle otherwise Turns.order retruns nothing
+  local seatedPlayers = getSeatedPlayers()
+  local shuffledPlayers = shuffleList(seatedPlayers)
+  Turns.order = shuffledPlayers
+  Turns.type = 2 -- type 2 is required for Turns.order to return something. Fuck you tts
+  Turns.enable = true
+end
+
+function addSalt()
+    stdBagA[1] = saltA
+    stdBagB[1] = saltB
+    stdBagC[1] = saltC
+    stdBagD[1] = saltD
+
+    stdBagASalsa[1] = saltA
+    stdBagBSalsa[1] = saltB
+    stdBagCSalsa[1] = saltC
+    stdBagDSalsa[1] = saltD
+end
+
+function removeSalt()
+    if not boolSalsa then
+        -- Remove salt tokens from the game
+        local allObjects = getAllObjects()
+        for _, obj in pairs(allObjects) do
+            if obj.hasTag('Salt') then
+                obj.destruct()
+            end
+        end
+    end
+end
+
+-- Germany specific setup
+function placeGermanThings()
+    if selectedMap == 8 then -- Germania
+        for i, pos in ipairs(posGermanyExtraLoot) do
+            local tokenBag = getObjectFromGUID(genericTokenBAGGUID)
+            if tokenBag then
+                tokenBag.takeObject({position = pos})
+            end
+        end
+    end
+end
+
+function PlaceCities(targetArray, cityBits)
+----------------------Unebrion Additions -----------------------
+    local brickTiles = {brickA, brickB, brickC, brickD}
+    local clothTiles = {clothA, clothB, clothC, clothD}
+    local foodTiles = {foodA, foodB, foodC, foodD}
+    local toolTiles = {toolA, toolB, toolC, toolD}
+    local wineTiles = {wineA, wineB, wineC, wineD}
+    local saltTiles = {saltA, saltB, saltC, saltD}
+----------------------------------------------------------------
+	if targetArray ~= nil then
+		local count = 1
+		local numMaxArray = #targetArray
+		shuffleArray(cityBits)
+		shuffleArray(cityBits)
+		shuffleArray(cityBits)
+		while count <= numMaxArray do
+			local obj_parameters = {}
+			obj_parameters.type = 'Custom_Model'
+			obj_parameters.position = targetArray[count]
+			obj_parameters.rotation = {0.00, 180.00, 0.00}
+
+			obj = spawnObject(obj_parameters)
+			obj.setLock(true)
+			custom = {}
+			custom.mesh = 'http://pastebin.com/raw/CnZMEjc3'
+			custom.diffuse = cityBits[count]
+			custom.material = 1
+			obj.setCustomObject(custom)
+
+---------------------- Unebrion Additions----------------------------------------------------------
+            obj.addTag('city_tile')
+            if cityBits[count] == tableChecker(brickTiles, cityBits[count]) then
+                obj.addTag('brick')
+            elseif cityBits[count] == tableChecker(clothTiles, cityBits[count]) then
+                obj.addTag('cloth')
+            elseif cityBits[count] == tableChecker(foodTiles, cityBits[count]) then
+                obj.addTag('food')
+            elseif cityBits[count] == tableChecker(toolTiles, cityBits[count]) then
+                obj.addTag('tool')
+            elseif cityBits[count] == tableChecker(wineTiles, cityBits[count]) then
+                obj.addTag('wine')
+            elseif cityBits[count] == tableChecker(saltTiles, cityBits[count]) then
+                obj.addTag('salt')
+            end
+---------------------------------------------------------------------
+			--obj.setName(debugCounter)
+			cityBits[count] = obj
+			count = count + 1
+			debugCounter = debugCounter+1
+		end
+	end
+end
+
+function drawRegionBest(lootSwitcher, pos)
+    if lootSwitcher == 1 then
+        TakeMove(brickBag, pos)
+    elseif lootSwitcher == 2 then
+        TakeMove(foodBag, pos)
+    elseif lootSwitcher == 3 then
+        TakeMove(toolBag, pos)
+    elseif lootSwitcher == 4 then
+        TakeMove(wineBag, pos)
+    elseif lootSwitcher == 5 then
+        TakeMove(clothBag, pos)
+    end
+end
+
+function removeOneGuy(lootSwitcher)
+    if lootSwitcher == 1 then
+        table.remove(stdTOTALISGERMANS, findFirst(1))
+    elseif lootSwitcher == 2 then
+        table.remove(stdTOTALISGERMANS, findFirst(2))
+    elseif lootSwitcher == 3 then
+        table.remove(stdTOTALISGERMANS, findFirst(3))
+    elseif lootSwitcher == 4 then
+        table.remove(stdTOTALISGERMANS, findFirst(4))
+    elseif lootSwitcher == 5 then
+        table.remove(stdTOTALISGERMANS, findFirst(5))
+    end
+end
+
+function shufflestuff()
+    print("Shuffling decks...")
+    --print("onePlayerZone: " .. onePlayerZone)
+    -- getDeckFromZone(onePlayerZone).shuffle()
+    -- getDeckFromZone(twoPlayerZone).shuffle()
+    -- getDeckFromZone(threePlayerZone).shuffle()
+    -- getDeckFromZone(fourPlayerZone).shuffle()
+    -- getDeckFromZone(fivePlayerZone).shuffle()
+end
+
+function stuffDeck(target, source, ammo, zone)
+    local i = 1
+    while i <= ammo do
+        local params = {}
+        params.position = target.getPosition()
+        source.takeObject(params)
+        i = i + 1
+    end
+end
+
+function setMainDeck()
+	local p1deck = getDeckFromZone(onePlayerZoneGUID  )
+	local p2deck = getDeckFromZone(twoPlayerZoneGUID  )
+	local p3deck = getDeckFromZone(threePlayerZoneGUID )
+	local p4deck = getDeckFromZone(fourPlayerZoneGUID  )
+	local p5deck = getDeckFromZone(fivePlayerZoneGUID  )
+--need to accomodate for venus count of 32 cards in deck
+	p1deck.setPosition(mainDeckLocation)
+	if(venusMode == 1) then --If Venus is off, then...
+		stuffDeck(p1deck,p2deck, 7, twoPlayerZoneGUID)
+		if(numberOfPlayers > 2 ) then
+			stuffDeck(p1deck,p3deck, 6, threePlayerZoneGUID)
+			if(numberOfPlayers > 3 ) then
+				stuffDeck(p1deck,p4deck, 5, fourPlayerZoneGUID)
+				if(numberOfPlayers > 4 ) then
+					stuffDeck(p1deck,p5deck, 4, onePlayerZoneGUID)
+				end
+			end
+		end
+	else --If Venus is on, then
+		stuffDeck(p1deck,p2deck, 9, twoPlayerZoneGUID)
+		if(numberOfPlayers > 2 ) then
+			stuffDeck(p1deck,p3deck, 7, threePlayerZoneGUID)
+			if(numberOfPlayers > 3 ) then
+				stuffDeck(p1deck,p4deck, 6, fourPlayerZoneGUID)
+				if(numberOfPlayers > 4 ) then
+					stuffDeck(p1deck,p5deck, 4, onePlayerZoneGUID)
+				end
+			end
+		end
+	end
+	Wait.time(
+		function() restockSenatorBoard() end, 1)
+end
+
+function setupBoardSpecificElements(stateId)
+    print("Setting up board specific elements for state ID: " .. stateId)
+    local gameBoard = boardPickerZone
+
+    if boolSalsa then
+        addSalt()
+    else
+        local i = 1
+        while i <= #lootZoneSwapSalsaGUID do
+            swapSaltTokenForFood(lootZoneSwapSalsaGUID[i])
+            i = i + 1
+        end
+    end
+
+    -- Board-specific setup based on state ID
+    if stateId == 1 then
+        PlaceCities(BRITTNANIAB, stdBagB)
+        PlaceCities(BRITTNANIAC, stdBagC)
+        PlaceCities(BRITTNANIAD, stdBagD)
+        TableConcat(stdBagB, stdBagC)
+        TableConcat(stdBagB, stdBagD)
+        parseRegions(stdBagB, BRITTNANIARegions, BRITTNANIAtiles)
+    elseif stateId == 2 then
+        PlaceCities(hispaniaa, stdBagASalsa)
+        PlaceCities(hispaniab, stdBagBSalsa)
+        PlaceCities(hispaniad, stdBagDSalsa)
+        TableConcat(stdBagASalsa, stdBagBSalsa)
+        TableConcat(stdBagASalsa, stdBagDSalsa)
+        parseRegions(stdBagASalsa, HispaniaRegions, hispaniatiles)
+    elseif stateId == 3 then
+        PlaceCities(italiaa, stdBagA)
+        PlaceCities(italiab, stdBagB)
+        PlaceCities(italiac, stdBagC)
+        TableConcat(stdBagA, stdBagB)
+        TableConcat(stdBagA, stdBagC)
+        parseRegions(stdBagA, ItaliaRegions, italiatiles)
+    -- Add other board states as needed
+    end
+end
+
+function parseRegions(cityBits, countrySegmentArray, regionArray)
+    if cityBits ~= nil then
+        local countyCounter = 1
+        local maxCountyBoys = #countrySegmentArray
+        shuffleArray(cityBits)
+        shuffleArray(cityBits)
+        shuffleArray(cityBits)
+
+        while countyCounter <= maxCountyBoys do
+            local bestLoot = whatIsBest(cityBits[1], cityBits[2])
+            if #cityBits > 2 then
+                bestLoot = whatIsBest(bestLoot, cityBits[3])
+            end
+            if #cityBits > 3 then
+                bestLoot = whatIsBest(bestLoot, cityBits[4])
+            end
+            if #cityBits > 4 then
+                bestLoot = whatIsBest(bestLoot, cityBits[5])
+            end
+
+            drawRegionBest(getValue(bestLoot), regionArray[countyCounter])
+            removeOneGuy(getValue(bestLoot))
+            countyCounter = countyCounter + 1
+        end
+    end
 end
 
 function prepareVenus()

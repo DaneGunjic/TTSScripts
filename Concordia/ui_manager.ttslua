@@ -82,7 +82,6 @@ function makeSellButton(guidTable)
 end
 
 function makeSupplyButtons(bagObjects)
-    --print("makeSupplyButtons")
     local buyParams = {
         width = 2000,
         height = 1000,
@@ -105,7 +104,7 @@ function makeSupplyButtons(bagObjects)
         color = 'Green'
     }
 
-    for _, entry in ipairs(bagObjects) do
+    for _, entry in pairs(bagObjects) do
         entry.createButton(buyParams)
         entry.createButton(prefectParams)
     end
@@ -285,66 +284,21 @@ end
 -- Buying and selling functions
 function buyOne(obj, color, altClick)
     local playerMoney = playerMoneyValues[color] or 0
-    local warehouseSnaps = playerWarehouses[color].getSnapPoints()
     local goodCost = tonumber(obj.getGMNotes())
+    local resourceName = obj.getName()
 
     if playerMoney >= goodCost then
-        for _, snap in pairs(warehouseSnaps) do
-            -- Use same raycast logic as prefectFree (with offset)
-            local oPosition = playerWarehouses[color].positionToWorld(snap.position) + Vector(0, 0.5, 0)
-            if not rayCast(oPosition, playerWarehouses[color]) then
-                local params = {rotation = {0,180,0},
-                                smooth = false,
-                                position = oPosition,
-                            }
-                obj.takeObject(params)
-                printToAll(Player[color].steam_name .. ' bought a ' .. obj.getName(), color)
-                addMoney(color, -goodCost)
-                return nil
-            end
+        if AddRemoveResource(color, true, resourceName) then
+            printToAll(Player[color].steam_name .. ' bought a ' .. resourceName, color)
+            addMoney(color, -goodCost)
         end
-        printToAll(Player[color].steam_name .. ' your warehouse may be full', color)
     else
-        printToAll(Player[color].steam_name .. ' does not have enough money to buy a ' .. obj.getName(), color)
+        printToAll(Player[color].steam_name .. ' does not have enough money to buy a ' .. resourceName, color)
     end
-    return nil
 end
 
 function prefectFree(obj, color, alt_click)
-    local warehouseSnaps = playerWarehouses[color].getSnapPoints()
-
-    -- Debug: summarize context before scanning snaps
-    do
-        local snapCount = 0
-        for _ in pairs(warehouseSnaps) do snapCount = snapCount + 1 end
-        --print(string.format('[WarehouseDebug] Start scan: color=%s obj=%s snaps=%d', tostring(color), tostring(obj and obj.getName() or 'nil'), snapCount))
-    end
-
-    for _, snap in pairs(warehouseSnaps) do
-        local oPosition = playerWarehouses[color].positionToWorld(snap.position) + Vector(0, 0.5, 0)
-
-        local blocker = rayCast(oPosition, playerWarehouses[color])
-        --print(string.format('[WarehouseDebug] Evaluating snap world pos=(%.2f, %.2f, %.2f), blocker=%s', oPosition.x or 0, oPosition.y or 0, oPosition.z or 0, tostring(blocker and blocker.getName() or 'nil')))
-        if not blocker then
-            local params = {rotation = {0,180,0},
-                            smooth = false,
-                            position = oPosition,
-                        }
-            if color == 'Blue' or color == 'Green' then
-                params.rotation = {0,0,0}
-                --print('[WarehouseDebug] Rotation adjusted for color ' .. tostring(color))
-            end
-            --print(string.format('[WarehouseDebug] takeObject params: pos=(%.2f, %.2f, %.2f) rot={%d,%d,%d}', params.position.x or 0, params.position.y or 0, params.position.z or 0, params.rotation[1], params.rotation[2], params.rotation[3]))
-            obj.takeObject(params)
-            printToAll(Player[color].steam_name .. ' got a ' .. obj.getName() .. ' for free', color)
-            --print('[WarehouseDebug] takeObject executed for ' .. tostring(obj.getName()))
-            return nil
-        else
-            --print('[WarehouseDebug] Snap occupied, skipping')
-        end
-    end
-    --printToAll(Player[color].steam_name .. ' your warehouse may be full', color)
-    return nil
+    AddRemoveResource(color, true, obj.getName())
 end
 
 function sellItems(obj, color, alt_click)
