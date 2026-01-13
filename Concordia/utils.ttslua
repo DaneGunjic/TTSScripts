@@ -3,7 +3,7 @@ function rayCast(StartPosition, obj)
         origin = StartPosition,
         type = 3,
         size = {0.6, 0.6, 0.6},
-        direction = {0, -1, 0},
+        direction = {0, 0, 0},
         max_distance = 0.1,
         debug = true
     })
@@ -219,4 +219,17 @@ function getValue(subject)
     else
         return 0
     end
+end
+
+function whatIsBest(kitty, puppy)
+	local kittyValue = getValue(kitty)
+	--print(kittyValue)
+	local puppyValue = getValue(puppy)
+	--print(puppyValue)
+	if(kittyValue == puppyValue or kittyValue > puppyValue)
+	then
+		return kitty
+	else
+		return puppy
+	end
 end

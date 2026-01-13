@@ -32,7 +32,7 @@ function onLoad(savedData)
         local data = JSON.decode(savedData)
         if data then
             gameStarted = data.gameStarted or false
-            selectedMap = data.selectedMap or 4
+            selectedMap = data.selectedMap or 5
             forum = data.forum or false
             altWineBoard = data.altWineBoard or false
             boolSalsa = data.boolSalsa or false
@@ -48,7 +48,7 @@ function onLoad(savedData)
 
     -- Setup senator boards
     SenatorBoardCloth.setSnapPoints(SENATOR_BOARD_SNAPS)
-    senatorWineBoard.setSnapPoints(SENATOR_BOARD_SNAPS)
+    SenatorBoardWine.setSnapPoints(SENATOR_BOARD_SNAPS)
 end
 
 function onObjectEnterContainer(container, enter_object)
@@ -64,15 +64,21 @@ function onObjectLeaveContainer(container, leave_object)
 end
 
 function onPlayerTurn(player, previousPlayer)
-    print("Player: " .. player.steam_name .. " start of turn")
+    if player and player.steam_name then
+        print("Player: " .. player.steam_name .. " start of turn")
+    else
+        print("Player turn started (name unavailable)")
+    end
     councilFlag = true
-    if roundCounter ~= 0 then
+    if roundCounter and roundCounter ~= 0 then
         restockSenatorBoard()
     end
-    roundCounter = roundCounter + 1
+    if roundCounter then
+        roundCounter = roundCounter + 1
+    else
+        roundCounter = 1
+    end
 end
-
-----------------End Events -----------------------------------------------
 
 -- Core game logic functions that coordinate between modules
 -- function startGame()
@@ -93,7 +99,7 @@ function resetGame()
     altWineBoard = false
     boolSalsa = false
     venusMode = 1
-    selectedMap = 4
+    selectedMap = 5
 
     -- Reset all game components
     resetTables()

@@ -102,7 +102,8 @@ function SelectBoardBalearica() setBoard(13) end
 function SelectBoardHellas() setBoard(14) end
 
 function setBoard(stateId)
-    if selectedMap == stateId then
+    --print('[game_setup] INFO: setBoard called with stateId = ' .. stateId .. ' selectedMap = ' .. MainBoard.getStateId())
+    if MainBoard and MainBoard.getStateId() == stateId then
         return
     end
 
@@ -129,7 +130,7 @@ function setBoard(stateId)
         local currentRot = MainBoard.getRotation()
         MainBoard.setRotation({currentRot.x, targetRotation, currentRot.z})
         MainBoard.locked = true
-        MainBoard.interactable = false
+        --MainBoard.interactable = false
 
         print('[game_setup] INFO: Board set to stateId = ' .. stateId .. ' with rotation ' .. targetRotation)
     else
@@ -156,7 +157,7 @@ function runInitialSetup()
         end
 	end
 
-    print("Setting up board specific elements for state ID: " .. MainBoard.getStateId())
+    --print("Setting up board specific elements for state ID: " .. MainBoard.getStateId())
 
 	if(MainBoard.getStateId() == 1) then
 		PlaceCities(BRITTNANIAB, stdBagB)
@@ -164,7 +165,7 @@ function runInitialSetup()
 		PlaceCities(BRITTNANIAD, stdBagD)
 		TableConcat(stdBagB, stdBagC)
 		TableConcat(stdBagB, stdBagD)
-		parseRegions(stdBagB,BRITTNANIARegions, BRITTNANIAtiles)
+		parseRegions(stdBagB, BRITTNANIARegions, BRITTNANIAtiles)
 
 	elseif(MainBoard.getStateId() == 2)  then
 		PlaceCities(hispaniaa, stdBagASalsa)
@@ -291,7 +292,6 @@ function runInitialSetup()
         parseRegions(stdBagA,HELLASRegions, HELLASTiles)
 	end
 
---------------------------------Unebrion Additions --------------------------------------------
 	BOARD_STATE = MainBoard.getStateId()
 	if BOARD_STATE == 2 or BOARD_STATE == 3 or BOARD_STATE == 5 then
 		SENATOR_CARD_ZONES = senatorZone1
@@ -317,14 +317,6 @@ function runInitialSetup()
 	return true
 end
 
--- Deck management functions
-function shuffleDeck(dGuid)
-    local deck = getObjectFromGUID(dGuid)
-    if deck and deck.type == 'Deck' then
-        deck.shuffle()
-    end
-end
-
 function swapDecks(zone1, zone2)
     local deck1 = getDeckFromZone(zone1)
     local deck2 = getDeckFromZone(zone2)
@@ -334,22 +326,6 @@ function swapDecks(zone1, zone2)
         local pos2 = deck2.getPosition()
         deck1.setPosition(pos2)
         deck2.setPosition(pos1)
-    end
-end
-
-function stuffDeck(target, source, ammo, zone)
-    local targetDeck = getObjectFromGUID(target)
-    local sourceDeck = getObjectFromGUID(source)
-
-    if targetDeck and sourceDeck then
-        for i = 1, ammo do
-            if sourceDeck.type == 'Deck' then
-                local card = sourceDeck.takeObject()
-                if card then
-                    targetDeck.putObject(card)
-                end
-            end
-        end
     end
 end
 
@@ -363,14 +339,13 @@ function startingMoney()
 	end
 end
 
--- First player selection
 function randomFirstPlayer() -- can't just pick a random first player because tts is shit.
---Have to get the seated players then shuffle otherwise Turns.order retruns nothing
-  local seatedPlayers = getSeatedPlayers()
-  local shuffledPlayers = shuffleList(seatedPlayers)
-  Turns.order = shuffledPlayers
-  Turns.type = 2 -- type 2 is required for Turns.order to return something. Fuck you tts
-  Turns.enable = true
+    --Have to get the seated players then shuffle otherwise Turns.order retruns nothing
+    local seatedPlayers = getSeatedPlayers()
+    local shuffledPlayers = shuffleList(seatedPlayers)
+    Turns.order = shuffledPlayers
+    Turns.type = 2 -- type 2 is required for Turns.order to return something. Fuck you tts
+    Turns.enable = true
 end
 
 function addSalt()
@@ -383,18 +358,6 @@ function addSalt()
     stdBagBSalsa[1] = saltB
     stdBagCSalsa[1] = saltC
     stdBagDSalsa[1] = saltD
-end
-
-function removeSalt()
-    if not boolSalsa then
-        -- Remove salt tokens from the game
-        local allObjects = getAllObjects()
-        for _, obj in pairs(allObjects) do
-            if obj.hasTag('Salt') then
-                obj.destruct()
-            end
-        end
-    end
 end
 
 -- Germany specific setup
@@ -410,14 +373,18 @@ function placeGermanThings()
 end
 
 function PlaceCities(targetArray, cityBits)
-----------------------Unebrion Additions -----------------------
     local brickTiles = {brickA, brickB, brickC, brickD}
     local clothTiles = {clothA, clothB, clothC, clothD}
     local foodTiles = {foodA, foodB, foodC, foodD}
     local toolTiles = {toolA, toolB, toolC, toolD}
     local wineTiles = {wineA, wineB, wineC, wineD}
     local saltTiles = {saltA, saltB, saltC, saltD}
-----------------------------------------------------------------
+
+	local rotY = 180
+	if MainBoard and MainBoard.getStateId() == 1 then
+		rotY = 270
+	end
+
 	if targetArray ~= nil then
 		local count = 1
 		local numMaxArray = #targetArray
@@ -428,7 +395,7 @@ function PlaceCities(targetArray, cityBits)
 			local obj_parameters = {}
 			obj_parameters.type = 'Custom_Model'
 			obj_parameters.position = targetArray[count]
-			obj_parameters.rotation = {0.00, 180.00, 0.00}
+			obj_parameters.rotation = {0.00, rotY, 0.00}
 
 			obj = spawnObject(obj_parameters)
 			obj.setLock(true)
@@ -491,58 +458,54 @@ function removeOneGuy(lootSwitcher)
 end
 
 function shufflestuff()
-    print("Shuffling decks...")
-    --print("onePlayerZone: " .. onePlayerZone)
-    -- getDeckFromZone(onePlayerZone).shuffle()
-    -- getDeckFromZone(twoPlayerZone).shuffle()
-    -- getDeckFromZone(threePlayerZone).shuffle()
-    -- getDeckFromZone(fourPlayerZone).shuffle()
-    -- getDeckFromZone(fivePlayerZone).shuffle()
+    Personality1Deck_NoTeams.shuffle()
+    Personality2Deck_NoTeams.shuffle()
+    Personality3Deck_NoTeams.shuffle()
+    Personality4Deck_NoTeams.shuffle()
+    Personality5Deck_NoTeams.shuffle()
 end
 
-function stuffDeck(target, source, ammo, zone)
-    local i = 1
-    while i <= ammo do
-        local params = {}
-        params.position = target.getPosition()
-        source.takeObject(params)
-        i = i + 1
+function stuffDeck(target, source, count)
+    for _ = 1, count do
+        source.takeObject({
+            position = target.getPosition(),
+            rotation = {0, 90, 180},
+            smooth = false
+        })
     end
 end
 
 function setMainDeck()
-	local p1deck = getDeckFromZone(onePlayerZoneGUID  )
-	local p2deck = getDeckFromZone(twoPlayerZoneGUID  )
-	local p3deck = getDeckFromZone(threePlayerZoneGUID )
-	local p4deck = getDeckFromZone(fourPlayerZoneGUID  )
-	local p5deck = getDeckFromZone(fivePlayerZoneGUID  )
---need to accomodate for venus count of 32 cards in deck
-	p1deck.setPosition(mainDeckLocation)
+    --need to accomodate for venus count of 32 cards in deck
+	Personality1Deck_NoTeams.setPosition(mainDeckLocation)
+    Personality1Deck_NoTeams.setRotation({0, 90, 180})
+
 	if(venusMode == 1) then --If Venus is off, then...
-		stuffDeck(p1deck,p2deck, 7, twoPlayerZoneGUID)
+        --print("venusMode is off, setting up main deck for " .. numberOfPlayers .. " players")
+		stuffDeck(Personality1Deck_NoTeams, Personality2Deck_NoTeams, #Personality2Deck_NoTeams.getObjects())
 		if(numberOfPlayers > 2 ) then
-			stuffDeck(p1deck,p3deck, 6, threePlayerZoneGUID)
+			stuffDeck(Personality1Deck_NoTeams,Personality3Deck_NoTeams, #Personality3Deck_NoTeams.getObjects())
 			if(numberOfPlayers > 3 ) then
-				stuffDeck(p1deck,p4deck, 5, fourPlayerZoneGUID)
+				stuffDeck(Personality1Deck_NoTeams,Personality4Deck_NoTeams, #Personality4Deck_NoTeams.getObjects())
 				if(numberOfPlayers > 4 ) then
-					stuffDeck(p1deck,p5deck, 4, onePlayerZoneGUID)
+					stuffDeck(Personality1Deck_NoTeams,Personality5Deck_NoTeams, #Personality5Deck_NoTeams.getObjects())
 				end
 			end
 		end
-	else --If Venus is on, then
-		stuffDeck(p1deck,p2deck, 9, twoPlayerZoneGUID)
-		if(numberOfPlayers > 2 ) then
-			stuffDeck(p1deck,p3deck, 7, threePlayerZoneGUID)
-			if(numberOfPlayers > 3 ) then
-				stuffDeck(p1deck,p4deck, 6, fourPlayerZoneGUID)
-				if(numberOfPlayers > 4 ) then
-					stuffDeck(p1deck,p5deck, 4, onePlayerZoneGUID)
-				end
-			end
-		end
+	-- else --If Venus is on, then
+	-- 	stuffDeck(Personality1Deck_NoTeams,Personality2Deck_NoTeams, #Personality2Deck_NoTeams.getObjects())
+	-- 	if(numberOfPlayers > 2 ) then
+	-- 		stuffDeck(Personality1Deck_NoTeams,Personality3Deck_NoTeams, #Personality3Deck_NoTeams.getObjects())
+	-- 		if(numberOfPlayers > 3 ) then
+	-- 			stuffDeck(Personality1Deck_NoTeams,Personality4Deck_NoTeams, #Personality4Deck_NoTeams.getObjects())
+	-- 			if(numberOfPlayers > 4 ) then
+	-- 				stuffDeck(Personality1Deck_NoTeams,Personality5Deck_NoTeams, #Personality5Deck_NoTeams.getObjects())
+	-- 			end
+	-- 		end
+	-- 	end
 	end
-	Wait.time(
-		function() restockSenatorBoard() end, 1)
+
+	Wait.time(restockSenatorBoard, 2)
 end
 
 function setupBoardSpecificElements(stateId)

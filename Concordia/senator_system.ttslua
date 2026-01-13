@@ -1,77 +1,32 @@
--- Concordia Senator System
 -- All functions related to senator card management, buying, and positioning
 
 -- Senator board placement and positioning
 function placeSenatorBoard()
+    print('Placing senator board')
     local senatorBoard = nil
+    local otherBoard = nil
     local rot = Vector(0,180,0)
 
     if altWineBoard then
-        senatorBoard = senatorWineBoard
+        senatorBoard = SenatorBoardWine
+        otherBoard = SenatorBoardCloth
     else
         senatorBoard = SenatorBoardCloth
+        otherBoard = SenatorBoardWine
     end
 
-    if not MainBoard or not senatorBoard then return end
+    if not MainBoard or not senatorBoard then print('MainBoard or senatorBoard is nil') return end
 
     local boardState = MainBoard.getStateId()
+    local pos = nil
+    local scale = nil
 
-    if boardState == 1 then -- Britannia
-        local pos = Vector(-0.07, 1.72, 18.86)
-        local scale = Vector(4.00, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 2 then -- Hispania
-        local pos = Vector(9.02, 1.74, 12.59)
-        local scale = Vector(4.00, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 3 then -- Italia
-        local pos = Vector(9.54, 1.77, 12.80)
-        local scale = Vector(4.00, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 4 then -- Byzantivm
-        local pos = Vector(0.08, 1.95, 18.36)
-        local scale = Vector(3.78, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 5 then -- Imperivm
-        local pos = Vector(9.11, 1.74, 12.20)
-        local scale = Vector(3.78, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 6 then -- Corsica
-        local pos = Vector(-0.02, 2.00, 18.77)
-        local scale = Vector(4.00, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 7 then -- Gallia
-        local pos = Vector(0.12, 2.00, 18.72)
-        local scale = Vector(4.00, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 8 then -- Germania
-        local pos = Vector(-9.27, 1.74, 12.60)
-        local scale = Vector(4.00, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 9 then -- Creta
-        local pos = Vector(1.20, 0.96, 18.82)
-        local scale = Vector(3.78, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 10 then -- Aegyptus
-        local pos = Vector(-27.27, 0.96, 12.96)
-        local scale = Vector(3.78, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 11 then -- Ionivm
-        local pos = Vector(0.18, 0.96, 22.47)
-        local scale = Vector(3.78, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 12 then -- Cyprvs
-        local pos = Vector(-0.14, 0.96, 22.41)
-        local scale = Vector(3.78, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 13 then -- Balearica
-        local pos = Vector(8.82, 1.96, -11.45)
-        local scale = Vector(3.78, 1.00, 3.78)
-        positionBoard(senatorBoard, pos, scale, rot)
-    elseif boardState == 14 then -- Hellas
-        local pos = Vector(-18.68, 1.96, -0.03)
-        local scale = Vector(4.00, 1.00, 3.78)
-        local rot = Vector(0.00, 90.00, 0.00)
+    if pos then
+        -- Swap logic: Move otherBoard to senatorBoard's current position
+        if (senatorBoard.getPosition() - pos):magnitude() > 1 then
+             otherBoard.setPosition(senatorBoard.getPosition())
+             otherBoard.setRotation(senatorBoard.getRotation())
+        end
         positionBoard(senatorBoard, pos, scale, rot)
     end
 
@@ -79,12 +34,13 @@ function placeSenatorBoard()
 end
 
 function positionBoard(obj, pos, scale, rot)
-  obj.setPosition(pos)
-  obj.setScale(scale)
-  if rot then
-    obj.setRotation(rot)
-  end
-  return nil
+    obj.setPosition(pos)
+    obj.setScale(scale)
+    if rot then
+        obj.setRotation(rot)
+    end
+
+    return nil
 end
 
 -- Senator board type switching (cloth/wine)
@@ -106,55 +62,65 @@ end
 
 -- Senator card restocking system
 function restockSenatorBoard()
-    print("Restocking senator board")
 	function restockSenatorBoardCoroutine()
+        --print("Restocking senator board")
 		local senatorBoard = nil
-		local gameBoard = getBoardFromZone(boardPickerZoneGUID)
 
-    if altWineBoard then
-      senatorBoard = getObjectFromGUID(senatorWineBoardGUID)
-   else
-      senatorBoard = getObjectFromGUID(SenatorBoardClothGUID)
-   end
+        if altWineBoard then
+            senatorBoard = SenatorBoardWine
+        else
+            senatorBoard = SenatorBoardCloth
+        end
 
 		local senatorBoardSnaps = senatorBoard.getSnapPoints()
 		for i, point in ipairs(senatorBoardSnaps) do
+            --print("Checking position " .. i)
 			local pos = senatorBoard.positionToWorld(point.position)
 			if not rayCast(pos, senatorBoard) then
+                --print("No object at position " .. i)
 				local nextCard = findNextSenatorCard(i, senatorBoardSnaps, senatorBoard)
 				if nextCard then
 					nextCard.setPositionSmooth(pos + Vector(0, 0.3, 0))
-					waitsome(0.3)
 				elseif nextCard == nil then
-					local drawDeck = checkForDeckOrCard(mainDeckZoneGUID)
-					if drawDeck == nil then break end
+					local drawDeck = nil
+                    if mainDeckZone then
+                        for _, obj in ipairs(mainDeckZone.getObjects()) do
+                            if obj.type == 'Deck' or obj.type == 'Card' then
+                                drawDeck = obj
+                                break
+                            end
+                        end
+                    end
+
+					if drawDeck == nil then print('No draw deck found') break end
+
 					if drawDeck ~= nil then
 						local params = {
 							position = pos + Vector(0, 0.3, 0),
 							flip = true,
 							smooth = false,
+                            rotation = {0, 90, 0}
 						}
-						if gameBoard.getStateId() == 14 then
-							params.rotation = {0,90,0}
-						end
 						if drawDeck.type == 'Deck' then
 							drawDeck.takeObject(params)
-							waitsome(0.1)
 						elseif drawDeck.type == 'Card' then
-							drawDeck.setPosition(pos + Vector(0, 4, 0))
+							drawDeck.setPosition(pos + Vector(0, 0.3, 0))
+                            drawDeck.setRotation({0, 90, 0})
 							drawDeck.flip()
 						end
 					end
 				end
 			end
 		end
+
 		return 1
 	end
+
 	startLuaCoroutine(self, 'restockSenatorBoardCoroutine')
 end
 
 function findNextSenatorCard(startPos, snapTable, obj)
-    for i = startPos, #snapTable, 1 do
+	for i = startPos, #snapTable, 1 do
         local pos = obj.positionToWorld(snapTable[i].position)
         local hitObj = rayCast(pos, obj)
         if hitObj then
@@ -162,8 +128,9 @@ function findNextSenatorCard(startPos, snapTable, obj)
                 return hitObj
             end
         end
-    end
-    return nil
+	end
+
+	return nil
 end
 
 -- Senator card buying system
