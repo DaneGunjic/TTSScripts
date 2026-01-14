@@ -9,7 +9,7 @@ function rayCast(StartPosition, obj)
     })
 
     for _, hitInfo in ipairs(hit) do
-        print(hitInfo.hit_object.guid)
+        --print(hitInfo.hit_object.guid)
         -- Never detect the object we are casting over, and never detect the game table
         if hitInfo.hit_object ~= obj and hitInfo.hit_object ~= GameTableObject then
             return hitInfo.hit_object

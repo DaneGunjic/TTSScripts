@@ -215,120 +215,103 @@ function buySenatorCard(clickedCard, color, alt_click)
     --print("Buying senator card " .. clickedCard.guid .. " for player " .. color)
     local cardPosition = cardPositionFinder(clickedCard)
     --print("cardPosition: " .. cardPosition)
-    local playerPayment = calculateSenatorPayment(color)
-    local playerPaymentZone = playerSellZones[color]
 
-    if not noSaltFlag then
-        noSaltFlag = true
-        Player[color].pingTable(playerPaymentZone.getPosition())
-        playerPaymentZone.highlightOn(color, 3)
-        return 0
+    -- Calculate Base Cost from Card Tags
+    local cardPrice = calculateCardCost(clickedCard)
+
+    -- Add Position-Based Costs
+    if cardPosition == 2 or cardPosition == 3 or cardPosition == 6 then
+        printToAll(Player[color].steam_name .. ' please pay 1 additional resource of your choice for the ? cost.', color)
+        if playerWarehouses[color] then
+            Player[color].pingTable(playerWarehouses[color].getPosition())
+        end
     end
 
-    local cardPrice = calculateCardCost(clickedCard)
-    local correctPayment = false
-    local totalGoodsNeeded = 0
-    local totalPlayerGoods = getTableTotal(playerPayment)
-
-    if cardPosition == 1 then
-        totalGoodsNeeded = tonumber(clickedCard.getGMNotes())
-    elseif cardPosition == 2 or cardPosition == 3 then
-        totalGoodsNeeded =  1 + clickedCard.getGMNotes()
-    elseif cardPosition == 4 then
+    if cardPosition == 4 then
         if altWineBoard then
-            if cardPrice.Wine ~= nil then
-                cardPrice.Wine = cardPrice.Wine + 1
-            else
-                cardPrice.Wine = 1
-            end
-
-            totalGoodsNeeded = 1 + clickedCard.getGMNotes()
+            cardPrice.Wine = (cardPrice.Wine or 0) + 1
         else
-            if cardPrice.Cloth ~= nil then
-                cardPrice.Cloth = cardPrice.Cloth + 1
-            else
-                cardPrice.Cloth = 1
-            end
-            totalGoodsNeeded = 1 + clickedCard.getGMNotes()
+            cardPrice.Cloth = (cardPrice.Cloth or 0) + 1
         end
     elseif cardPosition == 5 then
-        if cardPrice.Cloth ~= nil then
-            cardPrice.Cloth = cardPrice.Cloth + 1
-        else
-            cardPrice.Cloth = 1
-        end
-        totalGoodsNeeded = 1 + clickedCard.getGMNotes()
+        cardPrice.Cloth = (cardPrice.Cloth or 0) + 1
     elseif cardPosition == 6 then
         if altWineBoard then
-            if cardPrice.Wine ~= nil then
-                cardPrice.Wine = cardPrice.Wine + 1
-            else
-                cardPrice.Wine = 1
-            end
-            totalGoodsNeeded = 2 + clickedCard.getGMNotes()
+            cardPrice.Wine = (cardPrice.Wine or 0) + 1
         else
-            if cardPrice.Cloth ~= nil then
-                cardPrice.Cloth = cardPrice.Cloth + 1
-            else
-                cardPrice.Cloth = 1
-            end
-            totalGoodsNeeded = 2 + clickedCard.getGMNotes()
+            cardPrice.Cloth = (cardPrice.Cloth or 0) + 1
         end
     elseif cardPosition == 7 then
         if altWineBoard then
-            if cardPrice.Cloth ~= nil then
-                cardPrice.Cloth = cardPrice.Cloth + 1
-            else
-                cardPrice.Cloth = 1
-            end
-
-            if cardPrice.Wine ~= nil then
-                cardPrice.Wine = cardPrice.Wine + 1
-            else
-                cardPrice.Wine = 1
-            end
-
-            totalGoodsNeeded = 2 + clickedCard.getGMNotes()
+            cardPrice.Cloth = (cardPrice.Cloth or 0) + 1
+            cardPrice.Wine = (cardPrice.Wine or 0) + 1
         else
-            if cardPrice.Cloth ~= nil then
-                cardPrice.Cloth = cardPrice.Cloth + 2
-            else
-                cardPrice.Cloth = 2
-            end
-            totalGoodsNeeded = 2 + clickedCard.getGMNotes()
+            cardPrice.Cloth = (cardPrice.Cloth or 0) + 2
         end
     end
 
-    --print("totalGoodsNeeded: " .. totalGoodsNeeded)
-
-    correctPayment = true
-    --print("cardPrice:")
-    for k,v in pairs(cardPrice) do
-        --print("  "..k..": "..tostring(v))
+    -- Scan Player Warehouse
+    local warehouse = playerWarehouses[color]
+    if not warehouse then
+        print("Error: No warehouse found for color " .. color)
+        return 0
     end
 
-    for good, quantity in pairs(cardPrice) do
-        --print("DEBUG: Checking good =" .. good .. " required=" .. quantity .. " playerHas=" .. tostring(playerPayment[good]))
-        if playerPayment[good] == nil or playerPayment[good] < quantity then
-            printToAll(Player[color].steam_name .. ' you are missing ' .. good)
-            Player[color].pingTable(playerPaymentZone.getPosition())
-            playerPaymentZone.highlightOn(color, 3)
-            correctPayment = false
-            --print("DEBUG: Payment failed – missing or insufficient " .. good)
+    local inventory = { Brick={}, Food={}, Tool={}, Wine={}, Cloth={}, Salt={} }
+    local snaps = warehouse.getSnapPoints()
+
+    for _, snap in ipairs(snaps) do
+        local pos = warehouse.positionToWorld(snap.position)
+        local hitObj = rayCast(pos, warehouse)
+        if hitObj then
+            local name = hitObj.getName()
+            if inventory[name] then
+                table.insert(inventory[name], hitObj)
+            end
+        end
+    end
+
+    -- Check Affordability & Prepare Payment
+    local resourcesToPay = {}
+    local saltNeeded = 0
+
+    for good, amount in pairs(cardPrice) do
+        local available = #inventory[good]
+
+        if available >= amount then
+            -- Take required amount from inventory
+            for i = 1, amount do
+                table.insert(resourcesToPay, inventory[good][i])
+            end
+        else
+            -- Take all available and calculate deficit
+            for i = 1, available do
+                table.insert(resourcesToPay, inventory[good][i])
+            end
+            saltNeeded = saltNeeded + (amount - available)
+        end
+    end
+
+    -- Check if we have enough Salt to cover the deficit
+    if saltNeeded > 0 then
+        if #inventory.Salt >= saltNeeded then
+            for i = 1, saltNeeded do
+                table.insert(resourcesToPay, inventory.Salt[i])
+            end
+        else
+            printToAll(Player[color].steam_name .. ' you are missing resources (and insufficient Salt) to buy this card.', color)
+            Player[color].pingTable(warehouse.getPosition())
             return 0
         end
     end
 
-    --print(tostring(correctPayment) .. " " .. tostring(totalGoodsNeeded) .. " " .. tostring(totalPlayerGoods))
-    if correctPayment and (totalGoodsNeeded == totalPlayerGoods) then
-        clickedCard.clearButtons()
-        clickedCard.deal(1, color)
-        deleteItems(playerPaymentZone, color)
-    else
-        printToAll(Player[color].steam_name .. ' you do not have the correct number of goods in your sell zone.', color)
-        Player[color].pingTable(playerPaymentZone.getPosition())
-        playerPaymentZone.highlightOn(color, 3)
+    -- Execute Transaction
+    for _, obj in ipairs(resourcesToPay) do
+        obj.destruct()
     end
+
+    clickedCard.clearButtons()
+    clickedCard.deal(1, color)
 end
 
 function calculateSenatorPayment(color)
