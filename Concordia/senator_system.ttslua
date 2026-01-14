@@ -2,35 +2,27 @@
 
 -- Senator board placement and positioning
 function placeSenatorBoard()
-    --print('Placing senator board')
-    local senatorBoard = nil
-    local otherBoard = nil
+    print('Placing senator board')
+    local ClothBoard = nil
+    local WineBoard = nil
     local rot = Vector(0,180,0)
 
+    SenatorBoardWineOriginalPos = SenatorBoardWine.getPosition()
+    SenatorBoardClothOriginalPos = SenatorBoardCloth.getPosition()
+    SenatorBoardWineOriginalRot = SenatorBoardWine.getRotation()
+    SenatorBoardClothOriginalRot = SenatorBoardCloth.getRotation()
+
+    -- Swap logic: Move otherBoard to senatorBoard's current position
     if altWineBoard then
-        senatorBoard = SenatorBoardWine
-        otherBoard = SenatorBoardCloth
-    else
-        senatorBoard = SenatorBoardCloth
-        otherBoard = SenatorBoardWine
+        print('Swapping wine and cloth boards')
+            SenatorBoardWine.setPosition(SenatorBoardClothOriginalPos)
+            SenatorBoardCloth.setPosition(SenatorBoardWineOriginalPos)
+            SenatorBoardWine.setRotation(SenatorBoardClothOriginalRot)
+            SenatorBoardCloth.setRotation(SenatorBoardWineOriginalRot)
+            SenatorBoardWine.setLock(true)
+            SenatorBoardCloth.setLock(true)
+
     end
-
-    if not MainBoard or not senatorBoard then print('MainBoard or senatorBoard is nil') return end
-
-    local boardState = MainBoard.getStateId()
-    local pos = nil
-    local scale = nil
-
-    if pos then
-        -- Swap logic: Move otherBoard to senatorBoard's current position
-        if (senatorBoard.getPosition() - pos):magnitude() > 1 then
-             otherBoard.setPosition(senatorBoard.getPosition())
-             otherBoard.setRotation(senatorBoard.getRotation())
-        end
-        positionBoard(senatorBoard, pos, scale, rot)
-    end
-
-    senatorBoard.setLock(true)
 end
 
 function positionBoard(obj, pos, scale, rot)
@@ -73,47 +65,70 @@ function restockSenatorBoard()
         end
 
 		local senatorBoardSnaps = senatorBoard.getSnapPoints()
+        local existingCards = {}
+
+        -- 1. Identify and collect all existing Senator cards in order
 		for i, point in ipairs(senatorBoardSnaps) do
-            --print("Checking position " .. i)
 			local pos = senatorBoard.positionToWorld(point.position)
-			if not rayCast(pos, senatorBoard) then
-                --print("No object at position " .. i)
-				local nextCard = findNextSenatorCard(i, senatorBoardSnaps, senatorBoard)
-				if nextCard then
-					nextCard.setPositionSmooth(pos + Vector(0, 0.3, 0))
-				elseif nextCard == nil then
-					local drawDeck = nil
-                    if mainDeckZone then
-                        for _, obj in ipairs(mainDeckZone.getObjects()) do
-                            if obj.type == 'Deck' or obj.type == 'Card' then
-                                drawDeck = obj
-                                break
-                            end
+            local hitObj = rayCast(pos, senatorBoard)
+
+            if hitObj and hitObj.hasTag('Senator') then
+                table.insert(existingCards, hitObj)
+            end
+		end
+
+        -- 2. Move existing cards to the leftmost empty slots
+        for i, card in ipairs(existingCards) do
+            local targetSnap = senatorBoardSnaps[i]
+            local targetPos = senatorBoard.positionToWorld(targetSnap.position)
+
+            card.setPositionSmooth(targetPos + Vector(0, 0.3, 0))
+            -- Keep existing rotation
+        end
+
+        -- 3. Fill the remaining slots from the deck
+        local slotsFilled = #existingCards
+        local totalSlots = #senatorBoardSnaps
+
+        if slotsFilled < totalSlots then
+            for i = slotsFilled + 1, totalSlots do
+                local targetSnap = senatorBoardSnaps[i]
+                local targetPos = senatorBoard.positionToWorld(targetSnap.position)
+
+                local drawDeck = nil
+                if mainDeckZone then
+                    for _, obj in ipairs(mainDeckZone.getObjects()) do
+                        if obj.type == 'Deck' or obj.type == 'Card' then
+                            drawDeck = obj
+                            break
                         end
                     end
+                end
 
-					if drawDeck == nil then print('No draw deck found') break end
+                if not drawDeck then
+                    --print('No draw deck found')
+                    break
+                end
 
-					if drawDeck ~= nil then
-						local params = {
-							position = pos + Vector(0, 0.3, 0),
-							flip = true,
-							smooth = false,
-                            rotation = {0, 90, 0}
-						}
-						if drawDeck.type == 'Deck' then
-							drawnCard = drawDeck.takeObject(params)
-                            drawnCard.addTag("Senator")
-						elseif drawDeck.type == 'Card' then
-                            drawDeck.addTag("Senator")
-							drawDeck.setPosition(pos + Vector(0, 0.3, 0))
-                            drawDeck.setRotation({0, 90, 0})
-							drawDeck.flip()
-						end
-					end
-				end
-			end
-		end
+                local params = {
+                    position = targetPos + Vector(0, 0.3, 0),
+                    flip = true,
+                    smooth = false,
+                    rotation = {0, 90, 0}
+                }
+
+                if drawDeck.type == 'Deck' then
+                    local drawnCard = drawDeck.takeObject(params)
+                    drawnCard.addTag("Senator")
+                elseif drawDeck.type == 'Card' then
+                    drawDeck.addTag("Senator")
+                    drawDeck.setPosition(targetPos + Vector(0, 0.3, 0))
+                    drawDeck.setRotation({0, 90, 0})
+                end
+
+                coroutine.yield(0)
+            end
+        end
 
 		return 1
 	end
@@ -162,21 +177,21 @@ function cardPositionFinder(clickedCard) -- returns a number 1 - 7 representing 
 
     if altWineBoard then
         senatorBoard = SenatorBoardWine
-        otherBoard = SenatorBoardCloth
     else
         senatorBoard = SenatorBoardCloth
-        otherBoard = SenatorBoardWine
     end
 
     for i = 1, 7, 1 do
         local convertedPos = senatorBoard.positionToWorld(SENATOR_BOARD_SNAPS[i].position)
         local hitObj = rayCast(convertedPos, senatorBoard)
+        --Player["Red"].pingTable(convertedPos)
         if hitObj ~= nil then
             if hitObj.guid == clickedCard.guid then
                 return i
             end
         end
     end
+
     return nil
 end
 
@@ -205,7 +220,7 @@ function calculateCardCost(card)
     end
 
     for k,v in pairs(cardCost) do
-        --print("DEBUG: Cost includes " .. k .. ": " .. v)
+        --print("DEBUG: Cost includes " .. k .. ": " .. v)as
     end
 
     return cardCost
@@ -214,7 +229,7 @@ end
 function buySenatorCard(clickedCard, color, alt_click)
     --print("Buying senator card " .. clickedCard.guid .. " for player " .. color)
     local cardPosition = cardPositionFinder(clickedCard)
-    --print("cardPosition: " .. cardPosition)
+    print("cardPosition: " .. cardPosition or "nil")
 
     -- Calculate Base Cost from Card Tags
     local cardPrice = calculateCardCost(clickedCard)
@@ -238,8 +253,10 @@ function buySenatorCard(clickedCard, color, alt_click)
     elseif cardPosition == 6 then
         if altWineBoard then
             cardPrice.Wine = (cardPrice.Wine or 0) + 1
+            print("DEBUG: Updated cost for Wine: " .. cardPrice.Wine)
         else
             cardPrice.Cloth = (cardPrice.Cloth or 0) + 1
+            print("DEBUG: Updated cost for Cloth: " .. cardPrice.Cloth)
         end
     elseif cardPosition == 7 then
         if altWineBoard then
@@ -306,116 +323,100 @@ function buySenatorCard(clickedCard, color, alt_click)
     end
 
     -- Execute Transaction
+    local resourcesPaid = {}
     for _, obj in ipairs(resourcesToPay) do
+        local name = obj.getName()
+        resourcesPaid[name] = (resourcesPaid[name] or 0) + 1
         obj.destruct()
+    end
+
+    printToAll(Player[color].steam_name .. ' has paid the following for the senator card:', color)
+    for name, count in pairs(resourcesPaid) do
+        printToAll(name .. ': ' .. count, color)
     end
 
     clickedCard.clearButtons()
     clickedCard.deal(1, color)
 end
 
-function calculateSenatorPayment(color)
-    local playerPaymentZone = playerSellZones[color]
-    local playerPayment = upCast(playerPaymentZone, 5, 0.1, true)
-
-    local totalPayment = {}
-    for _, item in ipairs(playerPayment) do
-        if item.getName() == 'Salt' then
-            printToAll(Player[color].steam_name .. ' please convert your salt before buying', color)
-            noSaltFlag = false
-        end
-
-        if item.getName() == 'Brick' then
-            if totalPayment.Brick ~= nil then
-                totalPayment.Brick = totalPayment.Brick + 1
-            else
-                totalPayment.Brick = 1
-            end
-        elseif item.getName() == 'Food' then
-            if totalPayment.Food ~= nil then
-                totalPayment.Food = totalPayment.Food + 1
-            else
-                totalPayment.Food = 1
-            end
-        elseif item.getName() == 'Tool' then
-            if totalPayment.Tool ~= nil then
-                totalPayment.Tool = totalPayment.Tool + 1
-            else
-                totalPayment.Tool = 1
-            end
-        elseif item.getName() == 'Wine' then
-            if totalPayment.Wine ~= nil then
-                totalPayment.Wine = totalPayment.Wine + 1
-            else
-                totalPayment.Wine = 1
-            end
-        elseif item.getName() == 'Cloth' then
-            if totalPayment.Cloth ~= nil then
-                totalPayment.Cloth = totalPayment.Cloth + 1
-            else
-                totalPayment.Cloth = 1
-            end
-        end
-    end
-    noSaltFlag = true
-    return totalPayment
-end
-
 function buyWithCouncilCard(obj, color, alt_click)
-    local playerPayment = calculateSenatorPayment(color)
-    local playerPaymentZone = getObjectFromGUID(playerSellZones[color])
-
-    if not noSaltFlag then
-        noSaltFlag = true
-        Player[color].pingTable(playerPaymentZone.getPosition())
-        playerPaymentZone.highlightOn(color, 3)
-        return 0
-    end
-
-    local cardPrice = calculateCardCost(obj)
-    local correctPayment = false
-
     if councilFlag == false then
         printToAll(Player[color].steam_name .. ' you can only buy one card per turn with the council', color)
         return 0
     end
 
-    for good, quantity in pairs(playerPayment) do
-        if cardPrice[good] == nil then
-            printToAll(Player[color].steam_name .. ' you have no goods in your sell zone or something not required')
-            Player[color].pingTable(playerPaymentZone.getPosition())
-            playerPaymentZone.highlightOn(color, 3)
-            correctPayment = false
-            return 0
-        elseif cardPrice[good] > playerPayment[good] then
-            printToAll(Player[color].steam_name .. ' you are missing some goods, check your sell zone')
-            Player[color].pingTable(playerPaymentZone.getPosition())
-            playerPaymentZone.highlightOn(color, 3)
-            correctPayment = false
-            return 0
-        elseif cardPrice[good] < playerPayment[good] then
-            printToAll(Player[color].steam_name .. ' you have too many goods in your sell zone')
-            Player[color].pingTable(playerPaymentZone.getPosition())
-            playerPaymentZone.highlightOn(color, 3)
-            correctPayment = false
-            return 0
-        elseif cardPrice[good] == playerPayment[good] then
-            correctPayment = true
+    -- Calculate Base Cost from Card Tags (no position cost)
+    local cardPrice = calculateCardCost(obj)
+
+    -- Scan Player Warehouse
+    local warehouse = playerWarehouses[color]
+    if not warehouse then
+        print("Error: No warehouse found for color " .. color)
+        return 0
+    end
+
+    local inventory = { Brick={}, Food={}, Tool={}, Wine={}, Cloth={}, Salt={} }
+    local snaps = warehouse.getSnapPoints()
+
+    for _, snap in ipairs(snaps) do
+        local pos = warehouse.positionToWorld(snap.position)
+        local hitObj = rayCast(pos, warehouse)
+        if hitObj then
+            local name = hitObj.getName()
+            if inventory[name] then
+                table.insert(inventory[name], hitObj)
+            end
         end
     end
 
-    if correctPayment then
-        obj.clearButtons()
-        obj.deal(1, color)
-        deleteItems(playerPaymentZone, color)
-        councilFlag = false
-    end
-end
+    -- Check Affordability & Prepare Payment
+    local resourcesToPay = {}
+    local saltNeeded = 0
 
--- Utility function for deleting items from sell zone
-function deleteItems(obj, color, alt_click)
-    local objsToDelete = upCast(obj)
-    for _, item in ipairs(objsToDelete) do
-        item.destruct()
+    for good, amount in pairs(cardPrice) do
+        local available = #inventory[good]
+
+        if available >= amount then
+            -- Take required amount from inventory
+            for i = 1, amount do
+                table.insert(resourcesToPay, inventory[good][i])
+            end
+        else
+            -- Take all available and calculate deficit
+            for i = 1, available do
+                table.insert(resourcesToPay, inventory[good][i])
+            end
+            saltNeeded = saltNeeded + (amount - available)
+        end
     end
+
+    -- Check if we have enough Salt to cover the deficit
+    if saltNeeded > 0 then
+        if #inventory.Salt >= saltNeeded then
+            for i = 1, saltNeeded do
+                table.insert(resourcesToPay, inventory.Salt[i])
+            end
+        else
+            printToAll(Player[color].steam_name .. ' you are missing resources (and insufficient Salt) to buy this card.', color)
+            Player[color].pingTable(warehouse.getPosition())
+            return 0
+        end
+    end
+
+    -- Execute Transaction
+    local resourcesPaid = {}
+    for _, obj in ipairs(resourcesToPay) do
+        local name = obj.getName()
+        resourcesPaid[name] = (resourcesPaid[name] or 0) + 1
+        obj.destruct()
+    end
+
+    printToAll(Player[color].steam_name .. ' has paid the following for the senator card:', color)
+    for name, count in pairs(resourcesPaid) do
+        printToAll(name .. ': ' .. count, color)
+    end
+
+    obj.clearButtons()
+    obj.deal(1, color)
+    councilFlag = false
 end

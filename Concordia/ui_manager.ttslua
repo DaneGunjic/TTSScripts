@@ -17,14 +17,12 @@ function CreateButtons()
 
     btnSalsa = createButton('4ee1f2', 'SALSA [OFF]', 'ToggleSalsa', 0, 500, 'Green', -13.5, 10)
     btnForum = createButton('4ee1f2', 'FORVM [OFF]', 'turnOnOffForum', 0, 500, 'Green', -13.5, 9.5)
+    btnDisplay = createButton('4ee1f2','Cloth Display', 'turnSwapDisplay', 0, 500, 'Green', -13.5, 9)
 
     btnStartGame = createButton('4ee1f2', 'Start Game', 'StartGame', 0, 0, 'White', -15, 8)
 
-    -- btnMove = createButton('4ee1f2','Move and Draw','f1llMove',0,0,'Blue', -15, -1)
-    -- btnDisplay = createButton('4ee1f2','Cloth Display','clothOrWineBoard',0,0,'Blue', -15, -2)
-    -- btnVenus = createButton('4ee1f2','Venus OFF','turnSwapVenus',0,0,'Blue',0,0)
+   
 
-    -- btnBalerica = createButton('4ee1f2','BALEARICA','CsetBoardToBalearica',0,0,'Blue',0,0)
     -- btnRandomSetup = createButton('4ee1f2', 'Random Setup', 'randomMapAndStore',800,0, 'Pink', 0,0)
 end
 
@@ -236,15 +234,26 @@ function turnSwapVenus()
 end
 
 function turnSwapDisplay()
-    local idx = findButtonIndex(btnDisplay, 'clothOrWineBoard')
-    if idx == nil then return end
+    local idx = findButtonIndex(btnDisplay, 'turnSwapDisplay')
+    if idx == nil then print("Error: Could not find Display button index") return end
+
+    local buttons = btnDisplay.getButtons()
+    local currentLabel = ""
+    for _, btn in ipairs(buttons) do
+        if btn.index == idx then
+            currentLabel = btn.label
+            break
+        end
+    end
 
     local button_parameters = {}
     button_parameters.index = idx
-    if button_parameters.label == 'Cloth Display' then
+    if currentLabel == 'Cloth Display' then
         button_parameters.label = 'Wine Display'
+        altWineBoard = true
     else
         button_parameters.label = 'Cloth Display'
+        altWineBoard = false
     end
     btnDisplay.editButton(button_parameters)
 end

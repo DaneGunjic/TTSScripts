@@ -5,7 +5,7 @@ function rayCast(StartPosition, obj)
         size = {0.6, 0.6, 0.6},
         direction = {0, -1, 0},
         max_distance = 0.1,
-        debug = true
+        debug = false
     })
 
     for _, hitInfo in ipairs(hit) do
@@ -33,7 +33,7 @@ function upCast(obj, dist, offset, multi)
         type = 3,
         size = obj.getBounds().size,
         max_distance = dist,
-        debug = true
+        debug = false
     })
 
     local hitObjects = {}
@@ -177,7 +177,7 @@ function AddRemoveResource(color, add, resource)
             local blocker = rayCast(oPosition, warehouse)
 
             if not blocker then
-                print("Position/SnapPoint: " .. tostring(oPosition))
+                --print("Position/SnapPoint: " .. tostring(oPosition))
                 bag.takeObject({
                     position = oPosition,
                     rotation = {0, 180, 0},
