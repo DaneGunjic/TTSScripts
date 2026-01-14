@@ -3,13 +3,15 @@ function rayCast(StartPosition, obj)
         origin = StartPosition,
         type = 3,
         size = {0.6, 0.6, 0.6},
-        direction = {0, 0, 0},
+        direction = {0, -1, 0},
         max_distance = 0.1,
         debug = true
     })
 
     for _, hitInfo in ipairs(hit) do
-        if hitInfo.hit_object ~= obj then
+        print(hitInfo.hit_object.guid)
+        -- Never detect the object we are casting over, and never detect the game table
+        if hitInfo.hit_object ~= obj and hitInfo.hit_object ~= GameTableObject then
             return hitInfo.hit_object
         end
     end
@@ -175,6 +177,7 @@ function AddRemoveResource(color, add, resource)
             local blocker = rayCast(oPosition, warehouse)
 
             if not blocker then
+                print("Position/SnapPoint: " .. tostring(oPosition))
                 bag.takeObject({
                     position = oPosition,
                     rotation = {0, 180, 0},

@@ -2,7 +2,7 @@
 
 -- Senator board placement and positioning
 function placeSenatorBoard()
-    print('Placing senator board')
+    --print('Placing senator board')
     local senatorBoard = nil
     local otherBoard = nil
     local rot = Vector(0,180,0)
@@ -102,8 +102,10 @@ function restockSenatorBoard()
                             rotation = {0, 90, 0}
 						}
 						if drawDeck.type == 'Deck' then
-							drawDeck.takeObject(params)
+							drawnCard = drawDeck.takeObject(params)
+                            drawnCard.addTag("Senator")
 						elseif drawDeck.type == 'Card' then
+                            drawDeck.addTag("Senator")
 							drawDeck.setPosition(pos + Vector(0, 0.3, 0))
                             drawDeck.setRotation({0, 90, 0})
 							drawDeck.flip()
@@ -124,6 +126,7 @@ function findNextSenatorCard(startPos, snapTable, obj)
         local pos = obj.positionToWorld(snapTable[i].position)
         local hitObj = rayCast(pos, obj)
         if hitObj then
+            print("hitobject: " .. hitObj.getName())
             if hitObj.hasTag('Senator') then
                 return hitObj
             end
@@ -154,21 +157,22 @@ function makeSenatorBuyButton(obj)
     })
 end
 
-function cardPositionFinder(obj)
+function cardPositionFinder(clickedCard) -- returns a number 1 - 7 representing the position on the senator board
     local senatorBoard = nil
-    if altWineBoard then
-        senatorBoard = getObjectFromGUID(senatorWineBoardGUID)
-    else
-        senatorBoard = getObjectFromGUID(SenatorBoardClothGUID)
-    end
 
-    if not senatorBoard then return nil end
+    if altWineBoard then
+        senatorBoard = SenatorBoardWine
+        otherBoard = SenatorBoardCloth
+    else
+        senatorBoard = SenatorBoardCloth
+        otherBoard = SenatorBoardWine
+    end
 
     for i = 1, 7, 1 do
         local convertedPos = senatorBoard.positionToWorld(SENATOR_BOARD_SNAPS[i].position)
         local hitObj = rayCast(convertedPos, senatorBoard)
         if hitObj ~= nil then
-            if hitObj.guid == obj.guid then
+            if hitObj.guid == clickedCard.guid then
                 return i
             end
         end
@@ -176,11 +180,17 @@ function cardPositionFinder(obj)
     return nil
 end
 
-function calculateCardCost(obj)
-    local cardTags = obj.getTags()
+function calculateCardCost(card)
     local cardCost = {}
+    local tags = card.getTags()
 
-    for _, tag in ipairs(cardTags) do
+    --print("DEBUG: Calculating cost for card " .. (card.guid))
+    if not tags or #tags == 0 then
+        --print("DEBUG: Card has no tags!")
+    end
+
+    for _, tag in ipairs(tags) do
+        --print("DEBUG: Found tag: " .. tag)
         if tag == 'costBrick' then
             cardCost.Brick = 1
         elseif tag == 'costFood' then
@@ -193,13 +203,20 @@ function calculateCardCost(obj)
             cardCost.Cloth = 1
         end
     end
+
+    for k,v in pairs(cardCost) do
+        --print("DEBUG: Cost includes " .. k .. ": " .. v)
+    end
+
     return cardCost
 end
 
-function buySenatorCard(obj, color, alt_click)
-    local cardPosition = cardPositionFinder(obj)
+function buySenatorCard(clickedCard, color, alt_click)
+    --print("Buying senator card " .. clickedCard.guid .. " for player " .. color)
+    local cardPosition = cardPositionFinder(clickedCard)
+    --print("cardPosition: " .. cardPosition)
     local playerPayment = calculateSenatorPayment(color)
-    local playerPaymentZone = getObjectFromGUID(playerSellZones[color])
+    local playerPaymentZone = playerSellZones[color]
 
     if not noSaltFlag then
         noSaltFlag = true
@@ -208,15 +225,15 @@ function buySenatorCard(obj, color, alt_click)
         return 0
     end
 
-    local cardPrice = calculateCardCost(obj)
+    local cardPrice = calculateCardCost(clickedCard)
     local correctPayment = false
     local totalGoodsNeeded = 0
     local totalPlayerGoods = getTableTotal(playerPayment)
 
     if cardPosition == 1 then
-        totalGoodsNeeded = tonumber(obj.getGMNotes())
+        totalGoodsNeeded = tonumber(clickedCard.getGMNotes())
     elseif cardPosition == 2 or cardPosition == 3 then
-        totalGoodsNeeded = totalGoodsNeeded + 1 + obj.getGMNotes()
+        totalGoodsNeeded =  1 + clickedCard.getGMNotes()
     elseif cardPosition == 4 then
         if altWineBoard then
             if cardPrice.Wine ~= nil then
@@ -224,14 +241,15 @@ function buySenatorCard(obj, color, alt_click)
             else
                 cardPrice.Wine = 1
             end
-            totalGoodsNeeded = totalGoodsNeeded + 1 + obj.getGMNotes()
+
+            totalGoodsNeeded = 1 + clickedCard.getGMNotes()
         else
             if cardPrice.Cloth ~= nil then
                 cardPrice.Cloth = cardPrice.Cloth + 1
             else
                 cardPrice.Cloth = 1
             end
-            totalGoodsNeeded = totalGoodsNeeded + 1 + obj.getGMNotes()
+            totalGoodsNeeded = 1 + clickedCard.getGMNotes()
         end
     elseif cardPosition == 5 then
         if cardPrice.Cloth ~= nil then
@@ -239,7 +257,7 @@ function buySenatorCard(obj, color, alt_click)
         else
             cardPrice.Cloth = 1
         end
-        totalGoodsNeeded = totalGoodsNeeded + 1 + obj.getGMNotes()
+        totalGoodsNeeded = 1 + clickedCard.getGMNotes()
     elseif cardPosition == 6 then
         if altWineBoard then
             if cardPrice.Wine ~= nil then
@@ -247,14 +265,14 @@ function buySenatorCard(obj, color, alt_click)
             else
                 cardPrice.Wine = 1
             end
-            totalGoodsNeeded = totalGoodsNeeded + 2 + obj.getGMNotes()
+            totalGoodsNeeded = 2 + clickedCard.getGMNotes()
         else
             if cardPrice.Cloth ~= nil then
                 cardPrice.Cloth = cardPrice.Cloth + 1
             else
                 cardPrice.Cloth = 1
             end
-            totalGoodsNeeded = totalGoodsNeeded + 2 + obj.getGMNotes()
+            totalGoodsNeeded = 2 + clickedCard.getGMNotes()
         end
     elseif cardPosition == 7 then
         if altWineBoard then
@@ -270,32 +288,41 @@ function buySenatorCard(obj, color, alt_click)
                 cardPrice.Wine = 1
             end
 
-            totalGoodsNeeded = totalGoodsNeeded + 2 + obj.getGMNotes()
+            totalGoodsNeeded = 2 + clickedCard.getGMNotes()
         else
             if cardPrice.Cloth ~= nil then
                 cardPrice.Cloth = cardPrice.Cloth + 2
             else
                 cardPrice.Cloth = 2
             end
-            totalGoodsNeeded = totalGoodsNeeded + 2 + obj.getGMNotes()
+            totalGoodsNeeded = 2 + clickedCard.getGMNotes()
         end
     end
 
+    --print("totalGoodsNeeded: " .. totalGoodsNeeded)
+
+    correctPayment = true
+    --print("cardPrice:")
+    for k,v in pairs(cardPrice) do
+        --print("  "..k..": "..tostring(v))
+    end
+
     for good, quantity in pairs(cardPrice) do
-        if playerPayment[good] == nil then
+        --print("DEBUG: Checking good =" .. good .. " required=" .. quantity .. " playerHas=" .. tostring(playerPayment[good]))
+        if playerPayment[good] == nil or playerPayment[good] < quantity then
             printToAll(Player[color].steam_name .. ' you are missing ' .. good)
             Player[color].pingTable(playerPaymentZone.getPosition())
             playerPaymentZone.highlightOn(color, 3)
             correctPayment = false
+            --print("DEBUG: Payment failed – missing or insufficient " .. good)
             return 0
-        elseif playerPayment[good] ~= nil and quantity == cardPrice[good] then
-            correctPayment = true
         end
     end
 
+    --print(tostring(correctPayment) .. " " .. tostring(totalGoodsNeeded) .. " " .. tostring(totalPlayerGoods))
     if correctPayment and (totalGoodsNeeded == totalPlayerGoods) then
-        obj.clearButtons()
-        obj.deal(1, color)
+        clickedCard.clearButtons()
+        clickedCard.deal(1, color)
         deleteItems(playerPaymentZone, color)
     else
         printToAll(Player[color].steam_name .. ' you do not have the correct number of goods in your sell zone.', color)
@@ -305,15 +332,14 @@ function buySenatorCard(obj, color, alt_click)
 end
 
 function calculateSenatorPayment(color)
-    local playerPaymentZone = getObjectFromGUID(playerSellZones[color])
-    local playerPayment = upCast(playerPaymentZone)
+    local playerPaymentZone = playerSellZones[color]
+    local playerPayment = upCast(playerPaymentZone, 5, 0.1, true)
 
     local totalPayment = {}
     for _, item in ipairs(playerPayment) do
         if item.getName() == 'Salt' then
             printToAll(Player[color].steam_name .. ' please convert your salt before buying', color)
             noSaltFlag = false
-            return 0
         end
 
         if item.getName() == 'Brick' then

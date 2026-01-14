@@ -16,6 +16,8 @@ fontsize = 500
 widthsize = 2500
 heightsize = 1000
 
+GameTableObject = getObjectFromGUID('4ee1f2')
+
 -- Board and Zone GUIDs
 MainBoard = getObjectFromGUID('0e1994')
 
