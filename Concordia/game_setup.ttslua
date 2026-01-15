@@ -234,15 +234,15 @@ function runInitialSetup()
 		placeGermanThings()
 
 	elseif(MainBoard.getStateId() == 9)  then
-		PlaceCities(Cretaa, stdBagA)
-		PlaceCities(Cretab, stdBagB)
-		PlaceCities(Cretad, stdBagD)
+		PlaceCities(CretaA, stdBagA)
+		PlaceCities(CretaB, stdBagB)
+		PlaceCities(CretaD, stdBagD)
 		--table.remove(stdBagA,1)
 		--table.remove(Cretaa,1)
 		--table.remove(Cretatiles,1)
 		TableConcat(stdBagA, stdBagB)
 		TableConcat(stdBagA, stdBagD)
-		parseRegions(stdBagA,CretaRegions, Cretatiles)
+		parseRegions(stdBagA,CretaRegions, CretaTiles)
 
 	elseif(MainBoard.getStateId() == 10)  then
 		PlaceCities(Aegyptusb, stdBagA)
