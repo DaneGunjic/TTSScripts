@@ -3,7 +3,7 @@
 
 -- Player setup functions
 function StartGame()
-    print("Starting game...")
+    --print("Starting game...")
     numberOfPlayers = #getSeatedPlayers()
     DestroySetupButtons()
     startLuaCoroutine(Global, 'runInitialSetup')
@@ -81,9 +81,10 @@ end
 
 -- Cleanup function for setup buttons
 function DestroySetupButtons()
-    print("Destroying remaining setup buttons...")
+    --print("Destroying remaining setup buttons...")
     hideExpansionButtons()
     hideMapButtons()
+    hideSetupButtons()
 end
 
 function SelectBoardBritannia() setBoard(1) end
@@ -140,11 +141,12 @@ end
 
 -- Main setup coroutine
 function runInitialSetup()
-    print("Run initial setup")
+    --print("Run initial setup")
 	gameStarted = true
 	shufflestuff()
 
 	if boolSalsa then
+        makeSaltBagButtons(saltBags)
         addSalt()
         local seatedPlayers = getSeatedPlayers()
         for _, color in ipairs(seatedPlayers) do
@@ -160,20 +162,21 @@ function runInitialSetup()
     --print("Setting up board specific elements for state ID: " .. MainBoard.getStateId())
 
 	if(MainBoard.getStateId() == 1) then
-		PlaceCities(BRITTNANIAB, stdBagB)
-		PlaceCities(BRITTNANIAC, stdBagC)
-		PlaceCities(BRITTNANIAD, stdBagD)
+        print("Setting up Britannia cities and tiles")
+		PlaceCities(BritanniaB, stdBagB)
+		PlaceCities(BritanniaC, stdBagC)
+		PlaceCities(BritanniaD, stdBagD)
 		TableConcat(stdBagB, stdBagC)
 		TableConcat(stdBagB, stdBagD)
-		parseRegions(stdBagB, BRITTNANIARegions, BRITTNANIAtiles)
+		parseRegions(stdBagB, BritanniaRegions, BritanniaTiles)
 
 	elseif(MainBoard.getStateId() == 2)  then
-		PlaceCities(hispaniaa, stdBagASalsa)
-		PlaceCities(hispaniab, stdBagBSalsa)
-		PlaceCities(hispaniad, stdBagDSalsa)
+		PlaceCities(HispaniaA, stdBagASalsa)
+		PlaceCities(HispaniaB, stdBagBSalsa)
+		PlaceCities(HispaniaD, stdBagDSalsa)
 		TableConcat(stdBagASalsa, stdBagBSalsa)
 		TableConcat(stdBagASalsa, stdBagDSalsa)
-		parseRegions(stdBagASalsa,HispaniaRegions, hispaniatiles)
+		parseRegions(stdBagASalsa,HispaniaRegions, HispaniaTiles)
 
 	elseif(MainBoard.getStateId() == 3) then
 		PlaceCities(italiaa, stdBagA)
@@ -192,14 +195,15 @@ function runInitialSetup()
 		parseRegions(stdBagASalsa,ByzRegions, BYZANTIUMtiles)
 
 	elseif(MainBoard.getStateId() == 5) then
-		PlaceCities(europaa, stdBagA)
-		PlaceCities(europab, stdBagB)
-		PlaceCities(europac, stdBagC)
-		PlaceCities(europadef, stdBagD)
+        print("Setting up Imperiumvm cities and tiles")
+		PlaceCities(ImperiumA, stdBagA)
+		PlaceCities(ImperiumB, stdBagB)
+		PlaceCities(ImperiumC, stdBagC)
+		PlaceCities(ImperiumD, stdBagD)
 		TableConcat(stdBagA, stdBagB)
 		TableConcat(stdBagA, stdBagC)
 		TableConcat(stdBagA, stdBagD)
-		parseRegions(stdBagA,EuropaRegions, europatokens)
+		parseRegions(stdBagA, ImperiumRegions, ImperiumTokens)
 
 	elseif(MainBoard.getStateId() == 6) then
 		PlaceCities(CORSICAA, stdBagA)
@@ -430,30 +434,37 @@ function PlaceCities(targetArray, cityBits)
 end
 
 function drawRegionBest(lootSwitcher, pos)
+    local bag = nil
     if lootSwitcher == 1 then
-        TakeMove(brickBag, pos)
+        bag = BrickTokenBag
     elseif lootSwitcher == 2 then
-        TakeMove(foodBag, pos)
+        bag = FoodTokenBag
     elseif lootSwitcher == 3 then
-        TakeMove(toolBag, pos)
+        bag = ToolTokenBag
     elseif lootSwitcher == 4 then
-        TakeMove(wineBag, pos)
+        bag = WineTokenBag
     elseif lootSwitcher == 5 then
-        TakeMove(clothBag, pos)
+        bag = ClothTokenBag
     end
+
+    local params = {}
+	params.position = pos
+	params.rotation = {0.00, 180.00, 0.00}
+    params.smooth = false
+	bag.takeObject(params)
 end
 
 function removeOneGuy(lootSwitcher)
     if lootSwitcher == 1 then
-        table.remove(stdTOTALISGERMANS, findFirst(1))
+        table.remove(stdTOTALISGERMANS, findFirst(brickA))
     elseif lootSwitcher == 2 then
-        table.remove(stdTOTALISGERMANS, findFirst(2))
+        table.remove(stdTOTALISGERMANS, findFirst(foodA))
     elseif lootSwitcher == 3 then
-        table.remove(stdTOTALISGERMANS, findFirst(3))
+        table.remove(stdTOTALISGERMANS, findFirst(toolA))
     elseif lootSwitcher == 4 then
-        table.remove(stdTOTALISGERMANS, findFirst(4))
+        table.remove(stdTOTALISGERMANS, findFirst(wineA))
     elseif lootSwitcher == 5 then
-        table.remove(stdTOTALISGERMANS, findFirst(5))
+        table.remove(stdTOTALISGERMANS, findFirst(clothA))
     end
 end
 
@@ -505,7 +516,7 @@ function setMainDeck()
 	-- 	end
 	end
 
-	Wait.time(restockSenatorBoard, 2)
+	Wait.time(restockSenatorBoard, 1)
 end
 
 function setupBoardSpecificElements(stateId)
@@ -524,19 +535,19 @@ function setupBoardSpecificElements(stateId)
 
     -- Board-specific setup based on state ID
     if stateId == 1 then
-        PlaceCities(BRITTNANIAB, stdBagB)
+        PlaceCities(BritanniaB, stdBagB)
         PlaceCities(BRITTNANIAC, stdBagC)
         PlaceCities(BRITTNANIAD, stdBagD)
         TableConcat(stdBagB, stdBagC)
         TableConcat(stdBagB, stdBagD)
         parseRegions(stdBagB, BRITTNANIARegions, BRITTNANIAtiles)
     elseif stateId == 2 then
-        PlaceCities(hispaniaa, stdBagASalsa)
-        PlaceCities(hispaniab, stdBagBSalsa)
-        PlaceCities(hispaniad, stdBagDSalsa)
+        PlaceCities(HispaniaA, stdBagASalsa)
+        PlaceCities(HispaniaB, stdBagBSalsa)
+        PlaceCities(HispaniaD, stdBagDSalsa)
         TableConcat(stdBagASalsa, stdBagBSalsa)
         TableConcat(stdBagASalsa, stdBagDSalsa)
-        parseRegions(stdBagASalsa, HispaniaRegions, hispaniatiles)
+        parseRegions(stdBagASalsa, HispaniaRegions, HispaniaTiles)
     elseif stateId == 3 then
         PlaceCities(italiaa, stdBagA)
         PlaceCities(italiab, stdBagB)
@@ -548,31 +559,28 @@ function setupBoardSpecificElements(stateId)
     end
 end
 
-function parseRegions(cityBits, countrySegmentArray, regionArray)
-    if cityBits ~= nil then
-        local countyCounter = 1
-        local maxCountyBoys = #countrySegmentArray
-        shuffleArray(cityBits)
-        shuffleArray(cityBits)
-        shuffleArray(cityBits)
+function parseRegions(CityTokens, RegionsAndCities, regionArray)
+	if CityTokens ~= nil then
+		local bestLoot = brickA
+		local CurrentRegion = 1
+		local Regions = #RegionsAndCities
 
-        while countyCounter <= maxCountyBoys do
-            local bestLoot = whatIsBest(cityBits[1], cityBits[2])
-            if #cityBits > 2 then
-                bestLoot = whatIsBest(bestLoot, cityBits[3])
-            end
-            if #cityBits > 3 then
-                bestLoot = whatIsBest(bestLoot, cityBits[4])
-            end
-            if #cityBits > 4 then
-                bestLoot = whatIsBest(bestLoot, cityBits[5])
-            end
+		while CurrentRegion <= Regions do
+			local CitiesCount = 1
+			local CitiesInRegion = #RegionsAndCities[CurrentRegion]
+			bestLoot = brickA
+			while CitiesCount <= CitiesInRegion do
+				local CityNumber = RegionsAndCities[CurrentRegion][CitiesCount]
+				local obj_parameters = CityTokens[CityNumber].getCustomObject()
 
-            drawRegionBest(getValue(bestLoot), regionArray[countyCounter])
-            removeOneGuy(getValue(bestLoot))
-            countyCounter = countyCounter + 1
-        end
-    end
+				bestLoot = whatIsBest(bestLoot, obj_parameters.diffuse)
+				CitiesCount = CitiesCount + 1
+			end
+			drawRegionBest(getValue(bestLoot), regionArray[CurrentRegion])
+			removeOneGuy(getValue(bestLoot))
+			CurrentRegion = CurrentRegion + 1
+		end
+	end
 end
 
 function prepareVenus()

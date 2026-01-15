@@ -1,3 +1,10 @@
+function initializeUI()
+    CreateButtons()
+    makeSupplyButtons(supplyBags)
+    makeSellButton(playerSellZones)
+    initMoneyCounters()
+end
+
 function CreateButtons()
     --print('CreateButtons')
     btnBrit = createButton('4ee1f2', 'BRITANNIA', 'SelectBoardBritannia', 0, 0, 'Blue', -15, 15)
@@ -20,8 +27,6 @@ function CreateButtons()
     btnDisplay = createButton('4ee1f2','Cloth Display', 'turnSwapDisplay', 0, 500, 'Green', -13.5, 9)
 
     btnStartGame = createButton('4ee1f2', 'Start Game', 'StartGame', 0, 0, 'White', -15, 8)
-
-   
 
     -- btnRandomSetup = createButton('4ee1f2', 'Random Setup', 'randomMapAndStore',800,0, 'Pink', 0,0)
 end
@@ -109,6 +114,7 @@ function makeSupplyButtons(bagObjects)
 end
 
 function makeSaltBagButtons(tblSalt)
+    --print("makeSaltBagButtons")
     local prefectParams = {
         width = 2000,
         height = 1000,
@@ -120,9 +126,8 @@ function makeSaltBagButtons(tblSalt)
         color = 'Green'
     }
 
-    for _, entry in ipairs(tblSalt) do
-        local tempObj = (type(entry) == 'string') and getObjectFromGUID(entry) or entry
-        tempObj.createButton(prefectParams)
+    for _, entry in pairs(tblSalt) do
+        entry.createButton(prefectParams)
     end
 end
 
@@ -369,11 +374,6 @@ end
 
 -- Button visibility management
 function hideSetupButtons()
-    if btn2p then btn2p.destruct() end
-    if btn3p then btn3p.destruct() end
-    if btn4p then btn4p.destruct() end
-    if btn5p then btn5p.destruct() end
-    if btnRandomSetup then btnRandomSetup.destruct() end
     if btnStartGame then
         local idx = findButtonIndex(btnStartGame, 'StartGame')
         if idx then btnStartGame.removeButton(idx) end
@@ -420,6 +420,10 @@ function hideExpansionButtons()
     if btnVenus then
         local idx = findButtonIndex(btnVenus, 'turnSwapVenus')
         if idx then btnVenus.removeButton(idx) end
+    end
+    if btnDisplay then
+        local idx = findButtonIndex(btnDisplay, 'turnSwapDisplay')
+        if idx then btnDisplay.removeButton(idx) end
     end
 end
 
@@ -560,10 +564,4 @@ end
 
 function doNothing() end
 
-function initializeUI()
-    CreateButtons()
-    makeSupplyButtons(supplyBags)
-    makeSellButton(playerSellZones)
-    makeSaltBagButtons(saltBags)
-    initMoneyCounters()
-end
+

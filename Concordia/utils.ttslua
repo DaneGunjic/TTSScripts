@@ -115,6 +115,22 @@ function shuffleList(list)
     return list
 end
 
+function findFirst(who)
+	local counter = 1
+	local maxC = #stdTOTALISGERMANS
+	while counter <= maxC do
+		if(stdTOTALISGERMANS[counter] == who)
+		then
+			return counter
+		end
+		counter = counter + 1
+	end
+end
+
+function TakeMove(targetObjectBag, params)
+	return targetObjectBag.takeObject(params)
+end
+
 function createArrayForNCards(start, number)
     local array = {}
     for i = start, start + number - 1 do
@@ -207,7 +223,6 @@ function AddRemoveResource(color, add, resource)
     end
 end
 
--- Message utility
 function getValue(subject)
     if subject == brickA or subject == brickB or subject == brickC or subject == brickD then
         return 1
@@ -224,15 +239,15 @@ function getValue(subject)
     end
 end
 
-function whatIsBest(kitty, puppy)
-	local kittyValue = getValue(kitty)
-	--print(kittyValue)
-	local puppyValue = getValue(puppy)
-	--print(puppyValue)
-	if(kittyValue == puppyValue or kittyValue > puppyValue)
+function whatIsBest(objA, objB)
+	local valueA = getValue(objA)
+	print("valueA: " .. valueA)
+	local valueB = getValue(objB)
+	print("valueB: " .. valueB)
+	if(valueA == valueB or valueA > valueB)
 	then
-		return kitty
+		return objA
 	else
-		return puppy
+		return objB
 	end
 end
