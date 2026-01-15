@@ -10,10 +10,11 @@
 #include !\Concordia\maps\britannia.ttslua
 #include !\Concordia\maps\imprerium.ttslua
 #include !\Concordia\maps\hispania.ttslua
+#include !\Concordia\maps\italia.ttslua
+#include !\Concordia\maps\byzantium.ttslua
 
 local roundCounter = 0 -- this is only used to stop the first restock when the game starts.
 
-----------------Events----------------------------------------------------
 function onSave()
     local saveData = {}
     saveData.gameStarted = gameStarted
@@ -83,18 +84,6 @@ function onPlayerTurn(player, previousPlayer)
     end
 end
 
--- Core game logic functions that coordinate between modules
--- function startGame()
---     if not gameStarted then
---         print9("Starting game setup...")
---         runInitialSetup()
---         gameStarted = true
---         hideSetupButtons()
---         hideMapButtons()
---         broadcastToAll('Game Started! Good luck!', 'Green')
---     end
--- end
-
 function resetGame()
     gameStarted = false
     roundCounter = 0
@@ -112,75 +101,3 @@ function resetGame()
 
     broadcastToAll('Game Reset. Ready for new setup.', 'Yellow')
 end
-
--- Main coordination function for game setup
-function coordinateGameSetup()
-    -- Wait for components to settle
-    Wait.time(function()
-        -- Start main setup
-        runInitialSetup()
-    end, 1)
-end
-
-function setPlayerCount(count)
-    if count >= 2 and count <= 5 then
-        numberOfPlayers = count
-        return true
-    end
-    return false
-end
-
--- Game flow control
-function endTurn(player)
-    -- Handle end of turn logic
-    if gameStarted then
-        -- Check for game end conditions
-        -- Update UI as needed
-        -- Trigger any end-of-turn effects
-    end
-end
-
-function checkGameEnd()
-    -- Check if game should end
-    -- Return true if game is over, false otherwise
-    return false
-end
-
--- Error handling and debugging
-function handleError(errorMsg, functionName)
-    print("Error in " .. (functionName or "unknown function") .. ": " .. errorMsg)
-    broadcastToAll("An error occurred. Check the log for details.", "Red")
-end
-
--- Utility wrapper functions for cross-module communication
-function broadcastGameMessage(message, color)
-    broadcastMessage(message, color)
-end
-
-function updatePlayerMoney(color, amount)
-    addMoney(color, amount)
-end
-
-function getPlayerMoneyAmount(color)
-    local counter = getObjectFromGUID(playerMoneyCounters[color])
-    if counter then
-        return getMoneyTotal(counter)
-    end
-    return 0
-end
-
--- Main game initialization
-function initializeGame()
-    -- This function is called when the mod is loaded
-    -- It sets up the initial state and prepares for gameplay
-
-    -- Initialize all subsystems
-    if not gameStarted then
-        -- Setup is handled in onLoad
-        print("Concordia mod loaded successfully")
-        print("Select a map and player count to begin setup")
-    end
-end
-
--- Call initialization
-initializeGame()

@@ -10,19 +10,19 @@ end
 function scoreCalcCO()
     local seatedPlayers = getSeatedPlayers()
     UI.setAttribute('scoreboard', 'active', true)
-    
+
     for i, playerColor in ipairs(seatedPlayers) do
         UI.setAttribute('scoreboard' .. playerColor, 'active', true)
         UI.setAttribute('scoreboard' .. playerColor, 'offsetXY', 170+(i-1)*100 .. ' -140')
         UI.setValue('name' .. playerColor, getPlayerName(playerColor))
-        
+
         takeCards(playerColor)
         pauseSeconds(0.5)
-        
+
         local playerCardTotals = countCards(playerColor)
         local playerHouseCount = checkForHouses(playerColor)
         local totalScore = 0
-        
+
         -- Calculate scores for each god
         local mercuryScore = scoreMercury(playerColor, playerCardTotals, playerHouseCount)
         local marsScore = scoreMars(playerColor, playerCardTotals)
@@ -30,9 +30,9 @@ function scoreCalcCO()
         local vestaScore = scoreVesta(playerColor)
         local jupiterScore = scoreJupiter(playerColor, playerCardTotals, playerHouseCount)
         local minervaScore = scoreMinerva(playerColor, playerHouseCount, playerCardTotals)
-        
+
         totalScore = totalScore + mercuryScore + marsScore + saturnScore + vestaScore + jupiterScore + minervaScore
-        
+
         -- Update UI with scores
         UI.setValue('Mercury' .. playerColor, mercuryScore)
         UI.setValue('Mars' .. playerColor, marsScore)
@@ -40,7 +40,7 @@ function scoreCalcCO()
         UI.setValue('Vesta' .. playerColor, vestaScore)
         UI.setValue('Jupiter' .. playerColor, jupiterScore)
         UI.setValue('Minerva' .. playerColor, minervaScore)
-        
+
         -- Handle Concordia bonus
         if concordiaOwner == playerColor then
             UI.setValue('Concordia' .. playerColor, 7)
@@ -48,10 +48,10 @@ function scoreCalcCO()
         else
             UI.setValue('Concordia' .. playerColor, 0)
         end
-        
+
         UI.setValue('total' .. playerColor, totalScore)
     end
-    
+
     resetTables()
     toggleScoreBoardButton()
     scoreBoardToggle = 1
@@ -82,7 +82,7 @@ function scoreMinerva(color, houseTable, playerCardTable)
         Cloth = 0,
     }
     local minervaVP = 0
-    
+
     -- Handle Salsa expansion salt cities
     if (boolSalsa) then
         local bestMinervaCard = bestMinervaCard(color)
@@ -91,7 +91,7 @@ function scoreMinerva(color, houseTable, playerCardTable)
             houseTable[cityToAddSaltTo] = houseTable[cityToAddSaltTo] + houseTable.saltCities
         end
     end
-    
+
     -- Calculate Minerva scores for each resource type
     for key, card in pairs(minervaCards) do
         if card == color then
@@ -118,7 +118,7 @@ function scoreMinerva(color, houseTable, playerCardTable)
             end
         end
     end
-    
+
     -- Reset the table for next player
     minervaScores = {
         Brick = 0,
@@ -138,7 +138,7 @@ function scoreVesta(color)
     local supplies = upCast(playerSupplies)
     local supplyValue = 0
     local vestaVP = 0
-    
+
     for _, good in pairs(supplies) do
         for _, tag in ipairs(goodsList) do
             if good.hasTag(tag) then
@@ -149,7 +149,7 @@ function scoreVesta(color)
             supplyValue = supplyValue + 7
         end
     end
-    
+
     vestaVP = playerMoney + supplyValue
     return (math.floor(vestaVP/10))
 end
@@ -167,18 +167,18 @@ function scoreMercury(color, cardTable, houseTable)
     local numMercury = cardTable.Mercury
     local baseGoodsVP = 0
     local mercuryScore = 0
-    
+
     for key, goodType in pairs(houseTable) do
         if goodType > 0 and key ~= 'saltCities' then
             baseGoodsVP = baseGoodsVP + 2
         end
     end
-    
+
     -- Cap at 10 base points to handle salt cities properly
     if baseGoodsVP > 10 then
         baseGoodsVP = 10
     end
-    
+
     mercuryScore = mercuryScore + (numMercury * baseGoodsVP)
     return mercuryScore
 end
@@ -190,14 +190,14 @@ function scoreMars(color, cardTable)
     local marsVP = 4
     local playerStorage = getObjectFromGUID(playerWarehouses[playerColor])
     local storageContents = upCast(playerStorage)
-    
+
     local numColonists = 0
     for _, obj in pairs(storageContents) do
         if obj.hasTag(color .. 'Colonist') then
             numColonists = numColonists + 1
         end
     end
-    
+
     marsVP = (marsVP + (8 - (numColonists * 2))) * numMarsCards
     return marsVP
 end
@@ -207,13 +207,13 @@ function scoreJupiter(color, cardTable, houseTable)
     local numJupiter = cardTable.Jupiter
     local jupiterVP = 0
     local nonBrickHouseTotal = 0
-    
+
     for key, house in pairs(houseTable) do
         if key ~= 'brickCities' then
             nonBrickHouseTotal = nonBrickHouseTotal + house
         end
     end
-    
+
     jupiterVP = jupiterVP + (numJupiter * nonBrickHouseTotal)
     return jupiterVP
 end
@@ -229,7 +229,7 @@ function countCards(color)
         Mars = 0,
         Mercury = 0
     }
-    
+
     for _, obj in pairs(discardZoneObjects) do
         if obj.type == 'Deck' then
             playerDeck = obj
@@ -237,15 +237,15 @@ function countCards(color)
             printToAll('No deck found', 'White')
         end
     end
-    
+
     if not playerDeck then return cardTotals end
-    
+
     local deckToParse = playerDeck.getObjects()
     local deckPos = playerDeck.getPosition()
-    
+
     for _, card in ipairs(deckToParse) do
         local tempCard = playerDeck.takeObject({position = deckPos})
-        
+
         -- Track Minerva cards
         if tempCard.hasTag('MinervaBrick') then
             minervaCards.Brick = color
@@ -260,17 +260,17 @@ function countCards(color)
         elseif tempCard.hasTag('Concordia') then
             concordiaOwner = color
         end
-        
+
         -- Count god cards
         for _, tag in ipairs(cardTags) do
             if tempCard.hasTag(tag) then
                 cardTotals[tag] = cardTotals[tag] + 1
             end
         end
-        
+
         tempCard.destruct()
     end
-    
+
     return cardTotals
 end
 
@@ -278,7 +278,7 @@ function collectCards(color)
     local playerDiscardZone = getObjectFromGUID(playerDiscardTiles[color])
     local playerCards = upCast(playerDiscardZone)
     local playerDiscardZonePos = playerDiscardZone.getPosition()
-    
+
     for _, card in ipairs(playerCards) do
         card.setPosition(playerDiscardZonePos + Vector(0, 0.1, 0))
     end
@@ -298,7 +298,7 @@ function checkForHouses(color)
         foodCities = 0,
         saltCities = 0,
     }
-    
+
     local cityTiles = getCityTiles()
     for _, city in pairs(cityTiles) do
         local hitObjs = upCast(city)
@@ -330,7 +330,7 @@ end
 function getCityTiles()
     local allObjects = getAllObjects()
     local cityTiles = {}
-    
+
     for _, obj in pairs(allObjects) do
         if obj.hasTag('City') then
             table.insert(cityTiles, obj)
@@ -343,29 +343,13 @@ end
 function regionCheck(color)
     local gameBoard = boardPickerZone
     if not gameBoard then return 0 end
-    
+
     local boardState = gameBoard.getStateId()
     local regionCount = 0
-    
+
     -- This would need to be implemented based on the specific board layout
     -- For now, returning a placeholder value
     return regionCount
-end
-
--- Money counting function
-function getMoneyTotal(obj)
-    -- Deprecated: Money is now tracked in playerMoneyValues
-    if not obj then return 0 end
-    
-    -- Try to find color from obj GUID
-    local guid = obj.getGUID()
-    for color, moneyGuid in pairs(playerMoneyCounters) do
-        if moneyGuid == guid then
-            return playerMoneyValues[color] or 0
-        end
-    end
-    
-    return 0
 end
 
 -- Reset function for scoring tables

@@ -179,20 +179,20 @@ function runInitialSetup()
 		parseRegions(stdBagASalsa,HispaniaRegions, HispaniaTiles)
 
 	elseif(MainBoard.getStateId() == 3) then
-		PlaceCities(italiaa, stdBagA)
-		PlaceCities(italiab, stdBagB)
-		PlaceCities(italiac, stdBagC)
+		PlaceCities(ItaliaA, stdBagA)
+		PlaceCities(ItaliaB, stdBagB)
+		PlaceCities(ItaliaC, stdBagC)
 		TableConcat(stdBagA, stdBagB)
 		TableConcat(stdBagA, stdBagC)
-		parseRegions(stdBagA,ItaliaRegions, italiatiles)
+		parseRegions(stdBagA,ItaliaRegions, ItaliaTiles)
 
 	elseif(MainBoard.getStateId() == 4) then
-		PlaceCities(BYZANTIUMA, stdBagASalsa)
-		PlaceCities(BYZANTIUMB, stdBagBSalsa)
-		PlaceCities(BYZANTIUMC, stdBagCSalsa)
+		PlaceCities(ByzantiumA, stdBagASalsa)
+		PlaceCities(ByzantiumB, stdBagBSalsa)
+		PlaceCities(ByzantiumC, stdBagCSalsa)
 		TableConcat(stdBagASalsa, stdBagBSalsa)
 		TableConcat(stdBagASalsa, stdBagCSalsa)
-		parseRegions(stdBagASalsa,ByzRegions, BYZANTIUMtiles)
+		parseRegions(stdBagASalsa,ByzantiumRegions, ByzantiumTiles)
 
 	elseif(MainBoard.getStateId() == 5) then
         print("Setting up Imperiumvm cities and tiles")
@@ -385,8 +385,10 @@ function PlaceCities(targetArray, cityBits)
     local saltTiles = {saltA, saltB, saltC, saltD}
 
 	local rotY = 180
-	if MainBoard and MainBoard.getStateId() == 1 then
+	if MainBoard and (MainBoard.getStateId() == 1) then
 		rotY = 270
+    elseif MainBoard.getStateId() == 4 then
+        rotY = 90
 	end
 
 	if targetArray ~= nil then
@@ -549,12 +551,12 @@ function setupBoardSpecificElements(stateId)
         TableConcat(stdBagASalsa, stdBagDSalsa)
         parseRegions(stdBagASalsa, HispaniaRegions, HispaniaTiles)
     elseif stateId == 3 then
-        PlaceCities(italiaa, stdBagA)
-        PlaceCities(italiab, stdBagB)
-        PlaceCities(italiac, stdBagC)
+        PlaceCities(ItaliaA, stdBagA)
+        PlaceCities(ItaliaB, stdBagB)
+        PlaceCities(ItaliaC, stdBagC)
         TableConcat(stdBagA, stdBagB)
         TableConcat(stdBagA, stdBagC)
-        parseRegions(stdBagA, ItaliaRegions, italiatiles)
+        parseRegions(stdBagA, ItaliaRegions, ItaliaTiles)
     -- Add other board states as needed
     end
 end
