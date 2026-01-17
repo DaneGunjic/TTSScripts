@@ -56,12 +56,6 @@ function onLoad(savedData)
     createScoreButton()
 end
 
-function onObjectEnterContainer(container, enter_object)
-    if enter_object.getGMNotes() == 'Tribune' then
-        makeTribuneButtons(container)
-    end
-end
-
 function onObjectLeaveContainer(container, leave_object)
     if leave_object.getGMNotes() == 'Tribune' then
         container.clearButtons()

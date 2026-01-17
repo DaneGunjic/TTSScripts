@@ -23,7 +23,7 @@ function CreateButtons()
     btnHellas = createButton('4ee1f2','HELLAS','SelectBoardHellas', 0, 0, 'Blue', -15, 8.5)
 
     btnSalsa = createButton('4ee1f2', 'SALSA [OFF]', 'ToggleSalsa', 0, 500, 'Green', -13.5, 10)
-    btnForum = createButton('4ee1f2', 'FORVM [OFF]', 'turnOnOffForum', 0, 500, 'Green', -13.5, 9.5)
+    btnForum = createButton('4ee1f2', 'FORUM [OFF]', 'ToggleForum', 0, 500, 'Green', -13.5, 9.5)
     btnDisplay = createButton('4ee1f2','Cloth Display', 'turnSwapDisplay', 0, 500, 'Green', -13.5, 9)
 
     btnStartGame = createButton('4ee1f2', 'Start Game', 'StartGame', 0, 0, 'White', -15, 8)
@@ -164,21 +164,21 @@ function findButtonIndex(obj, funcName)
 end
 
 -- Expansion toggle functions
-function turnOnOffForum()
-    local idx = findButtonIndex(btnForum, 'turnOnOffForum')
+function ToggleForum()
+    local idx = findButtonIndex(btnForum, 'ToggleForum')
     if idx == nil then return end
 
     local button_parameters = {}
     button_parameters.index = idx
     if boolForum then
         boolForum = false
-        button_parameters.label = "Forum Exp: Off"
+        button_parameters.label = "Forum [OFF]"
         forum = false
     else
         boolForum = true
-        button_parameters.label = "Forum Exp: On"
+        button_parameters.label = "Forum [ON]"
         forum = true
-        broadcastToAll('When playing with FORVM Cards, setup must be done manually and leftovers to the green bag near the FORVM. Use the buttom to draw them to the table. Rules on the left side of this table',{r = 1, g = 1, b = 1})
+        --broadcastToAll('When playing with FORUM Cards, setup must be done manually and leftovers to the green bag near the FORUM. Use the buttom to draw them to the table. Rules on the left side of this table',{r = 1, g = 1, b = 1})
     end
     btnForum.editButton(button_parameters)
 end
@@ -365,11 +365,21 @@ function deleteItems(obj, color, alt_click)
     end
 end
 
--- Tribune action
-function tribuneAction(obj, color, alt_click)
-    -- Tribune card functionality
-    printToAll(Player[color].steam_name .. ' used Tribune action', color)
-    -- Add specific tribune logic here
+function tribuneAction(obj, color)
+    local deckSize = #obj.getObjects()
+    if deckSize <= 0 then
+        return
+    end
+
+    obj.deal(deckSize, color)
+
+    if deckSize > 3 then
+        local earnedMoney = deckSize - 3
+        printToAll(Player[color].steam_name .. ' got ' .. earnedMoney .. ' coins from Tribune', color)
+        addMoney(color, earnedMoney)
+    else
+        printToAll(Player[color].steam_name .. ' got 0 coins from Tribune', color)
+    end
 end
 
 -- Button visibility management
@@ -414,7 +424,7 @@ function hideExpansionButtons()
         if idx then btnSalsa.removeButton(idx) end
     end
     if btnForum then
-        local idx = findButtonIndex(btnForum, 'turnOnOffForum')
+        local idx = findButtonIndex(btnForum, 'ToggleForum')
         if idx then btnForum.removeButton(idx) end
     end
     if btnVenus then

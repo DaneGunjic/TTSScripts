@@ -80,6 +80,34 @@ function regionLoop(regionTable, tiles, color)
 	return playerRegions
 end
 
+function onObjectEnterContainer(container, enter_object)
+	if enter_object.getGMNotes() == 'Tribune' then
+		makeTribuneButtons(container)
+	end
+end
+
+function regionLoopVenus(regionTable, tiles, color)
+    local regionsWithTwo = 0
+    for _, region in pairs(regionTable) do
+        local houseCount = 0
+        for _, city in pairs(region) do
+            local tile = tiles[city]
+            if tile then
+                local hitObjs = upCast(tile, 5, 0.1, true)
+                for _, house in pairs(hitObjs) do
+                    if house.getGMNotes() == color then
+                        houseCount = houseCount + 1
+                    end
+                end
+            end
+        end
+        if houseCount >= 2 then
+            regionsWithTwo = regionsWithTwo + 1
+        end
+    end
+    return regionsWithTwo
+end
+
 -- Table utility functions
 function tableParser(key, tableToSearch)
     for _, thing in ipairs(tableToSearch) do

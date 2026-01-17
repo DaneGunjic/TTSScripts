@@ -120,6 +120,9 @@ ToolTokenBag = getObjectFromGUID('cef8df')
 WineTokenBag = getObjectFromGUID('d3c80f')
 ClothTokenBag = getObjectFromGUID('5755c7')
 
+ForumBlueBag = getObjectFromGUID('e9688c')
+ForumGreenBag = getObjectFromGUID('427c52')
+
 -- Positions and Rotations
 typeSideRot1 = {0.00, 180.00, 0.00}
 typeSideRot2 = {0.00, 180.00, 180.00}
@@ -150,7 +153,7 @@ SENATOR_BOARD_SNAPS = {
 
 -- Game Configuration
 goodsList = {'Brick', 'Food', 'Tool', 'Wine', 'Cloth'}
-cardTags = {'Jupiter', 'Saturn', 'Mars', 'Mercury'}
+cardTags = {'Jupiter', 'Saturn', 'Mars', 'Mercury', 'Venus'}
 
 -- Game State Flags
 boolSalsa = false

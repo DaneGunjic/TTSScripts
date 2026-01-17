@@ -159,6 +159,10 @@ function runInitialSetup()
         end
 	end
 
+    if forum then
+        setupForumTiles()
+    end
+
     --print("Setting up board specific elements for state ID: " .. MainBoard.getStateId())
 
 	if(MainBoard.getStateId() == 1) then
@@ -362,6 +366,51 @@ function addSalt()
     stdBagBSalsa[1] = saltB
     stdBagCSalsa[1] = saltC
     stdBagDSalsa[1] = saltD
+end
+
+function setupForumTiles()
+    local blueBag = ForumBlueBag
+    local greenBag = ForumGreenBag
+    if not blueBag or not greenBag then
+        return
+    end
+
+    local seatedPlayers = getSeatedPlayers()
+
+    for _, color in ipairs(seatedPlayers) do
+        local warehouse = playerWarehouses[color]
+        local basePos
+        if warehouse then
+            local wPos = warehouse.getPosition()
+            basePos = {wPos.x, wPos.y, wPos.z}
+        else
+            local bPos = blueBag.getPosition()
+            basePos = {bPos.x, bPos.y, bPos.z}
+        end
+
+        for i = 1, 2 do
+            local contents = blueBag.getObjects()
+            if not contents or #contents == 0 then
+                break
+            end
+            local entry = contents[1]
+            local offsetX = (i - 0.5) * 1.5
+            local params = {}
+            params.guid = entry.guid
+            params.position = {basePos[1] + offsetX, basePos[2] + 2, basePos[3]}
+            params.smooth = false
+            blueBag.takeObject(params)
+        end
+    end
+
+    local remaining = blueBag.getObjects()
+    if remaining and #remaining > 0 then
+        local gPos = greenBag.getPosition()
+        for _, entry in ipairs(remaining) do
+            local obj = blueBag.takeObject({guid = entry.guid, position = gPos, smooth = false})
+            greenBag.putObject(obj)
+        end
+    end
 end
 
 -- Germany specific setup

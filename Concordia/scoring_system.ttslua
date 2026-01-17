@@ -16,6 +16,7 @@ function scoreCalcCO()
         UI.setAttribute('scoreboard' .. playerColor, 'offsetXY', 170+(i-1)*100 .. ' -140')
         UI.setValue('name' .. playerColor, getPlayerName(playerColor))
 
+        sellWarehouseResources(playerColor)
         takeCards(playerColor)
 
         local t = os.clock() + 1
@@ -34,8 +35,9 @@ function scoreCalcCO()
         local vestaScore = scoreVesta(playerColor)
         local jupiterScore = scoreJupiter(playerColor, playerCardTotals, playerHouseCount)
         local minervaScore = scoreMinerva(playerColor, playerHouseCount, playerCardTotals)
+        local venusScore = scoreVenus(playerColor, playerCardTotals)
 
-        totalScore = totalScore + mercuryScore + marsScore + saturnScore + vestaScore + jupiterScore + minervaScore
+        totalScore = totalScore + mercuryScore + marsScore + saturnScore + vestaScore + jupiterScore + minervaScore + venusScore
 
         -- Update UI with scores
         UI.setValue('Mercury' .. playerColor, mercuryScore)
@@ -44,6 +46,7 @@ function scoreCalcCO()
         UI.setValue('Vesta' .. playerColor, vestaScore)
         UI.setValue('Jupiter' .. playerColor, jupiterScore)
         UI.setValue('Minerva' .. playerColor, minervaScore)
+        UI.setValue('Venus' .. playerColor, venusScore)
 
         -- Handle Concordia bonus
         if concordiaOwner == playerColor then
@@ -85,6 +88,21 @@ function bestMinervaCard(color)
     else
         return nil
     end
+end
+
+function scoreVenus(color, playerCardTable)
+    local numVenus = playerCardTable.Venus or 0
+    if numVenus == 0 then
+        return 0
+    end
+
+    local regionsWithTwo = venusRegionCheck(color)
+    local baseVP = 2 * regionsWithTwo
+    if baseVP > 14 then
+        baseVP = 14
+    end
+
+    return numVenus * baseVP
 end
 
 function scoreMinerva(color, houseTable, playerCardTable)
@@ -360,10 +378,10 @@ function regionCheck(color)
     elseif MainBoard.getStateId() == 2 then
         result = regionLoop(HispaniaRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 3 then
-     result = regionLoop(ItaliaRegions, stdBagA, color)
+        result = regionLoop(ItaliaRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 4 then
         result = regionLoop(ByzantiumRegions, stdBagASalsa, color)
-    elseif MainBoard.getStateId() == 5 then -- Imperium
+    elseif MainBoard.getStateId() == 5 then
         result = regionLoop(ImperiumRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 6 then
         result = regionLoop(corsicaRegions, stdBagA, color)
@@ -385,6 +403,103 @@ function regionCheck(color)
         result = regionLoop(HELLASRegions, stdBagA, color)
     end
     return result
+end
+
+function venusRegionCheck(color)
+    local result = 0
+
+    if MainBoard.getStateId() == 1 then
+        result = regionLoopVenus(BritanniaRegions, stdBagB, color)
+    elseif MainBoard.getStateId() == 2 then
+        result = regionLoopVenus(HispaniaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 3 then
+        result = regionLoopVenus(ItaliaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 4 then
+        result = regionLoopVenus(ByzantiumRegions, stdBagASalsa, color)
+    elseif MainBoard.getStateId() == 5 then
+        result = regionLoopVenus(ImperiumRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 6 then
+        result = regionLoopVenus(corsicaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 7 then
+        result = regionLoopVenus(GaliaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 8 then
+        result = regionLoopVenus(GermaniaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 9 then
+        result = regionLoopVenus(CretaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 10 then
+        result = regionLoopVenus(AegyptusRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 11 then
+        result = regionLoopVenus(IONIVMRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 12 then
+        result = regionLoopVenus(CYPRUSRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 13 then
+        result = regionLoopVenus(BALEARICARegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 14 then
+        result = regionLoopVenus(HELLASRegions, stdBagA, color)
+    end
+    return result
+end
+
+function sellWarehouseResources(color)
+    local warehouseObj = playerWarehouses[color]
+    if warehouseObj == nil then
+        printToAll(Player[color].steam_name .. ' had no warehouse to sell from', color)
+        return
+    end
+
+    local goodsSold = {}
+    local totalValue = 0
+
+    local objectsInWarehouse = upCast(warehouseObj, 5, 0.1, true)
+
+    for _, item in pairs(objectsInWarehouse) do
+        local itemName = item.getName()
+        local isResource = false
+        for _, good in ipairs(goodsList) do
+            if good == itemName then
+                isResource = true
+                break
+            end
+        end
+
+        if isResource and itemName ~= "Salt" then
+            local val = item.getGMNotes()
+            local itemValue = tonumber(val) or 0
+            if itemValue == 0 then
+                itemValue = 1
+            end
+
+            if goodsSold[itemName] then
+                goodsSold[itemName] = goodsSold[itemName] + 1
+            else
+                goodsSold[itemName] = 1
+            end
+
+            totalValue = totalValue + itemValue
+            item.destruct()
+        end
+    end
+
+    local message
+    if totalValue > 0 then
+        local goodsSummary = ""
+        local first = true
+        for key, value in pairs(goodsSold) do
+            local part = key .. " x" .. tostring(value)
+            if first then
+                goodsSummary = part
+                first = false
+            else
+                goodsSummary = goodsSummary .. ", " .. part
+            end
+        end
+        message = Player[color].steam_name .. ' sold ' .. goodsSummary .. ' for ' .. totalValue .. ' sestertii'
+        addMoney(color, totalValue)
+    else
+        message = Player[color].steam_name .. ' had no resources to sell'
+    end
+
+    printToAll(message, color)
 end
 
 -- Reset function for scoring tables
