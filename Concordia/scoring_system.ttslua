@@ -17,7 +17,11 @@ function scoreCalcCO()
         UI.setValue('name' .. playerColor, getPlayerName(playerColor))
 
         takeCards(playerColor)
-        pauseSeconds(0.5)
+
+        local t = os.clock() + 1
+        while os.clock() < t do
+            coroutine.yield(0)
+        end
 
         local playerCardTotals = countCards(playerColor)
         local playerHouseCount = checkForHouses(playerColor)
@@ -56,6 +60,16 @@ function scoreCalcCO()
     toggleScoreBoardButton()
     scoreBoardToggle = 1
     return 1
+end
+
+function takeCards(color)
+  local playerCards = Player[color].getHandObjects()
+  local playerDiscardZone = playerDiscardTiles[color]
+  local playerDiscardZonePos = playerDiscardZone.getPosition()
+
+  for _, card in ipairs(playerCards) do
+    card.setPosition(playerDiscardZonePos + Vector(0, 0.1, 0))
+  end
 end
 
 -- Minerva scoring (city types)
@@ -132,10 +146,11 @@ end
 
 -- Vesta scoring (money and goods)
 function scoreVesta(color)
+    print('Scoring Vesta for ' .. color)
     local playerColor = color
-    local playerSupplies = getObjectFromGUID(playerWarehouses[playerColor])
+    local playerSupplies = playerWarehouses[playerColor]
     local playerMoney = playerMoneyValues[playerColor] or 0
-    local supplies = upCast(playerSupplies)
+    local supplies = upCast(playerSupplies, 5, 0.1, true)
     local supplyValue = 0
     local vestaVP = 0
 
@@ -145,9 +160,6 @@ function scoreVesta(color)
                 supplyValue = supplyValue + good.getGMNotes()
             end
         end
-        if good.hasTag('Salt') then
-            supplyValue = supplyValue + 7
-        end
     end
 
     vestaVP = playerMoney + supplyValue
@@ -156,54 +168,56 @@ end
 
 -- Saturn scoring (regions)
 function scoreSaturn(color, numSaturnCards)
-    local playerRegions = regionCheck(color)
-    local saturnScore = 0
-    saturnScore = saturnScore + (numSaturnCards * playerRegions)
-    return saturnScore
+	local playerRegions = regionCheck(color)
+	local saturnScore = 0
+	saturnScore = saturnScore + (numSaturnCards * playerRegions)
+	return saturnScore
 end
 
 -- Mercury scoring (good types)
 function scoreMercury(color, cardTable, houseTable)
-    local numMercury = cardTable.Mercury
-    local baseGoodsVP = 0
-    local mercuryScore = 0
+	local numMercury = cardTable.Mercury
+	local baseGoodsVP = 0
+	local mercuryScore = 0
+	for key, goodType in pairs(houseTable) do
+		if goodType > 0 and key ~= saltCities then
+			baseGoodsVP = baseGoodsVP + 2
+		end
+	end
 
-    for key, goodType in pairs(houseTable) do
-        if goodType > 0 and key ~= 'saltCities' then
-            baseGoodsVP = baseGoodsVP + 2
-        end
-    end
+  if baseGoodsVP > 10 then -- this was the easiest way to deal with salt cities. Will account for missing and not go over 10 base
+    baseGoodsVP = 10
+  end
 
-    -- Cap at 10 base points to handle salt cities properly
-    if baseGoodsVP > 10 then
-        baseGoodsVP = 10
-    end
+	mercuryScore = mercuryScore + (numMercury * baseGoodsVP)
 
-    mercuryScore = mercuryScore + (numMercury * baseGoodsVP)
-    return mercuryScore
+	return mercuryScore
 end
 
 -- Mars scoring (colonists)
 function scoreMars(color, cardTable)
-    local playerColor = color
-    local numMarsCards = cardTable.Mars
-    local marsVP = 4
-    local playerStorage = getObjectFromGUID(playerWarehouses[playerColor])
-    local storageContents = upCast(playerStorage)
+  local playerColor = color
+	local numMarsCards = cardTable.Mars
+  local marsVP = 4
+	local playerStorage = playerWarehouses[playerColor]
+	-- print(playerStorage.guid)
+	local storageContents = upCast(playerStorage, 5, 0.1, true)
 
-    local numColonists = 0
-    for _, obj in pairs(storageContents) do
-        if obj.hasTag(color .. 'Colonist') then
-            numColonists = numColonists + 1
-        end
-    end
-
-    marsVP = (marsVP + (8 - (numColonists * 2))) * numMarsCards
-    return marsVP
+	local numColonists = 0
+	for _, obj in pairs(storageContents) do
+		if obj.hasTag(color .. 'Colonist') then
+			numColonists = numColonists + 1
+		end
+	end
+	-- print('You have this many colonists: ' .. numColonists)
+    marsVP = (marsVP + (8 -(numColonists * 2))) * numMarsCards
+    -- print('the value of marsVP is ' .. marsVP)
+	return marsVP
 end
 
 -- Jupiter scoring (non-brick houses)
 function scoreJupiter(color, cardTable, houseTable)
+    print('Scoring Jupiter for ' .. color)
     local numJupiter = cardTable.Jupiter
     local jupiterVP = 0
     local nonBrickHouseTotal = 0
@@ -220,14 +234,16 @@ end
 
 -- Card counting and collection functions
 function countCards(color)
-    local playerDiscardTile = getObjectFromGUID(playerDiscardTiles[color])
-    local discardZoneObjects = upCast(playerDiscardTile)
+    print('Counting cards for ' .. color)
+    local playerDiscardTile = playerDiscardTiles[color]
+    local discardZoneObjects = upCast(playerDiscardTile, 5, 0.1, true)
     local playerDeck = nil
     local cardTotals = {
         Jupiter = 0,
         Saturn = 0,
         Mars = 0,
-        Mercury = 0
+        Mercury = 0,
+        Venus = 0
     }
 
     for _, obj in pairs(discardZoneObjects) do
@@ -267,16 +283,15 @@ function countCards(color)
                 cardTotals[tag] = cardTotals[tag] + 1
             end
         end
-
-        tempCard.destruct()
     end
 
     return cardTotals
 end
 
 function collectCards(color)
-    local playerDiscardZone = getObjectFromGUID(playerDiscardTiles[color])
-    local playerCards = upCast(playerDiscardZone)
+    print('Collecting cards for ' .. color)
+    local playerDiscardZone = playerDiscardTiles[color]
+    local playerCards = upCast(playerDiscardZone, 5, 0.1, true)
     local playerDiscardZonePos = playerDiscardZone.getPosition()
 
     for _, card in ipairs(playerCards) do
@@ -284,12 +299,9 @@ function collectCards(color)
     end
 end
 
-function takeCards(color)
-    startLuaCoroutine(self, 'collectCards')
-end
-
 -- House counting functions
 function checkForHouses(color)
+    print('Checking for houses for ' .. color)
     local playerHouses = {
         brickCities = 0,
         clothCities = 0,
@@ -301,7 +313,7 @@ function checkForHouses(color)
 
     local cityTiles = getCityTiles()
     for _, city in pairs(cityTiles) do
-        local hitObjs = upCast(city)
+        local hitObjs = upCast(city, 5, 0.1, true)
         for _, house in pairs(hitObjs) do
             if house.getGMNotes() == color then
                 updateHouseTypes(city, playerHouses)
@@ -341,15 +353,38 @@ end
 
 -- Region checking for Saturn scoring
 function regionCheck(color)
-    local gameBoard = boardPickerZone
-    if not gameBoard then return 0 end
+	local result = 0
 
-    local boardState = gameBoard.getStateId()
-    local regionCount = 0
-
-    -- This would need to be implemented based on the specific board layout
-    -- For now, returning a placeholder value
-    return regionCount
+    if MainBoard.getStateId() == 1 then
+        result = regionLoop(BritanniaRegions, stdBagB, color)
+    elseif MainBoard.getStateId() == 2 then
+        result = regionLoop(HispaniaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 3 then
+     result = regionLoop(ItaliaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 4 then
+        result = regionLoop(ByzantiumRegions, stdBagASalsa, color)
+    elseif MainBoard.getStateId() == 5 then -- Imperium
+        result = regionLoop(ImperiumRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 6 then
+        result = regionLoop(corsicaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 7 then
+        result = regionLoop(GaliaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 8 then
+        result = regionLoop(GermaniaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 9 then
+        result = regionLoop(CretaRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 10 then
+        result = regionLoop(AegyptusRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 11 then
+        result = regionLoop(IONIVMRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 12 then
+        result = regionLoop(CYPRUSRegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 13 then
+        result = regionLoop(BALEARICARegions, stdBagA, color)
+    elseif MainBoard.getStateId() == 14 then
+        result = regionLoop(HELLASRegions, stdBagA, color)
+    end
+    return result
 end
 
 -- Reset function for scoring tables

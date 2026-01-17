@@ -1,0 +1,110 @@
+<TableLayout id="scoreboard" active="false"
+		rectAlignment="UpperLeft" offsetXY="70 -140"
+		height="208" width="100"
+		cellPadding="5 10 0 0" cellBackgroundColor="clear" rowBackgroundColor="rgba(0, 0, 0, 0.97)">
+	<Row><Cell><Text color="white" alignment="MiddleRight">Player</Text></Cell></Row>
+	<Row><Cell><Text color="white" alignment="MiddleRight">Vesta</Text></Cell></Row>
+	<Row><Cell><Text color="white" alignment="MiddleRight">Jvpiter</Text></Cell></Row>
+	<Row><Cell><Text color="white" alignment="MiddleRight">Satvrnvs</Text></Cell></Row>
+	<Row><Cell><Text color="white" alignment="MiddleRight">Mercvrivs</Text></Cell></Row>
+	<Row><Cell><Text color="white" alignment="MiddleRight">Mars</Text></Cell></Row>
+	<Row><Cell><Text color="white" alignment="MiddleRight">Minerva</Text></Cell></Row>
+  <Row><Cell><Text color="white" alignment="MiddleRight">Concordia</Text></Cell></Row>
+  <Row><Cell><Text color="white" alignment="MiddleRight">Venus</Text></Cell></Row>
+  <Row><Cell><Text color="white" alignment="MiddleRight">Total</Text></Cell></Row>
+</TableLayout>
+
+<TableLayout id="scoreboardRed" active="false"
+		rectAlignment="UpperLeft" offsetXY="190 -140"
+		height="208" width="100"
+		cellPadding="5 5 0 0" cellBackgroundColor="clear" rowBackgroundColor="rgba(0, 0, 0, 0.97)">
+	<Row><Cell><Text id="nameRed" color="Red" alignment="MiddleCenter"></Text></Cell></Row>
+	<Row><Cell><Text id="VestaRed" color="Red" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="JupiterRed" color="Red" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="SaturnRed" color="Red" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MercuryRed" color="Red" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MarsRed" color="Red" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MinervaRed" color="Red" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="ConcordiaRed" color="Red" alignment="MiddleCenter">0</Text></Cell></Row>
+    <Row><Cell><Text id="VenusRed" color="Red" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="totalRed" color="Red" alignment="MiddleCenter">0</Text></Cell></Row>
+</TableLayout>
+
+<TableLayout id="scoreboardBlue" active="false"
+		rectAlignment="UpperLeft" offsetXY="260 -140"
+		height="208" width="100"
+		cellPadding="5 5 0 0" cellBackgroundColor="clear" rowBackgroundColor="rgba(0, 0, 0, 0.97)">
+	<Row><Cell><Text id="nameBlue" color="Blue" alignment="MiddleCenter"></Text></Cell></Row>
+	<Row><Cell><Text id="VestaBlue" color="Blue" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="JupiterBlue" color="Blue" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="SaturnBlue" color="Blue" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MercuryBlue" color="Blue" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MarsBlue" color="Blue" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MinervaBlue" color="Blue" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="ConcordiaBlue" color="Blue" alignment="MiddleCenter">0</Text></Cell></Row>
+    <Row><Cell><Text id="VenusBlue" color="Blue" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="totalBlue" color="Blue" alignment="MiddleCenter">0</Text></Cell></Row>
+</TableLayout>
+
+<TableLayout id="scoreboardGreen" active="false"
+		rectAlignment="UpperLeft" offsetXY="330 -140"
+		height="208" width="100"
+		cellPadding="5 5 0 0" cellBackgroundColor="clear" rowBackgroundColor="rgba(0, 0, 0, 0.97)">
+	<Row><Cell><Text id="nameGreen" color="Green" alignment="MiddleCenter"></Text></Cell></Row>
+	<Row><Cell><Text id="VestaGreen" color="Green" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="JupiterGreen" color="Green" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="SaturnGreen" color="Green" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MercuryGreen" color="Green" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MarsGreen" color="Green" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MinervaGreen" color="Green" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="ConcordiaGreen" color="Green" alignment="MiddleCenter">0</Text></Cell></Row>
+    <Row><Cell><Text id="VenusGreen" color="Green" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="totalGreen" color="Green" alignment="MiddleCenter">0</Text></Cell></Row>
+</TableLayout>
+
+<TableLayout id="scoreboardYellow" active="false"
+		rectAlignment="UpperLeft" offsetXY="400 -140"
+		height="208" width="100"
+		cellPadding="5 5 0 0" cellBackgroundColor="clear" rowBackgroundColor="rgba(0, 0, 0, 0.97)">
+	<Row><Cell><Text id="nameYellow" color="Yellow" alignment="MiddleCenter"></Text></Cell></Row>
+	<Row><Cell><Text id="VestaYellow" color="Yellow" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="JupiterYellow" color="Yellow" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="SaturnYellow" color="Yellow" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MercuryYellow" color="Yellow" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MarsYellow" color="Yellow" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MinervaYellow" color="Yellow" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="ConcordiaYellow" color="Yellow" alignment="MiddleCenter">0</Text></Cell></Row>
+    <Row><Cell><Text id="VenusYellow" color="Yellow" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="totalYellow" color="Yellow" alignment="MiddleCenter">0</Text></Cell></Row>
+</TableLayout>
+
+<TableLayout id="scoreboardWhite" active="false"
+		rectAlignment="UpperLeft" offsetXY="470 -140"
+		height="208" width="100"
+		cellPadding="5 5 0 0" cellBackgroundColor="clear" rowBackgroundColor="rgba(0, 0, 0, 0.97)">
+	<Row><Cell><Text id="nameWhite" color="White" alignment="MiddleCenter"></Text></Cell></Row>
+	<Row><Cell><Text id="VestaWhite" color="White" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="JupiterWhite" color="White" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="SaturnWhite" color="White" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MercuryWhite" color="White" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MarsWhite" color="White" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MinervaWhite" color="White" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="ConcordiaWhite" color="White" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="totalWhite" color="White" alignment="MiddleCenter">0</Text></Cell></Row>
+</TableLayout>
+
+<TableLayout id="scoreboardBlack" active="false"
+		rectAlignment="UpperLeft" offsetXY="330 -140"
+		height="208" width="100"
+		cellPadding="5 5 0 0" cellBackgroundColor="clear" rowBackgroundColor="rgba(0, 0, 0, 0.97)">
+	<Row><Cell><Text id="nameBlack" color="Black" alignment="MiddleCenter"></Text></Cell></Row>
+	<Row><Cell><Text id="VestaBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="JupiterBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="SaturnBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MercuryBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MarsBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MinervaBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="ConcordiaBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
+    <Row><Cell><Text id="VenusBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="totalBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
+</TableLayout>

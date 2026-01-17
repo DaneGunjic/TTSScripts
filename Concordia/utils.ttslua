@@ -60,6 +60,26 @@ function upCast(obj, dist, offset, multi)
     end
 end
 
+function regionLoop(regionTable, tiles, color)
+	local playerRegions = 0
+	for _, region in pairs(regionTable) do
+		local currentRegion = region
+		local breakFlag = false
+		for _, city in pairs(currentRegion) do
+			local hitObjs = upCast(tiles[city], 5, 0.1, true)
+			for _, house in pairs(hitObjs) do
+				if breakFlag then break end
+				if house.getGMNotes() == color then
+					playerRegions = playerRegions + 1
+					breakFlag = true
+					break
+				end
+			end
+		end
+	end
+	return playerRegions
+end
+
 -- Table utility functions
 function tableParser(key, tableToSearch)
     for _, thing in ipairs(tableToSearch) do
@@ -105,6 +125,12 @@ function shuffleArray(array)
         counter = counter - 1
     end
 	return array
+end
+
+function getPlayerName(playerColor)
+	local name = Player[playerColor].steam_name
+	if name == nil then name = playerColor end
+	return name
 end
 
 function shuffleList(list)
