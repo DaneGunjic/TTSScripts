@@ -2,7 +2,7 @@
 
 -- Senator board placement and positioning
 function placeSenatorBoard()
-    print('Placing senator board')
+    --print('Placing senator board')
     local ClothBoard = nil
     local WineBoard = nil
     local rot = Vector(0,180,0)
@@ -14,7 +14,7 @@ function placeSenatorBoard()
 
     -- Swap logic: Move otherBoard to senatorBoard's current position
     if altWineBoard then
-        print('Swapping wine and cloth boards')
+        --print('Swapping wine and cloth boards')
             SenatorBoardWine.setPosition(SenatorBoardClothOriginalPos)
             SenatorBoardCloth.setPosition(SenatorBoardWineOriginalPos)
             SenatorBoardWine.setRotation(SenatorBoardClothOriginalRot)
@@ -141,7 +141,7 @@ function findNextSenatorCard(startPos, snapTable, obj)
         local pos = obj.positionToWorld(snapTable[i].position)
         local hitObj = rayCast(pos, obj)
         if hitObj then
-            print("hitobject: " .. hitObj.getName())
+            --print("hitobject: " .. hitObj.getName())
             if hitObj.hasTag('Senator') then
                 return hitObj
             end
@@ -229,17 +229,12 @@ end
 function buySenatorCard(clickedCard, color, alt_click)
     --print("Buying senator card " .. clickedCard.guid .. " for player " .. color)
     local cardPosition = cardPositionFinder(clickedCard)
-    print("cardPosition: " .. cardPosition or "nil")
+    --print("cardPosition: " .. cardPosition or "nil")
 
-    -- Calculate Base Cost from Card Tags
     local cardPrice = calculateCardCost(clickedCard)
-
-    -- Add Position-Based Costs
+    local hasWildCost = false
     if cardPosition == 2 or cardPosition == 3 or cardPosition == 6 then
-        printToAll(Player[color].steam_name .. ' please pay 1 additional resource of your choice for the ? cost.', color)
-        if playerWarehouses[color] then
-            Player[color].pingTable(playerWarehouses[color].getPosition())
-        end
+        hasWildCost = true
     end
 
     if cardPosition == 4 then
@@ -253,10 +248,10 @@ function buySenatorCard(clickedCard, color, alt_click)
     elseif cardPosition == 6 then
         if altWineBoard then
             cardPrice.Wine = (cardPrice.Wine or 0) + 1
-            print("DEBUG: Updated cost for Wine: " .. cardPrice.Wine)
+            --print("DEBUG: Updated cost for Wine: " .. cardPrice.Wine)
         else
             cardPrice.Cloth = (cardPrice.Cloth or 0) + 1
-            print("DEBUG: Updated cost for Cloth: " .. cardPrice.Cloth)
+            --print("DEBUG: Updated cost for Cloth: " .. cardPrice.Cloth)
         end
     elseif cardPosition == 7 then
         if altWineBoard then
@@ -270,7 +265,7 @@ function buySenatorCard(clickedCard, color, alt_click)
     -- Scan Player Warehouse
     local warehouse = playerWarehouses[color]
     if not warehouse then
-        print("Error: No warehouse found for color " .. color)
+        --rint("Error: No warehouse found for color " .. color)
         return 0
     end
 
@@ -309,7 +304,6 @@ function buySenatorCard(clickedCard, color, alt_click)
         end
     end
 
-    -- Check if we have enough Salt to cover the deficit
     if saltNeeded > 0 then
         if #inventory.Salt >= saltNeeded then
             for i = 1, saltNeeded do
@@ -322,7 +316,43 @@ function buySenatorCard(clickedCard, color, alt_click)
         end
     end
 
-    -- Execute Transaction
+    if hasWildCost then
+        local usedCounts = {}
+        for _, obj in ipairs(resourcesToPay) do
+            local name = obj.getName()
+            usedCounts[name] = (usedCounts[name] or 0) + 1
+        end
+
+        local totalInventoryCount = 0
+        for _, list in pairs(inventory) do
+            totalInventoryCount = totalInventoryCount + #list
+        end
+
+        local totalUsedCount = 0
+        for _, count in pairs(usedCounts) do
+            totalUsedCount = totalUsedCount + count
+        end
+
+        local remainingCount = totalInventoryCount - totalUsedCount
+
+        if remainingCount == 1 then
+            for name, list in pairs(inventory) do
+                local total = #list
+                local used = usedCounts[name] or 0
+                if total - used == 1 then
+                    local obj = list[used + 1]
+                    table.insert(resourcesToPay, obj)
+                    break
+                end
+            end
+        else
+            printToAll(Player[color].steam_name .. ' please pay 1 additional resource of your choice for the ? cost.', color)
+            if playerWarehouses[color] then
+                Player[color].pingTable(playerWarehouses[color].getPosition())
+            end
+        end
+    end
+
     local resourcesPaid = {}
     for _, obj in ipairs(resourcesToPay) do
         local name = obj.getName()

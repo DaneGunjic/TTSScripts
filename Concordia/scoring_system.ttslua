@@ -60,7 +60,6 @@ function scoreCalcCO()
     end
 
     resetTables()
-    toggleScoreBoardButton()
     scoreBoardToggle = 1
     return 1
 end
@@ -130,23 +129,23 @@ function scoreMinerva(color, houseTable, playerCardTable)
             if key == 'Brick' then
                 minervaScores.Brick = minervaScores.Brick + (3 * houseTable.brickCities)
                 minervaVP = minervaVP + minervaScores.Brick
-                printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Brick .. ' points for brick cities.', color)
+                --printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Brick .. ' points for brick cities.', color)
             elseif key =='Food' then
                 minervaScores.Food = minervaScores.Food + (3 * houseTable.foodCities)
                 minervaVP = minervaVP + minervaScores.Food
-                printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Food .. ' points for food cities.', color)
+                --printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Food .. ' points for food cities.', color)
             elseif key == 'Tool' then
                 minervaScores.Tool = minervaScores.Tool + (3 * houseTable.toolCities)
                 minervaVP = minervaVP + minervaScores.Tool
-                printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Tool .. ' points for tool cities.', color)
+                --printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Tool .. ' points for tool cities.', color)
             elseif key == 'Wine' then
                 minervaScores.Wine = minervaScores.Wine + (4 * houseTable.wineCities)
                 minervaVP = minervaVP + minervaScores.Wine
-                printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Wine .. ' points for wine cities.', color)
+                --printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Wine .. ' points for wine cities.', color)
             elseif key == 'Cloth'then
                 minervaScores.Cloth = minervaScores.Cloth + (5 * houseTable.clothCities)
                 minervaVP = minervaVP + minervaScores.Cloth
-                printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Cloth .. ' points for cloth cities.', color)
+                --printToAll(Player[color].steam_name .. ' got ' .. minervaScores.Cloth .. ' points for cloth cities.', color)
             end
         end
     end
@@ -164,7 +163,7 @@ end
 
 -- Vesta scoring (money and goods)
 function scoreVesta(color)
-    print('Scoring Vesta for ' .. color)
+    --print('Scoring Vesta for ' .. color)
     local playerColor = color
     local playerSupplies = playerWarehouses[playerColor]
     local playerMoney = playerMoneyValues[playerColor] or 0
@@ -195,17 +194,17 @@ end
 -- Mercury scoring (good types)
 function scoreMercury(color, cardTable, houseTable)
 	local numMercury = cardTable.Mercury
+    --print("Mercury cards for " .. color .. ": " .. tostring(numMercury))
 	local baseGoodsVP = 0
 	local mercuryScore = 0
 	for key, goodType in pairs(houseTable) do
-		if goodType > 0 and key ~= saltCities then
+		if goodType > 0 and key ~= "saltCities" then
+			--print("Mercury counts " .. key .. " with " .. tostring(goodType) .. " cities")
 			baseGoodsVP = baseGoodsVP + 2
+		else
+			--print("Mercury ignores " .. key .. " with " .. tostring(goodType) .. " cities")
 		end
 	end
-
-  if baseGoodsVP > 10 then -- this was the easiest way to deal with salt cities. Will account for missing and not go over 10 base
-    baseGoodsVP = 10
-  end
 
 	mercuryScore = mercuryScore + (numMercury * baseGoodsVP)
 
@@ -227,7 +226,8 @@ function scoreMars(color, cardTable)
 			numColonists = numColonists + 1
 		end
 	end
-	-- print('You have this many colonists: ' .. numColonists)
+
+	--print('You have this many unused colonists: ' .. numColonists)
     marsVP = (marsVP + (8 -(numColonists * 2))) * numMarsCards
     -- print('the value of marsVP is ' .. marsVP)
 	return marsVP
@@ -235,7 +235,7 @@ end
 
 -- Jupiter scoring (non-brick houses)
 function scoreJupiter(color, cardTable, houseTable)
-    print('Scoring Jupiter for ' .. color)
+    --print('Scoring Jupiter for ' .. color)
     local numJupiter = cardTable.Jupiter
     local jupiterVP = 0
     local nonBrickHouseTotal = 0
@@ -252,7 +252,7 @@ end
 
 -- Card counting and collection functions
 function countCards(color)
-    print('Counting cards for ' .. color)
+    --print('Counting cards for ' .. color)
     local playerDiscardTile = playerDiscardTiles[color]
     local discardZoneObjects = upCast(playerDiscardTile, 5, 0.1, true)
     local playerDeck = nil
@@ -298,6 +298,7 @@ function countCards(color)
         -- Count god cards
         for _, tag in ipairs(cardTags) do
             if tempCard.hasTag(tag) then
+                --print(tag)
                 cardTotals[tag] = cardTotals[tag] + 1
             end
         end
@@ -307,7 +308,7 @@ function countCards(color)
 end
 
 function collectCards(color)
-    print('Collecting cards for ' .. color)
+    --print('Collecting cards for ' .. color)
     local playerDiscardZone = playerDiscardTiles[color]
     local playerCards = upCast(playerDiscardZone, 5, 0.1, true)
     local playerDiscardZonePos = playerDiscardZone.getPosition()
@@ -319,7 +320,7 @@ end
 
 -- House counting functions
 function checkForHouses(color)
-    print('Checking for houses for ' .. color)
+    --print('Checking for houses for ' .. color)
     local playerHouses = {
         brickCities = 0,
         clothCities = 0,
@@ -331,9 +332,11 @@ function checkForHouses(color)
 
     local cityTiles = getCityTiles()
     for _, city in pairs(cityTiles) do
+        --print("Checking city tile: " .. city.getName() .. " (" .. city.guid .. ")")
         local hitObjs = upCast(city, 5, 0.1, true)
         for _, house in pairs(hitObjs) do
             if house.getGMNotes() == color then
+                --print("Found house for " .. color .. " in city")
                 updateHouseTypes(city, playerHouses)
             end
         end
@@ -358,15 +361,9 @@ function updateHouseTypes(obj, tbl)
 end
 
 function getCityTiles()
-    local allObjects = getAllObjects()
-    local cityTiles = {}
-
-    for _, obj in pairs(allObjects) do
-        if obj.hasTag('City') then
-            table.insert(cityTiles, obj)
-        end
-    end
-    return cityTiles
+	local cityTiles = {}
+	cityTiles = getObjectsWithAllTags({"city_tile"})
+	return cityTiles
 end
 
 -- Region checking for Saturn scoring
@@ -443,7 +440,7 @@ end
 function sellWarehouseResources(color)
     local warehouseObj = playerWarehouses[color]
     if warehouseObj == nil then
-        printToAll(Player[color].steam_name .. ' had no warehouse to sell from', color)
+        --printToAll(Player[color].steam_name .. ' had no warehouse to sell from', color)
         return
     end
 
@@ -528,23 +525,6 @@ function createScoreButton()
             font_size = 300,
             rotation = {0, 270, 0},
             color = 'Purple'
-        })
-    end
-    return 0
-end
-
-function toggleScoreBoardButton()
-    local buttonHolder = getObjectFromGUID('777e0a')
-    if buttonHolder then
-        buttonHolder.createButton({
-            position = {0, 1, 0},
-            label = 'Toggle \nScoreboard',
-            click_function = 'toggleScoreBoard',
-            width = 3500,
-            height = 2000,
-            font_size = 700,
-            rotation = {0, 270, 0},
-            color = 'Orange'
         })
     end
     return 0

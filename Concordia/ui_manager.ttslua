@@ -375,7 +375,6 @@ function tribuneAction(obj, color)
 
     if deckSize > 3 then
         local earnedMoney = deckSize - 3
-        printToAll(Player[color].steam_name .. ' got ' .. earnedMoney .. ' coins from Tribune', color)
         addMoney(color, earnedMoney)
     else
         printToAll(Player[color].steam_name .. ' got 0 coins from Tribune', color)
@@ -481,6 +480,13 @@ function addMoney(color, amount)
     playerMoneyValues[color] = playerMoneyValues[color] + amount
     if playerMoneyValues[color] < 0 then playerMoneyValues[color] = 0 end
     updateMoneyDisplay(color)
+
+    local playerName = Player[color].steam_name
+    if amount > 0 then
+        printToAll(playerName .. ' gained ' .. amount .. ' sestertii', color)
+    elseif amount < 0 then
+        printToAll(playerName .. ' spent ' .. math.abs(amount) .. ' sestertii', color)
+    end
 end
 
 function setMoney(color, amount)

@@ -11,7 +11,7 @@ end
 
 -- Random setup function
 function randomMapAndStore()
-    print("Randomizing map and store...")
+    --print("Randomizing map and store...")
     local randomStore = math.random(2)
     local randomMap = math.random(14)
     local randomSalsa = math.random(2)
@@ -124,7 +124,7 @@ function setBoard(stateId)
 
     selectedMap = stateId
     if MainBoard and MainBoard.setState then
-        print('[game_setup] INFO: Setting board to stateId = ' .. stateId)
+        --print('[game_setup] INFO: Setting board to stateId = ' .. stateId)
         MainBoard = MainBoard.setState(stateId)
 
         local targetRotation = mapRotations[stateId] or 0
@@ -133,7 +133,7 @@ function setBoard(stateId)
         MainBoard.locked = true
         --MainBoard.interactable = false
 
-        print('[game_setup] INFO: Board set to stateId = ' .. stateId .. ' with rotation ' .. targetRotation)
+        --print('[game_setup] INFO: Board set to stateId = ' .. stateId .. ' with rotation ' .. targetRotation)
     else
         print('[game_setup] WARN: MainBoard not available or not stateful')
     end
@@ -166,7 +166,7 @@ function runInitialSetup()
     --print("Setting up board specific elements for state ID: " .. MainBoard.getStateId())
 
 	if(MainBoard.getStateId() == 1) then
-        print("Setting up Britannia cities and tiles")
+        --print("Setting up Britannia cities and tiles")
 		PlaceCities(BritanniaB, stdBagB)
 		PlaceCities(BritanniaC, stdBagC)
 		PlaceCities(BritanniaD, stdBagD)
@@ -199,7 +199,7 @@ function runInitialSetup()
 		parseRegions(stdBagASalsa,ByzantiumRegions, ByzantiumTiles)
 
 	elseif(MainBoard.getStateId() == 5) then
-        print("Setting up Imperiumvm cities and tiles")
+        --print("Setting up Imperiumvm cities and tiles")
 		PlaceCities(ImperiumA, stdBagA)
 		PlaceCities(ImperiumB, stdBagB)
 		PlaceCities(ImperiumC, stdBagC)
@@ -375,6 +375,9 @@ function setupForumTiles()
         return
     end
 
+    blueBag.shuffle()
+    greenBag.shuffle()
+
     local seatedPlayers = getSeatedPlayers()
 
     for _, color in ipairs(seatedPlayers) do
@@ -398,6 +401,7 @@ function setupForumTiles()
             local params = {}
             params.guid = entry.guid
             params.position = {basePos[1] + offsetX, basePos[2] + 2, basePos[3]}
+            params.rotation = {0, 180, 0}
             params.smooth = false
             blueBag.takeObject(params)
         end
@@ -568,46 +572,6 @@ function setMainDeck()
 	end
 
 	Wait.time(restockSenatorBoard, 1)
-end
-
-function setupBoardSpecificElements(stateId)
-    print("Setting up board specific elements for state ID: " .. stateId)
-    local gameBoard = boardPickerZone
-
-    if boolSalsa then
-        addSalt()
-    else
-        local i = 1
-        while i <= #lootZoneSwapSalsaGUID do
-            swapSaltTokenForFood(lootZoneSwapSalsaGUID[i])
-            i = i + 1
-        end
-    end
-
-    -- Board-specific setup based on state ID
-    if stateId == 1 then
-        PlaceCities(BritanniaB, stdBagB)
-        PlaceCities(BRITTNANIAC, stdBagC)
-        PlaceCities(BRITTNANIAD, stdBagD)
-        TableConcat(stdBagB, stdBagC)
-        TableConcat(stdBagB, stdBagD)
-        parseRegions(stdBagB, BRITTNANIARegions, BRITTNANIAtiles)
-    elseif stateId == 2 then
-        PlaceCities(HispaniaA, stdBagASalsa)
-        PlaceCities(HispaniaB, stdBagBSalsa)
-        PlaceCities(HispaniaD, stdBagDSalsa)
-        TableConcat(stdBagASalsa, stdBagBSalsa)
-        TableConcat(stdBagASalsa, stdBagDSalsa)
-        parseRegions(stdBagASalsa, HispaniaRegions, HispaniaTiles)
-    elseif stateId == 3 then
-        PlaceCities(ItaliaA, stdBagA)
-        PlaceCities(ItaliaB, stdBagB)
-        PlaceCities(ItaliaC, stdBagC)
-        TableConcat(stdBagA, stdBagB)
-        TableConcat(stdBagA, stdBagC)
-        parseRegions(stdBagA, ItaliaRegions, ItaliaTiles)
-    -- Add other board states as needed
-    end
 end
 
 function parseRegions(CityTokens, RegionsAndCities, regionArray)

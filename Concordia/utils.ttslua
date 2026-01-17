@@ -127,12 +127,12 @@ function getTableTotal(tbl)
 end
 
 function tableChecker(checkMe, findMe)
-    for _, thing in ipairs(checkMe) do
-        if thing == findMe then
-            return true
-        end
-    end
-    return false
+	for i, thing in ipairs(checkMe) do
+		if thing == findMe then
+			return checkMe[i]
+		end
+	end
+return nil
 end
 
 function TableConcat(t1, t2)
@@ -295,9 +295,9 @@ end
 
 function whatIsBest(objA, objB)
 	local valueA = getValue(objA)
-	print("valueA: " .. valueA)
+	--print("valueA: " .. valueA)
 	local valueB = getValue(objB)
-	print("valueB: " .. valueB)
+	--print("valueB: " .. valueB)
 	if(valueA == valueB or valueA > valueB)
 	then
 		return objA

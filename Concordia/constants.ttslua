@@ -53,7 +53,7 @@ playerMoneyCounters = {
     Green = getObjectFromGUID('dd8233'),
     Yellow = getObjectFromGUID('a42320'),
     Blue = getObjectFromGUID('30e24c'),
-    Black = getObjectFromGUID('9de0d6')
+    Brown = getObjectFromGUID('9de0d6')
 }
 
 playerMoneyValues = {
@@ -62,7 +62,7 @@ playerMoneyValues = {
     Green = 0,
     Yellow = 0,
     Blue = 0,
-    Black = 0
+    Brown = 0
 }
 
 playerWarehouses = {
@@ -71,6 +71,7 @@ playerWarehouses = {
     Yellow = getObjectFromGUID('e9bbce'),
     Green = getObjectFromGUID('35a11d'),
     Blue = getObjectFromGUID('f5683a'),
+    Brown = getObjectFromGUID('a7db01')
 }
 
 playerSellZones = {
@@ -79,7 +80,7 @@ playerSellZones = {
     Yellow = getObjectFromGUID('212fed'),
     Green = getObjectFromGUID('a05304'),
     Blue = getObjectFromGUID('6be7e1'),
-    Black = getObjectFromGUID('eda941')
+    Brown = getObjectFromGUID('eda941')
 }
 
 playerDiscardTiles = {
@@ -88,7 +89,7 @@ playerDiscardTiles = {
     Green = getObjectFromGUID('9ebccc'),
     Yellow = getObjectFromGUID('bc64cc'),
     Blue = getObjectFromGUID('92e213'),
-    Black = getObjectFromGUID('00b0b4')
+    Brown = getObjectFromGUID('00b0b4')
 }
 
 supplyBags = {

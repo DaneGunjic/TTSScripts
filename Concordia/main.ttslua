@@ -64,9 +64,9 @@ end
 
 function onPlayerTurn(player, previousPlayer)
     if player and player.steam_name then
-        print("Player: " .. player.steam_name .. " start of turn")
+        --print("Player: " .. player.steam_name .. " start of turn")
     else
-        print("Player turn started (name unavailable)")
+        --print("Player turn started (name unavailable)")
     end
     councilFlag = true
     if roundCounter and roundCounter ~= 0 then

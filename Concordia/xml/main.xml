@@ -93,18 +93,18 @@
 	<Row><Cell><Text id="totalWhite" color="White" alignment="MiddleCenter">0</Text></Cell></Row>
 </TableLayout>
 
-<TableLayout id="scoreboardBlack" active="false"
+<TableLayout id="scoreboardBrown" active="false"
 		rectAlignment="UpperLeft" offsetXY="330 -140"
 		height="208" width="100"
 		cellPadding="5 5 0 0" cellBackgroundColor="clear" rowBackgroundColor="rgba(0, 0, 0, 0.97)">
-	<Row><Cell><Text id="nameBlack" color="Black" alignment="MiddleCenter"></Text></Cell></Row>
-	<Row><Cell><Text id="VestaBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
-	<Row><Cell><Text id="JupiterBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
-	<Row><Cell><Text id="SaturnBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
-	<Row><Cell><Text id="MercuryBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
-	<Row><Cell><Text id="MarsBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
-	<Row><Cell><Text id="MinervaBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
-	<Row><Cell><Text id="ConcordiaBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
-    <Row><Cell><Text id="VenusBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
-	<Row><Cell><Text id="totalBlack" color="Black" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="nameBrown" color="Brown" alignment="MiddleCenter"></Text></Cell></Row>
+	<Row><Cell><Text id="VestaBrown" color="Brown" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="JupiterBrown" color="Brown" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="SaturnBrown" color="Brown" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MercuryBrown" color="Brown" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MarsBrown" color="Brown" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="MinervaBrown" color="Brown" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="ConcordiaBrown" color="Brown" alignment="MiddleCenter">0</Text></Cell></Row>
+    <Row><Cell><Text id="VenusBrown" color="Brown" alignment="MiddleCenter">0</Text></Cell></Row>
+	<Row><Cell><Text id="totalBrown" color="Brown" alignment="MiddleCenter">0</Text></Cell></Row>
 </TableLayout>
