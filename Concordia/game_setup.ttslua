@@ -246,7 +246,7 @@ function runInitialSetup()
 		--table.remove(Cretatiles,1)
 		TableConcat(stdBagA, stdBagB)
 		TableConcat(stdBagA, stdBagD)
-		parseRegions(stdBagA,CretaRegions, CretaTiles)
+		parseRegions(stdBagA, CretaRegions, CretaTiles)
 
 	elseif(MainBoard.getStateId() == 10)  then
 		PlaceCities(Aegyptusb, stdBagA)
@@ -581,6 +581,8 @@ function parseRegions(CityTokens, RegionsAndCities, regionArray)
 		local Regions = #RegionsAndCities
 
 		while CurrentRegion <= Regions do
+            if not (MainBoard.getStateId() == 9 and CurrentRegion == 3) then -- skips region 3 if we're on Creta
+
 			local CitiesCount = 1
 			local CitiesInRegion = #RegionsAndCities[CurrentRegion]
 			bestLoot = brickA
@@ -593,7 +595,9 @@ function parseRegions(CityTokens, RegionsAndCities, regionArray)
 			end
 			drawRegionBest(getValue(bestLoot), regionArray[CurrentRegion])
 			removeOneGuy(getValue(bestLoot))
-			CurrentRegion = CurrentRegion + 1
+            end
+
+            CurrentRegion = CurrentRegion + 1
 		end
 	end
 end
