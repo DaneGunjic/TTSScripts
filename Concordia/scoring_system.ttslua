@@ -395,7 +395,7 @@ function regionCheck(color)
     elseif MainBoard.getStateId() == 12 then
         result = regionLoop(CYPRUSRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 13 then
-        result = regionLoop(BALEARICARegions, stdBagA, color)
+        result = regionLoop(BalearicaRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 14 then
         result = regionLoop(HELLASRegions, stdBagA, color)
     end
@@ -430,7 +430,7 @@ function venusRegionCheck(color)
     elseif MainBoard.getStateId() == 12 then
         result = regionLoopVenus(CYPRUSRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 13 then
-        result = regionLoopVenus(BALEARICARegions, stdBagA, color)
+        result = regionLoopVenus(BalearicaRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 14 then
         result = regionLoopVenus(HELLASRegions, stdBagA, color)
     end

@@ -236,14 +236,14 @@ function runInitialSetup()
 		parseRegions(stdBagA,CYPRUSRegions, CYPRUSTiles)
 
     elseif(MainBoard.getStateId() == 13) then
-        PlaceCities(BALEARICAA, stdBagA)
-        PlaceCities(BALEARICAC, stdBagC)
-        PlaceCities(BALEARICAD, stdBagD)
+        PlaceCities(BalearicaA, stdBagA)
+        PlaceCities(BalearicaC, stdBagC)
+        PlaceCities(BalearicaD, stdBagD)
 
         TableConcat(stdBagA, stdBagC)
         TableConcat(stdBagA, stdBagD)
 
-        parseRegions(stdBagA,BALEARICARegions, BALEARICAtiles)
+        parseRegions(stdBagA,BalearicaRegions, BalearicaTiles)
 
     elseif(MainBoard.getStateId() == 14) then
         PlaceCities(HELLASA, stdBagA)
