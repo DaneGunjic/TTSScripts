@@ -174,12 +174,12 @@ function runInitialSetup()
 		parseRegions(stdBagA, corsicaRegions, CORSICAtokens)
 
 	elseif(MainBoard.getStateId() == 7) then
-		PlaceCities(galliaa, stdBagA)
-		PlaceCities(galliab, stdBagB)
-		PlaceCities(galliac, stdBagC)
+		PlaceCities(GalliaA, stdBagA)
+		PlaceCities(GalliaB, stdBagB)
+		PlaceCities(GalliaC, stdBagC)
 		TableConcat(stdBagA, stdBagB)
 		TableConcat(stdBagA, stdBagC)
-		parseRegions(stdBagA, GaliaRegions, galliatokens)
+		parseRegions(stdBagA, GaliaRegions, GalliaTokens)
 
 	elseif(MainBoard.getStateId() == 8)  then
 		PlaceCities(germaniaa, stdBagA)
@@ -525,6 +525,7 @@ end
 
 function parseRegions(CityTokens, RegionsAndCities, regionArray)
 	if CityTokens ~= nil then
+        createSnapPointsFromTokens(MainBoard, regionArray)
 		local bestLoot = brickA
 		local CurrentRegion = 1
 		local Regions = #RegionsAndCities
@@ -657,4 +658,26 @@ function checkLastCardDeckInzone(locationZone)
         end
     end
     return nil
+end
+
+function createSnapPointsFromTokens(board, tokenList)
+    if not board or not tokenList then return end
+
+    local snapPoints = board.getSnapPoints() or {}
+    local currentRot = board.getRotation()
+    local targetWorldY = 180
+    local localY = targetWorldY - currentRot.y
+
+    for _, pos in ipairs(tokenList) do
+        local worldPos = {x=pos[1], y=pos[2], z=pos[3]}
+        local localPos = board.positionToLocal(worldPos)
+
+        table.insert(snapPoints, {
+            position = localPos,
+            rotation = {0, localY, 0},
+            rotation_snap = true
+        })
+    end
+
+    board.setSnapPoints(snapPoints)
 end
