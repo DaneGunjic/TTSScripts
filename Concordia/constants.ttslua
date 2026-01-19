@@ -19,7 +19,7 @@ heightsize = 1000
 GameTableObject = getObjectFromGUID('4ee1f2')
 
 -- Board and Zone GUIDs
-MainBoard = getObjectFromGUID('0e1994')
+MainBoard = getObjectFromGUID('645ee2')
 
 extraMarket = getObjectFromGUID('d3d1e9')
 boardPickerZone = getObjectFromGUID('465f48')
@@ -131,7 +131,7 @@ typeSidePosCreta = {-0.20, 1.16, 18.93}
 typeSidePosAegyptus = {-28.38, 1.16, 11.47}
 typeSidePosIonivm = {0.22, 1.96, 20.95}
 
-mainDeckLocation = {-40.00, 1.50, -16.15}
+mainDeckLocation = {-49.45, 2.00, -12.09}
 
 -- Germany Extra Loot Positions
 posGermanyExtraLoot = {

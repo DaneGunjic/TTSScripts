@@ -54,6 +54,9 @@ function onLoad(savedData)
     SenatorBoardWine.setSnapPoints(SENATOR_BOARD_SNAPS)
 
     createScoreButton()
+
+    MainBoard.lock()
+    MainBoard.interactable = false
 end
 
 function onObjectLeaveContainer(container, leave_object)
@@ -77,22 +80,4 @@ function onPlayerTurn(player, previousPlayer)
     else
         roundCounter = 1
     end
-end
-
-function resetGame()
-    gameStarted = false
-    roundCounter = 0
-    forum = false
-    altWineBoard = false
-    boolSalsa = false
-    venusMode = 1
-    selectedMap = 5
-
-    -- Reset all game components
-    resetTables()
-
-    -- Recreate setup UI
-    initializeUI()
-
-    broadcastToAll('Game Reset. Ready for new setup.', 'Yellow')
 end
