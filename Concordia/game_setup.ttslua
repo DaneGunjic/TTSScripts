@@ -295,21 +295,35 @@ end
 
 -- Money and starting setup
 function startingMoney()
-	local turnOrder = Turns.order
-	local startingMoney = 5
-	for _, player in pairs(turnOrder) do
-		addMoney(player, startingMoney)
-		startingMoney = startingMoney + 1
-	end
+    local seatedPlayers = getSeatedPlayers()
+    local startColor = Turns.turn_color
+    local startIndex = 1
+
+    -- Find the starting player index
+    for i, color in ipairs(seatedPlayers) do
+        if color == startColor then
+            startIndex = i
+            break
+        end
+    end
+
+    local currentMoney = 5
+    local playerCount = #seatedPlayers
+
+    for i = 0, playerCount - 1 do
+        local index = (startIndex + i - 1) % playerCount + 1
+        local player = seatedPlayers[index]
+        addMoney(player, currentMoney)
+        currentMoney = currentMoney + 1
+    end
 end
 
 function randomFirstPlayer()
-    --Have to get the seated players then shuffle otherwise Turns.order retruns nothing
     local seatedPlayers = getSeatedPlayers()
-    local shuffledPlayers = shuffleList(seatedPlayers)
-    Turns.order = shuffledPlayers
-    Turns.type = 2 -- type 2 is required for Turns.order to return something. Fuck you tts
+    local r = math.random(1, #seatedPlayers)
+    broadcastToAll("The starting player is: " .. seatedPlayers[r])
     Turns.enable = true
+    Turns.turn_color = seatedPlayers[r]
 end
 
 function addSalt()
@@ -473,11 +487,19 @@ function removeOneGuy(lootSwitcher)
 end
 
 function shufflestuff()
-    Personality1Deck_NoTeams.shuffle()
-    Personality2Deck_NoTeams.shuffle()
-    Personality3Deck_NoTeams.shuffle()
-    Personality4Deck_NoTeams.shuffle()
-    Personality5Deck_NoTeams.shuffle()
+    if teamsEnabled then
+        Personality1Deck_Teams.shuffle()
+        Personality2Deck_Teams.shuffle()
+        Personality3Deck_Teams.shuffle()
+        Personality4Deck_Teams.shuffle()
+        Personality5Deck_Teams.shuffle()
+    else
+        Personality1Deck_NoTeams.shuffle()
+        Personality2Deck_NoTeams.shuffle()
+        Personality3Deck_NoTeams.shuffle()
+        Personality4Deck_NoTeams.shuffle()
+        Personality5Deck_NoTeams.shuffle()
+    end
 end
 
 function stuffDeck(target, source, count)
@@ -491,36 +513,38 @@ function stuffDeck(target, source, count)
 end
 
 function setMainDeck()
+    local p1, p2, p3, p4, p5
+    if teamsEnabled then
+        p1 = Personality1Deck_Teams
+        p2 = Personality2Deck_Teams
+        p3 = Personality3Deck_Teams
+        p4 = Personality4Deck_Teams
+        p5 = Personality5Deck_Teams
+    else
+        p1 = Personality1Deck_NoTeams
+        p2 = Personality2Deck_NoTeams
+        p3 = Personality3Deck_NoTeams
+        p4 = Personality4Deck_NoTeams
+        p5 = Personality5Deck_NoTeams
+    end
+
     --need to accomodate for venus count of 32 cards in deck
-	Personality1Deck_NoTeams.setPosition(mainDeckLocation)
-    Personality1Deck_NoTeams.setRotation({0, 90, 180})
+	p1.setPosition(mainDeckLocation)
+    p1.setRotation({0, 90, 180})
 
-	if(venusMode == 1) then --If Venus is off, then...
-        --print("venusMode is off, setting up main deck for " .. numberOfPlayers .. " players")
-		stuffDeck(Personality1Deck_NoTeams, Personality2Deck_NoTeams, #Personality2Deck_NoTeams.getObjects())
-		if(numberOfPlayers > 2 ) then
-			stuffDeck(Personality1Deck_NoTeams,Personality3Deck_NoTeams, #Personality3Deck_NoTeams.getObjects())
-			if(numberOfPlayers > 3 ) then
-				stuffDeck(Personality1Deck_NoTeams,Personality4Deck_NoTeams, #Personality4Deck_NoTeams.getObjects())
-				if(numberOfPlayers > 4 ) then
-					stuffDeck(Personality1Deck_NoTeams,Personality5Deck_NoTeams, #Personality5Deck_NoTeams.getObjects())
-				end
-			end
-		end
-	-- else --If Venus is on, then
-	-- 	stuffDeck(Personality1Deck_NoTeams,Personality2Deck_NoTeams, #Personality2Deck_NoTeams.getObjects())
-	-- 	if(numberOfPlayers > 2 ) then
-	-- 		stuffDeck(Personality1Deck_NoTeams,Personality3Deck_NoTeams, #Personality3Deck_NoTeams.getObjects())
-	-- 		if(numberOfPlayers > 3 ) then
-	-- 			stuffDeck(Personality1Deck_NoTeams,Personality4Deck_NoTeams, #Personality4Deck_NoTeams.getObjects())
-	-- 			if(numberOfPlayers > 4 ) then
-	-- 				stuffDeck(Personality1Deck_NoTeams,Personality5Deck_NoTeams, #Personality5Deck_NoTeams.getObjects())
-	-- 			end
-	-- 		end
-	-- 	end
-	end
+    --print("venusMode is off, setting up main deck for " .. numberOfPlayers .. " players")
+    stuffDeck(p1, p2, #p2.getObjects())
+    if(numberOfPlayers > 2 ) then
+        stuffDeck(p1,p3, #p3.getObjects())
+        if(numberOfPlayers > 3 ) then
+            stuffDeck(p1,p4, #p4.getObjects())
+            if(numberOfPlayers > 4 ) then
+                stuffDeck(p1,p5, #p5.getObjects())
+            end
+        end
+    end
 
-	Wait.time(restockSenatorBoard, 1)
+    Wait.time(restockSenatorBoard, 1)
 end
 
 function parseRegions(CityTokens, RegionsAndCities, regionArray)

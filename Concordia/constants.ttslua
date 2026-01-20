@@ -5,6 +5,7 @@ altWineBoard = false
 selectedMap = 5
 numberOfPlayers = 2
 venusMode = 1
+teamsEnabled = false
 typeSide = 1
 debugCounter = 1
 lockDoubleTrouble = true
@@ -52,7 +53,7 @@ Personality4Deck_NoTeams = getObjectFromGUID('4d2f34')
 Personality5Deck_NoTeams = getObjectFromGUID('93f455')
 
 Personality1Deck_Teams = getObjectFromGUID('85c408')
-Personality2Deck_Teams = getObjectFromGUID('bb5e38')
+Personality2Deck_Teams = getObjectFromGUID('f75097')
 Personality3Deck_Teams = getObjectFromGUID('bd18b6')
 Personality4Deck_Teams = getObjectFromGUID('d89fc9')
 Personality5Deck_Teams = getObjectFromGUID('d0ff3f')

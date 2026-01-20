@@ -25,10 +25,9 @@ function CreateButtons()
     btnSalsa = createButton('4ee1f2', 'SALSA [OFF]', 'ToggleSalsa', 0, 500, 'Green', -13.5, 10)
     btnForum = createButton('4ee1f2', 'FORUM [OFF]', 'ToggleForum', 0, 500, 'Green', -13.5, 9.5)
     btnDisplay = createButton('4ee1f2','Cloth Display', 'turnSwapDisplay', 0, 500, 'Green', -13.5, 9)
+    btnTeams = createButton('4ee1f2','Teams [OFF]', 'ToggleTeams', 0, 500, 'Green', -13.5, 8.5)
 
     btnStartGame = createButton('4ee1f2', 'Start Game', 'StartGame', 0, 0, 'White', -15, 8)
-
-    -- btnRandomSetup = createButton('4ee1f2', 'Random Setup', 'randomMapAndStore',800,0, 'Pink', 0,0)
 end
 
 function createButton(objectGuid, label, clickFunction, heightOffset, widthOffset, buttonColor, offsetX, offsetZ)
@@ -218,24 +217,21 @@ function ToggleSalsa()
     end
 end
 
-function turnSwapVenus()
-    local idx = findButtonIndex(btnVenus, 'turnSwapVenus')
+function ToggleTeams()
+    local idx = findButtonIndex(btnTeams, 'ToggleTeams')
     if idx == nil then return end
 
     local button_parameters = {}
     button_parameters.index = idx
-    if venusONNN == 3 then
-        venusONNN = 1
-        button_parameters.label = "Venus OFF"
-    elseif venusONNN == 1 then
-        venusONNN = 2
-        button_parameters.label = "VENUS ON ♀️"
-    elseif venusONNN == 2 then
-        venusONNN = 3
-        button_parameters.label = "VENUS Teams"
-        broadcastToAll('For use with 4 or 6 Players, for 6 player setup, just use the 5 player setup button',{r = 1, g = 1, b = 1})
+    if teamsEnabled then
+        teamsEnabled = false
+        button_parameters.label = "Teams [OFF]"
+    else
+        teamsEnabled = true
+        button_parameters.label = "Teams [ON]"
+        broadcastToAll('Teams mode enabled - Team decks will be used',{r = 1, g = 1, b = 1})
     end
-    btnVenus.editButton(button_parameters)
+    btnTeams.editButton(button_parameters)
 end
 
 function turnSwapDisplay()
@@ -338,10 +334,11 @@ function sellItems(obj, color, alt_click)
         end
     end
 
-    printToAll(Player[color].steam_name .. ' has sold the following for ' .. totalValue .. ' sestertii:', color)
+    printToAll(Player[color].steam_name .. ' has sold the following: ', color)
     for key, value in pairs(goodsSold) do
         printToAll(key .. ': ' .. value, color)
     end
+    
     addMoney(color, totalValue)
 end
 
@@ -426,9 +423,9 @@ function hideExpansionButtons()
         local idx = findButtonIndex(btnForum, 'ToggleForum')
         if idx then btnForum.removeButton(idx) end
     end
-    if btnVenus then
-        local idx = findButtonIndex(btnVenus, 'turnSwapVenus')
-        if idx then btnVenus.removeButton(idx) end
+    if btnTeams then
+        local idx = findButtonIndex(btnTeams, 'ToggleTeams')
+        if idx then btnTeams.removeButton(idx) end
     end
     if btnDisplay then
         local idx = findButtonIndex(btnDisplay, 'turnSwapDisplay')
