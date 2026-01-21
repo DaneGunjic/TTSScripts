@@ -48,7 +48,6 @@ function SelectBoardBalearica() setBoard(13) end
 function SelectBoardHellas() setBoard(14) end
 
 function setBoard(stateId)
-    --print('[game_setup] INFO: setBoard called with stateId = ' .. stateId .. ' selectedMap = ' .. MainBoard.getStateId())
     if MainBoard and MainBoard.getStateId() == stateId then
         return
     end
@@ -70,15 +69,7 @@ function setBoard(stateId)
              end
         else
              local currentRot = MainBoard.getRotation()
-             MainBoard.setRotation({currentRot.x, 0, currentRot.z})
         end
-
-        MainBoard.locked = true
-        MainBoard.interactable = false
-
-        --print('[game_setup] INFO: Board set to stateId = ' .. stateId)
-    else
-        print('[game_setup] WARN: MainBoard not available or not stateful')
     end
 end
 
@@ -275,7 +266,7 @@ function placeGermanThings()
     end
 end
 
-function PlaceCities(targetArray, cityBits)
+function PlaceCities(cityPositions, cityTileTextures)
     local brickTiles = {brickA, brickB, brickC, brickD}
     local clothTiles = {clothA, clothB, clothC, clothD}
     local foodTiles = {foodA, foodB, foodC, foodD}
@@ -283,23 +274,23 @@ function PlaceCities(targetArray, cityBits)
     local wineTiles = {wineA, wineB, wineC, wineD}
     local saltTiles = {saltA, saltB, saltC, saltD}
 
-	if targetArray ~= nil then
+	if cityPositions ~= nil then
 		local count = 1
-		local numMaxArray = #targetArray
-		shuffleArray(cityBits)
-		shuffleArray(cityBits)
-		shuffleArray(cityBits)
+		local numMaxArray = #cityPositions
+
+		shuffleArray(cityTileTextures)
+
 		while count <= numMaxArray do
 			local obj_parameters = {}
 			obj_parameters.type = 'Custom_Model'
-			obj_parameters.position = targetArray[count]
+			obj_parameters.position = cityPositions[count]
 			obj_parameters.rotation = {0.00, 180, 0.00}
 
 			obj = spawnObject(obj_parameters)
 			obj.setLock(true)
 			custom = {}
 			custom.mesh = 'http://pastebin.com/raw/CnZMEjc3'
-			custom.diffuse = cityBits[count]
+			custom.diffuse = cityTileTextures[count]
 			custom.material = 1
 			obj.setCustomObject(custom)
 
@@ -314,23 +305,22 @@ function PlaceCities(targetArray, cityBits)
             -- textObj.setLock(true)
 
             obj.addTag('city_tile')
-            if cityBits[count] == tableChecker(brickTiles, cityBits[count]) then
+            if cityTileTextures[count] == tableChecker(brickTiles, cityTileTextures[count]) then
                 obj.addTag('brick')
-            elseif cityBits[count] == tableChecker(clothTiles, cityBits[count]) then
+            elseif cityTileTextures[count] == tableChecker(clothTiles, cityTileTextures[count]) then
                 obj.addTag('cloth')
-            elseif cityBits[count] == tableChecker(foodTiles, cityBits[count]) then
+            elseif cityTileTextures[count] == tableChecker(foodTiles, cityTileTextures[count]) then
                 obj.addTag('food')
-            elseif cityBits[count] == tableChecker(toolTiles, cityBits[count]) then
+            elseif cityTileTextures[count] == tableChecker(toolTiles, cityTileTextures[count]) then
                 obj.addTag('tool')
-            elseif cityBits[count] == tableChecker(wineTiles, cityBits[count]) then
+            elseif cityTileTextures[count] == tableChecker(wineTiles, cityTileTextures[count]) then
                 obj.addTag('wine')
-            elseif cityBits[count] == tableChecker(saltTiles, cityBits[count]) then
+            elseif cityTileTextures[count] == tableChecker(saltTiles, cityTileTextures[count]) then
                 obj.addTag('salt')
             end
 
-			cityBits[count] = obj
+			cityTileTextures[count] = obj
 			count = count + 1
-			debugCounter = debugCounter+1
 		end
 	end
 end
@@ -431,27 +421,41 @@ function setMainDeck()
     Wait.time(restockSenatorBoard, 1)
 end
 
-function parseRegions(CityTokens, RegionsAndCities, regionArray, ignoreRegions)
+-- Helper function to parse map regions and assign the correct bonus marker
+-- Based on the most valuable city type in that region (Cloth > Wine > Tool > Food > Brick)
+-- @param CityTokens: Table of spawned city tile objects (hydrated from PlaceCities)
+-- @param RegionsAndCities: Table mapping region indices to lists of city indices (e.g., Region 1 -> {1, 2, 3})
+-- @param regionBonusPositions: Table of coordinates for placing the region bonus markers
+-- @param ignoreRegions: Optional table of regions to skip (used for some map variants)
+function parseRegions(CityTokens, RegionsAndCities, regionBonusPositions, ignoreRegions)
 	if CityTokens ~= nil then
-        createSnapPointsFromTokens(MainBoard, regionArray)
+        createSnapPointsFromTokens(MainBoard, regionBonusPositions)
 		local bestLoot = brickA
 		local CurrentRegion = 1
 		local Regions = #RegionsAndCities
 
 		while CurrentRegion <= Regions do
+            -- Skip regions marked for ignoring (e.g. Creta map variant)
             if not (ignoreRegions and ignoreRegions[CurrentRegion]) then
 
 			local CitiesCount = 1
 			local CitiesInRegion = #RegionsAndCities[CurrentRegion]
 			bestLoot = brickA
+
+            -- Iterate through all cities in the current region to find the most valuable resource
 			while CitiesCount <= CitiesInRegion do
 				local CityNumber = RegionsAndCities[CurrentRegion][CitiesCount]
+                -- Get the custom object properties to check the diffuse texture (resource type)
 				local obj_parameters = CityTokens[CityNumber].getCustomObject()
 
+                -- Compare current best resource with this city's resource
 				bestLoot = whatIsBest(bestLoot, obj_parameters.diffuse)
 				CitiesCount = CitiesCount + 1
 			end
-			drawRegionBest(getValue(bestLoot), regionArray[CurrentRegion])
+
+            -- Spawn the bonus marker for the highest value resource found
+			drawRegionBest(getValue(bestLoot), regionBonusPositions[CurrentRegion])
+            -- Update global counts of available markers
 			removeOneGuy(getValue(bestLoot))
             end
 
