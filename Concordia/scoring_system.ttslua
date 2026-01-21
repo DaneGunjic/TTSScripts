@@ -381,7 +381,7 @@ function regionCheck(color)
     elseif MainBoard.getStateId() == 5 then
         result = regionLoop(ImperiumRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 6 then
-        result = regionLoop(corsicaRegions, stdBagA, color)
+        result = regionLoop(CorsicaRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 7 then
         result = regionLoop(GaliaRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 8 then
@@ -416,7 +416,7 @@ function venusRegionCheck(color)
     elseif MainBoard.getStateId() == 5 then
         result = regionLoopVenus(ImperiumRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 6 then
-        result = regionLoopVenus(corsicaRegions, stdBagA, color)
+        result = regionLoopVenus(CorsicaRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 7 then
         result = regionLoopVenus(GaliaRegions, stdBagA, color)
     elseif MainBoard.getStateId() == 8 then

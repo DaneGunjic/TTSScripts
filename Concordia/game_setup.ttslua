@@ -164,12 +164,12 @@ function runInitialSetup()
 		parseRegions(stdBagA, ImperiumRegions, ImperiumTokens)
 
 	elseif(MainBoard.getStateId() == 6) then
-		PlaceCities(CORSICAA, stdBagA)
-		PlaceCities(CORSICAB, stdBagB)
-		PlaceCities(CORSICAD, stdBagD)
+		PlaceCities(CorsicaA, stdBagA)
+		PlaceCities(CorsicaB, stdBagB)
+		PlaceCities(CorsicaD, stdBagD)
 		TableConcat(stdBagA, stdBagB)
 		TableConcat(stdBagA, stdBagD)
-		parseRegions(stdBagA, corsicaRegions, CORSICAtokens)
+		parseRegions(stdBagA, CorsicaRegions, CorsicaTokens)
 
 	elseif(MainBoard.getStateId() == 7) then
 		PlaceCities(GalliaA, stdBagA)

@@ -16,6 +16,7 @@
 #include !\Concordia\maps\balearica.ttslua
 #include !\Concordia\maps\gallia.ttslua
 #include !\Concordia\maps\hellas.ttslua
+#include !\Concordia\maps\corsica.ttslua
 
 local roundCounter = 0 -- this is only used to stop the first restock when the game starts.
 
