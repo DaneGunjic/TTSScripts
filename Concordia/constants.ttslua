@@ -215,14 +215,19 @@ wineD =  'https://i.imgur.com/JWdX9aI.jpg'
 clothD = 'https://i.imgur.com/YBwtcjz.jpg'
 saltD =  'https://i.imgur.com/AizreWP.jpg'
 
+-- A tiles -- 2 brick, 2 wheat, 1 tool, 1 wine, 1 cloth
+-- B tiles -- 2 brick, 2 wheat, 2 tool, 1 wine, 1 cloth
+-- C tiles -- 3 brick, 2 wheat, 2 tool, 2 wine, 1 cloth
+-- D tiles -- 1 brick, 1 wheat, 1 tool, 1 wine, 1 cloth
+
 stdBagA = {foodA, brickA, brickA, foodA, toolA, wineA, clothA }
 stdBagB = {toolB, toolB, foodB, brickB, brickB, foodB, wineB, clothB }
 stdBagC = {wineC, wineC, toolC, foodC, brickC, brickC, brickC, foodC, toolC, clothC }
 stdBagD = {brickD, foodD, toolD, wineD, clothD }
 
-stdBagASalsa = {foodA, foodA, brickA, brickA, foodA, toolA, wineA, clothA }
-stdBagBSalsa = {toolB, toolB, toolB, foodB,brickB,brickB, foodB, wineB, clothB }
-stdBagCSalsa = {wineC, wineC, wineC, toolC, foodC, brickC, brickC, brickC, foodC, toolC, clothC }
+stdBagASalsa = {toolA, foodA, brickA, brickA, foodA, toolA, wineA, clothA }
+stdBagBSalsa = {wineB, toolB, toolB, foodB, brickB, brickB, foodB, wineB, clothB }
+stdBagCSalsa = {clothC, wineC, wineC, toolC, foodC, brickC, brickC, brickC, foodC, toolC, clothC }
 stdBagDSalsa = {brickD, brickD, foodD, toolD, wineD, clothD }
 
 stdTOTALISGERMANS = {
@@ -233,300 +238,212 @@ stdTOTALISGERMANS = {
 	brickA, brickA ,brickA
 }
 
-
-CYPRUSA = {
-	{-16.85, 1.96, -9.99},
-	{-14.69, 1.96, -6.89},
-	{-12.60, 1.96, -10.30},
-	{-9.66, 1.96, -9.13},
-	{-11.01, 1.96, -5.61},
-	{-7.46, 1.96, -7.25},
-	{-5.52, 1.96, -3.78}
-}
-
-CYPRUSB = {
-	{5.91, 1.96, 3.69},
-	{10.61, 1.96, 4.67},
-	{10.42, 1.96, 10.99},
-	{16.02, 1.96, 7.09},
-	{19.15, 1.96, 10.50},
-	{-1.92, 1.96, 5.64},
-	{1.22, 1.96, 3.95},
-	{3.98, 1.96, 8.81}
-}
-
-CYPRUSC = {
-	{3.37, 1.96, -12.42},
-	{3.70, 1.96, -9.16},
-	{9.43, 1.96, -10.59},
-	{18.29, 1.96, -11.60},
-	{15.34, 1.96, -6.02},
-	{19.86, 1.96, -3.40},
-	{3.30, 1.96, -4.43},
-	{7.51, 1.96, -5.52},
-	{11.01, 1.96, -0.99},
-	{16.70, 1.96, 3.03}
-}
-
-CYPRUSD = {
-	{-8.01, 1.96, 1.97},
-	{-4.17, 1.96, 12.52},
-	{-19.75, 1.96, 3.35},
-	{-14.10, 1.96, 4.12},
-	{-14.72, 1.96, -0.35}
-}
-
-CYPRUSTiles = {
-	{-19.18, 1.98, 8.96},
-	{-18.50, 1.98, 6.88},
-	{-16.09, 1.98, 6.55},
-	{-13.69, 1.98, 6.54},
-	{-11.29, 1.98, 6.86},
-	{-10.66, 1.98, 8.95},
-	{-10.24, 1.98, 11.05},
-	{-11.11, 1.98, 13.13},
-	{-13.50, 1.98, 13.14},
-	{-15.89, 1.98, 13.14},
-	{-18.26, 1.98, 13.14},
-	{-18.88, 1.98, 11.06}
-}
-
-CYPRUSRegions = {
-	{1,2},
-	{3,4},
-	{5,6,7},
-	{16,17,18},
-	{19,20,21},
-	{22,23},
-	{24,25},
-	{8,9},
-	{10,11,12},
-	{13,14,15},
-	{26,27},
-	{28,29,30},
-}
-
-IONIVMA = {
-	{-7.37, 1.96, 7.43},
-	{-7.19, 1.96, 11.92},
-	{-3.28, 1.96, 2.09},
-	{-0.76, 1.96, 12.65},
-	{0.80, 1.96, 4.13},
-	{1.44, 1.96, 7.62},
-	{4.56, 1.96, 13.02}
-}
-
-IONIVMB = {
-    {-19.53, 1.96, 10.98},
-    {-19.68, 1.96, 6.61},
-    {-17.38, 1.96, -6.95},
-    {-16.94, 1.96, -2.3},
-    {-15.98, 1.96, 9.21},
-    {-14.60, 1.96, 5.21},
-    {-12.51, 1.96, 1.07},
-    {-11.26, 1.96, 7.16}
-}
-
-IONIVMC = {
-	{7.17, 1.96, 9.99},
-	{10.40, 1.96, 13},
-	{11.43, 1.96, 7.05},
-	{13.30, 1.96, 2.79},
-	{14.31, 1.96, -1.03},
-	{16.79, 1.96, -6.66},
-	{17.81, 1.96, 11.38},
-	{17.70, 1.96, 6.75},
-	{19.41, 1.96, -0.73},
-	{19.85, 1.96, -7.21}
-}
-
-IONIVMD = {
-    {-1.24, 1.96, -1.22},
-    {-0.84, 1.96, -4.41},
-    {1.56, 1.96, 0.24},
-    {2.48, 1.96, -6.58},
-    {10.05, 1.96, -11.3}
-}
-
-IONIVMtiles = {
-    {-12.11, 1.98, -6.97},
-    {-9.90, 1.98, -6.57},
-    {-7.71, 1.98, -6.56},
-    {-5.53, 1.98, -6.98},
-    {-4.96, 1.98, -9.04},
-    {-4.78, 1.98, -11.09},
-    {-6.90, 1.98, -12.64},
-    {-9.19, 1.98, -12.88},
-    {-11.50, 1.98, -12.88},
-    {-13.78, 1.98, -12.66},
-    {-14.29, 1.98, -10.38},
-    {-14.27, 1.98, -8.10}
-}
-
-IONIVMRegions = {
-    {1,3},
-    {2,4,7},
-    {5,6},
-    {16,17,22},
-    {23,24},
-    {18,19,20},
-    {21,25},
-    {27,29,30},
-    {26,28},
-    {10,11,14},
-    {13,15},
-    {8,9,12}
-}
-
-
-
-
-germaniaa = {
-    {-21.61, 1.74, -1.73},
-    {-21.23, 1.74, -5.75},
-    {-21.69, 1.74, -10.12},
-    {-16.84, 1.74, -4.15},
-    {-15.25, 1.74, -8.55},
-    {-11.24, 1.74, -10.91},
-    {-9.90, 1.74, -3.50}
-}
-
-germaniab = {
-    {-8.14, 1.74, -7.72},
-    {-5.69, 1.74, -1.43},
-    {-3.60, 1.74, 4.83},
-    {-2.00, 1.74, 1.31},
-    {-1.92, 1.74, -7.87},
-    {2.08, 1.74, -11.23},
-    {2.25, 1.74, 1.31},
-    {3.17, 1.74, 4.83}
-}
-
-germaniac = {
-    {6.55, 1.74, -12.80},
-    {17.22, 1.74, -13.59},
-    {11.37, 1.74, -5.57},
-    {2.35, 1.74, -7.15},
-    {7.63, 1.74, -3.23},
-    {11.60, 1.74, 0.92},
-    {17.27, 1.74, 2.29},
-    {9.53, 1.74, 5.74},
-    {7.91, 1.85, 14.25},
-    {12.67, 1.85, 13.56}
-}
-
-germaniad = {
-    {21.14, 1.74, -8.31},
-    {20.05, 1.74, -1.58},
-    {19.11, 1.74, 6.34},
-    {16.75, 1.74, 9.88},
-    {19.86, 1.74, 14.03}
-}
-
-germaniatiles = {
-    {-16.34, 1.82, 7.26},
-    {-14.09, 1.82, 7.53},
-    {-11.92, 1.82, 5.85},
-    {-11.32, 1.82, 3.74},
-    {-12.03, 1.82, 1.53},
-    {-14.23, 1.82, 0.71},
-    {-16.69, 1.82, 0.54},
-    {-19.15, 1.82, 0.79},
-    {-21.39, 1.82, 2.03},
-    {-21.69, 1.82, 4.32},
-    {-20.84, 1.82, 6.53},
-    {-18.58, 1.82, 7.02}
-}
-
-germaniacarddas  = {
-    {-21.46, 1.82, 12.84},
-    {-17.27, 1.82, 12.89},
-    {-13.29, 1.82, 12.93},
-    {-9.21, 1.82, 12.89},
-    {-5.12, 1.82, 12.93},
-    {-1.03, 1.82, 12.85},
-    {3.09, 1.82, 12.87}
-}
-
-
-
-GermaniaRegions = {
-    {21,23,22},
-    {24,25},
-    {28,29,30},
-    {26,27},
-    {18,20},
-    {17,16,19},
-    {8,12,13},
-    {3,5,6},
-    {1,2},
-    {4,7},
-    {10,11,9},
-    {15,14}
-}
-
-Aegyptustiles = {
-    {1.65, 1.84, -13.69},
-    {1.01, 1.84, -10.80},
-    {1.64, 1.84, -8.00},
-    {4.10, 1.84, -5.93},
-    {7.16, 1.84, -5.70},
-    {8.77, 1.84, -8.16},
-    {8.76, 1.84, -11.07},
-    {8.78, 1.84, -13.81},
-    {8.77, 1.84, -16.81},
-    {5.77, 1.84, -18.22}
-}
-
-Aegyptusc = {
-    {-4.39, 1.88, 10.24},
-    {-2.35, 1.88, 5.97},
-    {0.17, 1.88, 2.48},
-    {4.62, 1.88, 3.29},
-    {0.42, 1.88, -2.88},
-    {7.61, 1.88, -2.48},
-    {-2.48, 1.88, -7.31},
-    {-5.68, 1.88, -13.78},
-    {-1.77, 1.88, -17.65},
-    {3.58, 1.88, -20.01}
-}
-Aegyptusb = {
-    {8.21, 1.77, 21.44},
-    {4.96, 1.77, 19.88},
-    {7.95, 1.77, 16.47},
-    {6.80, 1.77, 12.88},
-    {7.84, 1.77, 8.45},
-    {3.21, 1.77, 10.24},
-    {0.89, 1.77, 14.62}
-}
-
-Aegyptusd = {
-    {-6.50, 1.77, 18.78},
-    {-1.14, 1.77, 19.02},
-    {-8.64, 1.77, 10.01},
-    {-8.54, 1.77, 2.66},
-    {-5.27, 1.77, 1.12}
-}
-
-AegyptusRegions = {
-    {8,9},
-    {20,21,22},
-    {18,19},
-    {7,6},
-    {2,1},
-    {3,4,5},
-    {12,10},
-    {13,11},
-    {16,17},
-    {14,15}
-}
-
-Aegyptuscarddas = {
-    {-3.28, 1.84, 13.29},
-    {0.98, 1.84, 13.28},
-    {5.15, 1.84, 13.29},
-    {9.42, 1.84, 13.29},
-    {13.64, 1.84, 13.31},
-    {17.88, 1.84, 13.29},
-    {22.11, 1.84, 13.30}
+-- Map Configuration Table
+MapDefinitions = {
+    [1] = { -- Britannia
+        cities = {
+            {data = BritanniaB, bag = stdBagB},
+            {data = BritanniaC, bag = stdBagC},
+            {data = BritanniaD, bag = stdBagD}
+        },
+        concats = {
+            {target = stdBagB, source = stdBagC},
+            {target = stdBagB, source = stdBagD}
+        },
+        parse = {bag = stdBagB, regions = BritanniaRegions, tiles = BritanniaTiles},
+        rotation = 270,
+        scale = {x = 15, y = 1, z = 15}
+    },
+    [2] = { -- Hispania
+        cities = {
+            {data = HispaniaA, bag = stdBagASalsa},
+            {data = HispaniaB, bag = stdBagBSalsa},
+            {data = HispaniaD, bag = stdBagDSalsa}
+        },
+        concats = {
+            {target = stdBagASalsa, source = stdBagBSalsa},
+            {target = stdBagASalsa, source = stdBagDSalsa}
+        },
+        parse = {bag = stdBagASalsa, regions = HispaniaRegions, tiles = HispaniaTiles},
+        rotation = 180,
+        scale = {x = 15, y = 1, z = 15}
+    },
+    [3] = { -- Italia
+        cities = {
+            {data = ItaliaA, bag = stdBagA},
+            {data = ItaliaB, bag = stdBagB},
+            {data = ItaliaC, bag = stdBagC}
+        },
+        concats = {
+            {target = stdBagA, source = stdBagB},
+            {target = stdBagA, source = stdBagC}
+        },
+        parse = {bag = stdBagA, regions = ItaliaRegions, tiles = ItaliaTiles},
+        rotation = 0,
+        scale = {x = 15, y = 1, z = 15}
+    },
+    [4] = { -- Byzantium
+        cities = {
+            {data = ByzantiumA, bag = stdBagASalsa},
+            {data = ByzantiumB, bag = stdBagBSalsa},
+            {data = ByzantiumC, bag = stdBagCSalsa}
+        },
+        concats = {
+            {target = stdBagASalsa, source = stdBagBSalsa},
+            {target = stdBagASalsa, source = stdBagCSalsa}
+        },
+        parse = {bag = stdBagASalsa, regions = ByzantiumRegions, tiles = ByzantiumTiles},
+        rotation = 180,
+        scale = {x = 21.50, y = 1, z = 21.50}
+    },
+    [5] = { -- Imperium
+        cities = {
+            {data = ImperiumA, bag = stdBagA},
+            {data = ImperiumB, bag = stdBagB},
+            {data = ImperiumC, bag = stdBagC},
+            {data = ImperiumD, bag = stdBagD}
+        },
+        concats = {
+            {target = stdBagA, source = stdBagB},
+            {target = stdBagA, source = stdBagC},
+            {target = stdBagA, source = stdBagD}
+        },
+        parse = {bag = stdBagA, regions = ImperiumRegions, tiles = ImperiumTokens},
+        rotation = 0,
+        scale = {x = 15, y = 1, z = 15}
+    },
+    [6] = { -- Corsica
+        cities = {
+            {data = CorsicaA, bag = stdBagA},
+            {data = CorsicaB, bag = stdBagB},
+            {data = CorsicaD, bag = stdBagD}
+        },
+        concats = {
+            {target = stdBagA, source = stdBagB},
+            {target = stdBagA, source = stdBagD}
+        },
+        parse = {bag = stdBagA, regions = CorsicaRegions, tiles = CorsicaTokens},
+        rotation = 180,
+        scale = {x = 21.50, y = 1, z = 21.50}
+    },
+    [7] = { -- Gallia
+        cities = {
+            {data = GalliaA, bag = stdBagA},
+            {data = GalliaB, bag = stdBagB},
+            {data = GalliaC, bag = stdBagC}
+        },
+        concats = {
+            {target = stdBagA, source = stdBagB},
+            {target = stdBagA, source = stdBagC}
+        },
+        parse = {bag = stdBagA, regions = GaliaRegions, tiles = GalliaTokens},
+        rotation = 180,
+        scale = {x = 21.50, y = 1, z = 21.50}
+    },
+    [8] = { -- Germania
+        cities = {
+            {data = germaniaa, bag = stdBagA},
+            {data = germaniab, bag = stdBagB},
+            {data = germaniac, bag = stdBagC},
+            {data = germaniad, bag = stdBagD}
+        },
+        concats = {
+            {target = stdBagA, source = stdBagB},
+            {target = stdBagA, source = stdBagC},
+            {target = stdBagA, source = stdBagD}
+        },
+        parse = {bag = stdBagA, regions = GermaniaRegions, tiles = germaniatiles},
+        customSetup = function() placeGermanThings() end,
+        rotation = 180,
+        scale = {x = 15, y = 1, z = 15}
+    },
+    [9] = { -- Creta
+        cities = {
+            {data = CretaA, bag = stdBagA},
+            {data = CretaB, bag = stdBagB},
+            {data = CretaD, bag = stdBagD}
+        },
+        concats = {
+            {target = stdBagA, source = stdBagB},
+            {target = stdBagA, source = stdBagD}
+        },
+        parse = {bag = stdBagA, regions = CretaRegions, tiles = CretaTiles, ignoreRegions = {[3]=true}},
+        rotation = 180,
+        scale = {x = 11, y = 1, z = 11}
+    },
+    [10] = { -- Aegyptus
+        cities = {
+            {data = Aegyptusb, bag = stdBagA},
+            {data = Aegyptusc, bag = stdBagC},
+            {data = Aegyptusd, bag = stdBagD}
+        },
+        concats = {
+            {target = stdBagA, source = stdBagC},
+            {target = stdBagA, source = stdBagD}
+        },
+        parse = {bag = stdBagA, regions = AegyptusRegions, tiles = Aegyptustiles},
+        customSetup = function() if putfood then putfood() end end,
+        rotation = 180,
+        scale = {x = 23.10, y = 1, z = 23.10}
+    },
+    [11] = { -- Ionivm
+        cities = {
+            {data = IONIVMA, bag = stdBagA},
+            {data = IONIVMB, bag = stdBagB},
+            {data = IONIVMC, bag = stdBagC},
+            {data = IONIVMD, bag = stdBagD}
+        },
+        concats = {
+            {target = stdBagA, source = stdBagB},
+            {target = stdBagA, source = stdBagC},
+            {target = stdBagA, source = stdBagD}
+        },
+        parse = {bag = stdBagA, regions = IONIVMRegions, tiles = IONIVMtiles},
+        rotation = 180,
+        scale = {x = 15, y = 1, z = 15}
+    },
+    [12] = { -- Cyprus
+        cities = {
+            {data = CYPRUSA, bag = stdBagA},
+            {data = CYPRUSB, bag = stdBagB},
+            {data = CYPRUSC, bag = stdBagC},
+            {data = CYPRUSD, bag = stdBagD}
+        },
+        concats = {
+            {target = stdBagA, source = stdBagB},
+            {target = stdBagA, source = stdBagC},
+            {target = stdBagA, source = stdBagD}
+        },
+        parse = {bag = stdBagA, regions = CYPRUSRegions, tiles = CYPRUSTiles},
+        rotation = 180,
+        scale = {x = 15, y = 1, z = 15}
+    },
+    [13] = { -- Balearica
+        cities = {
+            {data = BalearicaA, bag = stdBagA},
+            {data = BalearicaC, bag = stdBagC},
+            {data = BalearicaD, bag = stdBagD}
+        },
+        concats = {
+            {target = stdBagA, source = stdBagC},
+            {target = stdBagA, source = stdBagD}
+        },
+        parse = {bag = stdBagA, regions = BalearicaRegions, tiles = BalearicaTiles},
+        rotation = 180,
+        scale = {x = 15, y = 1, z = 15}
+    },
+    [14] = { -- Hellas
+        cities = {
+            {data = HellasA, bag = stdBagA},
+            {data = HellasB, bag = stdBagB},
+            {data = HelassC, bag = stdBagC}
+        },
+        concats = {
+            {target = stdBagA, source = stdBagB},
+            {target = stdBagA, source = stdBagC}
+        },
+        parse = {bag = stdBagA, regions = HellasRegions, tiles = HellasTiles},
+        rotation = 180,
+        scale = {x = 15, y = 1, z = 15}
+    }
 }

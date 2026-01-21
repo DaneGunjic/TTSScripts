@@ -19,7 +19,16 @@ function rayCast(StartPosition, obj)
     return nil
 end
 
+-- Coroutine wait helper
+function wait(time)
+    local start = os.clock()
+    repeat
+        coroutine.yield(0)
+    until os.clock() > start + time
+end
+
 function upCast(obj, dist, offset, multi)
+    --print("upCast: " .. obj.guid)
     local dist = dist or 5
     local offset = offset or 2
     local multi = multi or false
@@ -60,12 +69,14 @@ function upCast(obj, dist, offset, multi)
     end
 end
 
-function regionLoop(regionTable, tiles, color)
+function regionLoop(mapRegions, tiles, color)
+    --print("regionLoop: " .. color .. ". Tiles: " .. #tiles)
 	local playerRegions = 0
-	for _, region in pairs(regionTable) do
+	for _, region in pairs(mapRegions) do -- Goes through each region ({1, 2, 3}, {4, 5} . . )
 		local currentRegion = region
 		local breakFlag = false
 		for _, city in pairs(currentRegion) do
+            --print(color .. " city: " .. city)
 			local hitObjs = upCast(tiles[city], 5, 0.1, true)
 			for _, house in pairs(hitObjs) do
 				if breakFlag then break end
@@ -77,6 +88,7 @@ function regionLoop(regionTable, tiles, color)
 			end
 		end
 	end
+    print(color .. " regions: " .. playerRegions)
 	return playerRegions
 end
 

@@ -19,13 +19,11 @@ function scoreCalcCO()
         sellWarehouseResources(playerColor)
         takeCards(playerColor)
 
-        local t = os.clock() + 1
-        while os.clock() < t do
-            coroutine.yield(0)
-        end
+        wait(1)
 
         local playerCardTotals = countCards(playerColor)
         local playerHouseCount = checkForHouses(playerColor)
+
         local totalScore = 0
 
         -- Calculate scores for each god
@@ -38,6 +36,8 @@ function scoreCalcCO()
         local venusScore = scoreVenus(playerColor, playerCardTotals)
 
         totalScore = totalScore + mercuryScore + marsScore + saturnScore + vestaScore + jupiterScore + minervaScore + venusScore
+
+        --print("Setting totalScore for " .. playerColor .. " to " .. totalScore)
 
         -- Update UI with scores
         UI.setValue('Mercury' .. playerColor, mercuryScore)
@@ -76,6 +76,7 @@ end
 
 -- Minerva scoring (city types)
 function bestMinervaCard(color)
+    --print("Scoring Minerva for " .. color)
     local bestCard = nil
     for key, card in pairs(minervaCards) do
         if card == color then
@@ -90,6 +91,7 @@ function bestMinervaCard(color)
 end
 
 function scoreVenus(color, playerCardTable)
+    --print("Scoring Venus for " .. color)
     local numVenus = playerCardTable.Venus or 0
     if numVenus == 0 then
         return 0
@@ -105,6 +107,7 @@ function scoreVenus(color, playerCardTable)
 end
 
 function scoreMinerva(color, houseTable, playerCardTable)
+    --print("Scoring Minerva for " .. color)
     local minervaScores = {
         Brick = 0,
         Food = 0,
@@ -185,9 +188,12 @@ end
 
 -- Saturn scoring (regions)
 function scoreSaturn(color, numSaturnCards)
+    --print("Scoring Saturn for " .. color)
 	local playerRegions = regionCheck(color)
 	local saturnScore = 0
 	saturnScore = saturnScore + (numSaturnCards * playerRegions)
+
+    --print("Saturn score for " .. color .. ": " .. tostring(saturnScore))
 	return saturnScore
 end
 
@@ -213,24 +219,24 @@ end
 
 -- Mars scoring (colonists)
 function scoreMars(color, cardTable)
-  local playerColor = color
-	local numMarsCards = cardTable.Mars
-  local marsVP = 4
-	local playerStorage = playerWarehouses[playerColor]
-	-- print(playerStorage.guid)
-	local storageContents = upCast(playerStorage, 5, 0.1, true)
+    --print("Scoring Mars for " .. color)
+    local playerColor = color
+    local numMarsCards = cardTable.Mars
+    local marsVP = 4
+    local playerStorage = playerWarehouses[playerColor]
+    local storageContents = upCast(playerStorage, 5, 0.1, true)
 
-	local numColonists = 0
-	for _, obj in pairs(storageContents) do
-		if obj.hasTag(color .. 'Colonist') then
-			numColonists = numColonists + 1
-		end
-	end
+    local numColonists = 0
+    for _, obj in pairs(storageContents) do
+        if obj.hasTag(color .. 'Colonist') then
+            numColonists = numColonists + 1
+        end
+    end
 
-	--print('You have this many unused colonists: ' .. numColonists)
     marsVP = (marsVP + (8 -(numColonists * 2))) * numMarsCards
-    -- print('the value of marsVP is ' .. marsVP)
-	return marsVP
+
+    --print("Mars VP for " .. color .. ": " .. tostring(marsVP))
+    return marsVP
 end
 
 -- Jupiter scoring (non-brick houses)
@@ -320,7 +326,7 @@ end
 
 -- House counting functions
 function checkForHouses(color)
-    --print('Checking for houses for ' .. color)
+    print('Checking for houses for ' .. color)
     local playerHouses = {
         brickCities = 0,
         clothCities = 0,
@@ -341,6 +347,10 @@ function checkForHouses(color)
             end
         end
     end
+
+    print("Returning Player " .. color .. " houses: " .. playerHouses.brickCities .. " "
+    .. playerHouses.clothCities .. " " .. playerHouses.wineCities .. " "
+    .. playerHouses.toolCities .. " " .. playerHouses.foodCities .. " " .. playerHouses.saltCities)
     return playerHouses
 end
 
@@ -368,36 +378,37 @@ end
 
 -- Region checking for Saturn scoring
 function regionCheck(color)
+    --print("Checking regions for " .. color)
 	local result = 0
 
     if MainBoard.getStateId() == 1 then
-        result = regionLoop(BritanniaRegions, stdBagB, color)
+        result = regionLoop(BritanniaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 2 then
-        result = regionLoop(HispaniaRegions, stdBagA, color)
+        result = regionLoop(HispaniaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 3 then
-        result = regionLoop(ItaliaRegions, stdBagA, color)
+        result = regionLoop(ItaliaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 4 then
-        result = regionLoop(ByzantiumRegions, stdBagASalsa, color)
+        result = regionLoop(ByzantiumRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 5 then
-        result = regionLoop(ImperiumRegions, stdBagA, color)
+        result = regionLoop(ImperiumRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 6 then
-        result = regionLoop(CorsicaRegions, stdBagA, color)
+        result = regionLoop(CorsicaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 7 then
-        result = regionLoop(GaliaRegions, stdBagA, color)
+        result = regionLoop(GaliaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 8 then
-        result = regionLoop(GermaniaRegions, stdBagA, color)
+        result = regionLoop(GermaniaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 9 then
-        result = regionLoop(CretaRegions, stdBagA, color)
+        result = regionLoop(CretaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 10 then
-        result = regionLoop(AegyptusRegions, stdBagA, color)
+        result = regionLoop(AegyptusRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 11 then
-        result = regionLoop(IONIVMRegions, stdBagA, color)
+        result = regionLoop(IONIVMRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 12 then
-        result = regionLoop(CYPRUSRegions, stdBagA, color)
+        result = regionLoop(CYPRUSRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 13 then
-        result = regionLoop(BalearicaRegions, stdBagA, color)
+        result = regionLoop(BalearicaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 14 then
-        result = regionLoop(HellasRegions, stdBagA, color)
+        result = regionLoop(HellasRegions, getCityTiles(), color)
     end
     return result
 end
@@ -406,33 +417,33 @@ function venusRegionCheck(color)
     local result = 0
 
     if MainBoard.getStateId() == 1 then
-        result = regionLoopVenus(BritanniaRegions, stdBagB, color)
+        result = regionLoopVenus(BritanniaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 2 then
-        result = regionLoopVenus(HispaniaRegions, stdBagA, color)
+        result = regionLoopVenus(HispaniaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 3 then
-        result = regionLoopVenus(ItaliaRegions, stdBagA, color)
+        result = regionLoopVenus(ItaliaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 4 then
-        result = regionLoopVenus(ByzantiumRegions, stdBagASalsa, color)
+        result = regionLoopVenus(ByzantiumRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 5 then
-        result = regionLoopVenus(ImperiumRegions, stdBagA, color)
+        result = regionLoopVenus(ImperiumRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 6 then
-        result = regionLoopVenus(CorsicaRegions, stdBagA, color)
+        result = regionLoopVenus(CorsicaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 7 then
-        result = regionLoopVenus(GaliaRegions, stdBagA, color)
+        result = regionLoopVenus(GaliaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 8 then
-        result = regionLoopVenus(GermaniaRegions, stdBagA, color)
+        result = regionLoopVenus(GermaniaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 9 then
-        result = regionLoopVenus(CretaRegions, stdBagA, color)
+        result = regionLoopVenus(CretaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 10 then
-        result = regionLoopVenus(AegyptusRegions, stdBagA, color)
+        result = regionLoopVenus(AegyptusRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 11 then
-        result = regionLoopVenus(IONIVMRegions, stdBagA, color)
+        result = regionLoopVenus(IONIVMRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 12 then
-        result = regionLoopVenus(CYPRUSRegions, stdBagA, color)
+        result = regionLoopVenus(CYPRUSRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 13 then
-        result = regionLoopVenus(BalearicaRegions, stdBagA, color)
+        result = regionLoopVenus(BalearicaRegions, getCityTiles(), color)
     elseif MainBoard.getStateId() == 14 then
-        result = regionLoopVenus(HellasRegions, stdBagA, color)
+        result = regionLoopVenus(HellasRegions, getCityTiles(), color)
     end
     return result
 end

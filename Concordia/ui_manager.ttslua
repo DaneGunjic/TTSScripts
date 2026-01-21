@@ -5,29 +5,39 @@ function initializeUI()
     initMoneyCounters()
 end
 
+MapButtonObjects = {}
+
+local MapButtonDefs = {
+    {label='BRITANNIA', func='SelectBoardBritannia', color='Blue', x=7},
+    {label='HISPANIA', func='SelectBoardHispania', color='Blue', x=6},
+    {label='ITALIA', func='SelectBoardItalia', color='Blue', x=5},
+    {label='BYZANTIVM', func='SelectBoardByzantivm', color='Blue', x=4},
+    {label='IMPERIVM', func='SelectBoardImperivm', color='Blue', x=3},
+    {label='CORSICA', func='SelectBoardCorsica', color='Blue', x=2},
+    {label='GALLIA', func='SelectBoardGallia', color='Blue', x=1},
+    {label='GERMANIA', func='SelectBoardGermania', color='Red', x=-1},
+    {label='CRETA', func='SelectBoardCreta', color='Blue', x=-2},
+    {label='AEGYPTS', func='SelectBoardAegyptus', color='Red', x=-3},
+    {label='IONIVM', func='SelectBoardIonivm', color='Red', x=-4},
+    {label='CYPRVS', func='SelectBoardCyprvs', color='Red', x=-5},
+    {label='BALEARICA', func='SelectBoardBalearica', color='Blue', x=-6},
+    {label='HELLAS', func='SelectBoardHellas', color='Blue', x=-7}
+}
+
 function CreateButtons()
     --print('CreateButtons')
-    btnBrit = createButton('4ee1f2', 'BRITANNIA', 'SelectBoardBritannia', 0, 0, 'Blue', -15, 15)
-    btnHisp = createButton('4ee1f2', 'HISPANIA', 'SelectBoardHispania', 0, 0,'Blue', -15, 14.5)
-    btnItaly = createButton('4ee1f2', 'ITALIA', 'SelectBoardItalia', 0, 0, 'Blue', -15, 14)
-    btnByz = createButton('4ee1f2', 'BYZANTIVM', 'SelectBoardByzantivm', 0, 0, 'Blue', -15, 13.5)
-    btnEuro = createButton('4ee1f2', 'IMPERIVM', 'SelectBoardImperivm', 0, 0, 'Blue', -15, 13)
-    btnCorsica = createButton('4ee1f2', 'CORSICA', 'SelectBoardCorsica', 0, 0, 'Blue', -15, 12.5)
-    btnGaly = createButton('4ee1f2', 'GALLIA', 'SelectBoardGallia', 0, 0, 'Blue', -15, 12)
-    btnGerm = createButton('4ee1f2', 'GERMANIA', 'SelectBoardGermania', 0, 0, 'Blue', -15, 11.5)
-    btnCreta = createButton('4ee1f2', 'CRETA', 'SelectBoardCreta', 0, 0, 'Blue', -15, 11)
-    btnAegyptus = createButton('4ee1f2', 'AEGYPTS', 'SelectBoardAegyptus', 0, 0, 'Blue', -15, 10.5)
-    btnIonivm = createButton('4ee1f2','IONIVM','SelectBoardIonivm', 0, 0, 'Blue', -15, 10)
-    btnCyprvs = createButton('4ee1f2','CYPRVS','SelectBoardCyprvs', 0, 0, 'Blue', -15, 9.5)
-    btnBelearica = createButton('4ee1f2','BALEARICA','SelectBoardBalearica', 0, 0, 'Blue', -15, 9)
-    btnHellas = createButton('4ee1f2','HELLAS','SelectBoardHellas', 0, 0, 'Blue', -15, 8.5)
+    
+    for _, btn in ipairs(MapButtonDefs) do
+        local obj = createButton('4ee1f2', btn.label, btn.func, 0, 0, btn.color, btn.x, 5)
+        table.insert(MapButtonObjects, {obj=obj, func=btn.func})
+    end
 
-    btnSalsa = createButton('4ee1f2', 'SALSA [OFF]', 'ToggleSalsa', 0, 500, 'Green', -13.5, 10)
-    btnForum = createButton('4ee1f2', 'FORUM [OFF]', 'ToggleForum', 0, 500, 'Green', -13.5, 9.5)
-    btnDisplay = createButton('4ee1f2','Cloth Display', 'turnSwapDisplay', 0, 500, 'Green', -13.5, 9)
-    btnTeams = createButton('4ee1f2','Teams [OFF]', 'ToggleTeams', 0, 500, 'Green', -13.5, 8.5)
+    btnSalsa = createButton('4ee1f2', 'SALSA [OFF]', 'ToggleSalsa', 0, 500, 'Green', 7, 4)
+    btnForum = createButton('4ee1f2', 'FORUM [OFF]', 'ToggleForum', 0, 500, 'Green', 5, 4)
+    btnDisplay = createButton('4ee1f2','Cloth Display', 'turnSwapDisplay', 0, 500, 'Green', 3, 4)
+    btnTeams = createButton('4ee1f2','Teams [OFF]', 'ToggleTeams', 0, 500, 'Green', 1, 4)
 
-    btnStartGame = createButton('4ee1f2', 'Start Game', 'StartGame', 0, 0, 'White', -15, 8)
+    btnStartGame = createButton('4ee1f2', 'Start Game', 'StartGame', 1000, 1000, 'White', -1, 4)
 end
 
 function createButton(objectGuid, label, clickFunction, heightOffset, widthOffset, buttonColor, offsetX, offsetZ)
@@ -387,31 +397,15 @@ function hideSetupButtons()
 end
 
 function hideMapButtons()
-    local mapButtons = {
-        {btnItaly, 'SelectBoardItalia'},
-        {btnGaly, 'SelectBoardGallia'},
-        {btnHisp, 'SelectBoardHispania'},
-        {btnBrit, 'SelectBoardBritannia'},
-        {btnGerm, 'SelectBoardGermania'},
-        {btnByz, 'SelectBoardByzantivm'},
-        {btnEuro, 'SelectBoardImperivm'},
-        {btnAegyptus, 'SelectBoardAegyptus'},
-        {btnCreta, 'SelectBoardCreta'},
-        {btnCorsica, 'SelectBoardCorsica'},
-        {btnHellas, 'SelectBoardHellas'},
-        {btnCyprvs, 'SelectBoardCyprvs'},
-        {btnIonivm, 'SelectBoardIonivm'},
-        {btnBelearica, 'SelectBoardBalearica'}
-    }
-
-    for _, btnData in ipairs(mapButtons) do
-        local obj = btnData[1]
-        local func = btnData[2]
+    for _, item in ipairs(MapButtonObjects) do
+        local obj = item.obj
+        local func = item.func
         if obj then
             local idx = findButtonIndex(obj, func)
             if idx then obj.removeButton(idx) end
         end
     end
+    MapButtonObjects = {}
 end
 
 function hideExpansionButtons()

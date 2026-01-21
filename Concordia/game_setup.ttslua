@@ -1,7 +1,22 @@
 -- Concordia Game Setup
 -- All functions related to board setup, player setup, and deck management
 
--- Player setup functions
+CLOCKWISE_ORDER = { "White", "Red", "Green", "Yellow", "Blue", "Brown" }
+
+function getSortedSeatedPlayers()
+    local seated = getSeatedPlayers()
+    local sorted = {}
+    for _, color in ipairs(CLOCKWISE_ORDER) do
+        for _, p in ipairs(seated) do
+            if p == color then
+                table.insert(sorted, color)
+                break
+            end
+        end
+    end
+    return sorted
+end
+
 function StartGame()
     --print("Starting game...")
     numberOfPlayers = #getSeatedPlayers()
@@ -38,58 +53,30 @@ function setBoard(stateId)
         return
     end
 
-    local mapRotations = {
-        [1] = 270,   --
-        [2] = 180, -- Hispania
-        [3] = 0,   --
-        [4] = 180,  -- Byzantium
-        [5] = 0,   --
-        [6] = 180,  -- Corsica
-        [7] = 180,  -- Gallia
-        [8] = 180, -- Germania
-        [9] = 180, -- Creta
-        [10] = 180, -- Aegyptus
-        [11] = 180, -- Ionium
-        [12] = 180, -- Cyprus
-        [13] = 180, -- Balearica
-        [14] = 180  -- Hellas
-    }
-
-    local mapScales = {
-        [1] = {x = 15, y = 1, z = 15},
-        [2] = {x = 15, y = 1, z = 15},
-        [3] = {x = 15, y = 1, z = 15},
-        [4] = {x = 21.50, y = 1, z = 21.50},
-        [5] = {x = 15, y = 1, z = 15},
-        [6] = {x = 21.50, y = 1, z = 21.50},
-        [7] = {x = 21.50, y = 1, z = 21.50},
-        [8] = {x = 15, y = 1, z = 15},
-        [9] = {x = 11, y = 1, z = 11},
-        [10] = {x = 23.10, y = 1, z = 23.10},
-        [11] = {x = 15, y = 1, z = 15},
-        [12] = {x = 15, y = 1, z = 15},
-        [13] = {x = 15, y = 1, z = 15},
-        [14] = {x = 15, y = 1, z = 15}
-    }
+    local mapDef = MapDefinitions[stateId]
 
     selectedMap = stateId
     if MainBoard and MainBoard.setState then
         --print('[game_setup] INFO: Setting board to stateId = ' .. stateId)
         MainBoard = MainBoard.setState(stateId)
 
-        local targetRotation = mapRotations[stateId] or 0
-        local currentRot = MainBoard.getRotation()
-        MainBoard.setRotation({currentRot.x, targetRotation, currentRot.z})
+        if mapDef then
+             local targetRotation = mapDef.rotation or 0
+             local currentRot = MainBoard.getRotation()
+             MainBoard.setRotation({currentRot.x, targetRotation, currentRot.z})
 
-        local targetScale = mapScales[stateId]
-        if targetScale then
-            MainBoard.setScale({targetScale.x, targetScale.y, targetScale.z})
+             if mapDef.scale then
+                 MainBoard.setScale(mapDef.scale)
+             end
+        else
+             local currentRot = MainBoard.getRotation()
+             MainBoard.setRotation({currentRot.x, 0, currentRot.z})
         end
 
         MainBoard.locked = true
         MainBoard.interactable = false
 
-        --print('[game_setup] INFO: Board set to stateId = ' .. stateId .. ' with rotation ' .. targetRotation)
+        --print('[game_setup] INFO: Board set to stateId = ' .. stateId)
     else
         print('[game_setup] WARN: MainBoard not available or not stateful')
     end
@@ -101,16 +88,18 @@ function runInitialSetup()
 	gameStarted = true
 	shufflestuff()
 
+    -- Ensure Turns order is consistent with our logic
+    local sortedPlayers = getSortedSeatedPlayers()
+    Turns.order = sortedPlayers
+
 	if boolSalsa then
         makeSaltBagButtons(saltBags)
         addSalt()
-        local seatedPlayers = getSeatedPlayers()
-        for _, color in ipairs(seatedPlayers) do
+        for _, color in ipairs(sortedPlayers) do
             AddRemoveResource(color, true, "Salt")
         end
     else
-        local seatedPlayers = getSeatedPlayers()
-        for _, color in ipairs(seatedPlayers) do
+        for _, color in ipairs(sortedPlayers) do
             AddRemoveResource(color, true, "Food")
         end
 	end
@@ -119,160 +108,41 @@ function runInitialSetup()
         setupForumTiles()
     end
 
-	if(MainBoard.getStateId() == 1) then
-        --print("Setting up Britannia cities and tiles")
-		PlaceCities(BritanniaB, stdBagB)
-		PlaceCities(BritanniaC, stdBagC)
-		PlaceCities(BritanniaD, stdBagD)
-		TableConcat(stdBagB, stdBagC)
-		TableConcat(stdBagB, stdBagD)
-		parseRegions(stdBagB, BritanniaRegions, BritanniaTiles)
+    local mapId = MainBoard.getStateId()
+    local mapDef = MapDefinitions[mapId]
 
-	elseif(MainBoard.getStateId() == 2)  then
-		PlaceCities(HispaniaA, stdBagASalsa)
-		PlaceCities(HispaniaB, stdBagBSalsa)
-		PlaceCities(HispaniaD, stdBagDSalsa)
-		TableConcat(stdBagASalsa, stdBagBSalsa)
-		TableConcat(stdBagASalsa, stdBagDSalsa)
-		parseRegions(stdBagASalsa, HispaniaRegions, HispaniaTiles)
+    if mapDef then
+        -- Place cities
+        if mapDef.cities then
+            for _, cityInfo in ipairs(mapDef.cities) do
+                PlaceCities(cityInfo.data, cityInfo.bag)
+            end
+        end
 
-	elseif(MainBoard.getStateId() == 3) then
-		PlaceCities(ItaliaA, stdBagA)
-		PlaceCities(ItaliaB, stdBagB)
-		PlaceCities(ItaliaC, stdBagC)
-		TableConcat(stdBagA, stdBagB)
-		TableConcat(stdBagA, stdBagC)
-		parseRegions(stdBagA, ItaliaRegions, ItaliaTiles)
+        -- Concatenate tables
+        if mapDef.concats then
+            for _, concat in ipairs(mapDef.concats) do
+                TableConcat(concat.target, concat.source)
+            end
+        end
 
-	elseif(MainBoard.getStateId() == 4) then
-		PlaceCities(ByzantiumA, stdBagASalsa)
-		PlaceCities(ByzantiumB, stdBagBSalsa)
-		PlaceCities(ByzantiumC, stdBagCSalsa)
-		TableConcat(stdBagASalsa, stdBagBSalsa)
-		TableConcat(stdBagASalsa, stdBagCSalsa)
-		parseRegions(stdBagASalsa, ByzantiumRegions, ByzantiumTiles)
+        -- Parse regions
+            if mapDef.parse then
+                parseRegions(mapDef.parse.bag, mapDef.parse.regions, mapDef.parse.tiles, mapDef.parse.ignoreRegions)
+            end
 
-	elseif(MainBoard.getStateId() == 5) then
-        --print("Setting up Imperiumvm cities and tiles")
-		PlaceCities(ImperiumA, stdBagA)
-		PlaceCities(ImperiumB, stdBagB)
-		PlaceCities(ImperiumC, stdBagC)
-		PlaceCities(ImperiumD, stdBagD)
-		TableConcat(stdBagA, stdBagB)
-		TableConcat(stdBagA, stdBagC)
-		TableConcat(stdBagA, stdBagD)
-		parseRegions(stdBagA, ImperiumRegions, ImperiumTokens)
-
-	elseif(MainBoard.getStateId() == 6) then
-		PlaceCities(CorsicaA, stdBagA)
-		PlaceCities(CorsicaB, stdBagB)
-		PlaceCities(CorsicaD, stdBagD)
-		TableConcat(stdBagA, stdBagB)
-		TableConcat(stdBagA, stdBagD)
-		parseRegions(stdBagA, CorsicaRegions, CorsicaTokens)
-
-	elseif(MainBoard.getStateId() == 7) then
-		PlaceCities(GalliaA, stdBagA)
-		PlaceCities(GalliaB, stdBagB)
-		PlaceCities(GalliaC, stdBagC)
-		TableConcat(stdBagA, stdBagB)
-		TableConcat(stdBagA, stdBagC)
-		parseRegions(stdBagA, GaliaRegions, GalliaTokens)
-
-	elseif(MainBoard.getStateId() == 8)  then
-		PlaceCities(germaniaa, stdBagA)
-		PlaceCities(germaniab, stdBagB)
-		PlaceCities(germaniac, stdBagC)
-		PlaceCities(germaniad, stdBagD)
-		TableConcat(stdBagA, stdBagB)
-		TableConcat(stdBagA, stdBagC)
-		TableConcat(stdBagA, stdBagD)
-		parseRegions(stdBagA, GermaniaRegions, germaniatiles)
-
-		placeGermanThings()
-
-	elseif(MainBoard.getStateId() == 9)  then
-		PlaceCities(CretaA, stdBagA)
-		PlaceCities(CretaB, stdBagB)
-		PlaceCities(CretaD, stdBagD)
-		--table.remove(stdBagA,1)
-		--table.remove(Cretaa,1)
-		--table.remove(Cretatiles,1)
-		TableConcat(stdBagA, stdBagB)
-		TableConcat(stdBagA, stdBagD)
-		parseRegions(stdBagA, CretaRegions, CretaTiles)
-
-	elseif(MainBoard.getStateId() == 10)  then
-		PlaceCities(Aegyptusb, stdBagA)
-		PlaceCities(Aegyptusc, stdBagC)
-		PlaceCities(Aegyptusd, stdBagD)
-		TableConcat(stdBagA, stdBagC)
-		TableConcat(stdBagA, stdBagD)
-		parseRegions(stdBagA,AegyptusRegions, Aegyptustiles)
-		putfood()
-
-	elseif(MainBoard.getStateId() == 11) then
-		PlaceCities(IONIVMA, stdBagA)
-		PlaceCities(IONIVMB, stdBagB)
-		PlaceCities(IONIVMC, stdBagC)
-		PlaceCities(IONIVMD, stdBagD)
-		TableConcat(stdBagA, stdBagB)
-		TableConcat(stdBagA, stdBagC)
-		TableConcat(stdBagA, stdBagD)
-		parseRegions(stdBagA,IONIVMRegions, IONIVMtiles)
-
-    elseif(MainBoard.getStateId() == 12) then
-		PlaceCities(CYPRUSA, stdBagA)
-		PlaceCities(CYPRUSB, stdBagB)
-		PlaceCities(CYPRUSC, stdBagC)
-		PlaceCities(CYPRUSD, stdBagD)
-
-		TableConcat(stdBagA, stdBagB)
-		TableConcat(stdBagA, stdBagC)
-		TableConcat(stdBagA, stdBagD)
-
-		parseRegions(stdBagA,CYPRUSRegions, CYPRUSTiles)
-
-    elseif(MainBoard.getStateId() == 13) then
-        PlaceCities(BalearicaA, stdBagA)
-        PlaceCities(BalearicaC, stdBagC)
-        PlaceCities(BalearicaD, stdBagD)
-
-        TableConcat(stdBagA, stdBagC)
-        TableConcat(stdBagA, stdBagD)
-
-        parseRegions(stdBagA,BalearicaRegions, BalearicaTiles)
-
-    elseif(MainBoard.getStateId() == 14) then
-        PlaceCities(HellasA, stdBagA)
-        PlaceCities(HellasB, stdBagB)
-        PlaceCities(HelassC, stdBagC)
-
-        TableConcat(stdBagA, stdBagB)
-        TableConcat(stdBagA, stdBagC)
-
-        parseRegions(stdBagA,HellasRegions, HellasTiles)
-	end
-
-	BOARD_STATE = MainBoard.getStateId()
-	if BOARD_STATE == 2 or BOARD_STATE == 3 or BOARD_STATE == 5 then
-		SENATOR_CARD_ZONES = senatorZone1
-	elseif BOARD_STATE == 1 or BOARD_STATE == 4 or BOARD_STATE == 6 or BOARD_STATE == 7 or BOARD_STATE == 9 or BOARD_STATE == 11 or BOARD_STATE == 12 then
-		SENATOR_CARD_ZONES = senatorZone2
-	elseif BOARD_STATE == 8 then
-		SENATOR_CARD_ZONES = senatorZone3
-	elseif BOARD_STATE == 10 then
-		SENATOR_CARD_ZONES = senatorZone4
-	elseif BOARD_STATE == 14 then
-		SENATOR_CARD_ZONES = senatorZone5
-	elseif BOARD_STATE == 13 then
-		SENATOR_CARD_ZONES = senatorZone6
-	end
+        -- Custom setup
+        if mapDef.customSetup then
+            mapDef.customSetup()
+        end
+    else
+        broadcastToAll("Error: No configuration found for map state ID " .. tostring(mapId), {1,0,0})
+    end
 
 	MainBoard.interactable = false
 
     randomFirstPlayer()
-    startingMoney()
+    Wait.time(startingMoney, 1)
     setMainDeck()
     placeSenatorBoard()
 
@@ -293,34 +163,42 @@ end
 
 -- Money and starting setup
 function startingMoney()
-    local seatedPlayers = getSeatedPlayers()
-    local startColor = Turns.turn_color
+    --print("Starting money")
+    local turnOrder = Turns.order
+    local startPlayer = Turns.turn_color
     local startIndex = 1
 
-    -- Find the starting player index
-    for i, color in ipairs(seatedPlayers) do
-        if color == startColor then
+    -- Find index of starting player
+    for i, color in ipairs(turnOrder) do
+        if color == startPlayer then
             startIndex = i
+            --print("starting index: " .. startIndex .. " for color " .. color)
             break
         end
     end
 
     local currentMoney = 5
-    local playerCount = #seatedPlayers
+    local playerCount = #turnOrder
+    local numberOfTeams = math.max(1, math.floor(playerCount / 2))
 
     for i = 0, playerCount - 1 do
-        local index = (startIndex + i - 1) % playerCount + 1
-        local player = seatedPlayers[index]
-        addMoney(player, currentMoney)
-        currentMoney = currentMoney + 1
+        local index = ((startIndex + i - 1) % playerCount) + 1
+        local color = turnOrder[index]
+
+        if teamsEnabled then
+            addMoney(color, 5 + (i % numberOfTeams))
+        else
+            addMoney(color, currentMoney)
+            currentMoney = currentMoney + 1
+        end
     end
 end
 
 function randomFirstPlayer()
+    --print("Random first player")
     local seatedPlayers = getSeatedPlayers()
     local r = math.random(1, #seatedPlayers)
-    broadcastToAll("The starting player is: " .. seatedPlayers[r])
-    Turns.enable = true
+    --broadcastToAll("The starting player is: " .. seatedPlayers[r])
     Turns.turn_color = seatedPlayers[r]
 end
 
@@ -425,7 +303,16 @@ function PlaceCities(targetArray, cityBits)
 			custom.material = 1
 			obj.setCustomObject(custom)
 
----------------------- Unebrion Additions----------------------------------------------------------
+            -- local textPos = obj.getPosition() + Vector(0, 0.5, 0)
+            -- local textObj = spawnObject({
+            --     type = "3DText",
+            --     position = textPos,
+            --     rotation = {90, 0, 0},
+            --     sound = false,
+            -- })
+            -- textObj.setValue(tostring(count))
+            -- textObj.setLock(true)
+
             obj.addTag('city_tile')
             if cityBits[count] == tableChecker(brickTiles, cityBits[count]) then
                 obj.addTag('brick')
@@ -440,8 +327,7 @@ function PlaceCities(targetArray, cityBits)
             elseif cityBits[count] == tableChecker(saltTiles, cityBits[count]) then
                 obj.addTag('salt')
             end
----------------------------------------------------------------------
-			--obj.setName(debugCounter)
+
 			cityBits[count] = obj
 			count = count + 1
 			debugCounter = debugCounter+1
@@ -545,7 +431,7 @@ function setMainDeck()
     Wait.time(restockSenatorBoard, 1)
 end
 
-function parseRegions(CityTokens, RegionsAndCities, regionArray)
+function parseRegions(CityTokens, RegionsAndCities, regionArray, ignoreRegions)
 	if CityTokens ~= nil then
         createSnapPointsFromTokens(MainBoard, regionArray)
 		local bestLoot = brickA
@@ -553,7 +439,7 @@ function parseRegions(CityTokens, RegionsAndCities, regionArray)
 		local Regions = #RegionsAndCities
 
 		while CurrentRegion <= Regions do
-            if not (MainBoard.getStateId() == 9 and CurrentRegion == 3) then -- skips region 3 if we're on Creta
+            if not (ignoreRegions and ignoreRegions[CurrentRegion]) then
 
 			local CitiesCount = 1
 			local CitiesInRegion = #RegionsAndCities[CurrentRegion]
@@ -571,62 +457,6 @@ function parseRegions(CityTokens, RegionsAndCities, regionArray)
 
             CurrentRegion = CurrentRegion + 1
 		end
-	end
-end
-
-function prepareVenus()
-	if( venusMode == 2) then
-        --"market cards"
-		destroyObject(getObjectFromGUID('5a2ea0'))
-		destroyObject(getObjectFromGUID('a1b156'))
-		destroyObject(getObjectFromGUID('ca27d7'))
-		destroyObject(getObjectFromGUID('b48e37'))
-		destroyObject(getObjectFromGUID('2f7b6f'))
-		--"player decks"
-		destroyObject(getObjectFromGUID('16a471'))
-		destroyObject(getObjectFromGUID('284c5e'))
-		destroyObject(getObjectFromGUID('a16957'))
-		destroyObject(getObjectFromGUID('0c85d8'))
-		destroyObject(getObjectFromGUID('3999a6'))
-		--"market cards"
-		getObjectFromGUID('014d72').setPosition({57.33, 0.71, 33.81})
-		getObjectFromGUID('430fe0').setPosition( {61.00, 0.71, 33.08})
-		getObjectFromGUID('c33836').setPosition( {57.33, 0.71, 27.93})
-		getObjectFromGUID('4d2f34').setPosition({61.00, 0.71, 27.20})
-		getObjectFromGUID('cba63e').setPosition({57.33, 0.72, 22.05})
-		--"player decks"
-		getObjectFromGUID('edc9d2').setPosition({21.60, 1.02, -27.50})
-		getObjectFromGUID('6f2023').setPosition({-23.10, 1.02, -27.34})
-		getObjectFromGUID('134eac').setPosition({-40.81, 1.02, -7.85})
-		getObjectFromGUID('546dab').setPosition({-21.34, 1.02, 27.35})
-		getObjectFromGUID('7381f9').setPosition({22.75, 1.02, 27.46})
-		getObjectFromGUID('1441ba').setPosition({57.77, 0.94, -7.66})
-	elseif( venusMode == 3) then --if Venus Teams is on
-		--"market cards"
-		destroyObject(getObjectFromGUID('5a2ea0'))
-		destroyObject(getObjectFromGUID('a1b156'))
-		destroyObject(getObjectFromGUID('ca27d7'))
-		destroyObject(getObjectFromGUID('b48e37'))
-		destroyObject(getObjectFromGUID('2f7b6f'))
-		--"player decks"
-		destroyObject(getObjectFromGUID('16a471'))
-		destroyObject(getObjectFromGUID('284c5e'))
-		destroyObject(getObjectFromGUID('a16957'))
-		destroyObject(getObjectFromGUID('0c85d8'))
-		destroyObject(getObjectFromGUID('3999a6'))
-		--"market cards"
-		getObjectFromGUID('85c408').setPosition({57.33, 0.71, 33.81})
-		getObjectFromGUID('bb5e38').setPosition( {61.00, 0.71, 33.08})
-		getObjectFromGUID('454b3d').setPosition( {57.33, 0.71, 27.93})
-		getObjectFromGUID('d89fc9').setPosition({61.00, 0.71, 27.20})
-		getObjectFromGUID('d0ff3f').setPosition({57.33, 0.72, 22.05})
-		--"player decks"
-		getObjectFromGUID('0acab8').setPosition({21.60, 1.02, -27.50})
-        getObjectFromGUID('8b489e').setPosition({-23.10, 1.02, -27.34})
-		getObjectFromGUID('8bd73e').setPosition({-40.81, 1.02, -7.85})
-		getObjectFromGUID('bb68f0').setPosition({-21.34, 1.02, 27.35})
-		getObjectFromGUID('d8d757').setPosition({22.75, 1.02, 27.46})
-		getObjectFromGUID('f1c9e5').setPosition({57.77, 0.94, -7.66})
 	end
 end
 
