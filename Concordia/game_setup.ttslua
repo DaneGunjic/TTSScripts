@@ -119,8 +119,6 @@ function runInitialSetup()
         setupForumTiles()
     end
 
-    --print("Setting up board specific elements for state ID: " .. MainBoard.getStateId())
-
 	if(MainBoard.getStateId() == 1) then
         --print("Setting up Britannia cities and tiles")
 		PlaceCities(BritanniaB, stdBagB)
@@ -246,14 +244,14 @@ function runInitialSetup()
         parseRegions(stdBagA,BalearicaRegions, BalearicaTiles)
 
     elseif(MainBoard.getStateId() == 14) then
-        PlaceCities(HELLASA, stdBagA)
-        PlaceCities(HELLASB, stdBagB)
-        PlaceCities(HELLASC, stdBagC)
+        PlaceCities(HellasA, stdBagA)
+        PlaceCities(HellasB, stdBagB)
+        PlaceCities(HelassC, stdBagC)
 
         TableConcat(stdBagA, stdBagB)
         TableConcat(stdBagA, stdBagC)
 
-        parseRegions(stdBagA,HELLASRegions, HELLASTiles)
+        parseRegions(stdBagA,HellasRegions, HellasTiles)
 	end
 
 	BOARD_STATE = MainBoard.getStateId()
