@@ -18,15 +18,19 @@ function getSortedSeatedPlayers()
 end
 
 function StartGame()
-    --print("Starting game...")
     numberOfPlayers = #getSeatedPlayers()
+
+    if teamsEnabled and numberOfPlayers % 2 ~= 0 then
+        broadcastToAll("Error: Team mode requires an even number of players!", {1, 0, 0})
+        return
+    end
+
     DestroySetupButtons()
     startLuaCoroutine(Global, 'runInitialSetup')
 end
 
 -- Cleanup function for setup buttons
 function DestroySetupButtons()
-    --print("Destroying remaining setup buttons...")
     hideExpansionButtons()
     hideMapButtons()
     hideSetupButtons()
@@ -69,7 +73,11 @@ function setBoard(stateId)
              end
         else
              local currentRot = MainBoard.getRotation()
+             MainBoard.setRotation({currentRot.x, 0, currentRot.z})
         end
+
+        MainBoard.locked = true
+        MainBoard.interactable = false
     end
 end
 
