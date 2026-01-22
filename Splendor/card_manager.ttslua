@@ -52,6 +52,7 @@ function playCard(object, player, dealNext)
 end
 
 function reserveCard(player, object, dealNext)
+    --print("Reserve card " .. object.guid)
     if #Player[player].getHandObjects() >= MAX_HAND_SIZE then
         Player[player].broadcast('You can only have up to 3 cards reserved at a time', CHAT_INFO_COLOR)
         if soundToggle == 'talk' then
@@ -59,7 +60,15 @@ function reserveCard(player, object, dealNext)
         end
     else
         if isDeck(object) then
-            object.takeObject({position = {0, 0, 0}, callback = "reserveDeckCallback", callback_owner = Global, params = {player = player}})
+            --print("Reserve deck" .. object.guid)
+            object.takeObject({
+                position = {
+                    object.getPosition().x, object.getPosition().y + 1, object.getPosition().z
+                },
+                callback = "reserveDeckCallback",
+                callback_owner = Global,
+                params = {player = player}
+            })
             refreshDeckTooltip(object)
         elseif isCard(object) then
             object.interactable = true

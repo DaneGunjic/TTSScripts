@@ -192,6 +192,7 @@ function checkWinConditions(nextPlayerIndex, currentPlayerIndex)
     end
         if lastRound then
         if nextPlayerIndex == 1 then
+            updateTable('none')
             local winners = getWinners()
             if #winners > 1 then
                 warnAll('We have a draw!')
@@ -609,6 +610,7 @@ function serializeTable(val, name, skipnewlines, depth)
 end
 
 function reserveDeckCallback(object_spawned, params)
+    --print("Reserve deck callback")
     object_spawned.interactable = true
     object_spawned.deal(1, params.player)
 end

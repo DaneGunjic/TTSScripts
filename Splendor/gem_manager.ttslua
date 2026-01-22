@@ -62,11 +62,7 @@ end
 
 function createGemButtonsForZone(zone, count)
     if zone.getButtons() != nil then
-        local buttonCount = #zone.getButtons()
-        while buttonCount > 0 do
-            zone.removeButton(buttonCount - 1)
-            buttonCount = buttonCount - 1
-        end
+        zone.clearButtons()
     end
 
     if count == nil then
@@ -94,7 +90,13 @@ function resetSelectedGems()
 end
 
 function countSelectedGems()
-    return #getSelectedGemColours()
+    local count = 0
+    for colour, isSelected in pairs(selectedGems) do
+        if isSelected then
+            count = count + 1
+        end
+    end
+    return count
 end
 
 function getSelectedGemColours()
