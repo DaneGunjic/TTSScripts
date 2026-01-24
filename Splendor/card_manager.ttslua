@@ -52,15 +52,17 @@ function playCard(object, player, dealNext)
 end
 
 function reserveCard(player, object, dealNext)
-    --print("Reserve card " .. object.guid)
+    --print("Reserve card " .. object.guid .. " for player " .. player)
+    --Player[player].pingTable(object.getPosition())
     if #Player[player].getHandObjects() >= MAX_HAND_SIZE then
         Player[player].broadcast('You can only have up to 3 cards reserved at a time', CHAT_INFO_COLOR)
         if soundToggle == 'talk' then
             dingSound.AssetBundle.playTriggerEffect(8)
         end
     else
+        --print("object type " .. object.type)
         if isDeck(object) then
-            --print("Reserve deck" .. object.guid)
+            --print("Reserve deck " .. object.guid)
             object.takeObject({
                 position = {
                     object.getPosition().x, object.getPosition().y + 1, object.getPosition().z

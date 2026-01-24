@@ -544,10 +544,16 @@ function deckZoneClicked(zone, player, alt_click)
     end
     local playerZone = playerZones[player:lower()]
     local deckIndex = getIndex(deckZones, zone)
-    if deckZones[deckIndex].getObjects() != nil then
-        reserveCard(player, deckZones[deckIndex].getObjects()[1], false)
-        if isCard(deckZones[deckIndex].getObjects()[1]) then
-          zone.clearButtons()
+    local objects = zone.getObjects()
+    if objects != nil then
+        for _, object in pairs(objects) do
+            if isDeck(object) or isCard(object) then
+                reserveCard(player, object, false)
+                if isCard(object) then
+                    zone.clearButtons()
+                end
+                break
+            end
         end
     end
 end
