@@ -324,6 +324,9 @@ function TransitionPhase()
     if ValidatePhaseHandler(GameState) then
       local previousPhase = GameState
       printToAll("Everyone is ready! Advancing game state.", "Grey")
+      for _, color in ipairs(getSeatedPlayers()) do
+        RestoreNormalActionButtons(color)
+      end
       local nextPhase = currentHandler:next()
 
       -- Transfer money from money transfer zones
@@ -399,12 +402,45 @@ function ResolveBuyAction(color)
   if card_object then
     -- Add chat message for buy action
     local card_name = card_object.getName()
-    printToAll(Player[color].steam_name .. " constructed " .. card_name, color)
 
-    local new_pos = tile.getPosition() + tile.getTransformRight() * -3 + Vector(0, 2, 0)
-    card_object.setPosition(new_pos)
+    -- Determine target position based on Frontiers choice
+    local target_pos
+    local new_rot
+    local choice = PlayerFrontiersChoice[color]
+    local rotation_offset = 0
 
-    local new_rot = card_object.getRotation()
+    if ExpansionConfig.Frontiers and choice and (choice == "Left" or choice == "Right") then
+      -- If Frontiers is active and player chose Left or Right, place in respective zone
+      local target_zone = nil
+
+      if choice == "Right" then
+        target_zone = FrontiersZones[color]
+        target_pos = target_zone.getPosition() + (target_zone.getTransformRight() * 1.5)
+        printToAll(Player[color].steam_name .. " constructed " .. card_name .. " on the right frontier", color)
+      else
+        local leftPlayer = FindNextColor(color, "Left")
+        target_zone = FrontiersZones[leftPlayer]
+        target_pos = target_zone.getPosition() - (target_zone.getTransformRight() * 1.5)
+        printToAll(Player[color].steam_name .. " constructed " .. card_name .. " on the left frontier", color)
+      end
+
+      if target_zone then
+        new_rot = target_zone.getRotation()
+        target_pos.y = 2
+      else
+        print("Error: Frontiers zone " .. choice .. " not found for " .. color)
+        -- Fallback to default behavior
+        target_pos = tile.getPosition() + tile.getTransformRight() * -3 + Vector(0, 2, 0)
+      end
+    else
+       -- Default behavior (Middle choice or normal play)
+       target_pos = tile.getPosition() + tile.getTransformRight() * -3 + Vector(0, 2, 0)
+       new_rot = card_object.getRotation()
+       printToAll(Player[color].steam_name .. " constructed " .. card_name, color)
+    end
+
+    card_object.setPosition(target_pos)
+
     new_rot.z = 0
     card_object.setRotation(new_rot)
 

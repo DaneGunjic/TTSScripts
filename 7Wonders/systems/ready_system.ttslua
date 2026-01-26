@@ -15,6 +15,7 @@ function InitializeReadyStatusCircles()
 end
 
 function UnreadyAllPlayers()
+	--print("UnreadyAllPlayers")
 	local seatedPlayers = getSeatedPlayers()
 
 	for _, color in ipairs(seatedPlayers) do

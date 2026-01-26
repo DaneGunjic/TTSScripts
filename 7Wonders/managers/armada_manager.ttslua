@@ -73,6 +73,7 @@ function StorePlayerShip(player, shipType, shipObject)
 end
 
 function DealArmada()
+    DockyardBag.shuffle()
 	for _, player in ipairs(getSeatedPlayers()) do
 		DockyardBag.takeObject({
 			position = PlayerInfo[player].DockyardPos,
@@ -111,6 +112,8 @@ function DealIslandBoards()
 	if not ExpansionConfig.Armada then
 		return
 	end
+
+    IslandBoardBag.shuffle()
 
 	for _, player in ipairs(getSeatedPlayers()) do
 		IslandBoardBag.takeObject({

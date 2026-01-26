@@ -1,5 +1,7 @@
 function DealFrontiers()
 	-- Deal frontiers to frontier zones for each seated player
+	FrontiersBag.shuffle()
+
 	for _, player in ipairs(getSeatedPlayers()) do
 		local frontierZone = FrontiersZones[player]
 		if frontierZone and FrontiersBag then
@@ -33,7 +35,7 @@ function CreateFrontierButtons(frontierObj, playerColor)
 		label = "Flip",
 		position = {-1, 0.2, 0},
 		rotation = {0, 0, 0},
-    scale = {0.3, 0.3, 0.3},
+    	scale = {0.3, 0.3, 0.3},
 		font_size = 400,
 		width = 1200,
 		height = 600,
@@ -48,7 +50,7 @@ function CreateFrontierButtons(frontierObj, playerColor)
 		label = "Keep",
 		position = {1, 0.2, 0},
 		rotation = {0, 0, 0},
-    scale = {0.3, 0.3, 0.3},
+    	scale = {0.3, 0.3, 0.3},
 		font_size = 400,
 		width = 1200,
 		height = 600,
@@ -62,6 +64,7 @@ end
 
 -- Handler for frontier flip button
 function HandleFrontierFlip(obj, playerColor, alt_click)
+	--print("HandleFrontierFlip")
 	-- Check if the player owns this frontier
 	local ownerColor = obj.getVar("ownerColor")
 	if playerColor ~= ownerColor then
@@ -147,6 +150,7 @@ function HandleFrontierKeep(obj, playerColor, alt_click)
 
 	-- Check if both wonder and frontier are kept
 	if PlayerKeepStatus[playerColor].Wonder and PlayerKeepStatus[playerColor].Frontier then
+		--print("Both wonder and frontier kept, readying up player")
 		ReadyUp(Player[playerColor])
 	else
 		broadcastToColor("Waiting for you to keep your wonder as well...", playerColor, {1, 1, 0})

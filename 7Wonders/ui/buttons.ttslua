@@ -365,10 +365,6 @@ function ResetAllActionStatusUI()
 	end
 end
 
--- Frontiers Expansion Functions
--- Table to track player position choices for Frontiers expansion
-PlayerFrontiersChoice = {}
-
 -- Function to show Frontiers position selection buttons
 function ShowFrontiersPositionButtons(color)
 	local holder = PlayerCardHolder[color]
@@ -390,7 +386,7 @@ end
 -- Function to restore normal action buttons
 function RestoreNormalActionButtons(color)
 	local holder = PlayerCardHolder[color]
-	if not holder or not holder.Tile then return end
+	if not holder or not holder.Tile then print("Error: holder or holder.Tile is nil") return end
 
 	-- Hide position selection buttons
 	holder.Tile.UI.setAttribute("HolderLeft", "active", "false")
@@ -402,6 +398,11 @@ function RestoreNormalActionButtons(color)
 	holder.Tile.UI.setAttribute("HolderBuy", "active", "true")
 	holder.Tile.UI.setAttribute("HolderSell", "active", "true")
 	holder.Tile.UI.setAttribute("HolderWonder", "active", "true")
+
+	local armadaActive = "false"
+	if ExpansionConfig and ExpansionConfig.Armada then
+		armadaActive = "true"
+	end
 	holder.Tile.UI.setAttribute("HolderArmadaSell", "active", armadaActive)
 end
 
@@ -469,6 +470,11 @@ function HandleFrontiersBack(obj, color, alt)
 	PlayerSelectedAction[tileColor] = nil
 	PlayerFrontiersChoice[tileColor] = nil
 	UpdateActionStatusUI(tileColor, "None")
+	UnreadyPlayerIfNeeded(tileColor)
+
+	if ReadyList[color] then
+		ReadyUp(Player[color])
+	end
 end
 
 -- Helper function to get tile color from object

@@ -99,6 +99,7 @@ ReadyList = {}
 PlayerShips = {}
 PlayerShipMovements = {}
 PlayerCoins = {}
+PlayerFrontiersChoice = {}
 
 for _, color in ipairs(Players) do
   DraftWonders[color] = {}

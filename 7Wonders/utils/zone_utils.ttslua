@@ -91,6 +91,7 @@ function HandleCardHolderEnter(zone, enter_object, zoneInfo)
       local armadaActive = (ExpansionConfig and ExpansionConfig.Armada) and "true" or "false"
       data.Tile.UI.setAttribute("HolderArmadaSell", "active", armadaActive)
     end
+
     local reminder = "Choose your action!"
     if ExpansionConfig and ExpansionConfig.Armada and enter_object.getTags then
       local tags = enter_object.getTags()
