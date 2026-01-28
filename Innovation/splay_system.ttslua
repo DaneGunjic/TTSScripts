@@ -1,0 +1,154 @@
+function splay_cards(paramtable)
+  -- 0 - no splay
+  -- 1 - left
+  -- 2 - right
+  -- 3 - up
+  local splay_type = paramtable.newsplay
+  local zone = getObjectFromGUID(paramtable.zone)
+  local wait_time = 0.3
+
+  local compareLeft = comparisonLeft
+  local compareRight = comparisonRight
+  local compareUp = comparisonUp
+
+  local flipped = zone.getPosition().z > 0
+  if flipped then
+    compareLeft = comparisonRight
+    compareRight = comparisonLeft
+    compareUp = comparisonDown
+  end
+
+  local card_count = get_card_count(zone, paramtable.color)
+  wait_time = wait_time + (0.15 * card_count)
+
+  if paramtable.newsplay == 0 then --splay stack
+    if paramtable.oldsplay == 1 then --was left
+      splay_stacked(zone, paramtable.color, compareLeft)
+    elseif paramtable.oldsplay == 2 then --was right
+      splay_stacked(zone, paramtable.color, compareRight)
+    elseif paramtable.oldsplay == 3 then --was up
+      splay_stacked(zone, paramtable.color, compareUp)
+    end
+  elseif paramtable.newsplay == 1 then --splay left
+    if paramtable.oldsplay == 2 then -- was right
+      splay_stacked(zone, paramtable.color, compareRight)
+    elseif paramtable.oldsplay == 3 then -- was up
+      splay_stacked(zone, paramtable.color, compareUp)
+    else wait_time = 0 end
+    splay_left(zone, paramtable.color, wait_time)
+  elseif paramtable.newsplay == 2 then --splay right
+    if paramtable.oldsplay == 1 then --was left
+      splay_stacked(zone, paramtable.color, compareLeft)
+    elseif paramtable.oldsplay == 3 then -- was up
+      splay_stacked(zone, paramtable.color, compareUp)
+    else wait_time = 0 end
+    splay_right(zone, paramtable.color, wait_time)
+  elseif paramtable.newsplay == 3 then --splay up
+    if paramtable.oldsplay == 1 then --was left
+      splay_stacked(zone, paramtable.color, compareLeft)
+    elseif paramtable.oldsplay == 2 then --was right
+      splay_stacked(zone, paramtable.color, compareRight)
+    else wait_time = 0 end
+    splay_up(zone, paramtable.color, wait_time)
+  end
+end
+
+function splay_stacked(zone, color, sort_function, save_previous)
+  local cards = zone.getObjects()
+  local pos = nil
+  local y_increase = 0.1
+  local a = {}
+  for i, n in pairs(cards) do a[i] = n end
+
+  table.sort(a, sort_function)
+  for k, deck in ipairs(a) do
+    local deck_from_guid = getObjectFromGUID(deck.guid)
+    if deck.tag == "Deck" then
+      local deck_cards = deck_from_guid.getObjects()
+      for j, v in pairs(deck_cards) do
+        if color == getCardColor(v.description) then
+          if pos == nil then pos = deck_from_guid.getPosition() end
+          pos.y = pos.y + y_increase/3
+          deck_from_guid.takeObject({position=pos})
+        end
+      end
+    elseif deck.tag == "Card" and getCardColor(deck.getDescription()) == color then
+      if pos == nil then pos = deck_from_guid.getPosition() end
+      pos.y = pos.y + y_increase
+      deck.setPositionSmooth(pos, false, true)
+    end
+    y_increase = y_increase + 0.1
+  end
+end
+
+function splay_right(zone, color, wait_time, save_previous)
+  move_distance = -1.2
+  if zone.getPosition().z > 0 then move_distance = move_distance * -1 end
+  Wait.time(function() do_splay(zone, color, move_distance, 0, save_previous) end, wait_time)
+end
+
+function splay_up(zone, color, wait_time, save_previous)
+  move_distance = -1
+  if zone.getPosition().z > 0 then move_distance = move_distance * -1 end
+  Wait.time(function() do_splay(zone, color, 0, move_distance, save_previous) end, wait_time)
+end
+
+function splay_left(zone, color, wait_time, save_previous)
+  move_distance = 1.2
+  if zone.getPosition().z > 0 then move_distance = move_distance * -1 end
+  Wait.time(function() do_splay(zone, color, move_distance, 0, save_previous) end, wait_time)
+end
+
+function do_splay(zone, color, x_distance, z_distance, save_previous)
+  local cards = zone.getObjects()
+  local pos = nil
+  for i, deck in pairs(cards) do
+    if deck.tag == "Deck" then
+      local deck_from_guid = getObjectFromGUID(deck.guid)
+      local deck_cards = deck_from_guid.getObjects()
+      local move_distance_x = 0
+      local move_distance_z = 0
+      for j, v in pairs(deck_cards) do
+        if color == getCardColor(v.description) then
+          pos = deck_from_guid.getPosition()
+          pos.x = pos.x + move_distance_x
+          pos.z = pos.z + move_distance_z
+          pos.y = pos.y + (#deck_cards - j)/2
+          deck_from_guid.takeObject({position=pos, smooth=false})
+          move_distance_x = move_distance_x + x_distance
+          move_distance_z = move_distance_z + z_distance
+        end
+      end
+    end
+  end
+end
+
+function get_card_count(zone, color)
+  local count = 0
+  local cards = zone.getObjects()
+  for i, deck in pairs(cards) do
+    if deck.tag == "Card" then
+      if color == getCardColor(deck.getDescription()) then
+        count = count + 1
+      end
+    end
+  end
+
+  return count
+end
+
+function comparisonRight(a, b)
+  return a.getPosition().x < b.getPosition().x
+end
+
+function comparisonUp(a, b)
+  return a.getPosition().z < b.getPosition().z
+end
+
+function comparisonDown(a, b)
+  return a.getPosition().z > b.getPosition().z
+end
+
+function comparisonLeft(a, b)
+  return a.getPosition().x > b.getPosition().x
+end

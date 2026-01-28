@@ -1,0 +1,308 @@
+game_setup = false
+
+expansions = {
+  ['cities'] = true,
+  ['echoes'] = true,
+  ['artifacts'] = true,
+  ['figures'] = true
+}
+
+toggle_colors = {
+  ["off"] = "#FFFFFF|#FFFFFF|White|rgba(0.78,0.78,0.78,0.5)",
+  ["on"] = "#00F00F|#00F00F|White|rgba(0.78,0.78,0.78,0.5)"
+}
+
+deck_zones = {}
+deck_zones[1] = "ee7a48"
+deck_zones[2] = "dccdd3"
+deck_zones[3] = "4536b8"
+deck_zones[4] = "f7f83f"
+deck_zones[5] = "1d592a"
+deck_zones[6] = "279e05"
+deck_zones[7] = "f74544"
+deck_zones[8] = "960036"
+deck_zones[9] = "56e15a"
+deck_zones[10] = "4e5788"
+
+deck_zones_cities = {}
+deck_zones_cities[1] = "b05fdb"
+deck_zones_cities[2] = "9c3d4c"
+deck_zones_cities[3] = "c17975"
+deck_zones_cities[4] = "1cd3f7"
+deck_zones_cities[5] = "c3bf5e"
+deck_zones_cities[6] = "855d4d"
+deck_zones_cities[7] = "7b1e8b"
+deck_zones_cities[8] = "e4673f"
+deck_zones_cities[9] = "b33229"
+deck_zones_cities[10] = "2018f7"
+
+deck_zones_echoes = {}
+deck_zones_echoes[1] = "7ac138"
+deck_zones_echoes[2] = "106200"
+deck_zones_echoes[3] = "2796ae"
+deck_zones_echoes[4] = "4e5874"
+deck_zones_echoes[5] = "9ad21c"
+deck_zones_echoes[6] = "0f8a75"
+deck_zones_echoes[7] = "719cab"
+deck_zones_echoes[8] = "558c0b"
+deck_zones_echoes[9] = "2be020"
+deck_zones_echoes[10] = "3f0f8b"
+
+deck_zones_artifacts = {}
+deck_zones_artifacts[1] = "b6531a"
+deck_zones_artifacts[2] = "bd7008"
+deck_zones_artifacts[3] = "801572"
+deck_zones_artifacts[4] = "cadcb4"
+deck_zones_artifacts[5] = "56950e"
+deck_zones_artifacts[6] = "2a3e18"
+deck_zones_artifacts[7] = "aeddf5"
+deck_zones_artifacts[8] = "253cd0"
+deck_zones_artifacts[9] = "8a4597"
+deck_zones_artifacts[10] = "13d0fa"
+
+deck_zones_figures = {}
+deck_zones_figures[1] = "cc34e8"
+deck_zones_figures[2] = "80630a"
+deck_zones_figures[3] = "dc4693"
+deck_zones_figures[4] = "b2f336"
+deck_zones_figures[5] = "9b0621"
+deck_zones_figures[6] = "c6fd88"
+deck_zones_figures[7] = "0c3e9a"
+deck_zones_figures[8] = "93e2e9"
+deck_zones_figures[9] = "c94e51"
+deck_zones_figures[10] = "4c5463"
+
+relic_names_to_zones = {}
+relic_names_to_zones["Timbuktu"] = "5c9607"
+relic_names_to_zones["Complex Numbers"] = "e93944"
+relic_names_to_zones["Newton-Wickins Telescope"] = "de6658"
+relic_names_to_zones["Ching Shih"] = "3ca0e3"
+relic_names_to_zones["Safety Pin"] = "b0520b"
+
+relic_guids = {
+  "bcddb8",
+  "db74d0",
+  "c1b3a1",
+  "e61e23",
+  "2480ea"
+}
+
+achievements = {}
+achievements["cities"] = {
+  "725299",
+  "432309",
+  "13b4b1",
+  "1625fc",
+  "f503eb"
+}
+achievements["echoes"] = {
+  "41b532",
+  "925def",
+  "086490",
+  "dff8f9",
+  "92b18c"
+}
+achievements["figures"] = {
+  "2f7a06",
+  "cd8989",
+  "204ebf",
+  "81da98",
+  "aff188"
+}
+
+return_zone = "1fc0b1"
+
+score_zones = {}
+score_zones["White"] = "5f32fe"
+score_zones["Red"] = "47aec5"
+score_zones["Green"] = "5ebaa4"
+score_zones["Blue"] = "080fe5"
+
+achievement_zones = {}
+achievement_zones["White"] = "696253"
+achievement_zones["Red"] = "131b20"
+achievement_zones["Green"] = "05ce32"
+achievement_zones["Blue"] = "0e1eda"
+
+resources = {}
+resources["E"] = "Environment"
+resources["K"] = "Knowledge"
+resources["C"] = "Castle"
+resources["M"] = "Money"
+resources["I"] = "Industry"
+resources["T"] = "Technology"
+
+non_resources = {}
+non_resources["1"] = "1"
+non_resources["2"] = "2"
+non_resources["3"] = "3"
+non_resources["4"] = "4"
+non_resources["5"] = "5"
+non_resources["6"] = "6"
+non_resources["7"] = "7"
+non_resources["8"] = "8"
+non_resources["9"] = "9"
+non_resources["X"] = "10"
+non_resources["Y"] = "11"
+
+card_colors = {
+  "Blue",
+  "Yellow",
+  "Purple",
+  "Red",
+  "Green"
+}
+
+point_values = {
+  "1", "2", "3", "4", "5", "6", "7", "8", "9", "X", "Y"
+  }
+
+color_lookup = {
+  B = "Blue",
+  Y = "Yellow",
+  P = "Purple",
+  R = "Red",
+  G = "Green"
+}
+
+zone_zones = {
+  White = "42c27c",
+  Red = "f12279",
+  Blue = "948312",
+  Green = "70f7c2"
+}
+
+forecast_zones = {
+  White = "",
+  Red = "",
+  Blue = "",
+  Green = ""
+}
+
+meld_zones = {
+  White = {
+    "368e00",
+    "acc408",
+    "9191d1",
+    "019c77",
+    "39c08f",
+    "21047c"
+  },
+  Red = {
+    "e3ff09",
+    "77801d",
+    "1d4712",
+    "fb233f",
+    "ee91e3",
+    "a8cc06"
+  },
+  Blue = {
+    "3de1ab",
+    "3c50cd",
+    "46d405",
+    "6e66ae",
+    "829595",
+    "f57aa0"
+  },
+  Green = {
+    "a414e5",
+    "c809bb",
+    "c234e2",
+    "ec3704",
+    "8f86a0",
+    "c7d9dc"
+  }
+}
+
+splay_indicators = {
+  White = {
+    Blue = "d2d401",
+    Yellow = "09392a",
+    Purple = "7a701a",
+    Red = "d6d424",
+    Green = "9fdd12"
+  },
+  Red = {
+    Blue = "637d67",
+    Yellow = "2ad1a3",
+    Purple = "0a6804",
+    Red = "d2b0b6",
+    Green = "03cd9e"
+  },
+  Blue = {
+    Blue = "c6247e",
+    Yellow = "2ef8b0",
+    Purple = "f625a3",
+    Red = "87e6ac",
+    Green = "a0d513"
+  },
+  Green = {
+    Blue = "ddde9f",
+    Yellow = "e8f5ea",
+    Purple = "ca1584",
+    Red = "dfa88e",
+    Green = "e67ad4"
+  }
+}
+
+resource_indicators = {
+  White = {
+    Environment = "717269",
+    Knowledge = "c2938a",
+    Castle = "45f65e",
+    Money = "a29160",
+    Industry = "ad8648",
+    Technology = "12674c"
+  },
+  Red = {
+    Environment = "e2940b",
+    Knowledge = "177d4a",
+    Castle = "9c9b0e",
+    Money = "619485",
+    Industry = "bce9b4",
+    Technology = "0cfe3b"
+  },
+  Blue = {
+    Environment = "bcb168",
+    Knowledge = "8a6097",
+    Castle = "03ce97",
+    Money = "5aec71",
+    Industry = "b4c3b4",
+    Technology = "ceef0e"
+  },
+  Green = {
+    Environment = "e88e5a",
+    Knowledge = "47c9f7",
+    Castle = "aef8d1",
+    Money = "28e199",
+    Industry = "104356",
+    Technology = "93da8d"
+  }
+}
+
+tuck_zones = {}
+tuck_zones["White"] = "6bb65e"
+tuck_zones["Red"] = "6bbbb1"
+tuck_zones["Blue"] = "7906c8"
+tuck_zones["Green"] = "6b920d"
+
+score_cards = {}
+score_cards["White"] = "69daa4"
+score_cards["Red"] = "be0b2c"
+score_cards["Green"] = "ef7167"
+score_cards["Blue"] = "014ce8"
+
+setup_button = {}
+setup_button.click_function = "setup"
+setup_button.label = "Setup"
+setup_button.guid = "a9a05d"
+setup_button.function_owner = nil
+setup_button.width = 500
+setup_button.height = 500
+setup_button.font_size = 100
+setup_button.position = {0, 1.5, 0}
+setup_button.rotation = {0, 0, 0}
+
+player_nums = {}
+
+update_lock = false

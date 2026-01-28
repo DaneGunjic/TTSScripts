@@ -1,0 +1,199 @@
+function errorhandler(err)
+   print( "ERROR:", err )
+end
+
+function onUpdate()
+  local err =  xpcall(doUpdate, errorhandler)
+  if err == false then
+    update_lock = false
+  end
+end
+
+function doUpdate()
+  if update_lock == false then
+    update_lock = true
+    if game_setup == true then
+      players = getSeatedPlayers()
+
+      local splays_per_player = {}
+      local resource_counts_per_player = {}
+      for i, color in pairs(players) do
+        splays_per_player[color] = getPlayerSplays(color)
+        resource_counts_per_player[color] = getResourceCounts(color)
+      end
+
+      for i, player_color in pairs(players) do
+        local top_cards = getTopCards(player_color)
+        updateResourceLabels(resource_counts_per_player[player_color], player_color, top_cards)
+        updateScoreCount(player_color, top_cards)
+        updateAchievementCount(player_color, top_cards, splays_per_player, resource_counts_per_player)
+        updateHandData(player_color, top_cards)
+      end
+    end
+    update_lock = false
+  end
+end
+
+function isTopPlayer(player)
+  return player == "Blue" or player == "Green"
+end
+
+function isBottomPlayer(player)
+  return player == "White" or player == "Red"
+end
+
+function return_hotkey(player, card)
+  if card.tag == "Card" then
+    description = card.getDescription()
+    name = card.getName()
+    age = getAgeNum(description)
+    moveCardFromHand(player, card)
+    returnCardToDeck(card, age, description, name)
+  end
+end
+
+function tuck_hotkey(player, card)
+  if card.tag == "Card" then
+    tuckCardNoZone(player, card)
+  end
+end
+
+function meld_hotkey(player, card)
+  if card.tag == "Card" then
+    meldCard(player, card)
+  end
+end
+
+function draw_hotkey(player)
+  local max_age = getHighestAge(getTopCards(player))
+  if max_age == 0 then max_age = 1 end
+
+  local base_deck = nil
+
+  for i = max_age, 10 do
+    base_deck = getDeckOrCard(i)
+    if base_deck ~= nil then
+      max_age = i
+      break
+    end
+  end
+
+  if expansion_is_active("echoes") then
+    local cards_in_hand = Player[player].getHandObjects(1)
+    local has_echo = false
+    for i, card in pairs(cards_in_hand) do
+      if isEchoes(card.getDescription()) then
+        has_echo = true
+        break
+      end
+    end
+
+    if not has_echo and #cards_in_hand > 0 then
+      local echoes_deck = getDeckOrCardEchoes(max_age)
+      if echoes_deck ~= nil then
+        echoes_deck.deal(1, player)
+        broadcastToAll(getPlayerName(player) .. " draws echo card age " .. tostring(max_age))
+        return
+      end
+    end
+  end
+
+  if base_deck ~= nil and (base_deck.tag == "Deck" or base_deck.tag == "Card") then
+    base_deck.deal(1, player)
+    broadcastToAll(getPlayerName(player) .. " draws base card age " .. tostring(max_age))
+  end
+end
+
+function draw_city_hotkey(player)
+  if not expansion_is_active("cities") then return end
+
+  local max_age = getHighestAge(getTopCards(player))
+  if max_age == 0 then max_age = 1 end
+
+  local base_deck = nil
+
+  for i = max_age, 10 do
+    base_deck = getDeckOrCard(i)
+    if base_deck ~= nil then
+      max_age = i
+      break
+    end
+  end
+
+  local cards_in_hand = Player[player].getHandObjects(1)
+  local has_city = false
+  for i, card in pairs(cards_in_hand) do
+    if isCities(card.getDescription()) then
+      has_city = true
+      break
+    end
+  end
+
+  if has_city then
+    broadcastToAll(getPlayerName(player) .. " already has a city!")
+    return
+  end
+
+  local cities_deck = getDeckOrCardCities(max_age)
+  if cities_deck ~= nil then
+    cities_deck.deal(1, player)
+    broadcastToAll(getPlayerName(player) .. " draws city card age " .. tostring(max_age))
+    return
+  end
+end
+
+function draw_figure_hotkey(player)
+  if not expansion_is_active("figures") then return end
+
+  local max_age = getHighestAge(getTopCards(player))
+  if max_age == 0 then max_age = 1 end
+
+  local base_deck = nil
+
+  for i = max_age, 10 do
+    base_deck = getDeckOrCard(i)
+    if base_deck ~= nil then
+      max_age = i
+      break
+    end
+  end
+
+  local figures_deck = getDeckOrCardFigures(max_age)
+  if figures_deck ~= nil then
+    figures_deck.deal(1, player)
+    broadcastToAll(getPlayerName(player) .. " draws figure card age " .. tostring(max_age))
+    return
+  end
+end
+
+function onLoad()
+  setup_button_obj = getObjectFromGUID(setup_button.guid)
+  self.UI.hide("RightPanel")
+
+  createSplayButtons()
+
+  if setup_button_obj ~= nil then
+    -- setup_button_obj.createButton(setup_button)
+  else
+    setup()
+    -- game_setup = true
+    -- createReturnButton()
+    -- createSplayButtons()
+    -- createResourceButtons()
+    -- createScoreButtons()
+    -- createAchievementCountButtons()
+    broadcastToAll("Game reloaded. Splay states have been reset.",  {0.7,0.7,0})
+  end
+
+  addHotkey("Return", return_hotkey)
+  addHotkey("Tuck", tuck_hotkey)
+  addHotkey("Meld", meld_hotkey)
+  addHotkey("Draw", draw_hotkey)
+  addHotkey("DrawCity", draw_city_hotkey)
+  addHotkey("DrawFigure", draw_figure_hotkey)
+
+  for i = 1, 10 do
+    deck = getDeck(i)
+    deck.setVar("age", i)
+  end
+end

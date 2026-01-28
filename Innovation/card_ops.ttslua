@@ -1,0 +1,343 @@
+function onObjectEnterScriptingZone(scripting_zone, object)
+  local zone_guid = scripting_zone.getGUID()
+
+  if zone_guid == zone_zones["White"] or zone_guid == zone_zones["Red"] then
+    setRotation(object, scripting_zone, 180)
+    return
+  end
+
+  if zone_guid == zone_zones["Blue"] or zone_guid == zone_zones["Green"] then
+    setRotation(object, scripting_zone, 0)
+    return
+  end
+
+  if zone_guid == score_zones["White"] or zone_guid == score_zones["Red"] or zone_guid == achievement_zones["White"] or zone_guid == achievement_zones["Red"] then
+    setRotation(object, scripting_zone, 90)
+    return
+  end
+
+  if zone_guid == score_zones["Blue"] or zone_guid == score_zones["Green"]  or zone_guid == achievement_zones["Blue"] or zone_guid == achievement_zones["Green"] then
+    setRotation(object, scripting_zone, 270)
+    return
+  end
+
+  if zone_guid == tuck_zones["White"] then
+    setRotationFaceUpWithWait(object, scripting_zone, "White")
+    tuckCardFromZone("White", object, scripting_zone)
+    return
+  end
+
+  if zone_guid == tuck_zones["Green"] then
+    setRotationFaceUpWithWait(object, scripting_zone, "Green")
+    tuckCardFromZone("Green", object, scripting_zone)
+    return
+  end
+
+  if zone_guid == tuck_zones["Blue"] then
+    setRotationFaceUpWithWait(object, scripting_zone, "Blue")
+    tuckCardFromZone("Blue", object, scripting_zone)
+    return
+  end
+
+  if zone_guid == tuck_zones["Red"] then
+    setRotationFaceUpWithWait(object, scripting_zone, "Red")
+    tuckCardFromZone("Red", object, scripting_zone)
+    return
+  end
+end
+
+function tuckCardNoZone(player_color, object)
+  moveCardFromHand(player_color, object)
+
+  setRotationFaceUp(object, player_color)
+  tuckCard(player_color, object)
+end
+
+function tuckCardFromZone(player_color, object, scripting_zone)
+  Wait.time(function()
+    if objectInZone(object, scripting_zone) then
+      tuckCard(player_color, object)
+    end
+  end, 0.8)
+end
+
+function tuckCard(player_color, object)
+  local card_color = getCardColor(object.getDescription())
+  local splay_state = getObjectFromGUID(splay_indicators[player_color][card_color]).call("get_state")
+  local move_distance = 0
+  local player_zone_obj = getObjectFromGUID(zone_zones[player_color])
+
+  if splay_state == "None" then
+    tuckStacked(player_color, object)
+  elseif splay_state == "Left" then
+    move_distance = 1
+    local sort_function = sortLeft
+    if player_zone_obj.getPosition().z > 0 then
+      move_distance = move_distance * -1
+      sort_function = sortRight
+    end
+    tuckUnderSplay(player_color, object, move_distance, 0, sort_function)
+  elseif splay_state == "Right" then
+    move_distance = -1
+    local sort_function = sortRight
+    if player_zone_obj.getPosition().z > 0 then
+      move_distance = move_distance * -1
+      sort_function = sortLeft
+    end
+    tuckUnderSplay(player_color, object, move_distance, 0, sort_function)
+  elseif splay_state == "Up" then
+    move_distance = -1.2
+    local sort_function = sortUp
+    if player_zone_obj.getPosition().z > 0 then
+      move_distance = move_distance * -1
+      sort_function = sortDown
+    end
+    tuckUnderSplay(player_color, object, 0, move_distance, sort_function)
+  end
+end
+
+function moveCardFromHand(player_color, object)
+  if card_is_in_hand(object, player_color) == true then
+    object.setPosition(object.getPosition() + Vector(0, 20, 0))
+  end
+end
+
+function card_is_in_hand(card, player_color)
+  local card_pos = card.getPosition()
+   if player_color == "Green" or player_color == "Blue" then
+    if card_pos.z > 55.74 and card_pos.z < 55.75 then
+      return true
+    end
+
+    return false
+   end
+  if card_pos.z < -55.74 and card_pos.z > -55.75 then
+    return true
+  end
+
+  return false
+end
+
+function meldCard(player_color, object)
+  moveCardFromHand(player_color, object)
+
+  setRotationFaceUp(object, player_color)
+
+  local card_color = getCardColor(object.getDescription())
+  local splay_state = getObjectFromGUID(splay_indicators[player_color][card_color]).call("get_state")
+  local move_distance = 0
+  local player_zone_obj = getObjectFromGUID(zone_zones[player_color])
+
+  if splay_state == "None" then
+    meldStacked(player_color, object)
+  elseif splay_state == "Left" then
+    move_distance = -1
+    local sort_function = sortLeft
+    if player_zone_obj.getPosition().z > 0 then
+      move_distance = move_distance * -1
+      sort_function = sortRight
+    end
+    meldOverSplay(player_color, object, move_distance, 0, sort_function)
+  elseif splay_state == "Right" then
+    move_distance = 1
+    local sort_function = sortRight
+    if player_zone_obj.getPosition().z > 0 then
+      move_distance = move_distance * -1
+      sort_function = sortLeft
+    end
+    meldOverSplay(player_color, object, move_distance, 0, sort_function)
+  elseif splay_state == "Up" then
+    move_distance = 1.2
+    local sort_function = sortUp
+    if player_zone_obj.getPosition().z > 0 then
+      move_distance = move_distance * -1
+      sort_function = sortDown
+    end
+    meldOverSplay(player_color, object, 0, move_distance, sort_function)
+  end
+end
+
+function sortLeft(a, b)
+  return a.position.x < b.position.x
+end
+
+function sortRight(a, b)
+  return a.position.x > b.position.x
+end
+
+function sortUp(a, b)
+  return a.position.z > b.position.z
+end
+
+function sortDown(a, b)
+  return a.position.z < b.position.z
+end
+
+function meldOverSplay(player_color, card, move_distance_x, move_distance_z, sort_function)
+  local sorted_cards = getSortedResourcesFromCards(player_color, true)
+  local card_color = getCardColor(card.getDescription())
+
+  table.sort(sorted_cards[card_color], sort_function)
+
+  if next(sorted_cards[card_color]) == nil then
+    meldToEmptyZone(player_color, card)
+    return
+  end
+
+  local color_cards = sorted_cards[card_color]
+
+  local top_card = color_cards[1]
+  local top_pos = getObjectFromGUID(top_card.guid).getPosition()
+  local new_top_pos = { x = top_pos.x + move_distance_x, y = top_pos.y + 1, z = top_pos.z + move_distance_z }
+
+  card.setPositionSmooth(new_top_pos, false, true)
+end
+
+function tuckUnderSplay(player_color, card, move_distance_x, move_distance_z, sort_function)
+  local sorted_cards = getSortedResourcesFromCards(player_color, true)
+  local card_color = getCardColor(card.getDescription())
+
+  table.sort(sorted_cards[card_color], sort_function)
+  local color_cards = sorted_cards[card_color]
+
+  if next(color_cards) == nil then
+    meldToEmptyZone(player_color, card)
+    return
+  end
+
+  local y = 0.1 * #sorted_cards
+  for _, splayed_card in pairs(color_cards) do
+    local card_obj = getObjectFromGUID(splayed_card.guid)
+    local splayed_pos = card_obj.getPosition()
+    splayed_pos.y = y + 2
+    card_obj.setPosition(splayed_pos)
+    card_obj.setLock(true)
+    y = y - 0.1
+  end
+
+  local bottom_card = color_cards[#color_cards]
+  local bottom_pos = getObjectFromGUID(bottom_card.guid).getPosition()
+  local new_bottom_pos = { x = bottom_pos.x + move_distance_x, y = 0.3, z = bottom_pos.z + move_distance_z }
+
+  Wait.time(function()
+    card.setPositionSmooth(new_bottom_pos, false, true)
+    Wait.time(function()
+      for _, splayed_card in pairs(color_cards) do
+        local card_obj = getObjectFromGUID(splayed_card.guid)
+        local splay_pos = card_obj.getPosition() -- splayed_card.position
+        local new_pos = { splay_pos.x, splay_pos.y + 0.5, splay_pos.z}
+        card_obj.setPositionSmooth(new_pos, false, true)
+        card_obj.setLock(false)
+      end
+    end, 0.3)
+  end, 0.3)
+end
+
+function meldStacked(player_color, card)
+  local card_color = getCardColor(card.getDescription())
+  local player_zone = getObjectFromGUID(zone_zones[player_color])
+  local cards = player_zone.getObjects()
+
+  for i, deck in pairs(cards) do
+    if deck.tag == "Deck" then
+      local deck_from_guid = getObjectFromGUID(deck.guid)
+      local deck_cards = deck_from_guid.getObjects()
+      for j, v in pairs(deck_cards) do
+        if card_color == getCardColor(v.description) then
+          placeCardOverObject(card, deck_from_guid)
+          return
+        end
+      end
+    elseif deck.tag == "Card" then
+      if card_color == getCardColor(deck.getDescription()) then
+        placeCardOverObject(card, deck)
+        return
+      end
+    end
+  end
+
+  meldToEmptyZone(player_color, card)
+
+end
+
+function meldToEmptyZone(player_color, card)
+  for i,zone in pairs(meld_zones[player_color]) do
+    local meld_zone = getObjectFromGUID(zone)
+    local cards = meld_zone.getObjects()
+    local has_cards = false
+    for i, deck in pairs(cards) do
+      if deck.tag == "Deck" or deck.tag == "Card" then
+        has_cards = true
+      end
+    end
+
+    if has_cards == false then
+      local zone_pos = meld_zone.getPosition()
+      card.setPositionSmooth(zone_pos)
+      return
+    end
+  end
+end
+
+function placeCardUnderObject(card, obj)
+  local pos = obj.getPosition()
+  local orig_y = pos.y
+  pos.y = pos.y + 3
+  obj.setPosition(pos)
+  obj.setLock(true)
+  Wait.time(function()
+    pos.y = orig_y
+    card.setPositionSmooth(pos, false, true)
+    pos.y = 1.6
+    Wait.time(function()
+      obj.setLock(false)
+      obj.setPositionSmooth(pos, false, true)
+    end, 0.3)
+  end, 0.3)
+end
+
+function placeCardOverObject(card, obj)
+  local pos = obj.getPosition()
+  pos.y = pos.y + 1
+  card.setPositionSmooth(pos, false, true)
+end
+
+function objectInZone(object, in_zone)
+  local cards = in_zone.getObjects()
+  for i, card in pairs(cards) do
+    local card_guid = ""
+    if card.tag == "Card" or card.tag == "Deck" then card_guid = card.guid else card_guid = "" end
+    if card_guid == object.guid then return true end
+  end
+  return false
+end
+
+function setRotation(object, scripting_zone, rotation)
+    Wait.time(function()
+      if objectInZone(object, scripting_zone) then
+        local object_rotation = object.getRotation()
+        object_rotation.y = rotation
+        object.setRotationSmooth(object_rotation, false, true)
+      end
+    end, 0.8)
+end
+
+function setRotationFaceUpWithWait(object, scripting_zone, color)
+  Wait.time(function()
+    if objectInZone(object, scripting_zone) then
+      setRotationFaceUp(object, color)
+    end
+  end, 0.8)
+end
+
+function setRotationFaceUp(object, color)
+  rotation = 0
+  if color == "Red" or color == "White" then
+    rotation = 180
+  end
+
+  local object_rotation = object.getRotation()
+  object_rotation.y = rotation
+  object_rotation.z = 0
+  object.setRotationSmooth(object_rotation, false, true)
+end

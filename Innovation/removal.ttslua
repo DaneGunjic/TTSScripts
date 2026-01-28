@@ -1,0 +1,51 @@
+function remove_achievements(id)
+    for j, guid in pairs(achievements[id]) do
+      getObjectFromGUID(guid).destroy()
+    end
+end
+
+function remove_cities()
+  for i = 1, 10 do
+    deck = getDeckCities(i)
+    deck.destruct()
+  end
+
+  remove_achievements("cities")
+  expansions["cities"] = false
+end
+
+function remove_echoes()
+  for i = 1, 10 do
+    deck = getDeckEchoes(i)
+    deck.destruct()
+  end
+
+  remove_achievements("echoes")
+  expansions["echoes"] = false
+end
+
+function remove_artifacts()
+  for i = 1, 10 do
+    deck = getDeckArtifacts(i)
+    deck.destruct()
+  end
+
+  remove_relics()
+  expansions["artifacts"] = false
+end
+
+function remove_figures()
+  for i = 1, 10 do
+    deck = getDeckFigures(i)
+    deck.destruct()
+  end
+
+  remove_achievements("figures")
+  expansions["figures"] = false
+end
+
+function remove_relics()
+  for j, guid in pairs(relic_guids) do
+    getObjectFromGUID(guid).destroy()
+  end
+end

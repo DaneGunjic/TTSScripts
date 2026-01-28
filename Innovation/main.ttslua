@@ -1,0 +1,10 @@
+#include !\Innovation\constants.ttslua
+
+#include !\Innovation\deck_utils.ttslua
+#include !\Innovation\scoring_system.ttslua
+#include !\Innovation\splay_system.ttslua
+#include !\Innovation\card_ops.ttslua
+#include !\Innovation\ui_manager.ttslua
+#include !\Innovation\game_setup.ttslua
+#include !\Innovation\removal.ttslua
+#include !\Innovation\hotkeys_and_events.ttslua

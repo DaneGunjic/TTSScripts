@@ -1,0 +1,876 @@
+function updateScoreCount(player, top_cards)
+  local updated_count = getScoreCount(player)
+  updated_count = updateScoreCountWithFiguresKarma(player, updated_count, top_cards)
+
+  local score_button = getObjectFromGUID(score_cards[player])
+  local buttons = score_button.getButtons()
+  local previous_score_val = buttons[1].label
+
+  if previous_score_val != tostring(updated_count) then
+    indicator = score_button.editButton({
+      index=0,
+      label=updated_count
+    })
+
+    local player_num = player_nums[player]
+    local point_attr = {}
+    point_attr["text"] = updated_count
+    self.UI.setAttributes("Score" .. player_num, point_attr)
+  end
+end
+
+function updateScoreCountWithFiguresKarma(player, count, top_cards)
+  local max_score_update = 0
+  if top_cards["Tigernmas"] ~= nil then
+    local cards_in_hand = Player[player].getHandObjects(1)
+    if #cards_in_hand > max_score_update then max_score_update = #cards_in_hand end
+  end
+
+  if top_cards["Sinuhe"] ~= nil then
+    local active_castle_count = getActiveIconCount(player, "C")
+    if active_castle_count > max_score_update then max_score_update = active_castle_count end
+  end
+
+  if top_cards["Daedalus"] ~= nil then
+    local achievement_card_values = getAchievementValues(player)
+    if achievement_card_values > max_score_update then max_score_update = achievement_card_values end
+  end
+
+  if top_cards["Shen Kuo"] ~= nil then
+    local score_increase = getSplayCount(player) * 3
+    if score_increase > max_score_update then max_score_update = score_increase end
+  end
+
+  if top_cards["Michelangelo"] ~= nil then
+    local cards_in_hand = Player[player].getHandObjects(1)
+    local score_count = 0
+    for i, card in pairs(cards_in_hand) do
+      age = getAgeNum(card.getDescription())
+      score_count = score_count + age
+    end
+    if score_count > max_score_update then max_score_update = score_count end
+  end
+
+  if top_cards["William Shakespeare"] ~= nil then
+    local score_increase = getActiveIconCount(player, "H")
+    if score_increase > max_score_update then max_score_update = score_increase end
+  end
+
+  if top_cards["Christopher Polhem"] ~= nil then
+    local active_industry_count = getActiveIconCount(player, "I") * 2
+    if active_industry_count > max_score_update then max_score_update = active_industry_count end
+  end
+
+  if top_cards["Emmy Noether"] ~= nil then
+    local active_clock_count = getActiveIconCount(player, "T")
+    local clock_points = active_clock_count * active_clock_count
+    if clock_points > max_score_update then max_score_update = clock_points end
+  end
+
+  if top_cards["Wernher Von Braun"] ~= nil then
+    local cards_in_hand = Player[player].getHandObjects(2)
+    local score_count = 0
+    for i, card in pairs(cards_in_hand) do
+      age = getAgeNum(card.getDescription())
+      score_count = score_count + age
+    end
+    if score_count > max_score_update then max_score_update = score_count end
+  end
+
+  return count + max_score_update
+end
+
+function getScoreCardCount(player)
+  local zone = getObjectFromGUID(score_zones[player])
+  local cards = zone.getObjects()
+  local count = 0
+  for i, card in pairs(cards) do
+    if card.tag == "Deck" then
+      local cards_in_deck = card.getObjects()
+      for j = 1, #cards_in_deck do
+        age = getAgeNum(cards_in_deck[j].description)
+        count = count + 1
+      end
+    elseif card.tag == "Card" then
+      age = getAgeNum(card.getDescription())
+        count = count + 1
+    end
+  end
+  return count
+end
+
+function getScoreCount(player)
+  local zone = getObjectFromGUID(score_zones[player])
+  local cards = zone.getObjects()
+  local count = 0
+  for i, card in pairs(cards) do
+    if card.tag == "Deck" then
+      local cards_in_deck = card.getObjects()
+      for j = 1, #cards_in_deck do
+        age = getAgeNum(cards_in_deck[j].description)
+        count = count + age
+      end
+    elseif card.tag == "Card" then
+      age = getAgeNum(card.getDescription())
+        count = count + age
+    end
+  end
+
+  local player_board_count = getActiveIconCount(player, "NUM")
+  return count + player_board_count
+end
+
+function updateHandData(player_color, top_cards)
+    local cards = Player[player_color].getHandObjects(1)
+
+    local player_num = player_nums[player_color]
+    local point_attr = {}
+    point_attr["text"] = #cards
+    self.UI.setAttributes("Cards" .. player_num, point_attr)
+
+    local hand_high = 0
+    for _, card in pairs(cards) do
+      local age = getAgeNum(card.getDescription())
+      if age > hand_high then hand_high = age end
+    end
+
+    point_attr["text"] = hand_high
+    self.UI.setAttributes("High" .. player_num, point_attr)
+
+    point_attr["text"] = getHighestAge(top_cards)
+    self.UI.setAttributes("Age" .. player_num, point_attr)
+end
+
+function getHighestAge(top_cards)
+    local max_age = 0
+    for _, card in pairs(top_cards) do
+      local age = getAgeNum(card)
+      if age > max_age then max_age = age end
+    end
+
+    return max_age
+end
+
+function updateAchievementCount(player, top_cards, splays_per_player, resource_counts_per_player)
+  local zone = getObjectFromGUID(achievement_zones[player])
+  local cards = zone.getObjects()
+  local count = 0
+  for i, card in pairs(cards) do
+    if card.tag == "Deck" then
+      count = count + #card.getObjects()
+    elseif card.tag == "Card" then
+      count = count + 1
+    end
+  end
+
+  local player_board_count = getActiveIconCount(player, "A") + getCitiesFlagAchievementCount(player)
+  local updated_count = count + player_board_count
+  updated_count = updateAchievementCountFromFiguresKarma(player, top_cards, updated_count, splays_per_player, resource_counts_per_player)
+
+  local score_button = getObjectFromGUID(score_cards[player])
+  local buttons = score_button.getButtons()
+  local previous_score_val = buttons[2].label
+
+  if previous_score_val != tostring(updated_count) then
+    indicator = score_button.editButton({
+      index=1,
+      label=updated_count
+    })
+
+    local player_num = player_nums[player]
+    local point_attr = {}
+    point_attr["text"] = updated_count
+    self.UI.setAttributes("Ach" .. player_num, point_attr)
+
+  end
+end
+
+function updateAchievementCountFromFiguresKarma(player, top_cards, achievement_count, splays_per_player, resource_counts_per_player)
+  local max_achievement_update = 0
+  if top_cards["Niccolo Machiavelli"] ~= nil then
+    local achievements_per_color = {}
+    for _, card_color in pairs(card_colors) do
+      if splays_per_player[player][card_color] == "Right" then achievements_per_color[card_color] = true else achievements_per_color[card_color] = false end
+    end
+
+    for player_color, splays_per_color in pairs(splays_per_player) do
+      if player_color != player then
+        for card_color, splay_state in pairs(splays_per_color) do
+            if splay_state != "None" then achievements_per_color[card_color] = false end
+        end
+      end
+    end
+
+    local player_splay_right_with_no_other_splay_count = 0
+    for _, should_achieve in pairs(achievements_per_color) do
+      if should_achieve then player_splay_right_with_no_other_splay_count = player_splay_right_with_no_other_splay_count + 1 end
+    end
+
+    if  player_splay_right_with_no_other_splay_count > max_achievement_update then max_achievement_update = player_splay_right_with_no_other_splay_count end
+  end
+
+  if top_cards["Alfred Nobel"] ~= nil then
+    local ach_count = 0
+    for r in pairs(resources) do
+      local player_r_count = resource_counts_per_player[player][r]
+      local should_achieve = false
+      if player_r_count > 0 then should_achieve = true end
+      if should_achieve then
+        for _, player_ref in ipairs(Player.getPlayers()) do
+          local player_color = player_ref.color
+          if resource_counts_per_player[player_color] ~= nil and resource_counts_per_player[player_color][r] ~= nil and player_color != player then
+            if player_r_count < resource_counts_per_player[player_color][r] * 2 then should_achieve = false end
+          end
+        end
+      end
+
+      if should_achieve then ach_count = ach_count + 1 end
+    end
+
+    if ach_count > max_achievement_update then max_achievement_update = ach_count end
+  end
+
+  if top_cards["Robert E. Lee"] ~= nil then
+
+    local ach_count = math.floor(resource_counts_per_player[player]["E"] / 7)
+    if ach_count > max_achievement_update then max_achievement_update = ach_count end
+  end
+
+  if top_cards["Marie Curie"] ~= nil then
+    local additional_achievements = 0
+    local score_card_vals = getScoreCardValues(player)
+    if score_card_vals[7] ~= nil then additional_achievements = 1 end
+    if score_card_vals[8] ~= nil then additional_achievements = additional_achievements + 1 end
+    if score_card_vals[9] ~= nil then additional_achievements = additional_achievements + 1 end
+    if score_card_vals[10] ~= nil then additional_achievements = additional_achievements + 1 end
+    if additional_achievements > max_achievement_update then max_achievement_update = additional_achievements end
+  end
+
+  if top_cards["Nelson Mandela"] ~= nil then
+    -- TODO Each two inspire effects visible on your board counts as an achievement
+  end
+
+  return max_achievement_update + achievement_count
+end
+
+function getTopCardIconCount(top_cards, resource)
+  local resource_count = 0
+  for name, description in pairs(top_cards) do
+    local card_resources = getCardsResources(description)
+    _, count = string.gsub(card_resources, resource, resource)
+    resource_count = resource_count + count
+  end
+
+  return resource_count
+end
+
+function getAchievementValues(player)
+  local zone = getObjectFromGUID(achievement_zones[player])
+  local cards = zone.getObjects()
+  local total_values = 0
+  for i, card in pairs(cards) do
+    if card.tag == "Deck" then
+      local cards_in_deck = card.getObjects()
+      for j = 1, #cards_in_deck do
+        total_values = total_values + getAgeNum(cards_in_deck[j].description)
+      end
+    elseif card.tag == "Card" then
+      total_values = total_values + getAgeNum(card.getDescription())
+    end
+  end
+
+  return total_values
+end
+
+function getResourceCounts(player, card_color)
+  local sorted_cards = getSortedResourcesFromCards(player, false, card_color)
+  local r_concat = getActiveResources(sorted_cards, player)
+
+  local resource_counts = {}
+  for resource_shorthand, v in pairs(resources) do
+    _, count = string.gsub(r_concat, resource_shorthand, resource_shorthand)
+    resource_counts[resource_shorthand] = count
+  end
+
+  for resource_shorthand, v in pairs(non_resources) do
+    _, count = string.gsub(r_concat, resource_shorthand, resource_shorthand)
+    resource_counts[resource_shorthand] = count
+  end
+
+  return resource_counts
+end
+
+function getActiveIconCount(player, icon)
+  local sorted_cards = getSortedResourcesFromCards(player, true)
+  return getIconCountFromCardList(sorted_cards, player, icon)
+end
+
+function getCitiesFlagAchievementCount(player)
+  local flag_achievement_count = 0
+
+  local player_objects = {}
+  for _, player_ref in ipairs(Player.getPlayers()) do
+    player_objects[player_ref.color] = player_ref
+  end
+
+  local colors_with_flags = getFlagsPerColor(player)
+
+  for color, has_flag in pairs(colors_with_flags) do
+    should_get_achievement = false
+    if has_flag == true then
+      should_get_achievement = true
+      for _, player_ref in ipairs(Player.getPlayers()) do
+        if player_ref.color != player and areOpponents(player_ref.team, player_objects[player].team) then
+          if getActiveCardCount(player_ref.color, color) > getActiveCardCount(player, color) then should_get_achievement = false end
+        end
+      end
+    end
+    if should_get_achievement == true then flag_achievement_count = flag_achievement_count + 1 end
+  end
+
+  return flag_achievement_count
+end
+
+function getFlagsPerColor(player)
+  local colors_with_flags = {
+    Blue = false,
+    Yellow = false,
+    Purple = false,
+    Red = false,
+    Green = false
+  }
+
+  local sorted_cards = {
+    Blue = {},
+    Yellow = {},
+    Purple = {},
+    Red = {},
+    Green = {}
+  }
+
+  local zone = getObjectFromGUID(zone_zones[player])
+  local cards = zone.getObjects()
+  for i, card in pairs(cards) do
+    if card.tag == "Deck" then
+      local cards_in_deck = card.getObjects()
+      for j = 1, #cards_in_deck do
+        local resources_from_card = getCardsResources(cards_in_deck[j].description)
+        table.insert(sorted_cards[getCardColor(cards_in_deck[j].description)], {
+          resources = resources_from_card,
+          position = {x=0, y=0, z=0}
+        })
+      end
+    elseif card.tag == "Card" then
+      local resources_from_card = getCardsResources(card.getDescription())
+      table.insert(sorted_cards[getCardColor(card.getDescription())], {
+        resources = resources_from_card,
+        position = card.getPosition()
+      })
+    end
+  end
+
+  for _, color in pairs(card_colors) do
+    for resources, position in pairs(sorted_cards[color]) do
+      local color_resources = getActiveResourcesByColor(sorted_cards, player, color)
+      if string.match(color_resources, "F") then colors_with_flags[color] = true end
+    end
+  end
+
+  return colors_with_flags
+end
+
+function areOpponents(team1, team2)
+  if team1 == "None" then return true end
+  if team1 == "Clubs" and team2 == "Spades" then return false end
+  if team1 == "Spades" and team2 == "Clubs" then return false end
+  if team1 == "Diamonds" and team2 == "Hearts" then return false end
+  if team1 == "Hearts" and team2 == "Diamonds" then return false end
+  if team1 == team2 then return false end
+
+  return true
+end
+
+function getTopCards(player)
+  local current_top_cards = {}
+  local top_cards = {}
+  local zone = getObjectFromGUID(zone_zones[player])
+  local cards = zone.getObjects()
+  for i, card in pairs(cards) do
+    if card.tag == "Deck" then
+      local cards_in_deck = card.getObjects()
+      if cards_in_deck[#cards_in_deck] ~= nil then
+        local deck_card = cards_in_deck[#cards_in_deck]
+        local card_color = getCardColor(deck_card.description)
+        setCurrentTopCard(player, card, card_color, current_top_cards)
+        --top_cards[cards_in_deck[#cards_in_deck].name] = cards_in_deck[#cards_in_deck].description
+      end
+    elseif card.tag == "Card" then
+      local card_color = getCardColor(card.getDescription())
+      setCurrentTopCard(player, card, card_color, current_top_cards)
+    end
+  end
+
+  for color, card in pairs(current_top_cards) do
+    if card.tag == "Deck" then
+      local cards_in_deck = card.getObjects()
+      top_cards[cards_in_deck[#cards_in_deck].name] = cards_in_deck[#cards_in_deck].description
+    else
+      top_cards[card.getName()] = card.getDescription()
+    end
+  end
+
+  return top_cards
+end
+
+function setCurrentTopCard(player, card, card_color, current_top_cards)
+  if current_top_cards[card_color] ~= nil then
+    local current_position = 0
+    local splay_state = getObjectFromGUID(splay_indicators[player][card_color]).call("get_state")
+    if splay_state == 'None' then
+      current_position = current_top_cards[card_color].getPosition().y
+      if card.getPosition().y > current_position then current_top_cards[card_color] = card end
+    elseif (splay_state == 'Left' and isBottomPlayer(player)) or (splay_state == 'Right' and isTopPlayer(player)) then
+      current_position = current_top_cards[card_color].getPosition().x
+      if card.getPosition().x < current_position then current_top_cards[card_color] = card end
+    elseif (splay_state == 'Right' and isBottomPlayer(player)) or (splay_state == 'Left' and isTopPlayer(player)) then
+      current_position = current_top_cards[card_color].getPosition().x
+      if card.getPosition().x > current_position then current_top_cards[card_color] = card end
+    elseif splay_state == 'Up' then
+      current_position = current_top_cards[card_color].getPosition().z
+      if isBottomPlayer(player) then
+        if card.getPosition().z > current_position then current_top_cards[card_color] = card end
+      else
+        if card.getPosition().z < current_position then current_top_cards[card_color] = card end
+      end
+    end
+  else
+    current_top_cards[card_color] = card
+  end
+end
+
+function getActiveCardCount(player, color)
+  local count = 0
+  local zone = getObjectFromGUID(zone_zones[player])
+  local cards = zone.getObjects()
+  for i, card in pairs(cards) do
+    if card.tag == "Deck" then
+      local cards_in_deck = card.getObjects()
+      if cards_in_deck[1] ~= nil then
+        local resources_from_card = getCardsResources(cards_in_deck[1].description)
+        local deck_color = getCardColor(cards_in_deck[1].description)
+        if deck_color == color then return 1 end
+      end
+    elseif card.tag == "Card" then
+      if getCardColor(card.getDescription()) == color then count = count + 1 end
+    end
+  end
+
+  return count
+end
+
+function getSortedResourcesFromCards(player, ignoreBaseCardValues, card_color)
+  local sorted_cards = {
+    Blue = {},
+    Yellow = {},
+    Purple = {},
+    Red = {},
+    Green = {}
+  }
+
+  local zone = getObjectFromGUID(zone_zones[player])
+  local cards = zone.getObjects()
+  for i, card in pairs(cards) do
+    if card.tag == "Deck" then
+      local cards_in_deck = card.getObjects()
+      for j = 1, #cards_in_deck do
+        if card_color == nil or getCardColor(cards_in_deck[j].description) == card_color then
+          local resources_from_card = getCardsResources(cards_in_deck[j].description)
+          if isBaseCard(cards_in_deck[j].description) == true and ignoreBaseCardValues == true then
+            resources_from_card = string.gsub(resources_from_card, "A", "-")
+            resources_from_card = string.gsub(resources_from_card, "X", "-")
+          end
+          table.insert(sorted_cards[getCardColor(cards_in_deck[j].description)], {
+            resources = resources_from_card,
+            position = {x=0, y=0, z=0},
+            guid = card.getGUID()
+          })
+        end
+      end
+    elseif card.tag == "Card" then
+      if card_color == nil or getCardColor(card.getDescription()) == card_color then
+        local resources_from_card = getCardsResources(card.getDescription())
+        if cardIsFaceDown(card) then resources_from_card = "------"
+        elseif isBaseCard(card.getDescription()) == true and ignoreBaseCardValues == true then
+          resources_from_card = string.gsub(resources_from_card, "A", "-")
+          resources_from_card = string.gsub(resources_from_card, "X", "-")
+        end
+        table.insert(sorted_cards[getCardColor(card.getDescription())], {
+          resources = resources_from_card,
+          position = card.getPosition(),
+          guid = card.getGUID()
+        })
+      end
+    end
+  end
+
+  return sorted_cards
+end
+
+function getActiveResources(list, player)
+  r_concat = ""
+  for i, color in pairs(card_colors) do
+    local r = getActiveResourcesByColor(list, player, color)
+    r_concat = r_concat..r
+  end
+
+  return r_concat
+end
+
+function getActiveResourcesByColor(list, player, color)
+  local r = ""
+
+  local cards = list[color]
+  if #cards ~= 0 then
+    top_card = cards[#cards]
+    splay_state = getObjectFromGUID(splay_indicators[player][color]).call("get_state")
+
+    if splay_state == "None" then
+      r = r..top_card.resources
+    elseif splay_state == "Left" then
+      top_card = getLeftmostCard(cards, player, false)
+      for j, card in pairs(cards) do
+        r = r..getRightResources(card)
+      end
+      r = r..getInverseRightResources(top_card)
+    elseif splay_state == "Right" then
+      top_card = getRightmostCard(cards, player, false)
+      for j, card in pairs(cards) do
+        r = r..getLeftResources(card)
+      end
+      r = r..getInverseLeftResources(top_card)
+    elseif splay_state == "Up" then
+      top_card = getUpmostCard(cards, player, false)
+      for j, card in pairs(cards) do
+        r = r..getBottomResources(card)
+      end
+      r = r..getInverseBottomResources(top_card)
+    end
+  end
+
+  return r
+end
+
+function getIconCountFromCardList(list, player, icon)
+  local num_count = 0
+  local r = getActiveResources(list, player)
+
+  if icon == "NUM" then -- if getting points from board, get the highest and count everything else as 1
+    local point_vals_with_counts = {}
+    local active_point_vals = {}
+    for i, point_shorthand in pairs(point_values) do
+      _, count = string.gsub(r, point_shorthand, point_shorthand)
+      if count > 0 then
+        table.insert(active_point_vals, pointValue(point_shorthand))
+        point_vals_with_counts[pointValue(point_shorthand)] = count
+      end
+    end
+
+    point_vals_with_counts = updateBonusValuesFromFiguresKarma(player, point_vals_with_counts)
+
+    local point_count = 0
+    local max_point_val = 0
+    for shorthand, count in pairs(point_vals_with_counts) do
+      if count>0 and shorthand > max_point_val then
+        max_point_val = shorthand
+      end
+      point_count = point_count + count
+    end
+    points = max_point_val
+    if point_count > 0 then points = points + point_count - 1 end
+
+    return points
+  else
+    _, count = string.gsub(r, icon, icon)
+    return count
+  end
+
+  return 0
+end
+
+function updateBonusValuesFromFiguresKarma(player, active_point_vals)
+  local top_cards = getTopCards(player)
+  if top_cards["Zhang Heng"] ~= nill then
+    local score_card_vals = getScoreCardValues(player)
+    for val, count in pairs(score_card_vals) do
+      if active_point_vals[val] == nil then
+        active_point_vals[val] = count
+      else
+        active_point_vals[val] = active_point_vals[val] + count
+      end
+    end
+  end
+
+  return active_point_vals
+end
+
+function getScoreCardValues(player)
+  local score_values = {}
+  local zone = getObjectFromGUID(score_zones[player])
+  local cards = zone.getObjects()
+  for i, card in pairs(cards) do
+    if card.tag == "Deck" then
+      local cards_in_deck = card.getObjects()
+      for j = 1, #cards_in_deck do
+        age = getAgeNum(cards_in_deck[j].description)
+        if score_values[age] == nil then
+          score_values[age] = 1
+        else score_values[age] = score_values[age] + 1 end
+      end
+    elseif card.tag == "Card" then
+      age = getAgeNum(card.getDescription())
+      if score_values[age] == nil then
+        score_values[age] = 1
+      else score_values[age] = score_values[age] + 1 end
+    end
+  end
+
+  return score_values
+end
+
+function pointValue(icon)
+  if icon == "1" then return 1 end
+  if icon == "2" then return 2 end
+  if icon == "3" then return 3 end
+  if icon == "4" then return 4 end
+  if icon == "5" then return 5 end
+  if icon == "6" then return 6 end
+  if icon == "7" then return 7 end
+  if icon == "8" then return 8 end
+  if icon == "9" then return 9 end
+  if icon == "X" then return 10 end
+  if icon == "Y" then return 11 end
+  return 0
+end
+
+function cardIsFaceDown(card)
+  local card_rotation = card.getRotation()
+  if card_rotation.z > 315 or card_rotation.z < 45 then return false end
+  return true
+end
+
+function updateResourceLabels(resource_counts, player, top_cards)
+  for resource, count in pairs(resource_counts) do
+    local updated_count = updateFromTopFiguresKarma(top_cards, resource_counts, resource, player)
+    if resources[resource] != nil then
+      local resource_button = getObjectFromGUID(resource_indicators[player][resources[resource]])
+      local buttons = resource_button.getButtons()
+      local previous_val = buttons[1].label
+
+      if previous_val != tostring(updated_count) then
+        indicator = resource_button.editButton({
+          index=0,
+          label=updated_count
+        })
+
+        local player_num = player_nums[player]
+        local point_attr = {}
+        point_attr["text"] = updated_count
+        self.UI.setAttributes(resource .. player_num, point_attr)
+      end
+    end
+  end
+end
+
+function getActiveBonusCount(resource_counts)
+  return resource_counts["1"] + resource_counts["2"] + resource_counts["3"] + resource_counts["4"] + resource_counts["5"] + resource_counts["6"] + resource_counts["7"] + resource_counts["8"] + resource_counts["9"] + resource_counts["X"] + resource_counts["Y"]
+end
+
+function updateFromTopFiguresKarma(top_cards, resource_counts, resource, player)
+  if top_cards["Sneferu"] ~= nil and resource == "M" then
+    return resource_counts["M"] + resource_counts["C"]
+  end
+
+  if top_cards["Fu Xi"] ~= nil and resource == "K" then
+    return resource_counts["K"] + getScoreCardCount(player) + getForecastCount(player)
+  end
+
+  if top_cards["Gilgamesh"] ~= nil and resource == "C" then
+    local num_top_cards = 0
+    for name, description in pairs(top_cards) do
+      num_top_cards = num_top_cards + 1
+    end
+
+    return resource_counts["C"] + (num_top_cards * getActiveBonusCount(resource_counts))
+  end
+
+  if top_cards["Huang Di"] ~= nil and resource == "E" then
+    return resource_counts["E"] + resource_counts["K"]
+  end
+
+  if top_cards["Plato"] ~= nil and (resource == "E" or resource == "K" or resource == "C" or resource == "M") then
+    return resource_counts[resource] + getSplayCount(player)
+  end
+
+  if top_cards["Tran Huang Dao"] ~= nil and resource != "C" then
+    if resource_counts[resource] == 0 then return 0 end
+    return resource_counts[resource] + math.floor(resource_counts["C"] / 2)
+  end
+
+  if top_cards["Christopher Columbus"] ~= nil and resource == "M" then
+    return resource_counts["M"] + (2 * resource_counts["I"])
+  end
+
+  if top_cards["Adam Smith"] ~= nil and resource == "M" then
+    return resource_counts["M"] * 3
+  end
+
+  if top_cards["Catherine the Great"] ~= nil and resource == "K" then
+    return resource_counts["K"] * 3
+  end
+
+  if top_cards["John Ericsson"] ~= nil and resource == "T" then
+    return resource_counts["T"] + 2 * resource_counts["I"]
+  end
+
+  if top_cards["James Clerk Maxwell"] ~= nil then
+    local objs = Player[player].getHandObjects(1)
+    if resource_counts[resource] > 0 then
+      return resource_counts[resource] + #objs
+    end
+  end
+
+  if top_cards["J.P. Morgan"] ~= nil then
+    local icon_count = 0
+    for _, card_color in pairs(card_colors) do
+      local splay_state = getObjectFromGUID(splay_indicators[player][card_color]).call("get_state")
+      if splay_state == "Up" then
+        local active_resources = getResourceCounts(player, card_color)
+        icon_count = icon_count + active_resources[resource]
+      end
+    end
+    resource_counts[resource] = resource_counts[resource] + icon_count
+  end
+
+  if top_cards["John Von Neumann"] ~= nil and resource == "T" then
+    local objs = Player[player].getHandObjects(1)
+    return resource_counts["T"] + (2 * #objs)
+  end
+
+  return resource_counts[resource]
+end
+
+function getLeftmostCard(cards, player, redirected)
+  if (player == "Blue" or player == "Green") and redirected == false then
+    return getRightmostCard(cards, player, true)
+  end
+
+  leftmost = nil
+  min_x = 10000
+  for i, card in pairs(cards) do
+    if card.position.x < min_x then
+      min_x = card.position.x
+      leftmost = card
+    end
+  end
+  return leftmost
+end
+
+function getPlayerSplays(player)
+  local player_color_splays = {}
+  for _, card_color in pairs(card_colors) do
+    player_color_splays[card_color] = getObjectFromGUID(splay_indicators[player][card_color]).call("get_state")
+  end
+
+  return player_color_splays
+end
+
+function getSplayCount(player)
+  local count = 0
+  for _, card_color in pairs(card_colors) do
+    local splay_state = getObjectFromGUID(splay_indicators[player][card_color]).call("get_state")
+    if splay_state != "None" then count = count + 1 end
+  end
+
+  return count
+end
+
+function getRightmostCard(cards, player, redirected)
+  if (player == "Blue" or player == "Green") and redirected == false then
+    return getLeftmostCard(cards, player, true)
+  end
+
+  rightmost = nil
+  max_x = -10000
+  for i, card in pairs(cards) do
+    if card.position.x > max_x then
+      max_x = card.position.x
+      rightmost = card
+    end
+  end
+  return rightmost
+end
+
+function getUpmostCard(cards, player, redirected)
+  if (player == "Blue" or player == "Green") and redirected == false then
+    return getDownmostCard(cards, player, true)
+  end
+
+  upmost = nil
+  max_z = -10000
+  for i, card in pairs(cards) do
+    if card.position.z > max_z then
+      max_z = card.position.z
+      upmost = card
+    end
+  end
+  return upmost
+end
+
+function getDownmostCard(cards, player, redirected)
+  downmost = nil
+  min_z = 10000
+  for i, card in pairs(cards) do
+    if card.position.z < min_z then
+      min_z = card.position.z
+      downmost = card
+    end
+  end
+  return downmost
+end
+
+function getLeftResources(card)
+  return string.sub(card.resources, 1, 2)
+end
+
+function getRightResources(card)
+  return string.sub(card.resources, 4, 4) .. string.sub(card.resources, 6, 6)
+end
+
+function getBottomResources(card)
+  return string.sub(card.resources, 2, 4)
+end
+
+function getInverseRightResources(card)
+  return string.sub(card.resources, 1, 3) .. string.sub(card.resources, 5, 5)
+end
+
+function getInverseLeftResources(card)
+  return string.sub(card.resources, 3, 4) .. string.sub(card.resources, 5, 5)
+end
+
+function getInverseBottomResources(card)
+  return string.sub(card.resources, 1, 1) .. string.sub(card.resources, 5, 6)
+end
+
+function getAgeNum(description)
+  local age = getCardAge(description)
+  if age == "X" then
+    return 10
+  elseif age == "Y" then
+    return 11
+  end
+  if age == "" then
+    return 0
+  end
+  return tonumber(age)
+end
