@@ -111,6 +111,13 @@ function getForecastCount(player)
   return #objs
 end
 
+function isBaseCard(description)
+  if string.sub(description, 1, 1) == "B" then
+    return true
+  end
+  return false
+end
+
 function parse_card(description)
   local t = {}
   t.type = string.sub(description, 1, 1)

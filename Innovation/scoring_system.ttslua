@@ -425,7 +425,7 @@ end
 function setCurrentTopCard(player, card, card_color, current_top_cards)
   if current_top_cards[card_color] ~= nil then
     local current_position = 0
-    local splay_state = getObjectFromGUID(splay_indicators[player][card_color]).call("get_state")
+    local splay_state = get_splay_state(player, card_color)
     if splay_state == 'None' then
       current_position = current_top_cards[card_color].getPosition().y
       if card.getPosition().y > current_position then current_top_cards[card_color] = card end

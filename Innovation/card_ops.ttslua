@@ -47,7 +47,7 @@ end
 
 function tuckCard(player_color, object)
   local card_color = getCardColor(object.getDescription())
-  local splay_state = getObjectFromGUID(splay_indicators[player_color][card_color]).call("get_state")
+  local splay_state = get_splay_state(player_color, card_color)
   local move_distance = 0
   local player_zone_obj = getObjectFromGUID(zone_zones[player_color])
 
@@ -108,14 +108,14 @@ function meldCard(player_color, object)
   setRotationFaceUp(object, player_color)
 
   local card_color = getCardColor(object.getDescription())
-  local splay_state = getObjectFromGUID(splay_indicators[player_color][card_color]).call("get_state")
+  local splay_state = get_splay_state(player_color, card_color)
   local move_distance = 0
   local player_zone_obj = getObjectFromGUID(zone_zones[player_color])
 
   if splay_state == "None" then
     meldStacked(player_color, object)
   elseif splay_state == "Left" then
-    move_distance = -1
+    move_distance = -SPLAY_SHIFT_X
     local sort_function = sortLeft
     if player_zone_obj.getPosition().z > 0 then
       move_distance = move_distance * -1
@@ -123,7 +123,7 @@ function meldCard(player_color, object)
     end
     meldOverSplay(player_color, object, move_distance, 0, sort_function)
   elseif splay_state == "Right" then
-    move_distance = 1
+    move_distance = SPLAY_SHIFT_X
     local sort_function = sortRight
     if player_zone_obj.getPosition().z > 0 then
       move_distance = move_distance * -1
@@ -131,7 +131,7 @@ function meldCard(player_color, object)
     end
     meldOverSplay(player_color, object, move_distance, 0, sort_function)
   elseif splay_state == "Up" then
-    move_distance = SPLAY_SHIFT_X
+    move_distance = SPLAY_SHIFT_Z
     local sort_function = sortUp
     if player_zone_obj.getPosition().z > 0 then
       move_distance = move_distance * -1
