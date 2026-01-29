@@ -10,10 +10,11 @@
 
 function onLoad()
   setup_button_obj = getObjectFromGUID(setup_button.guid)
-  self.UI.hide("RightPanel")
+  --self.UI.hide("RightPanel")
 
   createSplayControlButtons()
   createSplayButtons()
+  createResourceButtons()
 
   if setup_button_obj ~= nil then
     --setup()

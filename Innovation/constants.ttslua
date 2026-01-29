@@ -131,6 +131,7 @@ resources["C"] = "Castle"
 resources["M"] = "Money"
 resources["I"] = "Industry"
 resources["T"] = "Technology"
+resources["H"] = "Human"
 
 non_resources = {}
 non_resources["1"] = "1"

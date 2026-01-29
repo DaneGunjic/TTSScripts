@@ -666,21 +666,30 @@ end
 function updateResourceLabels(resource_counts, player, top_cards)
   for resource, count in pairs(resource_counts) do
     local updated_count = updateFromTopFiguresKarma(top_cards, resource_counts, resource, player)
-    if resources[resource] ~= nil then
-      local resource_button = getObjectFromGUID(resource_indicators[player][resources[resource]])
-      local buttons = resource_button.getButtons()
-      local previous_val = buttons[1].label
+    if resources[resource] ~= nil and resource_indicators[player] ~= nil then
+      local indicator_guid = resource_indicators[player][resources[resource]]
+      if indicator_guid ~= nil then
+        local resource_button = getObjectFromGUID(indicator_guid)
+        if resource_button ~= nil then
+          local buttons = resource_button.getButtons()
+          if buttons ~= nil and buttons[1] ~= nil then
+            local previous_val = buttons[1].label
 
-      if previous_val ~= tostring(updated_count) then
-        indicator = resource_button.editButton({
-          index=0,
-          label=updated_count
-        })
+            if previous_val ~= tostring(updated_count) then
+              indicator = resource_button.editButton({
+                index=0,
+                label=updated_count
+              })
 
-        local player_num = player_nums[player]
-        local point_attr = {}
-        point_attr["text"] = updated_count
-        self.UI.setAttributes(resource .. player_num, point_attr)
+              local player_num = player_nums[player]
+              if player_num then
+                local point_attr = {}
+                point_attr["text"] = updated_count
+                self.UI.setAttributes(resource .. player_num, point_attr)
+              end
+            end
+          end
+        end
       end
     end
   end

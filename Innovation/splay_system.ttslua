@@ -26,6 +26,8 @@ function splay_cards(paramtable)
     set_splay_state(player, paramtable.color, "Up")
     anchored_splay(zone, player, paramtable.color, "Up")
   end
+
+  updateSplayButtonLabel(player, paramtable.color, paramtable.newsplay)
 end
 
 function splay_stacked(zone, color, sort_function, save_previous)
@@ -333,12 +335,34 @@ function comparisonUp(a, b)
   return a.getPosition().z < b.getPosition().z
 end
 
-function comparisonDown(a, b)
-  return a.getPosition().z > b.getPosition().z
-end
-
 function comparisonY(a, b)
   return a.getPosition().y < b.getPosition().y
+end
+
+function updateSplayButtonLabel(player, card_color, splay_type_int)
+  local table_obj = getObjectFromGUID("4ee1f2")
+  if table_obj == nil then return end
+
+  local splay_text = "Not Splayed"
+  if splay_type_int == 1 then splay_text = "Splayed Left"
+  elseif splay_type_int == 2 then splay_text = "Splayed Right"
+  elseif splay_type_int == 3 then splay_text = "Splayed Up"
+  end
+
+  local target_tooltip = player .. ":Reset Splay"
+
+  local buttons = table_obj.getButtons()
+  if buttons then
+    for _, btn in ipairs(buttons) do
+      if btn.click_function == "no_splay_" .. card_color and btn.tooltip == target_tooltip then
+        table_obj.editButton({
+          index = btn.index,
+          label = card_color .. "\n" .. splay_text
+        })
+        break
+      end
+    end
+  end
 end
 
 function comparisonLeft(a, b)

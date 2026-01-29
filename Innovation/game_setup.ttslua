@@ -4,7 +4,7 @@ function setup()
   game_setup = true
   self.UI.hide("buttons")
   createReturnButton()
-  createResourceButtons()
+  
   createScoreButtons()
   createAchievementCountButtons()
 
