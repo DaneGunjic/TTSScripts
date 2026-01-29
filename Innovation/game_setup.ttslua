@@ -1,8 +1,9 @@
 function setup()
+  print("setup() called")
+
   game_setup = true
   self.UI.hide("buttons")
   createReturnButton()
-  --createSplayButtons()
   createResourceButtons()
   createScoreButtons()
   createAchievementCountButtons()
@@ -44,6 +45,4 @@ function setup()
   end
 
   setupHud()
-
-  getObjectFromGUID(setup_button.guid).destruct()
 end

@@ -155,7 +155,7 @@ card_colors = {
 
 point_values = {
   "1", "2", "3", "4", "5", "6", "7", "8", "9", "X", "Y"
-  }
+}
 
 color_lookup = {
   B = "Blue",
@@ -214,35 +214,11 @@ meld_zones = {
   }
 }
 
-splay_indicators = {
-  White = {
-    Blue = "d2d401",
-    Yellow = "09392a",
-    Purple = "7a701a",
-    Red = "d6d424",
-    Green = "9fdd12"
-  },
-  Red = {
-    Blue = "637d67",
-    Yellow = "2ad1a3",
-    Purple = "0a6804",
-    Red = "d2b0b6",
-    Green = "03cd9e"
-  },
-  Blue = {
-    Blue = "c6247e",
-    Yellow = "2ef8b0",
-    Purple = "f625a3",
-    Red = "87e6ac",
-    Green = "a0d513"
-  },
-  Green = {
-    Blue = "ddde9f",
-    Yellow = "e8f5ea",
-    Purple = "ca1584",
-    Red = "dfa88e",
-    Green = "e67ad4"
-  }
+states = {
+  "Not Splayed",
+  "Splayed Left",
+  "Splayed Right",
+  "Splayed Up"
 }
 
 resource_indicators = {
@@ -287,15 +263,15 @@ tuck_zones["Blue"] = "7906c8"
 tuck_zones["Green"] = "6b920d"
 
 score_cards = {}
-score_cards["White"] = "69daa4"
-score_cards["Red"] = "be0b2c"
-score_cards["Green"] = "ef7167"
-score_cards["Blue"] = "014ce8"
+score_cards["White"] = "4ee1f2"
+score_cards["Red"] = "4ee1f2"
+score_cards["Green"] = "4ee1f2"
+score_cards["Blue"] = "4ee1f2"
 
 setup_button = {}
 setup_button.click_function = "setup"
 setup_button.label = "Setup"
-setup_button.guid = "a9a05d"
+setup_button.guid = "4ee1f2"
 setup_button.function_owner = nil
 setup_button.width = 500
 setup_button.height = 500
@@ -306,3 +282,16 @@ setup_button.rotation = {0, 0, 0}
 player_nums = {}
 
 update_lock = false
+
+HAND_Z_POSITIVE_MIN = 55.74
+HAND_Z_POSITIVE_MAX = 55.75
+HAND_Z_NEGATIVE_MIN = -55.75
+HAND_Z_NEGATIVE_MAX = -55.74
+
+ROT_Y_TOP = 0
+ROT_Y_LEFT = 90
+ROT_Y_BOTTOM = 180
+ROT_Y_RIGHT = 270
+
+SPLAY_SHIFT_X = 1.2
+SPLAY_SHIFT_Z = 1.0

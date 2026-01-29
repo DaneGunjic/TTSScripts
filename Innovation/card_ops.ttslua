@@ -1,47 +1,31 @@
+local __zone_action_map = nil
+function get_zone_action_map()
+  if __zone_action_map ~= nil then return __zone_action_map end
+  local m = {}
+  m[zone_zones["White"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_BOTTOM) end
+  m[zone_zones["Red"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_BOTTOM) end
+  m[zone_zones["Blue"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_TOP) end
+  m[zone_zones["Green"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_TOP) end
+  m[score_zones["White"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_LEFT) end
+  m[score_zones["Red"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_LEFT) end
+  m[achievement_zones["White"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_LEFT) end
+  m[achievement_zones["Red"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_LEFT) end
+  m[score_zones["Blue"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_RIGHT) end
+  m[score_zones["Green"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_RIGHT) end
+  m[achievement_zones["Blue"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_RIGHT) end
+  m[achievement_zones["Green"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_RIGHT) end
+  m[tuck_zones["White"]] = function(object, scripting_zone) setRotationFaceUpWithWait(object, scripting_zone, "White"); tuckCardFromZone("White", object, scripting_zone) end
+  m[tuck_zones["Red"]] = function(object, scripting_zone) setRotationFaceUpWithWait(object, scripting_zone, "Red"); tuckCardFromZone("Red", object, scripting_zone) end
+  m[tuck_zones["Blue"]] = function(object, scripting_zone) setRotationFaceUpWithWait(object, scripting_zone, "Blue"); tuckCardFromZone("Blue", object, scripting_zone) end
+  m[tuck_zones["Green"]] = function(object, scripting_zone) setRotationFaceUpWithWait(object, scripting_zone, "Green"); tuckCardFromZone("Green", object, scripting_zone) end
+  __zone_action_map = m
+  return m
+end
+
 function onObjectEnterScriptingZone(scripting_zone, object)
-  local zone_guid = scripting_zone.getGUID()
-
-  if zone_guid == zone_zones["White"] or zone_guid == zone_zones["Red"] then
-    setRotation(object, scripting_zone, 180)
-    return
-  end
-
-  if zone_guid == zone_zones["Blue"] or zone_guid == zone_zones["Green"] then
-    setRotation(object, scripting_zone, 0)
-    return
-  end
-
-  if zone_guid == score_zones["White"] or zone_guid == score_zones["Red"] or zone_guid == achievement_zones["White"] or zone_guid == achievement_zones["Red"] then
-    setRotation(object, scripting_zone, 90)
-    return
-  end
-
-  if zone_guid == score_zones["Blue"] or zone_guid == score_zones["Green"]  or zone_guid == achievement_zones["Blue"] or zone_guid == achievement_zones["Green"] then
-    setRotation(object, scripting_zone, 270)
-    return
-  end
-
-  if zone_guid == tuck_zones["White"] then
-    setRotationFaceUpWithWait(object, scripting_zone, "White")
-    tuckCardFromZone("White", object, scripting_zone)
-    return
-  end
-
-  if zone_guid == tuck_zones["Green"] then
-    setRotationFaceUpWithWait(object, scripting_zone, "Green")
-    tuckCardFromZone("Green", object, scripting_zone)
-    return
-  end
-
-  if zone_guid == tuck_zones["Blue"] then
-    setRotationFaceUpWithWait(object, scripting_zone, "Blue")
-    tuckCardFromZone("Blue", object, scripting_zone)
-    return
-  end
-
-  if zone_guid == tuck_zones["Red"] then
-    setRotationFaceUpWithWait(object, scripting_zone, "Red")
-    tuckCardFromZone("Red", object, scripting_zone)
+  local f = get_zone_action_map()[scripting_zone.getGUID()]
+  if f ~= nil then
+    f(object, scripting_zone)
     return
   end
 end
@@ -86,7 +70,7 @@ function tuckCard(player_color, object)
     end
     tuckUnderSplay(player_color, object, move_distance, 0, sort_function)
   elseif splay_state == "Up" then
-    move_distance = -1.2
+    move_distance = -SPLAY_SHIFT_X
     local sort_function = sortUp
     if player_zone_obj.getPosition().z > 0 then
       move_distance = move_distance * -1
@@ -105,13 +89,13 @@ end
 function card_is_in_hand(card, player_color)
   local card_pos = card.getPosition()
    if player_color == "Green" or player_color == "Blue" then
-    if card_pos.z > 55.74 and card_pos.z < 55.75 then
+    if card_pos.z > HAND_Z_POSITIVE_MIN and card_pos.z < HAND_Z_POSITIVE_MAX then
       return true
     end
 
     return false
    end
-  if card_pos.z < -55.74 and card_pos.z > -55.75 then
+  if card_pos.z < HAND_Z_NEGATIVE_MAX and card_pos.z > HAND_Z_NEGATIVE_MIN then
     return true
   end
 
@@ -147,7 +131,7 @@ function meldCard(player_color, object)
     end
     meldOverSplay(player_color, object, move_distance, 0, sort_function)
   elseif splay_state == "Up" then
-    move_distance = 1.2
+    move_distance = SPLAY_SHIFT_X
     local sort_function = sortUp
     if player_zone_obj.getPosition().z > 0 then
       move_distance = move_distance * -1
@@ -315,9 +299,7 @@ end
 function setRotation(object, scripting_zone, rotation)
     Wait.time(function()
       if objectInZone(object, scripting_zone) then
-        local object_rotation = object.getRotation()
-        object_rotation.y = rotation
-        object.setRotationSmooth(object_rotation, false, true)
+        rotate_object(object, rotation)
       end
     end, 0.8)
 end
@@ -331,13 +313,18 @@ function setRotationFaceUpWithWait(object, scripting_zone, color)
 end
 
 function setRotationFaceUp(object, color)
-  rotation = 0
+  local rotation = 0
   if color == "Red" or color == "White" then
     rotation = 180
   end
+  rotate_object(object, rotation, 0)
+end
 
+function rotate_object(object, y, z)
   local object_rotation = object.getRotation()
-  object_rotation.y = rotation
-  object_rotation.z = 0
+  object_rotation.y = y
+  if z ~= nil then
+    object_rotation.z = z
+  end
   object.setRotationSmooth(object_rotation, false, true)
 end

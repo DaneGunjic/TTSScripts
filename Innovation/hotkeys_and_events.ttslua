@@ -64,19 +64,21 @@ function meld_hotkey(player, card)
   end
 end
 
-function draw_hotkey(player)
+function get_max_age_for_draw(player)
   local max_age = getHighestAge(getTopCards(player))
   if max_age == 0 then max_age = 1 end
-
   local base_deck = nil
-
   for i = max_age, 10 do
     base_deck = getDeckOrCard(i)
     if base_deck ~= nil then
-      max_age = i
-      break
+      return i, base_deck
     end
   end
+  return max_age, base_deck
+end
+
+function draw_hotkey(player)
+  local max_age, base_deck = get_max_age_for_draw(player)
 
   if expansion_is_active("echoes") then
     local cards_in_hand = Player[player].getHandObjects(1)
@@ -107,18 +109,7 @@ end
 function draw_city_hotkey(player)
   if not expansion_is_active("cities") then return end
 
-  local max_age = getHighestAge(getTopCards(player))
-  if max_age == 0 then max_age = 1 end
-
-  local base_deck = nil
-
-  for i = max_age, 10 do
-    base_deck = getDeckOrCard(i)
-    if base_deck ~= nil then
-      max_age = i
-      break
-    end
-  end
+  local max_age = select(1, get_max_age_for_draw(player))
 
   local cards_in_hand = Player[player].getHandObjects(1)
   local has_city = false
@@ -145,18 +136,7 @@ end
 function draw_figure_hotkey(player)
   if not expansion_is_active("figures") then return end
 
-  local max_age = getHighestAge(getTopCards(player))
-  if max_age == 0 then max_age = 1 end
-
-  local base_deck = nil
-
-  for i = max_age, 10 do
-    base_deck = getDeckOrCard(i)
-    if base_deck ~= nil then
-      max_age = i
-      break
-    end
-  end
+  local max_age = select(1, get_max_age_for_draw(player))
 
   local figures_deck = getDeckOrCardFigures(max_age)
   if figures_deck ~= nil then
@@ -166,34 +146,16 @@ function draw_figure_hotkey(player)
   end
 end
 
-function onLoad()
-  setup_button_obj = getObjectFromGUID(setup_button.guid)
-  self.UI.hide("RightPanel")
-
-  createSplayButtons()
-
-  if setup_button_obj ~= nil then
-    -- setup_button_obj.createButton(setup_button)
-  else
-    setup()
-    -- game_setup = true
-    -- createReturnButton()
-    -- createSplayButtons()
-    -- createResourceButtons()
-    -- createScoreButtons()
-    -- createAchievementCountButtons()
-    broadcastToAll("Game reloaded. Splay states have been reset.",  {0.7,0.7,0})
-  end
-
-  addHotkey("Return", return_hotkey)
-  addHotkey("Tuck", tuck_hotkey)
-  addHotkey("Meld", meld_hotkey)
-  addHotkey("Draw", draw_hotkey)
-  addHotkey("DrawCity", draw_city_hotkey)
-  addHotkey("DrawFigure", draw_figure_hotkey)
-
-  for i = 1, 10 do
-    deck = getDeck(i)
-    deck.setVar("age", i)
+function register_hotkeys()
+  local h = {
+    Return = return_hotkey,
+    Tuck = tuck_hotkey,
+    Meld = meld_hotkey,
+    Draw = draw_hotkey,
+    DrawCity = draw_city_hotkey,
+    DrawFigure = draw_figure_hotkey
+  }
+  for name, fn in pairs(h) do
+    addHotkey(name, fn)
   end
 end

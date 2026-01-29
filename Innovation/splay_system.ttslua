@@ -1,59 +1,35 @@
 function splay_cards(paramtable)
-  -- 0 - no splay
-  -- 1 - left
-  -- 2 - right
-  -- 3 - up
   local splay_type = paramtable.newsplay
   local zone = getObjectFromGUID(paramtable.zone)
-  local wait_time = 0.3
+  local player = player_by_zone(paramtable.zone)
 
-  local compareLeft = comparisonLeft
-  local compareRight = comparisonRight
-  local compareUp = comparisonUp
-
-  local flipped = zone.getPosition().z > 0
-  if flipped then
-    compareLeft = comparisonRight
-    compareRight = comparisonLeft
-    compareUp = comparisonDown
-  end
-
-  local card_count = get_card_count(zone, paramtable.color)
-  wait_time = wait_time + (0.15 * card_count)
+  print("new splay_type: " .. paramtable.newsplay .. " old splay_type: " .. paramtable.oldsplay)
 
   if paramtable.newsplay == 0 then --splay stack
+    set_splay_state(player, paramtable.color, "None")
     if paramtable.oldsplay == 1 then --was left
-      splay_stacked(zone, paramtable.color, compareLeft)
+      splay_stacked(zone, paramtable.color, comparisonLeft)
     elseif paramtable.oldsplay == 2 then --was right
-      splay_stacked(zone, paramtable.color, compareRight)
+      splay_stacked(zone, paramtable.color, comparisonRight)
     elseif paramtable.oldsplay == 3 then --was up
-      splay_stacked(zone, paramtable.color, compareUp)
+      splay_stacked(zone, paramtable.color, comparisonUp)
     end
   elseif paramtable.newsplay == 1 then --splay left
-    if paramtable.oldsplay == 2 then -- was right
-      splay_stacked(zone, paramtable.color, compareRight)
-    elseif paramtable.oldsplay == 3 then -- was up
-      splay_stacked(zone, paramtable.color, compareUp)
-    else wait_time = 0 end
-    splay_left(zone, paramtable.color, wait_time)
+    print("splay left")
+    set_splay_state(player, paramtable.color, "Left")
+    anchored_splay(zone, player, paramtable.color, "Left")
   elseif paramtable.newsplay == 2 then --splay right
-    if paramtable.oldsplay == 1 then --was left
-      splay_stacked(zone, paramtable.color, compareLeft)
-    elseif paramtable.oldsplay == 3 then -- was up
-      splay_stacked(zone, paramtable.color, compareUp)
-    else wait_time = 0 end
-    splay_right(zone, paramtable.color, wait_time)
+    print("splay right")
+    set_splay_state(player, paramtable.color, "Right")
+    anchored_splay(zone, player, paramtable.color, "Right")
   elseif paramtable.newsplay == 3 then --splay up
-    if paramtable.oldsplay == 1 then --was left
-      splay_stacked(zone, paramtable.color, compareLeft)
-    elseif paramtable.oldsplay == 2 then --was right
-      splay_stacked(zone, paramtable.color, compareRight)
-    else wait_time = 0 end
-    splay_up(zone, paramtable.color, wait_time)
+    set_splay_state(player, paramtable.color, "Up")
+    anchored_splay(zone, player, paramtable.color, "Up")
   end
 end
 
 function splay_stacked(zone, color, sort_function, save_previous)
+  print("splay_stacked " .. color)
   local cards = zone.getObjects()
   local pos = nil
   local y_increase = 0.1
@@ -76,51 +52,264 @@ function splay_stacked(zone, color, sort_function, save_previous)
       if pos == nil then pos = deck_from_guid.getPosition() end
       pos.y = pos.y + y_increase
       deck.setPositionSmooth(pos, false, true)
+      deck.setLock(false)
     end
     y_increase = y_increase + 0.1
   end
 end
 
 function splay_right(zone, color, wait_time, save_previous)
-  move_distance = -1.2
-  if zone.getPosition().z > 0 then move_distance = move_distance * -1 end
-  Wait.time(function() do_splay(zone, color, move_distance, 0, save_previous) end, wait_time)
+  local player = player_by_zone(zone.getGUID())
+  anchored_splay(zone, player, color, "Right")
 end
 
 function splay_up(zone, color, wait_time, save_previous)
-  move_distance = -1
-  if zone.getPosition().z > 0 then move_distance = move_distance * -1 end
-  Wait.time(function() do_splay(zone, color, 0, move_distance, save_previous) end, wait_time)
+  local player = player_by_zone(zone.getGUID())
+  anchored_splay(zone, player, color, "Up")
 end
 
 function splay_left(zone, color, wait_time, save_previous)
-  move_distance = 1.2
-  if zone.getPosition().z > 0 then move_distance = move_distance * -1 end
-  Wait.time(function() do_splay(zone, color, move_distance, 0, save_previous) end, wait_time)
+  local player = player_by_zone(zone.getGUID())
+  anchored_splay(zone, player, color, "Left")
 end
 
-function do_splay(zone, color, x_distance, z_distance, save_previous)
+function player_by_zone(zone_guid)
+  for p, g in pairs(zone_zones) do
+    if g == zone_guid then return p end
+  end
+  return nil
+end
+
+function getColorCards(player, color)
+  local zone = getObjectFromGUID(zone_zones[player])
   local cards = zone.getObjects()
-  local pos = nil
-  for i, deck in pairs(cards) do
-    if deck.tag == "Deck" then
-      local deck_from_guid = getObjectFromGUID(deck.guid)
-      local deck_cards = deck_from_guid.getObjects()
-      local move_distance_x = 0
-      local move_distance_z = 0
-      for j, v in pairs(deck_cards) do
-        if color == getCardColor(v.description) then
-          pos = deck_from_guid.getPosition()
-          pos.x = pos.x + move_distance_x
-          pos.z = pos.z + move_distance_z
-          pos.y = pos.y + (#deck_cards - j)/2
-          deck_from_guid.takeObject({position=pos, smooth=false})
-          move_distance_x = move_distance_x + x_distance
-          move_distance_z = move_distance_z + z_distance
+  local list = {}
+  for i, obj in pairs(cards) do
+    if obj.tag == "Card" and getCardColor(obj.getDescription()) == color then
+      table.insert(list, obj)
+    end
+  end
+  return list
+end
+
+function getBottomAnchor(player, color, state)
+  local list = {}
+
+  for i, obj in pairs(getColorCards(player, color)) do
+    --print("Found " .. obj.getName() .. " (" .. color .. ")")
+    table.insert(list, {obj=obj, pos=obj.getPosition()})
+  end
+
+  if #list == 0 then
+    local zone = getObjectFromGUID(zone_zones[player])
+    for i, obj in pairs(zone.getObjects()) do
+      if obj.tag == "Deck" then
+        local deck_cards = obj.getObjects()
+        if deck_cards[1] ~= nil and getCardColor(deck_cards[1].description) == color then
+          --print("Found a deck." .. " (" .. color .. ") as anchor")
+          return obj, true
         end
       end
     end
+
+    return nil, false
   end
+
+  -- Always find the card with the lowest Y coordinate (min Y) - lowest height
+  local min_y = 100000
+  local anchor = nil
+  for i, e in pairs(list) do
+    if e.pos.y < min_y then min_y = e.pos.y; anchor = e.obj end
+  end
+  return anchor, false
+end
+
+function lockColorCards(player, color)
+  for i, obj in pairs(getColorCards(player, color)) do
+    obj.setLock(true)
+  end
+end
+
+function anchored_splay(zone, player, color, dir)
+  print("anchored_splay " .. dir .. " for " .. color)
+
+  local state = dir
+  local anchor, anchor_is_deck = getBottomAnchor(player, color, state)
+
+  if anchor == nil then return end
+
+  if anchor_is_deck then
+		local extracted_cards = {}
+    print("Anchor is a deck")
+
+    local deck_pos = anchor.getPosition()
+    local deck_rot = anchor.getRotation()
+    local deck_cards = anchor.getObjects()
+    local matching_guids = {}
+    local bottom_card_guid = nil
+
+    -- Find bottom-most matching card to be the new anchor
+    for i = 1, #deck_cards, 1 do
+      if getCardColor(deck_cards[i].description) == color then
+        bottom_card_guid = deck_cards[i].guid
+        print("[1] Found " .. deck_cards[i].name .. " (" .. color .. ") as bottom card")
+        break
+      end
+    end
+
+    -- Collect all matching GUIDs
+    for i, c in ipairs(deck_cards) do
+       if getCardColor(c.description) == color then
+         table.insert(matching_guids, c.guid)
+       end
+    end
+
+		for i, card_data in ipairs(deck_cards) do
+			print(card_data.guid)
+			local Offset = -SPLAY_SHIFT_X * (i - 1)
+			local target_pos = deck_pos + Vector(Offset, (i - 1) * 0.05, 0)
+
+			if i < #deck_cards then
+				local spawned_card = anchor.takeObject({
+					guid = card_data.guid,
+					position = target_pos,
+					rotation = deck_rot,
+					smooth = false,
+				})
+				spawned_card.setLock(true)
+				table.insert(extracted_cards, spawned_card)
+			else
+				-- Last card: the deck object is destroyed, find the remaining card by GUID
+				local last_card = getObjectFromGUID(card_data.guid)
+				if last_card then
+					last_card.setPosition(target_pos)
+					last_card.setRotation(deck_rot)
+					last_card.setLock(true)
+					table.insert(extracted_cards, last_card)
+				else
+					print("Error: Could not find last card " .. card_data.guid)
+				end
+			end
+			print("Pulled a card")
+		end
+  end
+
+  local ax = anchor.getPosition().x
+  local az = anchor.getPosition().z
+  local flipped = zone.getPosition().z > 0
+  local stepX = SPLAY_SHIFT_X
+  local stepZ = SPLAY_SHIFT_Z
+  if flipped then
+    stepX = -stepX
+    stepZ = -stepZ
+  end
+  local cards = getColorCards(player, color)
+  for _, obj in ipairs(extracted_cards) do
+    local found = false
+    for _, c in pairs(cards) do
+      if c.guid == obj.guid then found = true; break end
+    end
+    if not found then
+      table.insert(cards, obj)
+    end
+  end
+  local sorted = {}
+
+  for i, obj in pairs(cards) do
+    table.insert(sorted, obj)
+  end
+
+  table.sort(sorted, dir == "Left" and comparisonLeft or dir == "Right" and comparisonRight or comparisonUp)
+
+  local idx = 0
+  for i, obj in pairs(sorted) do
+    if obj.guid ~= anchor.guid then
+      local pos = obj.getPosition()
+      if dir == "Left" then
+        pos.x = ax + (idx+1)*(-stepX)
+        pos.z = pos.z
+      elseif dir == "Right" then
+        pos.x = ax + (idx+1)*(stepX)
+        pos.z = pos.z
+      elseif dir == "Up" then
+        pos.z = az + (idx+1)*(stepZ)
+        pos.x = pos.x
+      end
+      obj.setPositionSmooth(pos, false, true)
+      obj.setLock(true)
+      idx = idx + 1
+    else
+      if obj.tag == "Card" then obj.setLock(true) end
+    end
+  end
+end
+
+function shift_selected_color_left(player)
+  shift_selected_color(player, -SPLAY_SHIFT_X, 0)
+end
+
+function shift_selected_color_right(player)
+  shift_selected_color(player, SPLAY_SHIFT_X, 0)
+end
+
+function shift_selected_color_up(player)
+  shift_selected_color(player, 0, SPLAY_SHIFT_Z)
+end
+
+function shift_selected_color_down(player)
+  shift_selected_color(player, 0, -SPLAY_SHIFT_Z)
+end
+
+selected_color_per_player = {}
+
+function select_splay_color(player, color)
+  selected_color_per_player[player] = color
+end
+
+function shift_selected_color(player, dx, dz)
+  local color = selected_color_per_player[player]
+  if color == nil then return end
+
+  local zone_guid = zone_zones[player]
+  local zone = getObjectFromGUID(zone_guid)
+  if zone and zone.getPosition().z > 0 then
+    dx = -dx
+    dz = -dz
+  end
+
+  local anchor, anchor_is_deck = getBottomAnchor(player, color, get_splay_state(player, color))
+  if anchor == nil then return end
+  print(anchor.getName())
+  local ax = anchor.getPosition().x
+  local az = anchor.getPosition().z
+  for i, obj in pairs(getColorCards(player, color)) do
+    local pos = obj.getPosition()
+    pos.x = pos.x + dx
+    pos.z = pos.z + dz
+    obj.setPositionSmooth(pos, false, true)
+    obj.setLock(true)
+  end
+end
+
+-- Splay state storage and accessors
+splay_state = {
+  White = { Blue="None", Yellow="None", Purple="None", Red="None", Green="None" },
+  Red =   { Blue="None", Yellow="None", Purple="None", Red="None", Green="None" },
+  Blue =  { Blue="None", Yellow="None", Purple="None", Red="None", Green="None" },
+  Green = { Blue="None", Yellow="None", Purple="None", Red="None", Green="None" }
+}
+
+function get_splay_state(player, color)
+  local ps = splay_state[player]
+  if ps == nil then return "None" end
+  return ps[color] or "None"
+end
+
+function set_splay_state(player, color, state)
+  if splay_state[player] == nil then
+    splay_state[player] = { Blue="None", Yellow="None", Purple="None", Red="None", Green="None" }
+  end
+  splay_state[player][color] = state
 end
 
 function get_card_count(zone, color)
@@ -151,4 +340,155 @@ end
 
 function comparisonLeft(a, b)
   return a.getPosition().x > b.getPosition().x
+end
+
+-----------------------------------------------------------------------------------------------------
+
+function set_color(p)
+  params = {
+      click_function = "no_splay",
+      function_owner = self,
+      label          = "",
+      position       = {0, 1, 0},
+      rotation       = {0, 90, 0},
+      width          = 1500,
+      height         = 1000,
+      font_size      = 250,
+      color          = {0.5, 0.5, 0.5},
+      font_color     = {1, 1, 1},
+  }
+  self.createButton(params)
+
+  params = {
+      click_function = "splay_right",
+      function_owner = self,
+      label          = ">",
+      position       = {0, 1, 2},
+      rotation       = {0, 90, 0},
+      width          = 400,
+      height         = 400,
+      font_size      = 340,
+      color          = {0.5, 0.5, 0.5},
+      font_color     = {1, 1, 1},
+  }
+  self.createButton(params)
+
+  params = {
+      click_function = "splay_left",
+      function_owner = self,
+      label          = "<",
+      position       = {0, 1, -2},
+      rotation       = {0, 90, 0},
+      width          = 400,
+      height         = 400,
+      font_size      = 340,
+      color          = {0.5, 0.5, 0.5},
+      font_color     = {1, 1, 1},
+  }
+  self.createButton(params)
+
+  params = {
+      click_function = "splay_up",
+      function_owner = self,
+      label          = "^",
+      position       = {1.2, 1, 0},
+      rotation       = {0, 90, 0},
+      width          = 300,
+      height         = 300,
+      font_size      = 340,
+      color          = {0.5, 0.5, 0.5},
+      font_color     = {1, 1, 1},
+  }
+  self.createButton(params)
+
+  current_color = p.color
+  self.editButton({
+    index = 0,
+    color = color_codes[p.color],
+    label = p.color.."\n"..states[1]
+  })
+end
+
+function splay_right()
+  previous_state = current_state_idx
+  current_state_idx = 2
+  splay_action()
+end
+
+function splay_left()
+  previous_state = current_state_idx
+  current_state_idx = 1
+  splay_action()
+end
+
+function splay_up()
+  previous_state = current_state_idx
+  current_state_idx = 3
+  splay_action()
+end
+
+function no_splay(arg1, arg2)
+  if type(arg1) == "userdata" then
+     -- Old behavior: called directly by button
+     previous_state = current_state_idx
+     current_state_idx = 0
+     splay_action()
+  else
+     -- New behavior: called by wrapper
+     local player = arg1
+     local color = arg2
+     local zone_guid = zone_zones[player]
+     local state_map = {None=0, Left=1, Right=2, Up=3}
+     local old_state_str = get_splay_state(player, color)
+     local old_state_int = state_map[old_state_str] or 0
+
+     local paramtable = {
+       color = color,
+       zone = zone_guid,
+       oldsplay = old_state_int,
+       newsplay = 0
+     }
+     splay_cards(paramtable)
+  end
+end
+
+-- Dynamic function generation for no_splay buttons
+if card_colors then
+  for _, color in ipairs(card_colors) do
+     _G["no_splay_" .. color] = function(obj, player, alt)
+        no_splay(player, color)
+     end
+  end
+end
+
+function splay_action()
+  self.editButton({
+    index = 0,
+    label = current_color.."\n"..states[current_state_idx + 1]
+  })
+  paramtable = {
+    color = current_color,
+    zone = player_zone,
+    oldsplay = previous_state,
+    newsplay = current_state_idx
+  }
+
+  splay_cards(paramtable)
+end
+
+function get_state()
+  state_text = states[current_state_idx + 1]
+  if string.find(state_text, "Not") then
+    return "None"
+  elseif string.find(state_text, "Left") then
+    return "Left"
+  elseif string.find(state_text, "Right") then
+    return "Right"
+  elseif string.find(state_text, "Up") then
+    return "Up"
+  end
+end
+
+function click_func(obj, color, alt_click)
+  return
 end

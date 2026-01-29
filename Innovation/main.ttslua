@@ -1,5 +1,4 @@
 #include !\Innovation\constants.ttslua
-
 #include !\Innovation\deck_utils.ttslua
 #include !\Innovation\scoring_system.ttslua
 #include !\Innovation\splay_system.ttslua
@@ -8,3 +7,26 @@
 #include !\Innovation\game_setup.ttslua
 #include !\Innovation\removal.ttslua
 #include !\Innovation\hotkeys_and_events.ttslua
+
+function onLoad()
+  setup_button_obj = getObjectFromGUID(setup_button.guid)
+  self.UI.hide("RightPanel")
+
+  createSplayControlButtons()
+  createSplayButtons()
+
+  if setup_button_obj ~= nil then
+    --setup()
+  else
+    broadcastToAll("Game reloaded. Splay states have been reset.",  {0.7,0.7,0})
+  end
+
+  register_hotkeys()
+
+  for i = 1, 10 do
+    deck = getDeck(i)
+    deck.setVar("age", i)
+  end
+
+  #include !\Innovation\dynamic_functions.ttslua
+end

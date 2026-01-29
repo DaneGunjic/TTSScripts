@@ -6,7 +6,7 @@ function updateScoreCount(player, top_cards)
   local buttons = score_button.getButtons()
   local previous_score_val = buttons[1].label
 
-  if previous_score_val != tostring(updated_count) then
+  if previous_score_val ~= tostring(updated_count) then
     indicator = score_button.editButton({
       index=0,
       label=updated_count
@@ -171,7 +171,7 @@ function updateAchievementCount(player, top_cards, splays_per_player, resource_c
   local buttons = score_button.getButtons()
   local previous_score_val = buttons[2].label
 
-  if previous_score_val != tostring(updated_count) then
+  if previous_score_val ~= tostring(updated_count) then
     indicator = score_button.editButton({
       index=1,
       label=updated_count
@@ -194,9 +194,9 @@ function updateAchievementCountFromFiguresKarma(player, top_cards, achievement_c
     end
 
     for player_color, splays_per_color in pairs(splays_per_player) do
-      if player_color != player then
+      if player_color ~= player then
         for card_color, splay_state in pairs(splays_per_color) do
-            if splay_state != "None" then achievements_per_color[card_color] = false end
+            if splay_state ~= "None" then achievements_per_color[card_color] = false end
         end
       end
     end
@@ -218,7 +218,7 @@ function updateAchievementCountFromFiguresKarma(player, top_cards, achievement_c
       if should_achieve then
         for _, player_ref in ipairs(Player.getPlayers()) do
           local player_color = player_ref.color
-          if resource_counts_per_player[player_color] ~= nil and resource_counts_per_player[player_color][r] ~= nil and player_color != player then
+          if resource_counts_per_player[player_color] ~= nil and resource_counts_per_player[player_color][r] ~= nil and player_color ~= player then
             if player_r_count < resource_counts_per_player[player_color][r] * 2 then should_achieve = false end
           end
         end
@@ -257,7 +257,7 @@ function getTopCardIconCount(top_cards, resource)
   local resource_count = 0
   for name, description in pairs(top_cards) do
     local card_resources = getCardsResources(description)
-    _, count = string.gsub(card_resources, resource, resource)
+    local count = count_occurrences(card_resources, resource)
     resource_count = resource_count + count
   end
 
@@ -288,12 +288,12 @@ function getResourceCounts(player, card_color)
 
   local resource_counts = {}
   for resource_shorthand, v in pairs(resources) do
-    _, count = string.gsub(r_concat, resource_shorthand, resource_shorthand)
+    local count = count_occurrences(r_concat, resource_shorthand)
     resource_counts[resource_shorthand] = count
   end
 
   for resource_shorthand, v in pairs(non_resources) do
-    _, count = string.gsub(r_concat, resource_shorthand, resource_shorthand)
+    local count = count_occurrences(r_concat, resource_shorthand)
     resource_counts[resource_shorthand] = count
   end
 
@@ -320,7 +320,7 @@ function getCitiesFlagAchievementCount(player)
     if has_flag == true then
       should_get_achievement = true
       for _, player_ref in ipairs(Player.getPlayers()) do
-        if player_ref.color != player and areOpponents(player_ref.team, player_objects[player].team) then
+        if player_ref.color ~= player and areOpponents(player_ref.team, player_objects[player].team) then
           if getActiveCardCount(player_ref.color, color) > getActiveCardCount(player, color) then should_get_achievement = false end
         end
       end
@@ -532,7 +532,7 @@ function getActiveResourcesByColor(list, player, color)
   local cards = list[color]
   if #cards ~= 0 then
     top_card = cards[#cards]
-    splay_state = getObjectFromGUID(splay_indicators[player][color]).call("get_state")
+    splay_state = get_splay_state(player, color)
 
     if splay_state == "None" then
       r = r..top_card.resources
@@ -568,7 +568,7 @@ function getIconCountFromCardList(list, player, icon)
     local point_vals_with_counts = {}
     local active_point_vals = {}
     for i, point_shorthand in pairs(point_values) do
-      _, count = string.gsub(r, point_shorthand, point_shorthand)
+      local count = count_occurrences(r, point_shorthand)
       if count > 0 then
         table.insert(active_point_vals, pointValue(point_shorthand))
         point_vals_with_counts[pointValue(point_shorthand)] = count
@@ -590,11 +590,16 @@ function getIconCountFromCardList(list, player, icon)
 
     return points
   else
-    _, count = string.gsub(r, icon, icon)
+    local count = count_occurrences(r, icon)
     return count
   end
 
   return 0
+end
+
+function count_occurrences(str, token)
+  local _, count = string.gsub(str, token, token)
+  return count
 end
 
 function updateBonusValuesFromFiguresKarma(player, active_point_vals)
@@ -661,12 +666,12 @@ end
 function updateResourceLabels(resource_counts, player, top_cards)
   for resource, count in pairs(resource_counts) do
     local updated_count = updateFromTopFiguresKarma(top_cards, resource_counts, resource, player)
-    if resources[resource] != nil then
+    if resources[resource] ~= nil then
       local resource_button = getObjectFromGUID(resource_indicators[player][resources[resource]])
       local buttons = resource_button.getButtons()
       local previous_val = buttons[1].label
 
-      if previous_val != tostring(updated_count) then
+      if previous_val ~= tostring(updated_count) then
         indicator = resource_button.editButton({
           index=0,
           label=updated_count
@@ -711,7 +716,7 @@ function updateFromTopFiguresKarma(top_cards, resource_counts, resource, player)
     return resource_counts[resource] + getSplayCount(player)
   end
 
-  if top_cards["Tran Huang Dao"] ~= nil and resource != "C" then
+  if top_cards["Tran Huang Dao"] ~= nil and resource ~= "C" then
     if resource_counts[resource] == 0 then return 0 end
     return resource_counts[resource] + math.floor(resource_counts["C"] / 2)
   end
@@ -742,7 +747,7 @@ function updateFromTopFiguresKarma(top_cards, resource_counts, resource, player)
   if top_cards["J.P. Morgan"] ~= nil then
     local icon_count = 0
     for _, card_color in pairs(card_colors) do
-      local splay_state = getObjectFromGUID(splay_indicators[player][card_color]).call("get_state")
+      local splay_state = get_splay_state(player, card_color)
       if splay_state == "Up" then
         local active_resources = getResourceCounts(player, card_color)
         icon_count = icon_count + active_resources[resource]
@@ -763,22 +768,13 @@ function getLeftmostCard(cards, player, redirected)
   if (player == "Blue" or player == "Green") and redirected == false then
     return getRightmostCard(cards, player, true)
   end
-
-  leftmost = nil
-  min_x = 10000
-  for i, card in pairs(cards) do
-    if card.position.x < min_x then
-      min_x = card.position.x
-      leftmost = card
-    end
-  end
-  return leftmost
+  return extremeByAxis(cards, 'x', 'min')
 end
 
 function getPlayerSplays(player)
   local player_color_splays = {}
   for _, card_color in pairs(card_colors) do
-    player_color_splays[card_color] = getObjectFromGUID(splay_indicators[player][card_color]).call("get_state")
+    player_color_splays[card_color] = get_splay_state(player, card_color)
   end
 
   return player_color_splays
@@ -787,8 +783,8 @@ end
 function getSplayCount(player)
   local count = 0
   for _, card_color in pairs(card_colors) do
-    local splay_state = getObjectFromGUID(splay_indicators[player][card_color]).call("get_state")
-    if splay_state != "None" then count = count + 1 end
+    local splay_state = get_splay_state(player, card_color)
+    if splay_state ~= "None" then count = count + 1 end
   end
 
   return count
@@ -798,44 +794,18 @@ function getRightmostCard(cards, player, redirected)
   if (player == "Blue" or player == "Green") and redirected == false then
     return getLeftmostCard(cards, player, true)
   end
-
-  rightmost = nil
-  max_x = -10000
-  for i, card in pairs(cards) do
-    if card.position.x > max_x then
-      max_x = card.position.x
-      rightmost = card
-    end
-  end
-  return rightmost
+  return extremeByAxis(cards, 'x', 'max')
 end
 
 function getUpmostCard(cards, player, redirected)
   if (player == "Blue" or player == "Green") and redirected == false then
     return getDownmostCard(cards, player, true)
   end
-
-  upmost = nil
-  max_z = -10000
-  for i, card in pairs(cards) do
-    if card.position.z > max_z then
-      max_z = card.position.z
-      upmost = card
-    end
-  end
-  return upmost
+  return extremeByAxis(cards, 'z', 'max')
 end
 
 function getDownmostCard(cards, player, redirected)
-  downmost = nil
-  min_z = 10000
-  for i, card in pairs(cards) do
-    if card.position.z < min_z then
-      min_z = card.position.z
-      downmost = card
-    end
-  end
-  return downmost
+  return extremeByAxis(cards, 'z', 'min')
 end
 
 function getLeftResources(card)
@@ -873,4 +843,17 @@ function getAgeNum(description)
     return 0
   end
   return tonumber(age)
+end
+
+function extremeByAxis(cards, axis, cmp)
+  local extreme_card = nil
+  local extreme_val = (cmp == 'min') and 10000 or -10000
+  for i, card in pairs(cards) do
+    local val = axis == 'x' and card.position.x or card.position.z
+    if (cmp == 'min' and val < extreme_val) or (cmp == 'max' and val > extreme_val) then
+      extreme_val = val
+      extreme_card = card
+    end
+  end
+  return extreme_card
 end

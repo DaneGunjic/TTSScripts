@@ -95,24 +95,35 @@ function getDescription(card)
 end
 
 function getCardAge(description)
-  return string.sub(description, 3, 3)
+  return parse_card(description).age
 end
 
 function getCardColor(description)
-  local lookup_index = string.sub(description, 2, 2)
-  return color_lookup[lookup_index]
+  return parse_card(description).color
 end
 
 function getCardsResources(description)
-  if isCities(description) then
-    return string.sub(description, 4, 9)
-  end
-  return string.sub(description, 4, 7)
+  return parse_card(description).resources
 end
 
 function getForecastCount(player)
   local objs = Player[player].getHandObjects(2)
   return #objs
+end
+
+function parse_card(description)
+  local t = {}
+  t.type = string.sub(description, 1, 1)
+  local lookup_index = string.sub(description, 2, 2)
+  t.color = color_lookup[lookup_index]
+  local age = string.sub(description, 3, 3)
+  t.age = age
+  if t.type == "C" then
+    t.resources = string.sub(description, 4, 9)
+  else
+    t.resources = string.sub(description, 4, 7)
+  end
+  return t
 end
 
 function returnCardToDeck(card, age, description, name)

@@ -1,0 +1,70 @@
+-- Dynamic generation of no_splay functions for each card color
+for _, c in ipairs(card_colors) do
+  _G["no_splay_" .. c] = function(obj, player_clicker_color, alt_click)
+    local player = player_clicker_color
+    local zone_guid = zone_zones[player]
+    
+    -- Map splay state string to int for splay_cards
+    local state_str = get_splay_state(player, c)
+    local state_map = {None=0, Left=1, Right=2, Up=3}
+    local old_splay = state_map[state_str] or 0
+    
+    local paramtable = {
+       newsplay = 0,
+       zone = zone_guid,
+       color = c,
+       oldsplay = old_splay
+    }
+    splay_cards(paramtable)
+  end
+
+  _G["splay_left_" .. c] = function(obj, player_clicker_color, alt_click)
+    print("splay_left_" .. c .. " clicked by " .. player_clicker_color)
+    
+    local player = player_clicker_color
+    local zone_guid = zone_zones[player]
+    local state_str = get_splay_state(player, c)
+    local state_map = {None=0, Left=1, Right=2, Up=3}
+    local old_splay = state_map[state_str] or 0
+
+    local paramtable = {
+       newsplay = 1, -- Left
+       zone = zone_guid,
+       color = c,
+       oldsplay = old_splay
+    }
+    splay_cards(paramtable)
+  end
+
+  _G["splay_right_" .. c] = function(obj, player_clicker_color, alt_click)
+    local player = player_clicker_color
+    local zone_guid = zone_zones[player]
+    local state_str = get_splay_state(player, c)
+    local state_map = {None=0, Left=1, Right=2, Up=3}
+    local old_splay = state_map[state_str] or 0
+
+    local paramtable = {
+       newsplay = 2, -- Right
+       zone = zone_guid,
+       color = c,
+       oldsplay = old_splay
+    }
+    splay_cards(paramtable)
+  end
+
+  _G["splay_up_" .. c] = function(obj, player_clicker_color, alt_click)
+    local player = player_clicker_color
+    local zone_guid = zone_zones[player]
+    local state_str = get_splay_state(player, c)
+    local state_map = {None=0, Left=1, Right=2, Up=3}
+    local old_splay = state_map[state_str] or 0
+
+    local paramtable = {
+       newsplay = 3, -- Up
+       zone = zone_guid,
+       color = c,
+       oldsplay = old_splay
+    }
+    splay_cards(paramtable)
+  end
+end

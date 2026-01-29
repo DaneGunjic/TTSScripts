@@ -4,44 +4,29 @@ function remove_achievements(id)
     end
 end
 
-function remove_cities()
+function remove_expansion(id, deckGetter, postCleanup)
   for i = 1, 10 do
-    deck = getDeckCities(i)
+    local deck = deckGetter(i)
     deck.destruct()
   end
+  if postCleanup ~= nil then postCleanup() end
+  expansions[id] = false
+end
 
-  remove_achievements("cities")
-  expansions["cities"] = false
+function remove_cities()
+  remove_expansion("cities", getDeckCities, function() remove_achievements("cities") end)
 end
 
 function remove_echoes()
-  for i = 1, 10 do
-    deck = getDeckEchoes(i)
-    deck.destruct()
-  end
-
-  remove_achievements("echoes")
-  expansions["echoes"] = false
+  remove_expansion("echoes", getDeckEchoes, function() remove_achievements("echoes") end)
 end
 
 function remove_artifacts()
-  for i = 1, 10 do
-    deck = getDeckArtifacts(i)
-    deck.destruct()
-  end
-
-  remove_relics()
-  expansions["artifacts"] = false
+  remove_expansion("artifacts", getDeckArtifacts, remove_relics)
 end
 
 function remove_figures()
-  for i = 1, 10 do
-    deck = getDeckFigures(i)
-    deck.destruct()
-  end
-
-  remove_achievements("figures")
-  expansions["figures"] = false
+  remove_expansion("figures", getDeckFigures, function() remove_achievements("figures") end)
 end
 
 function remove_relics()
