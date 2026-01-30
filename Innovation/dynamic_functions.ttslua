@@ -37,6 +37,7 @@ for _, c in ipairs(card_colors) do
   end
 
   _G["splay_right_" .. c] = function(obj, player_clicker_color, alt_click)
+    --print("splay_right_" .. c .. " clicked by " .. player_clicker_color)
     local player = player_clicker_color
     local zone_guid = zone_zones[player]
     local state_str = get_splay_state(player, c)
@@ -53,6 +54,7 @@ for _, c in ipairs(card_colors) do
   end
 
   _G["splay_up_" .. c] = function(obj, player_clicker_color, alt_click)
+    --print("splay_up_" .. c .. " clicked by " .. player_clicker_color)
     local player = player_clicker_color
     local zone_guid = zone_zones[player]
     local state_str = get_splay_state(player, c)

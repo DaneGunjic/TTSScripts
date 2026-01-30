@@ -6,6 +6,9 @@ function setup()
   createReturnButton()
   createScoreButtons()
   createAchievementCountButtons()
+  createSplayControlButtons()
+  createSplayButtons()
+  createResourceButtons()
 
   for i = 1, 10 do
     deck = getDeck(i)

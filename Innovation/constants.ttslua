@@ -17,13 +17,14 @@ deck_zones = {}
 deck_zones[1] = "ee7a48"
 deck_zones[2] = "dccdd3"
 deck_zones[3] = "4536b8"
-deck_zones[4] = "f7f83f"
-deck_zones[5] = "1d592a"
-deck_zones[6] = "279e05"
-deck_zones[7] = "f74544"
-deck_zones[8] = "960036"
-deck_zones[9] = "56e15a"
-deck_zones[10] = "4e5788"
+deck_zones[4] = "b91b91"
+deck_zones[5] = "f7f83f"
+deck_zones[6] = "c2197e"
+deck_zones[7] = "1d592a"
+deck_zones[8] = "279e05"
+deck_zones[9] = "f74544"
+deck_zones[10] = "960036"
+deck_zones[11] = "56e15a"
 
 deck_zones_cities = {}
 deck_zones_cities[1] = "b05fdb"
@@ -239,7 +240,8 @@ resource_indicators = {
     Castle = "9c9b0e",
     Money = "619485",
     Industry = "bce9b4",
-    Technology = "0cfe3b"
+    Technology = "0cfe3b",
+    Person = "3863ad"
   },
   Blue = {
     Environment = "bcb168",
@@ -247,7 +249,8 @@ resource_indicators = {
     Castle = "03ce97",
     Money = "5aec71",
     Industry = "b4c3b4",
-    Technology = "ceef0e"
+    Technology = "ceef0e",
+    Person = "029f54"
   },
   Green = {
     Environment = "e88e5a",
@@ -255,7 +258,8 @@ resource_indicators = {
     Castle = "aef8d1",
     Money = "28e199",
     Industry = "104356",
-    Technology = "93da8d"
+    Technology = "93da8d",
+    Person = "f404c2"
   }
 }
 
@@ -292,3 +296,7 @@ ROT_Y_RIGHT = 270
 
 SPLAY_SHIFT_X = 1.20
 SPLAY_SHIFT_Z = 1.15
+
+
+zoneOldCard = "de6cc2"
+zoneNewCard = "e449b0"

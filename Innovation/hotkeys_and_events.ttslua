@@ -2,14 +2,15 @@ function errorhandler(err)
    print( "ERROR:", err )
 end
 
-function onUpdate()
-  local err =  xpcall(doUpdate, errorhandler)
+function UpdateGameState()
+local err =  xpcall(doUpdate, errorhandler)
   if err == false then
     update_lock = false
   end
 end
 
 function doUpdate()
+  --print("Do update")
   if update_lock == false then
     update_lock = true
     if game_setup == true then
@@ -34,6 +35,79 @@ function doUpdate()
   end
 end
 
+function onObjectEnterScriptingZone(scripting_zone, object)
+  --print("onObjectEnterScriptingZone")
+
+  local zone_guid = scripting_zone.getGUID()
+  local is_player_zone = false
+  for _, guid in pairs(zone_zones) do
+    if guid == zone_guid then
+      is_player_zone = true
+      break
+    end
+  end
+
+  if is_player_zone then
+    object.registerCollisions(false)
+  end
+
+  UpdateGameState()
+  local f = get_zone_action_map()[zone_guid]
+  if f ~= nil then
+    f(object, scripting_zone)
+    return
+  end
+end
+
+function onObjectLeaveScriptingZone(scripting_zone, object)
+  --print("onObjectLeaveScriptingZone")
+  local zone_guid = scripting_zone.getGUID()
+  local is_player_zone = false
+  for _, guid in pairs(zone_zones) do
+    if guid == zone_guid then
+      is_player_zone = true
+      break
+    end
+  end
+
+  if is_player_zone then
+    object.unregisterCollisions()
+  end
+
+  UpdateGameState()
+end
+
+function onObjectCollisionEnter(object, collision_info)
+  --print("onObjectCollisionEnter")
+  if object.type == "Card" and collision_info.collision_object.type == "Card" then
+    local color = getCardColor(object.getDescription())
+    local other_color = getCardColor(collision_info.collision_object.getDescription())
+
+    if color and other_color and color == other_color then
+      local zones = object.getZones()
+      if zones then
+        for _, zone in pairs(zones) do
+          local player = player_by_zone(zone.getGUID())
+          if player then
+            local splay_state = get_splay_state(player, color)
+            if splay_state == "Left" then
+               local func = _G["splay_left_" .. color]
+               if func then func(object, player, 0) end
+            elseif splay_state == "Right" then
+               local func = _G["splay_right_" .. color]
+               if func then func(object, player, 0) end
+            elseif splay_state == "Up" then
+               local func = _G["splay_up_" .. color]
+               if func then func(object, player, 0) end
+            end
+            break
+          end
+        end
+      end
+    end
+  end
+end
+
 function isTopPlayer(player)
   return player == "Blue" or player == "Green"
 end
@@ -43,24 +117,39 @@ function isBottomPlayer(player)
 end
 
 function return_hotkey(player, card)
+  if card == nil then
+    return
+  end
+
   if card.type == "Card" then
     description = card.getDescription()
     name = card.getName()
     age = getAgeNum(description)
     moveCardFromHand(player, card)
     returnCardToDeck(card, age, description, name)
+    broadcastToAll(Player[player].steam_name .. " returned " .. name)
   end
 end
 
 function tuck_hotkey(player, card)
+  if card == nil then
+    return
+  end
+
   if card.type == "Card" then
     tuckCardNoZone(player, card)
+    --broadcastToAll(Player[player].steam_name .. " tucked " .. card.getName())
   end
 end
 
 function meld_hotkey(player, card)
+  if card == nil then
+    return
+  end
+
   if card.type == "Card" then
     meldCard(player, card)
+    broadcastToAll(Player[player].steam_name .. " melded " .. card.getName())
   end
 end
 
@@ -146,6 +235,40 @@ function draw_figure_hotkey(player)
   end
 end
 
+function copy_card_data_hotkey(player_color)
+  local zone_old = getObjectFromGUID(zoneOldCard)
+  local zone_new = getObjectFromGUID(zoneNewCard)
+
+  if not zone_old or not zone_new then
+    broadcastToColor("Error: Could not find one of the zones.", player_color, {1,0,0})
+    return
+  end
+
+  local card_old = nil
+  for _, obj in ipairs(zone_old.getObjects()) do
+    if obj.type == "Card" then
+      card_old = obj
+      break
+    end
+  end
+
+  local card_new = nil
+  for _, obj in ipairs(zone_new.getObjects()) do
+    if obj.type == "Card" then
+      card_new = obj
+      break
+    end
+  end
+
+  if card_old and card_new then
+    card_new.setName(card_old.getName())
+    card_new.setDescription(card_old.getDescription())
+    broadcastToColor("Copied data from " .. card_old.getName() .. " to new card.", player_color, {0,1,0})
+  else
+    broadcastToColor("Error: Could not find cards in both zones.", player_color, {1,0,0})
+  end
+end
+
 function register_hotkeys()
   local h = {
     Return = return_hotkey,
@@ -153,7 +276,8 @@ function register_hotkeys()
     Meld = meld_hotkey,
     Draw = draw_hotkey,
     DrawCity = draw_city_hotkey,
-    DrawFigure = draw_figure_hotkey
+    DrawFigure = draw_figure_hotkey,
+    CopyCardData = copy_card_data_hotkey
   }
   for name, fn in pairs(h) do
     addHotkey(name, fn)

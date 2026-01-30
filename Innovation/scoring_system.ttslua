@@ -2,8 +2,10 @@ function updateScoreCount(player, top_cards)
   local updated_count = getScoreCount(player)
   updated_count = updateScoreCountWithFiguresKarma(player, updated_count, top_cards)
 
-  local score_button = getObjectFromGUID(score_cards[player])
-  local buttons = score_button.getButtons()
+  local table_obj = getObjectFromGUID("4ee1f2")
+  if table_obj == nil then return end
+
+  local buttons = table_obj.getButtons()
   local previous_score_val = nil
   local button_index = nil
 
@@ -16,7 +18,7 @@ function updateScoreCount(player, top_cards)
   end
 
   if button_index and previous_score_val ~= tostring(updated_count) then
-    indicator = score_button.editButton({
+    indicator = table_obj.editButton({
       index=button_index,
       label=updated_count
     })
@@ -176,8 +178,10 @@ function updateAchievementCount(player, top_cards, splays_per_player, resource_c
   local updated_count = count + player_board_count
   updated_count = updateAchievementCountFromFiguresKarma(player, top_cards, updated_count, splays_per_player, resource_counts_per_player)
 
-  local score_button = getObjectFromGUID(score_cards[player])
-  local buttons = score_button.getButtons()
+  local table_obj = getObjectFromGUID("4ee1f2")
+  if table_obj == nil then return end
+
+  local buttons = table_obj.getButtons()
   local previous_score_val = nil
   local button_index = nil
 
@@ -190,7 +194,7 @@ function updateAchievementCount(player, top_cards, splays_per_player, resource_c
   end
 
   if button_index and previous_score_val ~= tostring(updated_count) then
-    indicator = score_button.editButton({
+    indicator = table_obj.editButton({
       index=button_index,
       label=updated_count
     })

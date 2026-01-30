@@ -20,8 +20,10 @@ function createSplayButtons()
   if table_obj == nil then return end
 
   FirstSplayButtonForColor = {
-    White = {pos = {-40.17, 1.50, -17.15}, rot = {0, 180, 0}},
+    White = {pos = {-40, 1.50, -17.15}, rot = {0, 180, 0}},
     Red = {pos = {7, 1.50, -17.15}, rot = {0, 180, 0}},
+    Green = {pos = {40, 1.50, 17.15}, rot = {0, 0, 0}},
+    Blue = {pos = {-7, 1.50, 17.15}, rot = {0, 0, 0}},
   }
 
   for _, color in ipairs(getSeatedPlayers()) do
@@ -185,6 +187,8 @@ function createSplayControlButtons()
   local ColorShiftButtonPosition = {
     White = {pos = {-45, 1.5, -24.12}, rot = {0, 180, 0}},
     Red = {pos = {2, 1.5, -24.46}, rot = {0, 180, 0}},
+    Green = {pos = {45, 1.5, 24.12}, rot = {0, 0, 0}},
+    Blue = {pos = {-2, 1.5, 24.12}, rot = {0, 0, 0}},
   }
 
   local table_obj = getObjectFromGUID("4ee1f2")
@@ -224,18 +228,8 @@ function createSplayControlButtons()
         local offset = Vector(0, 0, 0)
         if d.name == "Left" then offset = Vector(-1.4, 0, 0)
         elseif d.name == "Right" then offset = Vector(1.4, 0, 0)
-        elseif d.name == "Up" then
-          if color == "White" or color == "Red" then
-            offset = Vector(0, 0, -1)
-          else
-            offset = Vector(0, 0, 1)
-          end
-        elseif d.name == "Down" then
-          if color == "White" or color == "Red" then
-            offset = Vector(0, 0, 1)
-          else
-            offset = Vector(0, 0, -1)
-          end
+        elseif d.name == "Up" then offset = Vector(0, 0, -1)
+        elseif d.name == "Down" then offset = Vector(0, 0, 1)
         end
 
         offset:rotateOver('y', ColorShiftButtonPosition[color].rot[2])
@@ -423,10 +417,10 @@ end
 
 function createScoreButtons()
   local ScoreButtonPosition = {
-    White = {pos = {-40.17, 1.50, -17.15}, rot = {0, 180, 0}},
-    Red = {pos = {7, 1.50, -17.15}, rot = {0, 180, 0}},
-    Blue = {pos = {-40.17, 1.50, 17.15}, rot = {0, 0, 0}},
-    Green = {pos = {7, 1.50, 17.15}, rot = {0, 0, 0}}
+    White = {pos = {-17, 1.50, -8}, rot = {0, 180, 0}},
+    Red = {pos = {25, 1.50, -8}, rot = {0, 180, 0}},
+    Blue = {pos = {-25, 1.50, 8}, rot = {0, 0, 0}},
+    Green = {pos = {17, 1.50, 8}, rot = {0, 0, 0}}
   }
 
   local table_obj = getObjectFromGUID("4ee1f2")
@@ -439,12 +433,12 @@ function createScoreButtons()
         click_function = "click_func",
         label = "0",
         function_owner = nil,
-        width = 700,
-        height = 700,
+        width = 1200,
+        height = 1200,
         font_size = 500,
         position = table_obj.positionToLocal(Vector(ScoreButtonPosition[player_color].pos)),
         rotation = ScoreButtonPosition[player_color].rot,
-        scale = {1, 1, 1},
+        scale = {0.5, 0.5, 0.5},
         color = {r=0, g=0.15, b=0.298},
         font_color = {r=1, g=0.796, b=0.196},
         tooltip = player_color .. ":Score"
@@ -455,24 +449,35 @@ function createScoreButtons()
 end
 
 function createAchievementCountButtons()
+  local AchievementButtonPosition = {
+    White = {pos = {-25, 1.50, -8}, rot = {0, 180, 0}},
+    Red = {pos = {18, 1.50, -8}, rot = {0, 180, 0}},
+    Blue = {pos = {-18, 1.50, 8}, rot = {0, 0, 0}},
+    Green = {pos = {25, 1.50, 8}, rot = {0, 0, 0}}
+  }
+
+  local table_obj = getObjectFromGUID("4ee1f2")
+  if table_obj == nil then return end
+
   local players = getSeatedPlayers()
   for i, player_color in pairs(players) do
-    local score_guid = score_cards[player_color]
-    local score_button = makeButton({
-      click_function = "click_func",
-      label = "0",
-      function_owner = nil,
-      width = 700,
-      height = 700,
-      font_size = 500,
-      position = {1, 0.5, -14.5},
-      rotation = {0, 0, 0},
-      scale = {1, 1, 1},
-      color = {r=1, g=0.796, b=0.196},
-      font_color = {r=0, g=0.15, b=0.298},
-      tooltip = player_color .. ":Achievement"
-    })
-    getObjectFromGUID(score_guid).createButton(score_button)
+    if AchievementButtonPosition[player_color] then
+      local score_button = makeButton({
+        click_function = "click_func",
+        label = "0",
+        function_owner = nil,
+        width = 1200,
+        height = 1200,
+        font_size = 500,
+        position = table_obj.positionToLocal(Vector(AchievementButtonPosition[player_color].pos)),
+        rotation = AchievementButtonPosition[player_color].rot,
+        scale = {0.5, 0.5, 0.5},
+        color = {r=1, g=0.796, b=0.196},
+        font_color = {r=0, g=0.15, b=0.298},
+        tooltip = player_color .. ":Achievement"
+      })
+      table_obj.createButton(score_button)
+    end
   end
 end
 

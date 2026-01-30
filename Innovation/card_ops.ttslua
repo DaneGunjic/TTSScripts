@@ -22,14 +22,6 @@ function get_zone_action_map()
   return m
 end
 
-function onObjectEnterScriptingZone(scripting_zone, object)
-  local f = get_zone_action_map()[scripting_zone.getGUID()]
-  if f ~= nil then
-    f(object, scripting_zone)
-    return
-  end
-end
-
 function tuckCardNoZone(player_color, object)
   moveCardFromHand(player_color, object)
 
@@ -54,7 +46,7 @@ function tuckCard(player_color, object)
   if splay_state == "None" then
     tuckStacked(player_color, object)
   elseif splay_state == "Left" then
-    move_distance = 1
+    move_distance = SPLAY_SHIFT_X
     local sort_function = sortLeft
     if player_zone_obj.getPosition().z > 0 then
       move_distance = move_distance * -1
@@ -62,7 +54,7 @@ function tuckCard(player_color, object)
     end
     tuckUnderSplay(player_color, object, move_distance, 0, sort_function)
   elseif splay_state == "Right" then
-    move_distance = -1
+    move_distance = -SPLAY_SHIFT_X
     local sort_function = sortRight
     if player_zone_obj.getPosition().z > 0 then
       move_distance = move_distance * -1
@@ -70,7 +62,7 @@ function tuckCard(player_color, object)
     end
     tuckUnderSplay(player_color, object, move_distance, 0, sort_function)
   elseif splay_state == "Up" then
-    move_distance = -SPLAY_SHIFT_X
+    move_distance = -SPLAY_SHIFT_Z
     local sort_function = sortUp
     if player_zone_obj.getPosition().z > 0 then
       move_distance = move_distance * -1
@@ -178,43 +170,59 @@ function meldOverSplay(player_color, card, move_distance_x, move_distance_z, sor
 end
 
 function tuckUnderSplay(player_color, card, move_distance_x, move_distance_z, sort_function)
-  local sorted_cards = getSortedResourcesFromCards(player_color, true)
+  broadcastToAll(Player[player_color].steam_name .. " tucked " .. card.getName() .. " under " .. getCardColor(card.getDescription()) .. " splay")
   local card_color = getCardColor(card.getDescription())
+  local splay_state = get_splay_state(player_color, card_color)
+  local bottom_card = getBottomAnchor(player_color, card_color, splay_state)
 
-  table.sort(sorted_cards[card_color], sort_function)
-  local color_cards = sorted_cards[card_color]
-
-  if next(color_cards) == nil then
+  if bottom_card == nil then
     meldToEmptyZone(player_color, card)
     return
   end
 
-  local y = 0.1 * #sorted_cards
+  local bottom_pos = bottom_card.getPosition()
+  local color_cards = getColorCards(player_color, card_color)
+
   for _, splayed_card in pairs(color_cards) do
-    local card_obj = getObjectFromGUID(splayed_card.guid)
-    local splayed_pos = card_obj.getPosition()
-    splayed_pos.y = y + 2
-    card_obj.setPosition(splayed_pos)
-    card_obj.setLock(true)
-    y = y - 0.1
+    local splayed_pos = splayed_card.getPosition()
+    splayed_pos.y = splayed_pos.y + 0.05
+    splayed_card.setPosition(splayed_pos)
+    splayed_card.setLock(true)
   end
 
-  local bottom_card = color_cards[#color_cards]
-  local bottom_pos = getObjectFromGUID(bottom_card.guid).getPosition()
-  local new_bottom_pos = { x = bottom_pos.x + move_distance_x, y = 0.3, z = bottom_pos.z + move_distance_z }
+  local new_bottom_pos = { x = bottom_pos.x + move_distance_x, y = bottom_pos.y, z = bottom_pos.z + move_distance_z }
 
   Wait.time(function()
-    card.setPositionSmooth(new_bottom_pos, false, true)
-    Wait.time(function()
-      for _, splayed_card in pairs(color_cards) do
-        local card_obj = getObjectFromGUID(splayed_card.guid)
-        local splay_pos = card_obj.getPosition() -- splayed_card.position
-        local new_pos = { splay_pos.x, splay_pos.y + 0.5, splay_pos.z}
-        card_obj.setPositionSmooth(new_pos, false, true)
-        card_obj.setLock(false)
-      end
-    end, 0.3)
+    card.setPosition(new_bottom_pos)
+    card.setLock(true)
   end, 0.3)
+end
+
+function tuckStacked(player_color, card)
+  broadcastToAll(Player[player_color].steam_name .. " tucked " .. card.getName() .. " under " .. getCardColor(card.getDescription()) .. " stack")
+  local card_color = getCardColor(card.getDescription())
+  local player_zone = getObjectFromGUID(zone_zones[player_color])
+  local cards = player_zone.getObjects()
+
+  for i, deck in pairs(cards) do
+    if deck.type == "Deck" then
+      local deck_from_guid = getObjectFromGUID(deck.guid)
+      local deck_cards = deck_from_guid.getObjects()
+      for j, v in pairs(deck_cards) do
+        if card_color == getCardColor(v.description) then
+          placeCardUnderObject(card, deck_from_guid)
+          return
+        end
+      end
+    elseif deck.type == "Card" then
+      if card_color == getCardColor(deck.getDescription()) then
+        placeCardUnderObject(card, deck)
+        return
+      end
+    end
+  end
+
+  meldToEmptyZone(player_color, card)
 end
 
 function meldStacked(player_color, card)

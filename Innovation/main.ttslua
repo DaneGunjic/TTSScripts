@@ -27,9 +27,9 @@ function onLoad(saved_data)
   setup_button_obj = getObjectFromGUID(setup_button.guid)
   --self.UI.hide("RightPanel")
 
-  createSplayControlButtons()
-  createSplayButtons()
-  createResourceButtons()
+  --createSplayControlButtons()
+  --createSplayButtons()
+  --createResourceButtons()
   createSetupButtons()
 
   register_hotkeys()

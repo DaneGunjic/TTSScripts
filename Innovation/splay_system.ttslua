@@ -1,19 +1,24 @@
 function splay_cards(paramtable)
+  --print("splay_cards")
   local splay_type = paramtable.newsplay
   local zone = getObjectFromGUID(paramtable.zone)
   local player = player_by_zone(paramtable.zone)
+
+  local dir = "None"
+  if splay_type == 1 then dir = "Left" end
+  if splay_type == 2 then dir = "Right" end
+  if splay_type == 3 then dir = "Up" end
+
+  local current_splay_state = get_splay_state(player, paramtable.color)
+  if current_splay_state ~= dir then
+    broadcastToAll(Player[player].steam_name .. " splayed " .. paramtable.color .. " " .. dir)
+  end
 
   --print("new splay_type: " .. paramtable.newsplay .. " old splay_type: " .. paramtable.oldsplay)
 
   if paramtable.newsplay == 0 then --splay stack
     set_splay_state(player, paramtable.color, "None")
-    if paramtable.oldsplay == 1 then --was left
-      splay_stacked(zone, paramtable.color, comparisonLeft)
-    elseif paramtable.oldsplay == 2 then --was right
-      splay_stacked(zone, paramtable.color, comparisonRight)
-    elseif paramtable.oldsplay == 3 then --was up
-      splay_stacked(zone, paramtable.color, comparisonUp)
-    end
+    splay_stacked(zone, paramtable.color, comparisonY)
   elseif paramtable.newsplay == 1 then --splay left
     --print("splay left")
     set_splay_state(player, paramtable.color, "Left")
@@ -28,6 +33,8 @@ function splay_cards(paramtable)
   end
 
   updateSplayButtonLabel(player, paramtable.color, paramtable.newsplay)
+
+  --UpdateGameState()
 end
 
 function splay_stacked(zone, color, sort_function, save_previous)
@@ -35,29 +42,31 @@ function splay_stacked(zone, color, sort_function, save_previous)
   local cards = zone.getObjects()
   local pos = nil
   local y_increase = 0.1
-  local a = {}
-  for i, n in pairs(cards) do a[i] = n end
+  local cards_table = {}
+  for i, n in pairs(cards) do cards_table[i] = n end
 
-  table.sort(a, sort_function)
-  for k, deck in ipairs(a) do
+  table.sort(cards_table, sort_function)
+  for k, deck in ipairs(cards_table) do
     local deck_from_guid = getObjectFromGUID(deck.guid)
     if deck.type == "Deck" then
-      local deck_cards = deck_from_guid.getObjects()
-      for j, v in pairs(deck_cards) do
-        if color == getCardColor(v.description) then
-          if pos == nil then pos = deck_from_guid.getPosition() end
-          pos.y = pos.y + y_increase/3
-          deck_from_guid.takeObject({position=pos})
-        end
-      end
+      -- local deck_cards = deck_from_guid.getObjects()
+      -- for j, v in pairs(deck_cards) do
+      --   if color == getCardColor(v.description) then
+      --     if pos == nil then pos = deck_from_guid.getPosition() end
+      --     pos.y = pos.y + y_increase/3
+      --     deck_from_guid.takeObject({position=pos})
+      --   end
+      -- end
     elseif deck.type == "Card" and getCardColor(deck.getDescription()) == color then
       if pos == nil then pos = deck_from_guid.getPosition() end
       pos.y = pos.y + y_increase
-      deck.setPositionSmooth(pos, false, true)
+      deck.setPosition(pos)
       deck.setLock(false)
     end
     y_increase = y_increase + 0.1
   end
+
+  UpdateGameState()
 end
 
 function splay_right(zone, color, wait_time, save_previous)
@@ -127,8 +136,7 @@ function getBottomAnchor(player, color, state)
 end
 
 function anchored_splay(zone, player, color, dir)
-  --print("anchored_splay " .. dir .. " for " .. color)
-
+  --print("anchored_splay")
   local state = dir
   local anchor, anchor_is_deck = getBottomAnchor(player, color, state)
 
@@ -167,10 +175,15 @@ function anchored_splay(zone, player, color, dir)
 
 			if dir == "Left" then
 				OffsetX = -SPLAY_SHIFT_X * (i - 1)
+        if player == "Blue" or player == "Green" then OffsetX = -OffsetX end
 			elseif dir == "Right" then
 				OffsetX = SPLAY_SHIFT_X * (i - 1)
+        if player == "Blue" or player == "Green" then OffsetX = -OffsetX end
 			elseif dir == "Up" then
 				OffsetZ = SPLAY_SHIFT_Z * (i - 1)
+        if player == "Blue" or player == "Green" then
+           OffsetZ = -OffsetZ
+        end
 			end
 
 			local target_pos = deck_pos + Vector(OffsetX, (i - 1) * 0.05, OffsetZ)
@@ -231,12 +244,29 @@ function anchored_splay(zone, player, color, dir)
           pos.x = ax + ((i-1) * stepX)
         elseif dir == "Up" then
           pos.x = ax
-          pos.z = az + ((i-1) * stepZ)
+          local splay_offset = (i-1) * SPLAY_SHIFT_Z
+          if player == "White" or player == "Red" then
+             pos.z = az + splay_offset
+          else
+             pos.z = az - splay_offset
+          end
         end
+
+        -- The first card (anchor) keeps its height. Subsequent cards are stacked higher.
+        if i > 1 then
+           -- Assuming the anchor is at index 1 and determines the base height
+           -- We want each subsequent card to be 0.05 higher than the previous one
+           -- Since i=1 is the base, i=2 is +0.05, i=3 is +0.10, etc.
+           local anchor_y = sorted[1].getPosition().y
+           pos.y = anchor_y + ((i-1) * 0.05)
+        end
+
         obj.setPosition(pos)
         obj.setLock(true)
     end
   end
+
+  UpdateGameState()
 end
 
 function shift_selected_color_left(player)
