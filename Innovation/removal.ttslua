@@ -1,13 +1,17 @@
 function remove_achievements(id)
     for j, guid in pairs(achievements[id]) do
-      getObjectFromGUID(guid).destroy()
+      if getObjectFromGUID(guid) ~= nil then
+        getObjectFromGUID(guid).destroy()
+      end
     end
 end
 
 function remove_expansion(id, deckGetter, postCleanup)
   for i = 1, 10 do
     local deck = deckGetter(i)
-    deck.destruct()
+    if deck ~= nil then
+      deck.destruct()
+    end
   end
   if postCleanup ~= nil then postCleanup() end
   expansions[id] = false
@@ -31,6 +35,8 @@ end
 
 function remove_relics()
   for j, guid in pairs(relic_guids) do
-    getObjectFromGUID(guid).destroy()
+    if getObjectFromGUID(guid) ~= nil then
+      getObjectFromGUID(guid).destroy()
+    end
   end
 end

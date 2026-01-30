@@ -15,18 +15,13 @@ function onLoad()
   createSplayControlButtons()
   createSplayButtons()
   createResourceButtons()
-
-  if setup_button_obj ~= nil then
-    --setup()
-  else
-    broadcastToAll("Game reloaded. Splay states have been reset.",  {0.7,0.7,0})
-  end
+  createSetupButtons()
 
   register_hotkeys()
 
   for i = 1, 10 do
     deck = getDeck(i)
-    deck.setVar("age", i)
+    if deck then deck.setVar("age", i) end
   end
 
   #include !\Innovation\dynamic_functions.ttslua

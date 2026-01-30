@@ -101,6 +101,85 @@ function createSplayButtons()
   end
 end
 
+function toggleEchoes(obj, color, alt) toggleExpansionHelper("echoes", "Echoes") end
+function toggleCities(obj, color, alt) toggleExpansionHelper("cities", "Cities") end
+function toggleArtifacts(obj, color, alt) toggleExpansionHelper("artifacts", "Artifacts") end
+function toggleFigures(obj, color, alt) toggleExpansionHelper("figures", "Figures") end
+function toggleUnseen(obj, color, alt) toggleExpansionHelper("unseen", "Unseen") end
+
+function toggleExpansionHelper(key, name)
+  expansions[key] = not expansions[key]
+  local status = "OFF"
+  local button_color = {0.05, 0.05, 0.05, 1}
+  if expansions[key] then
+    status = "ON"
+    button_color = {0, 0.5, 0, 1}
+  end
+
+  local setup_button_obj = getObjectFromGUID(setup_button.guid)
+  local buttons = setup_button_obj.getButtons()
+  for i, btn in ipairs(buttons) do
+    if btn.click_function == "toggle" .. name then
+      setup_button_obj.editButton({
+        index = btn.index,
+        label = name .. " [" .. status .. "]",
+        color = button_color
+      })
+      break
+    end
+  end
+end
+
+function createSetupButtons()
+  local setup_button_obj = getObjectFromGUID(setup_button.guid)
+  if setup_button_obj ~= nil then
+
+    local exps = {
+      {key="echoes", label="Echoes", func="toggleEchoes", z=-4},
+      {key="cities", label="Cities", func="toggleCities", z=-3},
+      {key="artifacts", label="Artifacts", func="toggleArtifacts", z=-2},
+      {key="figures", label="Figures", func="toggleFigures", z=-1},
+      {key="unseen", label="Unseen", func="toggleUnseen", z=0}
+    }
+
+    for _, ex in ipairs(exps) do
+      local status = "OFF"
+      local b_color = {0.05, 0.05, 0.05, 1}
+      if expansions[ex.key] then
+        status = "ON"
+        b_color = {0, 0.5, 0, 1}
+      end
+
+      setup_button_obj.createButton({
+        click_function = ex.func,
+        label = ex.label .. " [" .. status .. "]",
+        width = 4000,
+        height = 1000,
+        font_size = 500,
+        position = { 0, 12, ex.z },
+        rotation = { 0, 180, 0 },
+        scale = { 0.2, 0.2, 0.2 },
+        font_color = {1, 1, 1},
+        color = b_color,
+      })
+    end
+
+    setup_button_obj.createButton({
+      click_function = "click_setup",
+      label = "Setup",
+      function_owner = nil,
+      width = 4000,
+      height = 1000,
+      font_size = 600,
+      position = { 0, 12, -5 },
+      rotation = { 0, 180, 0 },
+      scale = { 0.2, 0.2, 0.2 },
+      color = "Green",
+      font_color = {0, 0, 0},
+    })
+  end
+end
+
 function createSplayControlButtons()
  -- These are the locations of the splay control buttons on the table
   local ColorShiftButtonPosition = {
@@ -385,10 +464,6 @@ function createAchievementCountButtons()
   end
 end
 
-function noop()
-  return
-end
-
 function toggleScorePanels(player, value, id)
   local right_arrow = "▶"
   local left_arrow = "◀"
@@ -459,107 +534,6 @@ function makeButton(props)
   return b
 end
 
-function showForPlayer(params)
-   local panel = params.panel
-   local color = params.color
-   local opened = self.UI.getAttribute(panel, "visibility")
-   if opened == nil then opened = "" end
-
-   if opened:find(color) then
-      opened = opened:gsub("|" .. color, "")
-      opened = opened:gsub(color .. "|", "")
-      opened = opened:gsub(color, "")
-      self.UI.setAttribute(panel, "visibility", opened)
-      if opened == "" then
-         self.UI.setAttribute(panel, "active", "false")
-         shown[panel] = false
-      end
-   else
-      if shown[panel] ~= true then
-         self.UI.setAttribute(panel, "active", "true")
-         self.UI.setAttribute(panel, "visibility", color)
-         shown[panel] = true
-      else
-         self.UI.setAttribute(panel, "visibility", opened .. "|" .. color)
-      end
-   end
-end
-
-function spawnerClicked(player, value, id)
-   if id == "ScenarioMS" then
-      self.UI.setAttribute("ScenarioSpawner", "active", "true")
-      --self.UI.setAttribute("MonsterSpawner", "active", "false")
-   elseif id == "SingleMS" then
-      self.UI.setAttribute("MonsterSpawner", "active", "true")
-      --self.UI.setAttribute("ScenarioSpawner", "active", "false")
-   elseif id == "showSpawner" then
-      showForPlayer({panel = "Spawner", color = player.color})
-   elseif id == "spawnMonster_Button" then
-      local partySheet
-      for _, obj in pairs(getAllObjects()) do
-         if obj.getDescription():find("Party Sheet") then
-            partySheet = obj
-            break
-         end
-      end
-      if partySheet then
-         local oldLevel = partySheet.UI.getAttribute("scenarioLevel", "text")
-         partySheet.UI.setAttribute("scenarioLevel", "text", self.UI.getAttribute("MSSLevel", "text"))
-         getObjectFromGUID("75ab50").call("spawnMonster", {monsterName = self.UI.getAttribute("monsterDropdown", "selected"), monsterType = self.UI.getAttribute("typeDropdown", "selected"), monsterDifficulty = isElite and "elite" or "normal"})
-         Wait.time(function() resetLevel({partySheet, oldLevel}) end, 0.5)
-      else
-         getObjectFromGUID("75ab50").call("spawnMonster", {monsterName = self.UI.getAttribute("monsterDropdown", "selected"), monsterType = self.UI.getAttribute("typeDropdown", "selected"), monsterDifficulty = isElite and "elite" or "normal"})
-      end
-   elseif id == "createMap" then
-      createMap({tonumber(self.UI.getAttribute("SSScenario", "text"))})
-      spawnerClicked(player, value, "showSpawner")
-   elseif id == "win" or id == "lost" then
-      local classesInPlay = {}
-      for color, _ in pairs(colorToPlayer) do
-         if color ~= "Black" then
-            if getClassFromColor(color) then
-               classesInPlay[getClassFromColor(color)] = color
-            end
-         end
-      end
-
-      for _, obj in pairs(getAllObjects()) do
-         if classesInPlay[obj.getName()] then
-            if obj.tag == "Figurine" then
-               obj.setPositionSmooth(colorToPlayer[classesInPlay[obj.getName()]].coin)
-               local hpTable = obj.getTable("health")
-               Wait.time(function() obj.call("add") end, 0.2, hpTable.max - hpTable.value)
-            end
-         end
-      end
-
-      local playArea
-      for _, obj in pairs(getAllObjects()) do
-         if obj.getName() == "Play Area" then playArea = obj end
-      end
-   end
-end
-
-function toggleExpansion(player, value, expansion)
-  local button_color = self.UI.getAttribute(expansion, "colors")
-  if button_color == toggle_colors["off"] then
-    button_color = toggle_colors["on"]
-  else
-    button_color = toggle_colors["off"]
-  end
-  local attr = {}
-  attr["colors"] = button_color
-  local button_color = self.UI.setAttributes(expansion, attr)
-end
-
-function expansive_is_selected(id)
-  if self.UI.getAttribute(id, "colors") == toggle_colors["on"]
-    then return true
-  end
-
-  return false
-end
-
 function expansion_is_active(id)
   if expansions[id] then
     return true
@@ -569,19 +543,18 @@ function expansion_is_active(id)
 end
 
 function click_setup()
-  self.UI.hide("Spawner")
   setup()
 
-  if not expansive_is_selected("cities") then
+  if not expansions["cities"] then
     remove_cities()
   end
-  if not expansive_is_selected("echoes") then
+  if not expansions["echoes"] then
     remove_echoes()
   end
-  if not expansive_is_selected("artifacts") then
+  if not expansions["artifacts"] then
     remove_artifacts()
   end
-  if not expansive_is_selected("figures") then
+  if not expansions["figures"] then
     remove_figures()
   end
 end
@@ -630,3 +603,7 @@ shown = {
    spawner = false,
    CameraControls = false
 }
+
+function noop()
+  return
+end

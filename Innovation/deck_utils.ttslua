@@ -24,17 +24,21 @@ function getDeck(age)
   local zone = getObjectFromGUID(deck_zones[age])
   local objects = zone.getObjects()
   for _, deck in pairs(objects) do
-    if deck.tag == "Deck" then return deck end
+    if deck.type == "Deck" then return deck end
+  end
+  
+  for _, obj in pairs(objects) do
+    if obj.type == "Card" then return obj end
   end
 
-  return objects[1]
+  return nil
 end
 
 function getDeckOrCard(age)
   local zone = getObjectFromGUID(deck_zones[age])
   local objects = zone.getObjects()
   for _, deck in pairs(objects) do
-    if deck.tag == "Deck" or deck.tag == "Card" then return deck end
+    if deck.type == "Deck" or deck.type == "Card" then return deck end
   end
 
   return nil
@@ -44,17 +48,21 @@ function getDeckExpansion(expansion_deck)
   local zone = getObjectFromGUID(expansion_deck)
   local objects = zone.getObjects()
   for _, deck in pairs(objects) do
-    if deck.tag == "Deck" then return deck end
+    if deck.type == "Deck" then return deck end
   end
 
-  return objects[1]
+  for _, obj in pairs(objects) do
+    if obj.type == "Card" then return obj end
+  end
+
+  return nil
 end
 
 function getDeckOrCardExpansion(expansion_deck)
   local zone = getObjectFromGUID(expansion_deck)
   local objects = zone.getObjects()
   for _, deck in pairs(objects) do
-    if deck.tag == "Deck" or deck.tag == "Card" then return deck end
+    if deck.type == "Deck" or deck.type == "Card" then return deck end
   end
 
   return nil
@@ -90,7 +98,7 @@ end
 
 function getDescription(card)
   local description = ""
-  if card.tag == "Deck" then description = card.description else description = card.getDescription() end
+  if card.type == "Deck" then description = card.description else description = card.getDescription() end
   return description
 end
 
@@ -147,7 +155,7 @@ function returnCardToDeck(card, age, description, name)
     card.setRotationSmooth(deck_rotation, false, true)
   end
   for k, return_deck in pairs(return_deck_stuff) do
-    if return_deck.tag == "Deck" or return_deck.tag == "Card" then
+    if return_deck.type == "Deck" or return_deck.type == "Card" then
       local deck_position = {}
 
       return_deck.highlightOn("Red",2)
@@ -187,13 +195,13 @@ function returnCards()
   local description = ""
   for i, card in pairs(cards) do
     return_card = false
-    if card.tag == "Deck" then
+    if card.type == "Deck" then
       local deck_cards = card.getObjects()
       description = deck_cards[1].description
       name = ""
       age = getAgeNum(description)
       return_card = true
-    elseif card.tag == "Card" then
+    elseif card.type == "Card" then
       description = card.getDescription()
       name = card.getName()
       age = getAgeNum(description)

@@ -1,10 +1,11 @@
 game_setup = false
 
 expansions = {
-  ['cities'] = true,
-  ['echoes'] = true,
-  ['artifacts'] = true,
-  ['figures'] = true
+  ['cities'] = false,
+  ['echoes'] = false,
+  ['artifacts'] = false,
+  ['figures'] = false,
+  ['unseen'] = false
 }
 
 toggle_colors = {
@@ -294,5 +295,5 @@ ROT_Y_LEFT = 90
 ROT_Y_BOTTOM = 180
 ROT_Y_RIGHT = 270
 
-SPLAY_SHIFT_X = 1.2
-SPLAY_SHIFT_Z = 1.0
+SPLAY_SHIFT_X = 1.20
+SPLAY_SHIFT_Z = 1.15

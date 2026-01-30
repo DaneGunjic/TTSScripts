@@ -2,45 +2,47 @@ function setup()
   print("setup() called")
 
   game_setup = true
-  self.UI.hide("buttons")
-  createReturnButton()
   
+  createReturnButton()
   createScoreButtons()
   createAchievementCountButtons()
 
   for i = 1, 10 do
     deck = getDeck(i)
-    deck.shuffle()
+    if deck then deck.shuffle() end
     deck = getDeckCities(i)
-    deck.shuffle()
+    if deck then deck.shuffle() end
     deck = getDeckEchoes(i)
-    deck.shuffle()
+    if deck then deck.shuffle() end
     deck = getDeckArtifacts(i)
-    deck.shuffle()
+    if deck then deck.shuffle() end
     deck = getDeckFigures(i)
-    deck.shuffle()
+    if deck then deck.shuffle() end
   end
 
   for i = 1, 9 do
-    getDeck(i).takeObject({
-      position = {-36.64 + (3*i), 1.8, 7},
-      rotation = {0, 90, 180}
-    })
+    local deck = getDeck(i)
+    if deck then
+      deck.takeObject({
+        position = {-36.64 + (3*i), 1.8, 7},
+        rotation = {0, 90, 180}
+      })
+    end
   end
 
   players = getSeatedPlayers()
   deck1 = getDeck(1)
   echoes_deck1 = nil
-  if expansive_is_selected("echoes") then
+  if expansions["echoes"] then
     echoes_deck1 = getDeckEchoes(1)
   end
 
   for i,v in pairs(players) do
-    if not expansive_is_selected("echoes") then
-      deck1.deal(2, v)
+    if not expansions["echoes"] then
+      if deck1 then deck1.deal(2, v) end
     else
-      deck1.deal(1, v)
-      echoes_deck1.deal(1, v)
+      if deck1 then deck1.deal(1, v) end
+      if echoes_deck1 then echoes_deck1.deal(1, v) end
     end
   end
 

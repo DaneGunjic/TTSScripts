@@ -1,0 +1,157 @@
+<Defaults>
+    <Button color="#828282"/>
+    <Button class="ini" color="rgba(0, 0, 0, 0.95)" textColor="rgb(1, 1, 1)" fontSize="16"/>
+    <Image preserveAspect="true"/>
+</Defaults>
+
+
+
+<Button id="scorePanelBtn" onClick="toggleScorePanels" width="23" height="25" text="&#x25B6;" fontSize="20" offsetXY="0 -150" rectAlignment="UpperRight"/>
+<Panel class="Window" id="RightPanel" width="235" height="400" offsetXY="0 -150" color="#69696910" rectAlignment="UpperRight">
+</Panel>
+
+<Panel id="ResourcePanel" width="250" height="100" rectAlignment="UpperRight" offsetXY="-0 -180" >
+    <TableLayout width="250" columnWidths="120 5 20 20 20 20 20 20" cellBackgroundColor="clear" cellPadding="0 0 0 0" padding="0 0 0 0" cellSpacing="0" autoCalculateHeight="true">
+        <Row preferredHeight="20">
+            <Cell><Text id="NameHeader" color="rgb(1, 1, 1)" resizeTextForBestFit="true" height="20" width="120" text=" "/></Cell>
+            <Cell><Text id="Spacer"/></Cell>
+            <Cell><Image image="Castle"/></Cell>
+            <Cell><Image image="Crown"/></Cell>
+            <Cell><Image image="Leaf"/></Cell>
+            <Cell><Image image="Lightbulb"/></Cell>
+            <Cell><Image image="Industry"/></Cell>
+            <Cell><Image image="Clock"/></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="Player1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight" /></Cell>
+            <Cell><Text id="Spacer1"/></Cell>
+            <Cell><Text id="C1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="M1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="E1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="K1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="I1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="T1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="Player2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight"/></Cell>
+            <Cell><Text id="Spacer2"/></Cell>
+            <Cell><Text id="C2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="M2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="E2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="K2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="I2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="T2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="Player3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight"/></Cell>
+            <Cell><Text id="Spacer3"/></Cell>
+            <Cell><Text id="C3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="M3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="E3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="K3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="I3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="T3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="Player4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight"/></Cell>
+            <Cell><Text id="Spacer4"/></Cell>
+            <Cell><Text id="C4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="M4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="E4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="K4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="I4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text id="T4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+    </TableLayout>
+</Panel>
+
+<Panel id="ScorePanel" width="250" height="100" rectAlignment="UpperRight" offsetXY="-0 -310" >
+    <TableLayout width="250" columnWidths="120 15 40 15 50" cellBackgroundColor="clear" cellPadding="0 0 0 0" padding="0 0 0 0" cellSpacing="0" autoCalculateHeight="true">
+        <Row preferredHeight="20">
+            <Cell><Text id="NameHeader" color="rgb(1, 1, 1)" resizeTextForBestFit="true" height="20" width="120" text=" "/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="ScoreHeader" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="40" text="Score" alignment="MiddleCenter" /></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="AchHeader" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="50" text="Achieve" alignment="MiddleCenter" /></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="SPlayer1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight" /></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Score1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Ach1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="SPlayer2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight" /></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Score2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Ach2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="SPlayer3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight" /></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Score3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Ach3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="SPlayer4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight" /></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Score4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Ach4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+    </TableLayout>
+</Panel>
+
+<Panel id="BoardPanel" width="250" height="100" rectAlignment="UpperRight" offsetXY="-0 -440" >
+    <TableLayout width="250" columnWidths="120 5 40 5 40 5 40" cellBackgroundColor="clear" cellPadding="0 0 0 0" padding="0 0 0 0" cellSpacing="0" autoCalculateHeight="true">
+        <Row preferredHeight="20">
+            <Cell><Text id="NameHeader" color="rgb(1, 1, 1)" resizeTextForBestFit="true" height="20" width="120" text=" "/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="AgeHeader" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="40" text="Age" alignment="MiddleCenter" /></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="CardsHeader" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="40" text="Hand" alignment="MiddleCenter" /></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="HighHeader" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="40" text="High" alignment="MiddleCenter" /></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="BPlayer1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight" /></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Age1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Cards1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="High1" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="BPlayer2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight" /></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Age2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Cards2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="High2" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="BPlayer3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight" /></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Age3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Cards3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="High3" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+        <Row preferredHeight="20">
+            <Cell><Text id="BPlayer4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" width="120" text="" alignment="MiddleRight" /></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Age4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="Cards4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+            <Cell><Text /></Cell>
+            <Cell><Text id="High4" color="rgb(1, 1, 1)" resizeTextForBestFit="false" height="20" text=""/></Cell>
+        </Row>
+    </TableLayout>
+</Panel>
+<Button id="scorePanelBGBtn" onClick="toggleScoreBG" width="23" height="25" text="&#x25C0;" fontSize="20" offsetXY="0 -550" rectAlignment="UpperRight"/>

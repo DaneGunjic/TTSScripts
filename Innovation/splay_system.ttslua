@@ -126,12 +126,6 @@ function getBottomAnchor(player, color, state)
   return anchor, false
 end
 
-function lockColorCards(player, color)
-  for i, obj in pairs(getColorCards(player, color)) do
-    obj.setLock(true)
-  end
-end
-
 function anchored_splay(zone, player, color, dir)
   print("anchored_splay " .. dir .. " for " .. color)
 
@@ -317,7 +311,7 @@ function get_card_count(zone, color)
   local count = 0
   local cards = zone.getObjects()
   for i, deck in pairs(cards) do
-    if deck.tag == "Card" then
+    if deck.type == 'Card' then
       if color == getCardColor(deck.getDescription()) then
         count = count + 1
       end
