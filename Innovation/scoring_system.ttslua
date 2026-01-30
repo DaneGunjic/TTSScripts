@@ -4,11 +4,20 @@ function updateScoreCount(player, top_cards)
 
   local score_button = getObjectFromGUID(score_cards[player])
   local buttons = score_button.getButtons()
-  local previous_score_val = buttons[1].label
+  local previous_score_val = nil
+  local button_index = nil
 
-  if previous_score_val ~= tostring(updated_count) then
+  for _, button in ipairs(buttons) do
+    if button.tooltip == player .. ":Score" then
+      previous_score_val = button.label
+      button_index = button.index
+      break
+    end
+  end
+
+  if button_index and previous_score_val ~= tostring(updated_count) then
     indicator = score_button.editButton({
-      index=0,
+      index=button_index,
       label=updated_count
     })
 
@@ -85,13 +94,13 @@ function getScoreCardCount(player)
   local cards = zone.getObjects()
   local count = 0
   for i, card in pairs(cards) do
-    if card.tag == "Deck" then
+    if card.type == "Deck" then
       local cards_in_deck = card.getObjects()
       for j = 1, #cards_in_deck do
         age = getAgeNum(cards_in_deck[j].description)
         count = count + 1
       end
-    elseif card.tag == "Card" then
+    elseif card.type == "Card" then
       age = getAgeNum(card.getDescription())
         count = count + 1
     end
@@ -104,13 +113,13 @@ function getScoreCount(player)
   local cards = zone.getObjects()
   local count = 0
   for i, card in pairs(cards) do
-    if card.tag == "Deck" then
+    if card.type == "Deck" then
       local cards_in_deck = card.getObjects()
       for j = 1, #cards_in_deck do
         age = getAgeNum(cards_in_deck[j].description)
         count = count + age
       end
-    elseif card.tag == "Card" then
+    elseif card.type == "Card" then
       age = getAgeNum(card.getDescription())
         count = count + age
     end
@@ -156,9 +165,9 @@ function updateAchievementCount(player, top_cards, splays_per_player, resource_c
   local cards = zone.getObjects()
   local count = 0
   for i, card in pairs(cards) do
-    if card.tag == "Deck" then
+    if card.type == "Deck" then
       count = count + #card.getObjects()
-    elseif card.tag == "Card" then
+    elseif card.type == "Card" then
       count = count + 1
     end
   end
@@ -169,11 +178,20 @@ function updateAchievementCount(player, top_cards, splays_per_player, resource_c
 
   local score_button = getObjectFromGUID(score_cards[player])
   local buttons = score_button.getButtons()
-  local previous_score_val = buttons[2].label
+  local previous_score_val = nil
+  local button_index = nil
 
-  if previous_score_val ~= tostring(updated_count) then
+  for _, button in ipairs(buttons) do
+    if button.tooltip == player .. ":Achievement" then
+      previous_score_val = button.label
+      button_index = button.index
+      break
+    end
+  end
+
+  if button_index and previous_score_val ~= tostring(updated_count) then
     indicator = score_button.editButton({
-      index=1,
+      index=button_index,
       label=updated_count
     })
 
@@ -269,12 +287,12 @@ function getAchievementValues(player)
   local cards = zone.getObjects()
   local total_values = 0
   for i, card in pairs(cards) do
-    if card.tag == "Deck" then
+    if card.type == "Deck" then
       local cards_in_deck = card.getObjects()
       for j = 1, #cards_in_deck do
         total_values = total_values + getAgeNum(cards_in_deck[j].description)
       end
-    elseif card.tag == "Card" then
+    elseif card.type == "Card" then
       total_values = total_values + getAgeNum(card.getDescription())
     end
   end
@@ -283,6 +301,7 @@ function getAchievementValues(player)
 end
 
 function getResourceCounts(player, card_color)
+  --print("Get resource counts")
   local sorted_cards = getSortedResourcesFromCards(player, false, card_color)
   local r_concat = getActiveResources(sorted_cards, player)
 
@@ -351,7 +370,7 @@ function getFlagsPerColor(player)
   local zone = getObjectFromGUID(zone_zones[player])
   local cards = zone.getObjects()
   for i, card in pairs(cards) do
-    if card.tag == "Deck" then
+    if card.type == "Deck" then
       local cards_in_deck = card.getObjects()
       for j = 1, #cards_in_deck do
         local resources_from_card = getCardsResources(cards_in_deck[j].description)
@@ -360,7 +379,7 @@ function getFlagsPerColor(player)
           position = {x=0, y=0, z=0}
         })
       end
-    elseif card.tag == "Card" then
+    elseif card.type == "Card" then
       local resources_from_card = getCardsResources(card.getDescription())
       table.insert(sorted_cards[getCardColor(card.getDescription())], {
         resources = resources_from_card,
@@ -396,7 +415,7 @@ function getTopCards(player)
   local zone = getObjectFromGUID(zone_zones[player])
   local cards = zone.getObjects()
   for i, card in pairs(cards) do
-    if card.tag == "Deck" then
+    if card.type == "Deck" then
       local cards_in_deck = card.getObjects()
       if cards_in_deck[#cards_in_deck] ~= nil then
         local deck_card = cards_in_deck[#cards_in_deck]
@@ -404,14 +423,14 @@ function getTopCards(player)
         setCurrentTopCard(player, card, card_color, current_top_cards)
         --top_cards[cards_in_deck[#cards_in_deck].name] = cards_in_deck[#cards_in_deck].description
       end
-    elseif card.tag == "Card" then
+    elseif card.type == "Card" then
       local card_color = getCardColor(card.getDescription())
       setCurrentTopCard(player, card, card_color, current_top_cards)
     end
   end
 
   for color, card in pairs(current_top_cards) do
-    if card.tag == "Deck" then
+    if card.type == "Deck" then
       local cards_in_deck = card.getObjects()
       top_cards[cards_in_deck[#cards_in_deck].name] = cards_in_deck[#cards_in_deck].description
     else
@@ -453,14 +472,14 @@ function getActiveCardCount(player, color)
   local zone = getObjectFromGUID(zone_zones[player])
   local cards = zone.getObjects()
   for i, card in pairs(cards) do
-    if card.tag == "Deck" then
+    if card.type == "Deck" then
       local cards_in_deck = card.getObjects()
       if cards_in_deck[1] ~= nil then
         local resources_from_card = getCardsResources(cards_in_deck[1].description)
         local deck_color = getCardColor(cards_in_deck[1].description)
         if deck_color == color then return 1 end
       end
-    elseif card.tag == "Card" then
+    elseif card.type == "Card" then
       if getCardColor(card.getDescription()) == color then count = count + 1 end
     end
   end
@@ -480,37 +499,44 @@ function getSortedResourcesFromCards(player, ignoreBaseCardValues, card_color)
   local zone = getObjectFromGUID(zone_zones[player])
   local cards = zone.getObjects()
   for i, card in pairs(cards) do
-    if card.tag == "Deck" then
+    if card.type == "Deck" then
       local cards_in_deck = card.getObjects()
+      local deck_pos = card.getPosition()
       for j = 1, #cards_in_deck do
-        if card_color == nil or getCardColor(cards_in_deck[j].description) == card_color then
+        local c_color = getCardColor(cards_in_deck[j].description)
+        if (card_color == nil or c_color == card_color) and sorted_cards[c_color] then
           local resources_from_card = getCardsResources(cards_in_deck[j].description)
           if isBaseCard(cards_in_deck[j].description) == true and ignoreBaseCardValues == true then
             resources_from_card = string.gsub(resources_from_card, "A", "-")
             resources_from_card = string.gsub(resources_from_card, "X", "-")
           end
-          table.insert(sorted_cards[getCardColor(cards_in_deck[j].description)], {
+          table.insert(sorted_cards[c_color], {
             resources = resources_from_card,
-            position = {x=0, y=0, z=0},
+            position = {x=deck_pos.x, y=deck_pos.y + (j * 0.1), z=deck_pos.z},
             guid = card.getGUID()
           })
         end
       end
-    elseif card.tag == "Card" then
-      if card_color == nil or getCardColor(card.getDescription()) == card_color then
+    elseif card.type == "Card" then
+      local c_color = getCardColor(card.getDescription())
+      if (card_color == nil or c_color == card_color) and sorted_cards[c_color] then
         local resources_from_card = getCardsResources(card.getDescription())
         if cardIsFaceDown(card) then resources_from_card = "------"
         elseif isBaseCard(card.getDescription()) == true and ignoreBaseCardValues == true then
           resources_from_card = string.gsub(resources_from_card, "A", "-")
           resources_from_card = string.gsub(resources_from_card, "X", "-")
         end
-        table.insert(sorted_cards[getCardColor(card.getDescription())], {
+        table.insert(sorted_cards[c_color], {
           resources = resources_from_card,
           position = card.getPosition(),
           guid = card.getGUID()
         })
       end
     end
+  end
+
+  for color, list in pairs(sorted_cards) do
+    table.sort(list, function(a, b) return a.position.y < b.position.y end)
   end
 
   return sorted_cards
@@ -531,8 +557,8 @@ function getActiveResourcesByColor(list, player, color)
 
   local cards = list[color]
   if #cards ~= 0 then
-    top_card = cards[#cards]
-    splay_state = get_splay_state(player, color)
+    local top_card = cards[#cards]
+    local splay_state = get_splay_state(player, color)
 
     if splay_state == "None" then
       r = r..top_card.resources
@@ -623,7 +649,7 @@ function getScoreCardValues(player)
   local zone = getObjectFromGUID(score_zones[player])
   local cards = zone.getObjects()
   for i, card in pairs(cards) do
-    if card.tag == "Deck" then
+    if card.type == "Deck" then
       local cards_in_deck = card.getObjects()
       for j = 1, #cards_in_deck do
         age = getAgeNum(cards_in_deck[j].description)
@@ -631,7 +657,7 @@ function getScoreCardValues(player)
           score_values[age] = 1
         else score_values[age] = score_values[age] + 1 end
       end
-    elseif card.tag == "Card" then
+    elseif card.type == "Card" then
       age = getAgeNum(card.getDescription())
       if score_values[age] == nil then
         score_values[age] = 1

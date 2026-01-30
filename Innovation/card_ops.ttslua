@@ -223,7 +223,7 @@ function meldStacked(player_color, card)
   local cards = player_zone.getObjects()
 
   for i, deck in pairs(cards) do
-    if deck.tag == "Deck" then
+    if deck.type == "Deck" then
       local deck_from_guid = getObjectFromGUID(deck.guid)
       local deck_cards = deck_from_guid.getObjects()
       for j, v in pairs(deck_cards) do
@@ -232,7 +232,7 @@ function meldStacked(player_color, card)
           return
         end
       end
-    elseif deck.tag == "Card" then
+    elseif deck.type == "Card" then
       if card_color == getCardColor(deck.getDescription()) then
         placeCardOverObject(card, deck)
         return
@@ -250,7 +250,7 @@ function meldToEmptyZone(player_color, card)
     local cards = meld_zone.getObjects()
     local has_cards = false
     for i, deck in pairs(cards) do
-      if deck.tag == "Deck" or deck.tag == "Card" then
+      if deck.type == "Deck" or deck.type == "Card" then
         has_cards = true
       end
     end
@@ -290,7 +290,7 @@ function objectInZone(object, in_zone)
   local cards = in_zone.getObjects()
   for i, card in pairs(cards) do
     local card_guid = ""
-    if card.tag == "Card" or card.tag == "Deck" then card_guid = card.guid else card_guid = "" end
+    if card.type == "Card" or card.type == "Deck" then card_guid = card.guid else card_guid = "" end
     if card_guid == object.guid then return true end
   end
   return false

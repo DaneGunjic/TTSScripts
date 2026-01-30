@@ -132,7 +132,7 @@ resources["C"] = "Castle"
 resources["M"] = "Money"
 resources["I"] = "Industry"
 resources["T"] = "Technology"
-resources["H"] = "Human"
+resources["P"] = "Person"
 
 non_resources = {}
 non_resources["1"] = "1"
@@ -230,7 +230,8 @@ resource_indicators = {
     Castle = "45f65e",
     Money = "a29160",
     Industry = "ad8648",
-    Technology = "12674c"
+    Technology = "12674c",
+    Person = "9cfd58"
   },
   Red = {
     Environment = "e2940b",
@@ -263,12 +264,6 @@ tuck_zones["White"] = "6bb65e"
 tuck_zones["Red"] = "6bbbb1"
 tuck_zones["Blue"] = "7906c8"
 tuck_zones["Green"] = "6b920d"
-
-score_cards = {}
-score_cards["White"] = "4ee1f2"
-score_cards["Red"] = "4ee1f2"
-score_cards["Green"] = "4ee1f2"
-score_cards["Blue"] = "4ee1f2"
 
 setup_button = {}
 setup_button.click_function = "setup"

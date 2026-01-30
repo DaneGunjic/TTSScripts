@@ -43,7 +43,7 @@ function isBottomPlayer(player)
 end
 
 function return_hotkey(player, card)
-  if card.tag == "Card" then
+  if card.type == "Card" then
     description = card.getDescription()
     name = card.getName()
     age = getAgeNum(description)
@@ -53,13 +53,13 @@ function return_hotkey(player, card)
 end
 
 function tuck_hotkey(player, card)
-  if card.tag == "Card" then
+  if card.type == "Card" then
     tuckCardNoZone(player, card)
   end
 end
 
 function meld_hotkey(player, card)
-  if card.tag == "Card" then
+  if card.type == "Card" then
     meldCard(player, card)
   end
 end
@@ -100,7 +100,7 @@ function draw_hotkey(player)
     end
   end
 
-  if base_deck ~= nil and (base_deck.tag == "Deck" or base_deck.tag == "Card") then
+  if base_deck ~= nil and (base_deck.type == "Deck" or base_deck.type == "Card") then
     base_deck.deal(1, player)
     broadcastToAll(getPlayerName(player) .. " draws base card age " .. tostring(max_age))
   end

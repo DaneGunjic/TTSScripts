@@ -8,7 +8,22 @@
 #include !\Innovation\removal.ttslua
 #include !\Innovation\hotkeys_and_events.ttslua
 
-function onLoad()
+function onSave()
+  local data_to_save = {
+    splay_state = splay_state
+  }
+  return JSON.encode(data_to_save)
+end
+
+function onLoad(saved_data)
+  if saved_data ~= "" and saved_data ~= nil then
+    local loaded_data = JSON.decode(saved_data)
+    if loaded_data.splay_state ~= nil then
+      --print("Loaded splay state")
+      splay_state = loaded_data.splay_state
+    end
+  end
+
   setup_button_obj = getObjectFromGUID(setup_button.guid)
   --self.UI.hide("RightPanel")
 

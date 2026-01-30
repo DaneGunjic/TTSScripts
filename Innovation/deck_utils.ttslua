@@ -26,7 +26,7 @@ function getDeck(age)
   for _, deck in pairs(objects) do
     if deck.type == "Deck" then return deck end
   end
-  
+
   for _, obj in pairs(objects) do
     if obj.type == "Card" then return obj end
   end
@@ -124,6 +124,48 @@ function isBaseCard(description)
     return true
   end
   return false
+end
+
+function isCities(description)
+  if string.sub(description, 1, 1) == "C" then
+    return true
+  end
+  return false
+end
+
+function isEchoes(description)
+  if string.sub(description, 1, 1) == "E" then
+    return true
+  end
+  return false
+end
+
+function isArtifacts(description)
+  if string.sub(description, 1, 1) == "A" then
+    return true
+  end
+  return false
+end
+
+function isFigures(description)
+  if string.sub(description, 1, 1) == "F" then
+    return true
+  end
+  return false
+end
+
+function isUnseen(description)
+  if string.sub(description, 1, 1) == "U" then
+    return true
+  end
+  return false
+end
+
+function isExpansion(description)
+  if isBaseCard(description) then
+    return false
+  end
+  return true
 end
 
 function parse_card(description)

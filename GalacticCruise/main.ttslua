@@ -246,7 +246,7 @@ end
 function createScoreDisplayButtons()
     scoreDisplayObj = getObjectFromGUID(scoreDisplayGUID)
     if not scoreDisplayObj then
-        print("GUID: " .. scoreDisplayGUID)
+        --print("GUID: " .. scoreDisplayGUID)
         return
     end
 

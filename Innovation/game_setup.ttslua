@@ -1,5 +1,5 @@
 function setup()
-  print("setup() called")
+  --print("setup() called")
 
   game_setup = true
   

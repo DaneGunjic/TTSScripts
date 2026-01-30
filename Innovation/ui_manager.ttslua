@@ -21,7 +21,7 @@ function createSplayButtons()
 
   FirstSplayButtonForColor = {
     White = {pos = {-40.17, 1.50, -17.15}, rot = {0, 180, 0}},
-    Red = {pos = {39.17, 1.50, -17.15}, rot = {0, 180, 0}},
+    Red = {pos = {7, 1.50, -17.15}, rot = {0, 180, 0}},
   }
 
   for _, color in ipairs(getSeatedPlayers()) do
@@ -184,7 +184,7 @@ function createSplayControlButtons()
  -- These are the locations of the splay control buttons on the table
   local ColorShiftButtonPosition = {
     White = {pos = {-45, 1.5, -24.12}, rot = {0, 180, 0}},
-    Red = {pos = {7.75, 1.5, -24.46}, rot = {0, 0, 0}},
+    Red = {pos = {2, 1.5, -24.46}, rot = {0, 180, 0}},
   }
 
   local table_obj = getObjectFromGUID("4ee1f2")
@@ -422,24 +422,35 @@ function createResourceButtons()
 end
 
 function createScoreButtons()
+  local ScoreButtonPosition = {
+    White = {pos = {-40.17, 1.50, -17.15}, rot = {0, 180, 0}},
+    Red = {pos = {7, 1.50, -17.15}, rot = {0, 180, 0}},
+    Blue = {pos = {-40.17, 1.50, 17.15}, rot = {0, 0, 0}},
+    Green = {pos = {7, 1.50, 17.15}, rot = {0, 0, 0}}
+  }
+
+  local table_obj = getObjectFromGUID("4ee1f2")
+  if table_obj == nil then return end
+
   local players = getSeatedPlayers()
   for i, player_color in pairs(players) do
-    local score_guid = score_cards[player_color]
-    local score_button = makeButton({
-      click_function = "click_func",
-      label = "0",
-      function_owner = nil,
-      width = 700,
-      height = 700,
-      font_size = 500,
-      position = {-1, 0.5, -14.5},
-      rotation = {0, 0, 0},
-      scale = {1, 1, 1},
-      color = {r=0, g=0.15, b=0.298},
-      font_color = {r=1, g=0.796, b=0.196}
-    })
-    getObjectFromGUID(score_guid).createButton(score_button)
-
+    if ScoreButtonPosition[player_color] then
+      local score_button = makeButton({
+        click_function = "click_func",
+        label = "0",
+        function_owner = nil,
+        width = 700,
+        height = 700,
+        font_size = 500,
+        position = table_obj.positionToLocal(Vector(ScoreButtonPosition[player_color].pos)),
+        rotation = ScoreButtonPosition[player_color].rot,
+        scale = {1, 1, 1},
+        color = {r=0, g=0.15, b=0.298},
+        font_color = {r=1, g=0.796, b=0.196},
+        tooltip = player_color .. ":Score"
+      })
+      table_obj.createButton(score_button)
+    end
   end
 end
 
@@ -458,7 +469,8 @@ function createAchievementCountButtons()
       rotation = {0, 0, 0},
       scale = {1, 1, 1},
       color = {r=1, g=0.796, b=0.196},
-      font_color = {r=0, g=0.15, b=0.298}
+      font_color = {r=0, g=0.15, b=0.298},
+      tooltip = player_color .. ":Achievement"
     })
     getObjectFromGUID(score_guid).createButton(score_button)
   end
@@ -556,6 +568,24 @@ function click_setup()
   end
   if not expansions["figures"] then
     remove_figures()
+  end
+
+  local setup_button_obj = getObjectFromGUID(setup_button.guid)
+  if setup_button_obj ~= nil then
+    local buttons = setup_button_obj.getButtons()
+    if buttons ~= nil then
+      for i = #buttons, 1, -1 do
+        local btn = buttons[i]
+        if btn.click_function == "click_setup" or
+           btn.click_function == "toggleEchoes" or
+           btn.click_function == "toggleCities" or
+           btn.click_function == "toggleArtifacts" or
+           btn.click_function == "toggleFigures" or
+           btn.click_function == "toggleUnseen" then
+          setup_button_obj.removeButton(btn.index)
+        end
+      end
+    end
   end
 end
 

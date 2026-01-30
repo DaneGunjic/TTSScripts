@@ -19,7 +19,7 @@ for _, c in ipairs(card_colors) do
   end
 
   _G["splay_left_" .. c] = function(obj, player_clicker_color, alt_click)
-    print("splay_left_" .. c .. " clicked by " .. player_clicker_color)
+    --print("splay_left_" .. c .. " clicked by " .. player_clicker_color)
     
     local player = player_clicker_color
     local zone_guid = zone_zones[player]
