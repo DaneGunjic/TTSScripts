@@ -7,7 +7,7 @@ function remove_achievements(id)
 end
 
 function remove_expansion(id, deckGetter, postCleanup)
-  for i = 1, 10 do
+  for i = 1, 11 do
     local deck = deckGetter(i)
     if deck ~= nil then
       deck.destruct()

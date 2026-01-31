@@ -69,30 +69,37 @@ function getDeckOrCardExpansion(expansion_deck)
 end
 
 function getDeckCities(age)
+  --print("getDeckCities AGE " .. age)
   return getDeckExpansion(deck_zones_cities[age])
 end
 
 function getDeckOrCardCities(age)
+  --print("getDeckOrCardCities AGE " .. age)
   return getDeckOrCardExpansion(deck_zones_cities[age])
 end
 
 function getDeckEchoes(age)
+  --print("getDeckEchoes AGE " .. age)
   return getDeckExpansion(deck_zones_echoes[age])
 end
 
 function getDeckOrCardEchoes(age)
+  --print("getDeckOrCardEchoes AGE " .. age)
   return getDeckOrCardExpansion(deck_zones_echoes[age])
 end
 
 function getDeckArtifacts(age)
+  --print("getDeckArtifacts AGE " .. age)
   return getDeckExpansion(deck_zones_artifacts[age])
 end
 
 function getDeckFigures(age)
+  --print("getDeckFigures AGE " .. age)
   return getDeckExpansion(deck_zones_figures[age])
 end
 
 function getDeckOrCardFigures(age)
+  --print("getDeckOrCardFigures AGE " .. age)
   return getDeckOrCardExpansion(deck_zones_figures[age])
 end
 

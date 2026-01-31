@@ -447,25 +447,8 @@ end
 
 function setCurrentTopCard(player, card, card_color, current_top_cards)
   if current_top_cards[card_color] ~= nil then
-    local current_position = 0
-    local splay_state = get_splay_state(player, card_color)
-    if splay_state == 'None' then
-      current_position = current_top_cards[card_color].getPosition().y
-      if card.getPosition().y > current_position then current_top_cards[card_color] = card end
-    elseif (splay_state == 'Left' and isBottomPlayer(player)) or (splay_state == 'Right' and isTopPlayer(player)) then
-      current_position = current_top_cards[card_color].getPosition().x
-      if card.getPosition().x < current_position then current_top_cards[card_color] = card end
-    elseif (splay_state == 'Right' and isBottomPlayer(player)) or (splay_state == 'Left' and isTopPlayer(player)) then
-      current_position = current_top_cards[card_color].getPosition().x
-      if card.getPosition().x > current_position then current_top_cards[card_color] = card end
-    elseif splay_state == 'Up' then
-      current_position = current_top_cards[card_color].getPosition().z
-      if isBottomPlayer(player) then
-        if card.getPosition().z > current_position then current_top_cards[card_color] = card end
-      else
-        if card.getPosition().z < current_position then current_top_cards[card_color] = card end
-      end
-    end
+    local current_position = current_top_cards[card_color].getPosition().y
+    if card.getPosition().y > current_position then current_top_cards[card_color] = card end
   else
     current_top_cards[card_color] = card
   end
@@ -693,9 +676,24 @@ function cardIsFaceDown(card)
   return true
 end
 
-function updateResourceLabels(resource_counts, player, top_cards)
+function updateResourceLabels(resource_counts, player, top_cards, all_effective_counts)
   for resource, count in pairs(resource_counts) do
     local updated_count = updateFromTopFiguresKarma(top_cards, resource_counts, resource, player)
+    
+    local is_max = false
+    if all_effective_counts and resources[resource] ~= nil then
+       local max_val = 0
+       for p_color, p_counts in pairs(all_effective_counts) do
+           if p_counts[resource] and p_counts[resource] > max_val then
+               max_val = p_counts[resource]
+           end
+       end
+       
+       if updated_count == max_val and max_val > 0 then
+           is_max = true
+       end
+    end
+
     if resources[resource] ~= nil and resource_indicators[player] ~= nil then
       local indicator_guid = resource_indicators[player][resources[resource]]
       if indicator_guid ~= nil then
@@ -704,18 +702,34 @@ function updateResourceLabels(resource_counts, player, top_cards)
           local buttons = resource_button.getButtons()
           if buttons ~= nil and buttons[1] ~= nil then
             local previous_val = buttons[1].label
+            
+            local current_color = buttons[1].color
+            local target_color = {1, 1, 1}
+            if is_max then target_color = {0, 1, 0} end
+            
+            local color_changed = false
+            if math.abs(current_color[1] - target_color[1]) > 0.001 or
+               math.abs(current_color[2] - target_color[2]) > 0.001 or
+               math.abs(current_color[3] - target_color[3]) > 0.001 then
+               color_changed = true
+            end
+            
+            local label_changed = (previous_val ~= tostring(updated_count))
 
-            if previous_val ~= tostring(updated_count) then
+            if label_changed or color_changed then
               indicator = resource_button.editButton({
                 index=0,
-                label=updated_count
+                label=updated_count,
+                color=target_color
               })
 
-              local player_num = player_nums[player]
-              if player_num then
-                local point_attr = {}
-                point_attr["text"] = updated_count
-                self.UI.setAttributes(resource .. player_num, point_attr)
+              if label_changed then
+                  local player_num = player_nums[player]
+                  if player_num then
+                    local point_attr = {}
+                    point_attr["text"] = updated_count
+                    self.UI.setAttributes(resource .. player_num, point_attr)
+                  end
               end
             end
           end

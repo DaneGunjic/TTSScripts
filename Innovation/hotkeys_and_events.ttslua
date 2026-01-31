@@ -18,14 +18,25 @@ function doUpdate()
 
       local splays_per_player = {}
       local resource_counts_per_player = {}
+      local top_cards_per_player = {}
+
       for i, color in pairs(players) do
         splays_per_player[color] = getPlayerSplays(color)
         resource_counts_per_player[color] = getResourceCounts(color)
+        top_cards_per_player[color] = getTopCards(color)
+      end
+
+      local effective_counts_per_player = {}
+      for i, color in pairs(players) do
+        effective_counts_per_player[color] = {}
+        for resource, _ in pairs(resources) do
+           effective_counts_per_player[color][resource] = updateFromTopFiguresKarma(top_cards_per_player[color], resource_counts_per_player[color], resource, color)
+        end
       end
 
       for i, player_color in pairs(players) do
-        local top_cards = getTopCards(player_color)
-        updateResourceLabels(resource_counts_per_player[player_color], player_color, top_cards)
+        local top_cards = top_cards_per_player[player_color]
+        updateResourceLabels(resource_counts_per_player[player_color], player_color, top_cards, effective_counts_per_player)
         updateScoreCount(player_color, top_cards)
         updateAchievementCount(player_color, top_cards, splays_per_player, resource_counts_per_player)
         updateHandData(player_color, top_cards)

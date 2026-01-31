@@ -37,6 +37,7 @@ deck_zones_cities[7] = "7b1e8b"
 deck_zones_cities[8] = "e4673f"
 deck_zones_cities[9] = "b33229"
 deck_zones_cities[10] = "2018f7"
+deck_zones_cities[11] = "89c6d9"
 
 deck_zones_echoes = {}
 deck_zones_echoes[1] = "7ac138"
@@ -49,6 +50,7 @@ deck_zones_echoes[7] = "719cab"
 deck_zones_echoes[8] = "558c0b"
 deck_zones_echoes[9] = "2be020"
 deck_zones_echoes[10] = "3f0f8b"
+deck_zones_echoes[11] = "89c6d9"
 
 deck_zones_artifacts = {}
 deck_zones_artifacts[1] = "b6531a"
@@ -61,6 +63,7 @@ deck_zones_artifacts[7] = "aeddf5"
 deck_zones_artifacts[8] = "253cd0"
 deck_zones_artifacts[9] = "8a4597"
 deck_zones_artifacts[10] = "13d0fa"
+deck_zones_artifacts[11] = "89c6d9"
 
 deck_zones_figures = {}
 deck_zones_figures[1] = "cc34e8"
@@ -73,6 +76,7 @@ deck_zones_figures[7] = "0c3e9a"
 deck_zones_figures[8] = "93e2e9"
 deck_zones_figures[9] = "c94e51"
 deck_zones_figures[10] = "4c5463"
+deck_zones_figures[11] = "89c6d9"
 
 relic_names_to_zones = {}
 relic_names_to_zones["Timbuktu"] = "5c9607"

@@ -10,7 +10,7 @@ function setup()
   createSplayButtons()
   createResourceButtons()
 
-  for i = 1, 10 do
+  for i = 1, 11 do
     deck = getDeck(i)
     if deck then deck.shuffle() end
     deck = getDeckCities(i)
@@ -23,7 +23,7 @@ function setup()
     if deck then deck.shuffle() end
   end
 
-  for i = 1, 9 do
+  for i = 1, 11 do
     local deck = getDeck(i)
     if deck then
       deck.takeObject({
