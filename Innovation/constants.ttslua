@@ -78,6 +78,19 @@ deck_zones_figures[9] = "c94e51"
 deck_zones_figures[10] = "4c5463"
 deck_zones_figures[11] = "89c6d9"
 
+deck_zones_unseen = {}
+deck_zones_unseen[1] = "223dc6"
+deck_zones_unseen[2] = "fd7b27"
+deck_zones_unseen[3] = "f46cee"
+deck_zones_unseen[4] = "7c9f16"
+deck_zones_unseen[5] = "5395b1"
+deck_zones_unseen[6] = "5e5c1d"
+deck_zones_unseen[7] = "1dd792"
+deck_zones_unseen[8] = "c62c2f"
+deck_zones_unseen[9] = "0e267b"
+deck_zones_unseen[10] = "a75236"
+deck_zones_unseen[11] = "392891"
+
 relic_names_to_zones = {}
 relic_names_to_zones["Timbuktu"] = "5c9607"
 relic_names_to_zones["Complex Numbers"] = "e93944"
@@ -114,6 +127,13 @@ achievements["figures"] = {
   "204ebf",
   "81da98",
   "aff188"
+}
+achievements["unseen"] = {
+  "a",
+  "b",
+  "c",
+  "d",
+  "e"
 }
 
 return_zone = "1fc0b1"
@@ -289,10 +309,10 @@ player_nums = {}
 
 update_lock = false
 
-HAND_Z_POSITIVE_MIN = 55.74
-HAND_Z_POSITIVE_MAX = 55.75
-HAND_Z_NEGATIVE_MIN = -55.75
-HAND_Z_NEGATIVE_MAX = -55.74
+HAND_Z_POSITIVE_MIN = 48
+HAND_Z_POSITIVE_MAX = 21
+HAND_Z_NEGATIVE_MIN = -52
+HAND_Z_NEGATIVE_MAX = -48
 
 ROT_Y_TOP = 0
 ROT_Y_LEFT = 90

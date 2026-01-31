@@ -21,6 +21,8 @@ function setup()
     if deck then deck.shuffle() end
     deck = getDeckFigures(i)
     if deck then deck.shuffle() end
+    deck = getDeckUnseen(i)
+    if deck then deck.shuffle() end
   end
 
   for i = 1, 11 do

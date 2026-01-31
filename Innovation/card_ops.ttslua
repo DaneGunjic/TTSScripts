@@ -95,6 +95,7 @@ function card_is_in_hand(card, player_color)
 end
 
 function meldCard(player_color, object)
+  print("meldCard")
   moveCardFromHand(player_color, object)
 
   setRotationFaceUp(object, player_color)

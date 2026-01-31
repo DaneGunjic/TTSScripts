@@ -33,6 +33,10 @@ function remove_figures()
   remove_expansion("figures", getDeckFigures, function() remove_achievements("figures") end)
 end
 
+function remove_unseen()
+  remove_expansion("unseen", getDeckUnseen, function() remove_achievements("unseen") end)
+end
+
 function remove_relics()
   for j, guid in pairs(relic_guids) do
     if getObjectFromGUID(guid) ~= nil then

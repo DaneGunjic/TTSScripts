@@ -21,9 +21,9 @@ function createSplayButtons()
 
   FirstSplayButtonForColor = {
     White = {pos = {-40, 1.50, -17.15}, rot = {0, 180, 0}},
-    Red = {pos = {7, 1.50, -17.15}, rot = {0, 180, 0}},
+    Red = {pos = {6, 1.50, -17.15}, rot = {0, 180, 0}},
     Green = {pos = {40, 1.50, 17.15}, rot = {0, 0, 0}},
-    Blue = {pos = {-7, 1.50, 17.15}, rot = {0, 0, 0}},
+    Blue = {pos = {-5, 1.50, 17.15}, rot = {0, 0, 0}},
   }
 
   for _, color in ipairs(getSeatedPlayers()) do
@@ -186,7 +186,7 @@ function createSplayControlButtons()
  -- These are the locations of the splay control buttons on the table
   local ColorShiftButtonPosition = {
     White = {pos = {-45, 1.5, -24.12}, rot = {0, 180, 0}},
-    Red = {pos = {2, 1.5, -24.46}, rot = {0, 180, 0}},
+    Red = {pos = {1, 1.5, -24.12}, rot = {0, 180, 0}},
     Green = {pos = {45, 1.5, 24.12}, rot = {0, 0, 0}},
     Blue = {pos = {-2, 1.5, 24.12}, rot = {0, 0, 0}},
   }
@@ -574,6 +574,10 @@ function click_setup()
   if not expansions["figures"] then
     remove_figures()
   end
+  if not expansions["unseen"] then
+    remove_unseen()
+  end
+
 
   local setup_button_obj = getObjectFromGUID(setup_button.guid)
   if setup_button_obj ~= nil then

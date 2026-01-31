@@ -98,6 +98,11 @@ function getDeckFigures(age)
   return getDeckExpansion(deck_zones_figures[age])
 end
 
+function getDeckUnseen(age)
+  --print("getDeckFigures AGE " .. age)
+  return getDeckExpansion(deck_zones_unseen[age])
+end
+
 function getDeckOrCardFigures(age)
   --print("getDeckOrCardFigures AGE " .. age)
   return getDeckOrCardExpansion(deck_zones_figures[age])
