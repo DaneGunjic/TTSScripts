@@ -102,11 +102,11 @@ achievements["cities"] = {
   "f503eb"
 }
 achievements["echoes"] = {
-  "41b532",
-  "925def",
-  "086490",
-  "dff8f9",
-  "92b18c"
+  "711f59",
+  "6ba71a",
+  "593536",
+  "d6a4f1",
+  "06331f"
 }
 achievements["figures"] = {
   "2f7a06",
@@ -151,6 +151,7 @@ non_resources["8"] = "8"
 non_resources["9"] = "9"
 non_resources["X"] = "10"
 non_resources["Y"] = "11"
+non_resources["Z"] = "11"
 
 card_colors = {
   "Blue",

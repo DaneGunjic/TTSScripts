@@ -679,7 +679,7 @@ end
 function updateResourceLabels(resource_counts, player, top_cards, all_effective_counts)
   for resource, count in pairs(resource_counts) do
     local updated_count = updateFromTopFiguresKarma(top_cards, resource_counts, resource, player)
-    
+
     local is_max = false
     if all_effective_counts and resources[resource] ~= nil then
        local max_val = 0
@@ -688,7 +688,7 @@ function updateResourceLabels(resource_counts, player, top_cards, all_effective_
                max_val = p_counts[resource]
            end
        end
-       
+
        if updated_count == max_val and max_val > 0 then
            is_max = true
        end
@@ -702,18 +702,18 @@ function updateResourceLabels(resource_counts, player, top_cards, all_effective_
           local buttons = resource_button.getButtons()
           if buttons ~= nil and buttons[1] ~= nil then
             local previous_val = buttons[1].label
-            
+
             local current_color = buttons[1].color
             local target_color = {1, 1, 1}
             if is_max then target_color = {0, 1, 0} end
-            
+
             local color_changed = false
             if math.abs(current_color[1] - target_color[1]) > 0.001 or
                math.abs(current_color[2] - target_color[2]) > 0.001 or
                math.abs(current_color[3] - target_color[3]) > 0.001 then
                color_changed = true
             end
-            
+
             local label_changed = (previous_val ~= tostring(updated_count))
 
             if label_changed or color_changed then
