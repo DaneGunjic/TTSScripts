@@ -667,6 +667,7 @@ function pointValue(icon)
   if icon == "9" then return 9 end
   if icon == "X" then return 10 end
   if icon == "Y" then return 11 end
+  if icon == "Z" then return 12 end
   return 0
 end
 
@@ -756,7 +757,7 @@ function updateResourceLabels(resource_counts, player, top_cards, all_effective_
 end
 
 function getActiveBonusCount(resource_counts)
-  return resource_counts["1"] + resource_counts["2"] + resource_counts["3"] + resource_counts["4"] + resource_counts["5"] + resource_counts["6"] + resource_counts["7"] + resource_counts["8"] + resource_counts["9"] + resource_counts["X"] + resource_counts["Y"]
+  return resource_counts["1"] + resource_counts["2"] + resource_counts["3"] + resource_counts["4"] + resource_counts["5"] + resource_counts["6"] + resource_counts["7"] + resource_counts["8"] + resource_counts["9"] + resource_counts["X"] + resource_counts["Y"] + resource_counts["Z"]
 end
 
 function updateFromTopFiguresKarma(top_cards, resource_counts, resource, player)

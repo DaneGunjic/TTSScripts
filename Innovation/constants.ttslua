@@ -37,7 +37,7 @@ deck_zones_cities[7] = "7b1e8b"
 deck_zones_cities[8] = "e4673f"
 deck_zones_cities[9] = "b33229"
 deck_zones_cities[10] = "2018f7"
-deck_zones_cities[11] = "89c6d9"
+deck_zones_cities[11] = "03ffcc"
 
 deck_zones_echoes = {}
 deck_zones_echoes[1] = "7ac138"
@@ -63,7 +63,7 @@ deck_zones_artifacts[7] = "aeddf5"
 deck_zones_artifacts[8] = "253cd0"
 deck_zones_artifacts[9] = "8a4597"
 deck_zones_artifacts[10] = "13d0fa"
-deck_zones_artifacts[11] = "89c6d9"
+deck_zones_artifacts[11] = "13d0fa"
 
 deck_zones_figures = {}
 deck_zones_figures[1] = "cc34e8"
@@ -76,7 +76,7 @@ deck_zones_figures[7] = "0c3e9a"
 deck_zones_figures[8] = "93e2e9"
 deck_zones_figures[9] = "c94e51"
 deck_zones_figures[10] = "4c5463"
-deck_zones_figures[11] = "89c6d9"
+deck_zones_figures[11] = "cc34e8"
 
 deck_zones_unseen = {}
 deck_zones_unseen[1] = "223dc6"
@@ -108,11 +108,11 @@ relic_guids = {
 
 achievements = {}
 achievements["cities"] = {
-  "725299",
-  "432309",
-  "13b4b1",
-  "1625fc",
-  "f503eb"
+  "e434ac",
+  "1941d0",
+  "83367b",
+  "7ba28f",
+  "3675c6"
 }
 achievements["echoes"] = {
   "711f59",
@@ -129,11 +129,11 @@ achievements["figures"] = {
   "aff188"
 }
 achievements["unseen"] = {
-  "a",
-  "b",
-  "c",
-  "d",
-  "e"
+  "88e01f",
+  "a7736d",
+  "15978b",
+  "eda115",
+  "553bf8"
 }
 
 return_zone = "1fc0b1"
@@ -171,7 +171,7 @@ non_resources["8"] = "8"
 non_resources["9"] = "9"
 non_resources["X"] = "10"
 non_resources["Y"] = "11"
-non_resources["Z"] = "11"
+non_resources["Z"] = "12"
 
 card_colors = {
   "Blue",
@@ -182,7 +182,7 @@ card_colors = {
 }
 
 point_values = {
-  "1", "2", "3", "4", "5", "6", "7", "8", "9", "X", "Y"
+  "1", "2", "3", "4", "5", "6", "7", "8", "9", "X", "Y", "Z"
 }
 
 color_lookup = {
