@@ -69,6 +69,17 @@ function tuckCard(player_color, object)
       sort_function = sortDown
     end
     tuckUnderSplay(player_color, object, 0, move_distance, sort_function)
+  elseif splay_state == "Aslant" then
+    local move_distance_x = -SPLAY_SHIFT_X
+    local move_distance_z = -SPLAY_SHIFT_Z
+    local sort_function = sortUp -- Unused by tuckUnderSplay but kept for consistency
+    
+    if player_zone_obj.getPosition().z > 0 then
+      move_distance_x = -move_distance_x
+      move_distance_z = -move_distance_z
+      sort_function = sortDown
+    end
+    tuckUnderSplay(player_color, object, move_distance_x, move_distance_z, sort_function)
   end
 end
 
@@ -95,7 +106,7 @@ function card_is_in_hand(card, player_color)
 end
 
 function meldCard(player_color, object)
-  print("meldCard")
+  --print("meldCard")
   moveCardFromHand(player_color, object)
 
   setRotationFaceUp(object, player_color)
@@ -131,6 +142,17 @@ function meldCard(player_color, object)
       sort_function = sortDown
     end
     meldOverSplay(player_color, object, 0, move_distance, sort_function)
+  elseif splay_state == "Aslant" then
+    local move_distance_x = SPLAY_SHIFT_X
+    local move_distance_z = SPLAY_SHIFT_Z
+    local sort_function = sortUp
+    
+    if player_zone_obj.getPosition().z > 0 then
+      move_distance_x = -move_distance_x
+      move_distance_z = -move_distance_z
+      sort_function = sortDown
+    end
+    meldOverSplay(player_color, object, move_distance_x, move_distance_z, sort_function)
   end
 end
 

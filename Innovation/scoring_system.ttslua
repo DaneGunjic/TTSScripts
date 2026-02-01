@@ -567,6 +567,10 @@ function getActiveResourcesByColor(list, player, color)
         r = r..getBottomResources(card)
       end
       r = r..getInverseBottomResources(top_card)
+    elseif splay_state == "Aslant" then
+      for j, card in pairs(cards) do
+        r = r..string.sub(card.resources, 1, 4)
+      end
     end
   end
 

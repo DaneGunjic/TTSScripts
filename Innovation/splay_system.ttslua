@@ -8,6 +8,7 @@ function splay_cards(paramtable)
   if splay_type == 1 then dir = "Left" end
   if splay_type == 2 then dir = "Right" end
   if splay_type == 3 then dir = "Up" end
+  if splay_type == 4 then dir = "Aslant" end
 
   local current_splay_state = get_splay_state(player, paramtable.color)
   if current_splay_state ~= dir then
@@ -30,6 +31,9 @@ function splay_cards(paramtable)
   elseif paramtable.newsplay == 3 then --splay up
     set_splay_state(player, paramtable.color, "Up")
     anchored_splay(zone, player, paramtable.color, "Up")
+  elseif paramtable.newsplay == 4 then --splay aslant
+    set_splay_state(player, paramtable.color, "Aslant")
+    anchored_splay(zone, player, paramtable.color, "Aslant")
   end
 
   updateSplayButtonLabel(player, paramtable.color, paramtable.newsplay)
@@ -184,6 +188,12 @@ function anchored_splay(zone, player, color, dir)
         if player == "Blue" or player == "Green" then
            OffsetZ = -OffsetZ
         end
+			elseif dir == "Aslant" then
+				OffsetX = SPLAY_SHIFT_X * (i - 1)
+        if player == "Blue" or player == "Green" then OffsetX = -OffsetX end
+
+				OffsetZ = SPLAY_SHIFT_Z * (i - 1)
+        if player == "Blue" or player == "Green" then OffsetZ = -OffsetZ end
 			end
 
 			local target_pos = deck_pos + Vector(OffsetX, (i - 1) * 0.05, OffsetZ)
@@ -244,6 +254,14 @@ function anchored_splay(zone, player, color, dir)
           pos.x = ax + ((i-1) * stepX)
         elseif dir == "Up" then
           pos.x = ax
+          local splay_offset = (i-1) * SPLAY_SHIFT_Z
+          if player == "White" or player == "Red" then
+             pos.z = az + splay_offset
+          else
+             pos.z = az - splay_offset
+          end
+        elseif dir == "Aslant" then
+          pos.x = ax + ((i-1) * stepX)
           local splay_offset = (i-1) * SPLAY_SHIFT_Z
           if player == "White" or player == "Red" then
              pos.z = az + splay_offset
@@ -372,6 +390,7 @@ function updateSplayButtonLabel(player, card_color, splay_type_int)
   if splay_type_int == 1 then splay_text = "Splayed Left"
   elseif splay_type_int == 2 then splay_text = "Splayed Right"
   elseif splay_type_int == 3 then splay_text = "Splayed Up"
+  elseif splay_type_int == 4 then splay_text = "Splayed Aslant"
   end
 
   local target_tooltip = player .. ":Reset Splay"

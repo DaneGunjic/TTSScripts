@@ -99,6 +99,24 @@ function createSplayButtons()
         scale = { 0.2, 1, 0.2 },
         tooltip = "Splay Right"
       })
+
+      -- Aslant splay button
+      local offset_aslant = Vector(2.2, 0, -1.5)
+      offset_aslant:rotateOver('y', FirstSplayButtonForColor[color].rot[2])
+      local pos_aslant = table_obj.positionToLocal(Vector(pos) + offset_aslant)
+
+      table_obj.createButton({
+        click_function = "splay_aslant_" .. card_color,
+        label = "/",
+        function_owner = nil,
+        width = 500,
+        height = 500,
+        font_size = 350,
+        position = pos_aslant,
+        rotation = FirstSplayButtonForColor[color].rot,
+        scale = { 0.2, 1, 0.2 },
+        tooltip = "Splay Aslant"
+      })
     end
   end
 end

@@ -110,6 +110,9 @@ function onObjectCollisionEnter(object, collision_info)
             elseif splay_state == "Up" then
                local func = _G["splay_up_" .. color]
                if func then func(object, player, 0) end
+            elseif splay_state == "Aslant" then
+               local func = _G["splay_aslant_" .. color]
+               if func then func(object, player, 0) end
             end
             break
           end
