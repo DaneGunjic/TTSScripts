@@ -17,6 +17,7 @@ function getReturnDeckZone(description, age, name)
   if isEchoes(description) then return_deck_zone = getObjectFromGUID(deck_zones_echoes[age]) end
   if isArtifacts(description) then return_deck_zone = getObjectFromGUID(deck_zones_artifacts[age]) end
   if isFigures(description) then return_deck_zone = getObjectFromGUID(deck_zones_figures[age]) end
+  if isUnseen(description) then return_deck_zone = getObjectFromGUID(deck_zones_unseen[age]) end
   return return_deck_zone
 end
 

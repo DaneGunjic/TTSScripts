@@ -76,7 +76,7 @@ deck_zones_figures[7] = "0c3e9a"
 deck_zones_figures[8] = "93e2e9"
 deck_zones_figures[9] = "c94e51"
 deck_zones_figures[10] = "4c5463"
-deck_zones_figures[11] = "cc34e8"
+deck_zones_figures[11] = "c6867f"
 
 deck_zones_unseen = {}
 deck_zones_unseen[1] = "223dc6"
@@ -122,11 +122,11 @@ achievements["echoes"] = {
   "06331f"
 }
 achievements["figures"] = {
-  "2f7a06",
-  "cd8989",
-  "204ebf",
-  "81da98",
-  "aff188"
+  "98692f",
+  "ddaa66",
+  "dace47",
+  "b38935",
+  "f5f88d"
 }
 achievements["unseen"] = {
   "88e01f",
