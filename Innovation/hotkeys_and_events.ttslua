@@ -2,11 +2,18 @@ function errorhandler(err)
    print( "ERROR:", err )
 end
 
+update_timer_id = nil
+
 function UpdateGameState()
-local err =  xpcall(doUpdate, errorhandler)
-  if err == false then
-    update_lock = false
-  end
+  if update_timer_id ~= nil then return end
+
+  update_timer_id = Wait.time(function()
+    update_timer_id = nil
+    local err =  xpcall(doUpdate, errorhandler)
+    if err == false then
+      update_lock = false
+    end
+  end, 0.5)
 end
 
 function doUpdate()
@@ -58,15 +65,16 @@ function onObjectEnterScriptingZone(scripting_zone, object)
     end
   end
 
-  if is_player_zone then
-    object.registerCollisions(false)
-  end
-
-  UpdateGameState()
   local f = get_zone_action_map()[zone_guid]
   if f ~= nil then
     f(object, scripting_zone)
+    UpdateGameState()
     return
+  end
+
+  if is_player_zone then
+    object.registerCollisions()
+    UpdateGameState()
   end
 end
 
@@ -83,6 +91,8 @@ function onObjectLeaveScriptingZone(scripting_zone, object)
 
   if is_player_zone then
     object.unregisterCollisions()
+  else
+    return
   end
 
   UpdateGameState()

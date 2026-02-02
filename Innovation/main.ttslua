@@ -10,7 +10,8 @@
 
 function onSave()
   local data_to_save = {
-    splay_state = splay_state
+    splay_state = splay_state,
+    game_setup = game_setup
   }
   return JSON.encode(data_to_save)
 end
@@ -22,15 +23,25 @@ function onLoad(saved_data)
       --print("Loaded splay state")
       splay_state = loaded_data.splay_state
     end
+    if loaded_data.game_setup ~= nil then
+      game_setup = loaded_data.game_setup
+    end
   end
 
   setup_button_obj = getObjectFromGUID(setup_button.guid)
   --self.UI.hide("RightPanel")
 
-  --createSplayControlButtons()
-  --createSplayButtons()
-  --createResourceButtons()
-  createSetupButtons()
+  if game_setup then
+    createReturnButton()
+    createScoreButtons()
+    createAchievementCountButtons()
+    createSplayControlButtons()
+    createSplayButtons()
+    createResourceButtons()
+    setupHud()
+  else
+    createSetupButtons()
+  end
 
   register_hotkeys()
 
