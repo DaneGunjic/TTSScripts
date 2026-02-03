@@ -1,16 +1,16 @@
 game_setup = false
 
 expansions = {
-  ['cities'] = false,
-  ['echoes'] = false,
-  ['artifacts'] = false,
-  ['figures'] = false,
-  ['unseen'] = false
+	['cities'] = false,
+	['echoes'] = false,
+	['artifacts'] = false,
+	['figures'] = false,
+	['unseen'] = false
 }
 
 toggle_colors = {
-  ["off"] = "#FFFFFF|#FFFFFF|White|rgba(0.78,0.78,0.78,0.5)",
-  ["on"] = "#00F00F|#00F00F|White|rgba(0.78,0.78,0.78,0.5)"
+	["off"] = "#FFFFFF|#FFFFFF|White|rgba(0.78,0.78,0.78,0.5)",
+	["on"] = "#00F00F|#00F00F|White|rgba(0.78,0.78,0.78,0.5)"
 }
 
 deck_zones = {}
@@ -99,41 +99,41 @@ relic_names_to_zones["Ching Shih"] = "3ca0e3"
 relic_names_to_zones["Safety Pin"] = "b0520b"
 
 relic_guids = {
-  "bcddb8",
-  "db74d0",
-  "c1b3a1",
-  "e61e23",
-  "2480ea"
+	"bcddb8",
+	"db74d0",
+	"c1b3a1",
+	"e61e23",
+	"2480ea"
 }
 
 achievements = {}
 achievements["cities"] = {
-  "e434ac",
-  "1941d0",
-  "83367b",
-  "7ba28f",
-  "3675c6"
+	"e434ac",
+	"1941d0",
+	"83367b",
+	"7ba28f",
+	"3675c6"
 }
 achievements["echoes"] = {
-  "711f59",
-  "6ba71a",
-  "593536",
-  "d6a4f1",
-  "06331f"
+	"711f59",
+	"6ba71a",
+	"593536",
+	"d6a4f1",
+	"06331f"
 }
 achievements["figures"] = {
-  "98692f",
-  "ddaa66",
-  "dace47",
-  "b38935",
-  "f5f88d"
+	"98692f",
+	"ddaa66",
+	"dace47",
+	"b38935",
+	"f5f88d"
 }
 achievements["unseen"] = {
-  "88e01f",
-  "a7736d",
-  "15978b",
-  "eda115",
-  "553bf8"
+	"88e01f",
+	"a7736d",
+	"15978b",
+	"eda115",
+	"553bf8"
 }
 
 return_zone = "1fc0b1"
@@ -174,119 +174,119 @@ non_resources["Y"] = "11"
 non_resources["Z"] = "12"
 
 card_colors = {
-  "Blue",
-  "Yellow",
-  "Purple",
-  "Red",
-  "Green"
+	"Blue",
+	"Yellow",
+	"Purple",
+	"Red",
+	"Green"
 }
 
 point_values = {
-  "1", "2", "3", "4", "5", "6", "7", "8", "9", "X", "Y", "Z"
+	"1", "2", "3", "4", "5", "6", "7", "8", "9", "X", "Y", "Z"
 }
 
 color_lookup = {
-  B = "Blue",
-  Y = "Yellow",
-  P = "Purple",
-  R = "Red",
-  G = "Green"
+	B = "Blue",
+	Y = "Yellow",
+	P = "Purple",
+	R = "Red",
+	G = "Green"
 }
 
 zone_zones = {
-  White = "42c27c",
-  Red = "f12279",
-  Blue = "948312",
-  Green = "70f7c2"
+	White = "42c27c",
+	Red = "f12279",
+	Blue = "948312",
+	Green = "70f7c2"
 }
 
 forecast_zones = {
-  White = "",
-  Red = "",
-  Blue = "",
-  Green = ""
+	White = "",
+	Red = "",
+	Blue = "",
+	Green = ""
 }
 
 meld_zones = {
-  White = {
-    "368e00",
-    "acc408",
-    "9191d1",
-    "019c77",
-    "39c08f",
-    "21047c"
-  },
-  Red = {
-    "e3ff09",
-    "77801d",
-    "1d4712",
-    "fb233f",
-    "ee91e3",
-    "a8cc06"
-  },
-  Blue = {
-    "3de1ab",
-    "3c50cd",
-    "46d405",
-    "6e66ae",
-    "829595",
-    "f57aa0"
-  },
-  Green = {
-    "a414e5",
-    "c809bb",
-    "c234e2",
-    "ec3704",
-    "8f86a0",
-    "c7d9dc"
-  }
+	White = {
+		"368e00",
+		"acc408",
+		"9191d1",
+		"019c77",
+		"39c08f",
+		"21047c"
+	},
+	Red = {
+		"e3ff09",
+		"77801d",
+		"1d4712",
+		"fb233f",
+		"ee91e3",
+		"a8cc06"
+	},
+	Blue = {
+		"3de1ab",
+		"3c50cd",
+		"46d405",
+		"6e66ae",
+		"829595",
+		"f57aa0"
+	},
+	Green = {
+		"a414e5",
+		"c809bb",
+		"c234e2",
+		"ec3704",
+		"8f86a0",
+		"c7d9dc"
+	}
 }
 
 states = {
-  "Not Splayed",
-  "Splayed Left",
-  "Splayed Right",
-  "Splayed Up",
-  "Splayed Aslant"
+	"Not Splayed",
+	"Splayed Left",
+	"Splayed Right",
+	"Splayed Up",
+	"Splayed Aslant"
 }
 
 resource_indicators = {
-  White = {
-    Environment = "717269",
-    Knowledge = "c2938a",
-    Castle = "45f65e",
-    Money = "a29160",
-    Industry = "ad8648",
-    Technology = "12674c",
-    Person = "9cfd58"
-  },
-  Red = {
-    Environment = "e2940b",
-    Knowledge = "177d4a",
-    Castle = "9c9b0e",
-    Money = "619485",
-    Industry = "bce9b4",
-    Technology = "0cfe3b",
-    Person = "3863ad"
-  },
-  Blue = {
-    Environment = "bcb168",
-    Knowledge = "8a6097",
-    Castle = "03ce97",
-    Money = "5aec71",
-    Industry = "b4c3b4",
-    Technology = "ceef0e",
-    Person = "029f54"
-  },
-  Green = {
-    Environment = "e88e5a",
-    Knowledge = "47c9f7",
-    Castle = "aef8d1",
-    Money = "28e199",
-    Industry = "104356",
-    Technology = "93da8d",
-    Person = "f404c2"
-  }
+	White = {
+		Environment = "717269",
+		Knowledge = "c2938a",
+		Castle = "45f65e",
+		Money = "a29160",
+		Industry = "ad8648",
+		Technology = "12674c",
+		Person = "9cfd58"
+	},
+	Red = {
+		Environment = "e2940b",
+		Knowledge = "177d4a",
+		Castle = "9c9b0e",
+		Money = "619485",
+		Industry = "bce9b4",
+		Technology = "0cfe3b",
+		Person = "3863ad"
+	},
+	Blue = {
+		Environment = "bcb168",
+		Knowledge = "8a6097",
+		Castle = "03ce97",
+		Money = "5aec71",
+		Industry = "b4c3b4",
+		Technology = "ceef0e",
+		Person = "029f54"
+	},
+	Green = {
+		Environment = "e88e5a",
+		Knowledge = "47c9f7",
+		Castle = "aef8d1",
+		Money = "28e199",
+		Industry = "104356",
+		Technology = "93da8d",
+		Person = "f404c2"
+	}
 }
 
 tuck_zones = {}
