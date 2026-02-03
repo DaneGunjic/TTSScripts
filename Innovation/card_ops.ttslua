@@ -14,10 +14,18 @@ function get_zone_action_map()
   m[score_zones["Green"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_RIGHT) end
   m[achievement_zones["Blue"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_RIGHT) end
   m[achievement_zones["Green"]] = function(object, scripting_zone) setRotation(object, scripting_zone, ROT_Y_RIGHT) end
-  m[tuck_zones["White"]] = function(object, scripting_zone) setRotationFaceUpWithWait(object, scripting_zone, "White"); tuckCardFromZone("White", object, scripting_zone) end
-  m[tuck_zones["Red"]] = function(object, scripting_zone) setRotationFaceUpWithWait(object, scripting_zone, "Red"); tuckCardFromZone("Red", object, scripting_zone) end
-  m[tuck_zones["Blue"]] = function(object, scripting_zone) setRotationFaceUpWithWait(object, scripting_zone, "Blue"); tuckCardFromZone("Blue", object, scripting_zone) end
-  m[tuck_zones["Green"]] = function(object, scripting_zone) setRotationFaceUpWithWait(object, scripting_zone, "Green"); tuckCardFromZone("Green", object, scripting_zone) end
+  m[tuck_zones["White"]] = function(object, scripting_zone)
+    setRotationFaceUpWithWait(object, scripting_zone, "White"); tuckCardFromZone("White", object, scripting_zone)
+  end
+  m[tuck_zones["Red"]] = function(object, scripting_zone)
+    setRotationFaceUpWithWait(object, scripting_zone, "Red"); tuckCardFromZone("Red", object, scripting_zone)
+  end
+  m[tuck_zones["Blue"]] = function(object, scripting_zone)
+    setRotationFaceUpWithWait(object, scripting_zone, "Blue"); tuckCardFromZone("Blue", object, scripting_zone)
+  end
+  m[tuck_zones["Green"]] = function(object, scripting_zone)
+    setRotationFaceUpWithWait(object, scripting_zone, "Green"); tuckCardFromZone("Green", object, scripting_zone)
+  end
   __zone_action_map = m
   return m
 end
@@ -73,7 +81,7 @@ function tuckCard(player_color, object)
     local move_distance_x = -SPLAY_SHIFT_X
     local move_distance_z = -SPLAY_SHIFT_Z
     local sort_function = sortUp -- Unused by tuckUnderSplay but kept for consistency
-    
+
     if player_zone_obj.getPosition().z > 0 then
       move_distance_x = -move_distance_x
       move_distance_z = -move_distance_z
@@ -91,13 +99,13 @@ end
 
 function card_is_in_hand(card, player_color)
   local card_pos = card.getPosition()
-   if player_color == "Green" or player_color == "Blue" then
+  if player_color == "Green" or player_color == "Blue" then
     if card_pos.z > HAND_Z_POSITIVE_MIN and card_pos.z < HAND_Z_POSITIVE_MAX then
       return true
     end
 
     return false
-   end
+  end
   if card_pos.z < HAND_Z_NEGATIVE_MAX and card_pos.z > HAND_Z_NEGATIVE_MIN then
     return true
   end
@@ -146,7 +154,7 @@ function meldCard(player_color, object)
     local move_distance_x = SPLAY_SHIFT_X
     local move_distance_z = SPLAY_SHIFT_Z
     local sort_function = sortUp
-    
+
     if player_zone_obj.getPosition().z > 0 then
       move_distance_x = -move_distance_x
       move_distance_z = -move_distance_z
@@ -193,7 +201,8 @@ function meldOverSplay(player_color, card, move_distance_x, move_distance_z, sor
 end
 
 function tuckUnderSplay(player_color, card, move_distance_x, move_distance_z, sort_function)
-  broadcastToAll(Player[player_color].steam_name .. " tucked " .. card.getName() .. " under " .. getCardColor(card.getDescription()) .. " splay")
+  broadcastToAll(Player[player_color].steam_name ..
+  " tucked " .. card.getName() .. " under " .. getCardColor(card.getDescription()) .. " splay")
   local card_color = getCardColor(card.getDescription())
   local splay_state = get_splay_state(player_color, card_color)
   local bottom_card = getBottomAnchor(player_color, card_color, splay_state)
@@ -222,7 +231,8 @@ function tuckUnderSplay(player_color, card, move_distance_x, move_distance_z, so
 end
 
 function tuckStacked(player_color, card)
-  broadcastToAll(Player[player_color].steam_name .. " tucked " .. card.getName() .. " under " .. getCardColor(card.getDescription()) .. " stack")
+  broadcastToAll(Player[player_color].steam_name ..
+  " tucked " .. card.getName() .. " under " .. getCardColor(card.getDescription()) .. " stack")
   local card_color = getCardColor(card.getDescription())
   local player_zone = getObjectFromGUID(zone_zones[player_color])
   local cards = player_zone.getObjects()
@@ -272,11 +282,10 @@ function meldStacked(player_color, card)
   end
 
   meldToEmptyZone(player_color, card)
-
 end
 
 function meldToEmptyZone(player_color, card)
-  for i,zone in pairs(meld_zones[player_color]) do
+  for i, zone in pairs(meld_zones[player_color]) do
     local meld_zone = getObjectFromGUID(zone)
     local cards = meld_zone.getObjects()
     local has_cards = false
@@ -328,11 +337,11 @@ function objectInZone(object, in_zone)
 end
 
 function setRotation(object, scripting_zone, rotation)
-    Wait.time(function()
-      if objectInZone(object, scripting_zone) then
-        rotate_object(object, rotation)
-      end
-    end, 0.8)
+  Wait.time(function()
+    if objectInZone(object, scripting_zone) then
+      rotate_object(object, rotation)
+    end
+  end, 0.8)
 end
 
 function setRotationFaceUpWithWait(object, scripting_zone, color)

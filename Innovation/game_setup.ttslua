@@ -1,56 +1,56 @@
 function setup()
-  --print("setup() called")
+	--print("setup() called")
 
-  game_setup = true
-  
-  createReturnButton()
-  createScoreButtons()
-  createAchievementCountButtons()
-  createSplayControlButtons()
-  createSplayButtons()
-  createResourceButtons()
+	game_setup = true
 
-  for i = 1, 11 do
-    deck = getDeck(i)
-    if deck then deck.shuffle() end
-    deck = getDeckCities(i)
-    if deck then deck.shuffle() end
-    deck = getDeckEchoes(i)
-    if deck then deck.shuffle() end
-    deck = getDeckArtifacts(i)
-    if deck then deck.shuffle() end
-    deck = getDeckFigures(i)
-    if deck then deck.shuffle() end
-    deck = getDeckUnseen(i)
-    if deck then deck.shuffle() end
-  end
+	createReturnButton()
+	createScoreButtons()
+	createAchievementCountButtons()
+	createSplayControlButtons()
+	createSplayButtons()
+	createResourceButtons()
 
-  for i = 1, 11 do
-    local deck = getDeck(i)
-    if deck then
-      deck.takeObject({
-        position = {-34.4 + (1.8*i), 1.8 + (i*0.05), 0},
-        rotation = {0, 90, 180},
-        smooth = false
-      })
-    end
-  end
+	for i = 1, 11 do
+		deck = getDeck(i)
+		if deck then deck.shuffle() end
+		deck = getDeckCities(i)
+		if deck then deck.shuffle() end
+		deck = getDeckEchoes(i)
+		if deck then deck.shuffle() end
+		deck = getDeckArtifacts(i)
+		if deck then deck.shuffle() end
+		deck = getDeckFigures(i)
+		if deck then deck.shuffle() end
+		deck = getDeckUnseen(i)
+		if deck then deck.shuffle() end
+	end
 
-  players = getSeatedPlayers()
-  deck1 = getDeck(1)
-  echoes_deck1 = nil
-  if expansions["echoes"] then
-    echoes_deck1 = getDeckEchoes(1)
-  end
+	for i = 1, 11 do
+		local deck = getDeck(i)
+		if deck then
+			deck.takeObject({
+				position = { -34.4 + (1.8 * i), 1.8 + (i * 0.05), 0 },
+				rotation = { 0, 90, 180 },
+				smooth = false
+			})
+		end
+	end
 
-  for i,v in pairs(players) do
-    if not expansions["echoes"] then
-      if deck1 then deck1.deal(2, v) end
-    else
-      if deck1 then deck1.deal(1, v) end
-      if echoes_deck1 then echoes_deck1.deal(1, v) end
-    end
-  end
+	players = getSeatedPlayers()
+	deck1 = getDeck(1)
+	echoes_deck1 = nil
+	if expansions["echoes"] then
+		echoes_deck1 = getDeckEchoes(1)
+	end
 
-  setupHud()
+	for i, v in pairs(players) do
+		if not expansions["echoes"] then
+			if deck1 then deck1.deal(2, v) end
+		else
+			if deck1 then deck1.deal(1, v) end
+			if echoes_deck1 then echoes_deck1.deal(1, v) end
+		end
+	end
+
+	setupHud()
 end

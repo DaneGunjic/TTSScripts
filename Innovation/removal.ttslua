@@ -1,46 +1,46 @@
 function remove_achievements(id)
-    for j, guid in pairs(achievements[id]) do
-      if getObjectFromGUID(guid) ~= nil then
-        getObjectFromGUID(guid).destroy()
-      end
-    end
+	for j, guid in pairs(achievements[id]) do
+		if getObjectFromGUID(guid) ~= nil then
+			getObjectFromGUID(guid).destroy()
+		end
+	end
 end
 
 function remove_expansion(id, deckGetter, postCleanup)
-  for i = 1, 11 do
-    local deck = deckGetter(i)
-    if deck ~= nil then
-      deck.destruct()
-    end
-  end
-  if postCleanup ~= nil then postCleanup() end
-  expansions[id] = false
+	for i = 1, 11 do
+		local deck = deckGetter(i)
+		if deck ~= nil then
+			deck.destruct()
+		end
+	end
+	if postCleanup ~= nil then postCleanup() end
+	expansions[id] = false
 end
 
 function remove_cities()
-  remove_expansion("cities", getDeckCities, function() remove_achievements("cities") end)
+	remove_expansion("cities", getDeckCities, function() remove_achievements("cities") end)
 end
 
 function remove_echoes()
-  remove_expansion("echoes", getDeckEchoes, function() remove_achievements("echoes") end)
+	remove_expansion("echoes", getDeckEchoes, function() remove_achievements("echoes") end)
 end
 
 function remove_artifacts()
-  remove_expansion("artifacts", getDeckArtifacts, remove_relics)
+	remove_expansion("artifacts", getDeckArtifacts, remove_relics)
 end
 
 function remove_figures()
-  remove_expansion("figures", getDeckFigures, function() remove_achievements("figures") end)
+	remove_expansion("figures", getDeckFigures, function() remove_achievements("figures") end)
 end
 
 function remove_unseen()
-  remove_expansion("unseen", getDeckUnseen, function() remove_achievements("unseen") end)
+	remove_expansion("unseen", getDeckUnseen, function() remove_achievements("unseen") end)
 end
 
 function remove_relics()
-  for j, guid in pairs(relic_guids) do
-    if getObjectFromGUID(guid) ~= nil then
-      getObjectFromGUID(guid).destroy()
-    end
-  end
+	for j, guid in pairs(relic_guids) do
+		if getObjectFromGUID(guid) ~= nil then
+			getObjectFromGUID(guid).destroy()
+		end
+	end
 end

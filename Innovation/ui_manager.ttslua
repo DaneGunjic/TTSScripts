@@ -20,10 +20,10 @@ function createSplayButtons()
   if table_obj == nil then return end
 
   FirstSplayButtonForColor = {
-    White = {pos = {-40, 1.50, -17.15}, rot = {0, 180, 0}},
-    Red = {pos = {6, 1.50, -17.15}, rot = {0, 180, 0}},
-    Green = {pos = {40, 1.50, 17.15}, rot = {0, 0, 0}},
-    Blue = {pos = {-5, 1.50, 17.15}, rot = {0, 0, 0}},
+    White = { pos = { -40, 1.50, -17.15 }, rot = { 0, 180, 0 } },
+    Red = { pos = { 6, 1.50, -17.15 }, rot = { 0, 180, 0 } },
+    Green = { pos = { 40, 1.50, 17.15 }, rot = { 0, 0, 0 } },
+    Blue = { pos = { -5, 1.50, 17.15 }, rot = { 0, 0, 0 } },
   }
 
   for _, color in ipairs(getSeatedPlayers()) do
@@ -122,18 +122,22 @@ function createSplayButtons()
 end
 
 function toggleEchoes(obj, color, alt) toggleExpansionHelper("echoes", "Echoes") end
+
 function toggleCities(obj, color, alt) toggleExpansionHelper("cities", "Cities") end
+
 function toggleArtifacts(obj, color, alt) toggleExpansionHelper("artifacts", "Artifacts") end
+
 function toggleFigures(obj, color, alt) toggleExpansionHelper("figures", "Figures") end
+
 function toggleUnseen(obj, color, alt) toggleExpansionHelper("unseen", "Unseen") end
 
 function toggleExpansionHelper(key, name)
   expansions[key] = not expansions[key]
   local status = "OFF"
-  local button_color = {0.05, 0.05, 0.05, 1}
+  local button_color = { 0.05, 0.05, 0.05, 1 }
   if expansions[key] then
     status = "ON"
-    button_color = {0, 0.5, 0, 1}
+    button_color = { 0, 0.5, 0, 1 }
   end
 
   local setup_button_obj = getObjectFromGUID(setup_button.guid)
@@ -153,21 +157,20 @@ end
 function createSetupButtons()
   local setup_button_obj = getObjectFromGUID(setup_button.guid)
   if setup_button_obj ~= nil then
-
     local exps = {
-      {key="echoes", label="Echoes", func="toggleEchoes", z=-4},
-      {key="cities", label="Cities", func="toggleCities", z=-3},
-      {key="artifacts", label="Artifacts", func="toggleArtifacts", z=-2},
-      {key="figures", label="Figures", func="toggleFigures", z=-1},
-      {key="unseen", label="Unseen", func="toggleUnseen", z=0}
+      { key = "echoes",  label = "Echoes",  func = "toggleEchoes",  z = -4 },
+      { key = "cities",  label = "Cities",  func = "toggleCities",  z = -3 },
+      { key = "artifacts", label = "Artifacts", func = "toggleArtifacts", z = -2 },
+      { key = "figures", label = "Figures", func = "toggleFigures", z = -1 },
+      { key = "unseen",  label = "Unseen",  func = "toggleUnseen",  z = 0 }
     }
 
     for _, ex in ipairs(exps) do
       local status = "OFF"
-      local b_color = {0.05, 0.05, 0.05, 1}
+      local b_color = { 0.05, 0.05, 0.05, 1 }
       if expansions[ex.key] then
         status = "ON"
-        b_color = {0, 0.5, 0, 1}
+        b_color = { 0, 0.5, 0, 1 }
       end
 
       setup_button_obj.createButton({
@@ -179,7 +182,7 @@ function createSetupButtons()
         position = { 0, 12, ex.z },
         rotation = { 0, 180, 0 },
         scale = { 0.2, 0.2, 0.2 },
-        font_color = {1, 1, 1},
+        font_color = { 1, 1, 1 },
         color = b_color,
       })
     end
@@ -195,18 +198,18 @@ function createSetupButtons()
       rotation = { 0, 180, 0 },
       scale = { 0.2, 0.2, 0.2 },
       color = "Green",
-      font_color = {0, 0, 0},
+      font_color = { 0, 0, 0 },
     })
   end
 end
 
 function createSplayControlButtons()
- -- These are the locations of the splay control buttons on the table
+  -- These are the locations of the splay control buttons on the table
   local ColorShiftButtonPosition = {
-    White = {pos = {-45, 1.5, -24.12}, rot = {0, 180, 0}},
-    Red = {pos = {1, 1.5, -24.12}, rot = {0, 180, 0}},
-    Green = {pos = {45, 1.5, 24.12}, rot = {0, 0, 0}},
-    Blue = {pos = {-2, 1.5, 24.12}, rot = {0, 0, 0}},
+    White = { pos = { -45, 1.5, -24.12 }, rot = { 0, 180, 0 } },
+    Red = { pos = { 1, 1.5, -24.12 }, rot = { 0, 180, 0 } },
+    Green = { pos = { 45, 1.5, 24.12 }, rot = { 0, 0, 0 } },
+    Blue = { pos = { -2, 1.5, 24.12 }, rot = { 0, 0, 0 } },
   }
 
   local table_obj = getObjectFromGUID("4ee1f2")
@@ -223,11 +226,11 @@ function createSplayControlButtons()
         width = 1000,
         height = 800,
         font_size = 300,
-        font_color = {1, 1, 1},
+        font_color = { 1, 1, 1 },
         position = table_obj.positionToLocal(ColorShiftButtonPosition[color].pos),
         rotation = ColorShiftButtonPosition[color].rot,
-        color = {0.05, 0.05, 0.05, 1},
-        scale = {x = 0.2, y = 0.2, z = 0.2},
+        color = { 0.05, 0.05, 0.05, 1 },
+        scale = { x = 0.2, y = 0.2, z = 0.2 },
         tooltip = color .. ":Red"
       })
 
@@ -235,19 +238,23 @@ function createSplayControlButtons()
 
       -- Directions
       local dirs = {
-        {name="Left", label="←"},
-        {name="Right", label="→"},
-        {name="Up", label="↑"},
-        {name="Down", label="↓"}
+        { name = "Left", label = "←" },
+        { name = "Right", label = "→" },
+        { name = "Up", label = "↑" },
+        { name = "Down", label = "↓" }
       }
 
       -- This is where we create the shift (arrow) buttons for each player
       for _, d in pairs(dirs) do
         local offset = Vector(0, 0, 0)
-        if d.name == "Left" then offset = Vector(-1.4, 0, 0)
-        elseif d.name == "Right" then offset = Vector(1.4, 0, 0)
-        elseif d.name == "Up" then offset = Vector(0, 0, -1)
-        elseif d.name == "Down" then offset = Vector(0, 0, 1)
+        if d.name == "Left" then
+          offset = Vector(-1.4, 0, 0)
+        elseif d.name == "Right" then
+          offset = Vector(1.4, 0, 0)
+        elseif d.name == "Up" then
+          offset = Vector(0, 0, -1)
+        elseif d.name == "Down" then
+          offset = Vector(0, 0, 1)
         end
 
         offset:rotateOver('y', ColorShiftButtonPosition[color].rot[2])
@@ -260,17 +267,17 @@ function createSplayControlButtons()
           width = 500,
           height = 500,
           font_size = 300,
-          font_color = {1, 1, 1},
+          font_color = { 1, 1, 1 },
           position = local_pos,
           rotation = ColorShiftButtonPosition[color].rot,
-          color = {0.05, 0.05, 0.05, 1},
-          scale = {x = 0.2, y = 0.2, z = 0.2}
+          color = { 0.05, 0.05, 0.05, 1 },
+          scale = { x = 0.2, y = 0.2, z = 0.2 }
         })
 
         -- We use tooltips to determine which color the button belongs to
         table_obj.createButton(shift_btn)
         local idx = #table_obj.getButtons() - 1
-        table_obj.editButton({index=idx, tooltipl=color .. ":" .. d.name})
+        table_obj.editButton({ index = idx, tooltipl = color .. ":" .. d.name })
       end
     end
   end
@@ -315,7 +322,7 @@ function getNextColor(current)
       if i == #card_colors then
         return card_colors[1]
       else
-        return card_colors[i+1]
+        return card_colors[i + 1]
       end
     end
   end
@@ -346,8 +353,11 @@ function splayShiftClicked(obj, player_clicker_color, alt_click)
 end
 
 function splayShiftLeft(obj, color, alt) performShift(color, "Left") end
+
 function splayShiftRight(obj, color, alt) performShift(color, "Right") end
+
 function splayShiftUp(obj, color, alt) performShift(color, "Up") end
+
 function splayShiftDown(obj, color, alt) performShift(color, "Down") end
 
 function performShift(player_color, dir)
@@ -372,10 +382,14 @@ function performShift(player_color, dir)
 
   select_splay_color(player_color, current_selected_color)
 
-  if dir == "Left" then shift_selected_color_left(player_color)
-  elseif dir == "Right" then shift_selected_color_right(player_color)
-  elseif dir == "Up" then shift_selected_color_up(player_color)
-  elseif dir == "Down" then shift_selected_color_down(player_color)
+  if dir == "Left" then
+    shift_selected_color_left(player_color)
+  elseif dir == "Right" then
+    shift_selected_color_right(player_color)
+  elseif dir == "Up" then
+    shift_selected_color_up(player_color)
+  elseif dir == "Down" then
+    shift_selected_color_down(player_color)
   end
 end
 
@@ -386,13 +400,17 @@ function splayShiftClicked(player, value, id)
   local tip = btn.tooltip
   local space = string.find(tip, " ")
   if space == nil then return end
-  local color = string.sub(tip, 1, space-1)
-  local dir = string.sub(tip, space+1)
+  local color = string.sub(tip, 1, space - 1)
+  local dir = string.sub(tip, space + 1)
   select_splay_color(player, color)
-  if dir == "Left" then shift_selected_color_left(player)
-  elseif dir == "Right" then shift_selected_color_right(player)
-  elseif dir == "Up" then shift_selected_color_up(player)
-  elseif dir == "Down" then shift_selected_color_down(player)
+  if dir == "Left" then
+    shift_selected_color_left(player)
+  elseif dir == "Right" then
+    shift_selected_color_right(player)
+  elseif dir == "Up" then
+    shift_selected_color_up(player)
+  elseif dir == "Down" then
+    shift_selected_color_down(player)
   end
 end
 
@@ -407,21 +425,22 @@ function createResourceButtons()
           if indicator_obj ~= nil then
             local score_button = makeButton({
               click_function = "click_func",
-              color = {1, 1 , 1},
-              font_color = {0, 0, 0},
+              color = { 1, 1, 1 },
+              font_color = { 0, 0, 0 },
               label = "0",
               function_owner = nil,
               width = 600,
               height = 600,
               font_size = 600,
-              position = {0, 0, -5},
-              rotation = {0, 0, 0},
-              scale = {4, 4, 4}
+              position = { 0, 0, -5 },
+              rotation = { 0, 0, 0 },
+              scale = { 4, 4, 4 }
             })
 
             indicator_obj.createButton(score_button)
           else
-            print("Error: Could not find object for resource " .. resource .. " for player " .. player_color .. " with GUID " .. indicator_guid)
+            print("Error: Could not find object for resource " ..
+            resource .. " for player " .. player_color .. " with GUID " .. indicator_guid)
           end
         else
           print("Warning: No GUID defined for resource " .. resource .. " for player " .. player_color)
@@ -435,10 +454,10 @@ end
 
 function createScoreButtons()
   local ScoreButtonPosition = {
-    White = {pos = {-17, 1.50, -8}, rot = {0, 180, 0}},
-    Red = {pos = {25, 1.50, -8}, rot = {0, 180, 0}},
-    Blue = {pos = {-25, 1.50, 8}, rot = {0, 0, 0}},
-    Green = {pos = {17, 1.50, 8}, rot = {0, 0, 0}}
+    White = { pos = { -17, 1.50, -8 }, rot = { 0, 180, 0 } },
+    Red = { pos = { 25, 1.50, -8 }, rot = { 0, 180, 0 } },
+    Blue = { pos = { -25, 1.50, 8 }, rot = { 0, 0, 0 } },
+    Green = { pos = { 17, 1.50, 8 }, rot = { 0, 0, 0 } }
   }
 
   local table_obj = getObjectFromGUID("4ee1f2")
@@ -456,9 +475,9 @@ function createScoreButtons()
         font_size = 500,
         position = table_obj.positionToLocal(Vector(ScoreButtonPosition[player_color].pos)),
         rotation = ScoreButtonPosition[player_color].rot,
-        scale = {0.5, 0.5, 0.5},
-        color = {r=0, g=0.15, b=0.298},
-        font_color = {r=1, g=0.796, b=0.196},
+        scale = { 0.5, 0.5, 0.5 },
+        color = { r = 0, g = 0.15, b = 0.298 },
+        font_color = { r = 1, g = 0.796, b = 0.196 },
         tooltip = player_color .. ":Score"
       })
       table_obj.createButton(score_button)
@@ -468,10 +487,10 @@ end
 
 function createAchievementCountButtons()
   local AchievementButtonPosition = {
-    White = {pos = {-25, 1.50, -8}, rot = {0, 180, 0}},
-    Red = {pos = {18, 1.50, -8}, rot = {0, 180, 0}},
-    Blue = {pos = {-18, 1.50, 8}, rot = {0, 0, 0}},
-    Green = {pos = {25, 1.50, 8}, rot = {0, 0, 0}}
+    White = { pos = { -25, 1.50, -8 }, rot = { 0, 180, 0 } },
+    Red = { pos = { 18, 1.50, -8 }, rot = { 0, 180, 0 } },
+    Blue = { pos = { -18, 1.50, 8 }, rot = { 0, 0, 0 } },
+    Green = { pos = { 25, 1.50, 8 }, rot = { 0, 0, 0 } }
   }
 
   local table_obj = getObjectFromGUID("4ee1f2")
@@ -489,9 +508,9 @@ function createAchievementCountButtons()
         font_size = 500,
         position = table_obj.positionToLocal(Vector(AchievementButtonPosition[player_color].pos)),
         rotation = AchievementButtonPosition[player_color].rot,
-        scale = {0.5, 0.5, 0.5},
-        color = {r=1, g=0.796, b=0.196},
-        font_color = {r=0, g=0.15, b=0.298},
+        scale = { 0.5, 0.5, 0.5 },
+        color = { r = 1, g = 0.796, b = 0.196 },
+        font_color = { r = 0, g = 0.15, b = 0.298 },
         tooltip = player_color .. ":Achievement"
       })
       table_obj.createButton(score_button)
@@ -604,11 +623,11 @@ function click_setup()
       for i = #buttons, 1, -1 do
         local btn = buttons[i]
         if btn.click_function == "click_setup" or
-           btn.click_function == "toggleEchoes" or
-           btn.click_function == "toggleCities" or
-           btn.click_function == "toggleArtifacts" or
-           btn.click_function == "toggleFigures" or
-           btn.click_function == "toggleUnseen" then
+            btn.click_function == "toggleEchoes" or
+            btn.click_function == "toggleCities" or
+            btn.click_function == "toggleArtifacts" or
+            btn.click_function == "toggleFigures" or
+            btn.click_function == "toggleUnseen" then
           setup_button_obj.removeButton(btn.index)
         end
       end
@@ -634,31 +653,31 @@ function setupHud()
   point_value["text"] = "0"
   local i = 1
   for _, player in ipairs(p) do
-      player_attr["text"] = player.steam_name
-      player_attr["color"] = player.color
+    player_attr["text"] = player.steam_name
+    player_attr["color"] = player.color
 
-      self.UI.setAttributes("Player" .. i, player_attr)
-      self.UI.setAttributes("SPlayer" .. i, player_attr)
-      self.UI.setAttributes("BPlayer" .. i, player_attr)
-      self.UI.setAttributes("C" .. i, point_value)
-      self.UI.setAttributes("M" .. i, point_value)
-      self.UI.setAttributes("E" .. i, point_value)
-      self.UI.setAttributes("K" .. i, point_value)
-      self.UI.setAttributes("I" .. i, point_value)
-      self.UI.setAttributes("T" .. i, point_value)
-      self.UI.setAttributes("Score" .. i, point_value)
-      self.UI.setAttributes("Ach" .. i, point_value)
-      player_nums[player.color] = i
-      i = i + 1
+    self.UI.setAttributes("Player" .. i, player_attr)
+    self.UI.setAttributes("SPlayer" .. i, player_attr)
+    self.UI.setAttributes("BPlayer" .. i, player_attr)
+    self.UI.setAttributes("C" .. i, point_value)
+    self.UI.setAttributes("M" .. i, point_value)
+    self.UI.setAttributes("E" .. i, point_value)
+    self.UI.setAttributes("K" .. i, point_value)
+    self.UI.setAttributes("I" .. i, point_value)
+    self.UI.setAttributes("T" .. i, point_value)
+    self.UI.setAttributes("Score" .. i, point_value)
+    self.UI.setAttributes("Ach" .. i, point_value)
+    player_nums[player.color] = i
+    i = i + 1
   end
 end
 
 shown = {
-   battleInterface = false,
-   iniList = true,
-   soloMode = false,
-   spawner = false,
-   CameraControls = false
+  battleInterface = false,
+  iniList = true,
+  soloMode = false,
+  spawner = false,
+  CameraControls = false
 }
 
 function noop()

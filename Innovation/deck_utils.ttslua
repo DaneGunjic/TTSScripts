@@ -1,269 +1,270 @@
 function getBaseDeckOffsetCoords(deck_position)
-  local len = math.sqrt(deck_position.x * deck_position.x + deck_position.z * deck_position.z)
-  local dx = deck_position.x / len
-  local dz = deck_position.z / len
-  local new_x = deck_position.x + 5 * dx
-  local new_z = deck_position.z + 5 * dz
-  return new_x, new_z
+	local len = math.sqrt(deck_position.x * deck_position.x + deck_position.z * deck_position.z)
+	local dx = deck_position.x / len
+	local dz = deck_position.z / len
+	local new_x = deck_position.x + 5 * dx
+	local new_z = deck_position.z + 5 * dz
+	return new_x, new_z
 end
 
 function getReturnDeckZone(description, age, name)
-  if relic_names_to_zones[name] ~= nil then
-    return getObjectFromGUID(relic_names_to_zones[name])
-  end
+	if relic_names_to_zones[name] ~= nil then
+		return getObjectFromGUID(relic_names_to_zones[name])
+	end
 
-  local return_deck_zone = getObjectFromGUID(deck_zones[age])
-  if isCities(description) then return_deck_zone = getObjectFromGUID(deck_zones_cities[age]) end
-  if isEchoes(description) then return_deck_zone = getObjectFromGUID(deck_zones_echoes[age]) end
-  if isArtifacts(description) then return_deck_zone = getObjectFromGUID(deck_zones_artifacts[age]) end
-  if isFigures(description) then return_deck_zone = getObjectFromGUID(deck_zones_figures[age]) end
-  if isUnseen(description) then return_deck_zone = getObjectFromGUID(deck_zones_unseen[age]) end
-  return return_deck_zone
+	local return_deck_zone = getObjectFromGUID(deck_zones[age])
+	if isCities(description) then return_deck_zone = getObjectFromGUID(deck_zones_cities[age]) end
+	if isEchoes(description) then return_deck_zone = getObjectFromGUID(deck_zones_echoes[age]) end
+	if isArtifacts(description) then return_deck_zone = getObjectFromGUID(deck_zones_artifacts[age]) end
+	if isFigures(description) then return_deck_zone = getObjectFromGUID(deck_zones_figures[age]) end
+	if isUnseen(description) then return_deck_zone = getObjectFromGUID(deck_zones_unseen[age]) end
+	return return_deck_zone
 end
 
 function getDeck(age)
-  local zone = getObjectFromGUID(deck_zones[age])
-  local objects = zone.getObjects()
-  for _, deck in pairs(objects) do
-    if deck.type == "Deck" then return deck end
-  end
+	local zone = getObjectFromGUID(deck_zones[age])
+	local objects = zone.getObjects()
+	for _, deck in pairs(objects) do
+		if deck.type == "Deck" then return deck end
+	end
 
-  for _, obj in pairs(objects) do
-    if obj.type == "Card" then return obj end
-  end
+	for _, obj in pairs(objects) do
+		if obj.type == "Card" then return obj end
+	end
 
-  return nil
+	return nil
 end
 
 function getDeckOrCard(age)
-  local zone = getObjectFromGUID(deck_zones[age])
-  local objects = zone.getObjects()
-  for _, deck in pairs(objects) do
-    if deck.type == "Deck" or deck.type == "Card" then return deck end
-  end
+	local zone = getObjectFromGUID(deck_zones[age])
+	local objects = zone.getObjects()
+	for _, deck in pairs(objects) do
+		if deck.type == "Deck" or deck.type == "Card" then return deck end
+	end
 
-  return nil
+	return nil
 end
 
 function getDeckExpansion(expansion_deck)
-  local zone = getObjectFromGUID(expansion_deck)
-  local objects = zone.getObjects()
-  for _, deck in pairs(objects) do
-    if deck.type == "Deck" then return deck end
-  end
+	local zone = getObjectFromGUID(expansion_deck)
+	local objects = zone.getObjects()
+	for _, deck in pairs(objects) do
+		if deck.type == "Deck" then return deck end
+	end
 
-  for _, obj in pairs(objects) do
-    if obj.type == "Card" then return obj end
-  end
+	for _, obj in pairs(objects) do
+		if obj.type == "Card" then return obj end
+	end
 
-  return nil
+	return nil
 end
 
 function getDeckOrCardExpansion(expansion_deck)
-  local zone = getObjectFromGUID(expansion_deck)
-  local objects = zone.getObjects()
-  for _, deck in pairs(objects) do
-    if deck.type == "Deck" or deck.type == "Card" then return deck end
-  end
+	local zone = getObjectFromGUID(expansion_deck)
+	local objects = zone.getObjects()
+	for _, deck in pairs(objects) do
+		if deck.type == "Deck" or deck.type == "Card" then return deck end
+	end
 
-  return nil
+	return nil
 end
 
 function getDeckCities(age)
-  --print("getDeckCities AGE " .. age)
-  return getDeckExpansion(deck_zones_cities[age])
+	--print("getDeckCities AGE " .. age)
+	return getDeckExpansion(deck_zones_cities[age])
 end
 
 function getDeckOrCardCities(age)
-  --print("getDeckOrCardCities AGE " .. age)
-  return getDeckOrCardExpansion(deck_zones_cities[age])
+	--print("getDeckOrCardCities AGE " .. age)
+	return getDeckOrCardExpansion(deck_zones_cities[age])
 end
 
 function getDeckEchoes(age)
-  --print("getDeckEchoes AGE " .. age)
-  return getDeckExpansion(deck_zones_echoes[age])
+	--print("getDeckEchoes AGE " .. age)
+	return getDeckExpansion(deck_zones_echoes[age])
 end
 
 function getDeckOrCardEchoes(age)
-  --print("getDeckOrCardEchoes AGE " .. age)
-  return getDeckOrCardExpansion(deck_zones_echoes[age])
+	--print("getDeckOrCardEchoes AGE " .. age)
+	return getDeckOrCardExpansion(deck_zones_echoes[age])
 end
 
 function getDeckArtifacts(age)
-  --print("getDeckArtifacts AGE " .. age)
-  return getDeckExpansion(deck_zones_artifacts[age])
+	--print("getDeckArtifacts AGE " .. age)
+	return getDeckExpansion(deck_zones_artifacts[age])
 end
 
 function getDeckFigures(age)
-  --print("getDeckFigures AGE " .. age)
-  return getDeckExpansion(deck_zones_figures[age])
+	--print("getDeckFigures AGE " .. age)
+	return getDeckExpansion(deck_zones_figures[age])
 end
 
 function getDeckUnseen(age)
-  --print("getDeckFigures AGE " .. age)
-  return getDeckExpansion(deck_zones_unseen[age])
+	--print("getDeckFigures AGE " .. age)
+	return getDeckExpansion(deck_zones_unseen[age])
 end
 
 function getDeckOrCardFigures(age)
-  --print("getDeckOrCardFigures AGE " .. age)
-  return getDeckOrCardExpansion(deck_zones_figures[age])
+	--print("getDeckOrCardFigures AGE " .. age)
+	return getDeckOrCardExpansion(deck_zones_figures[age])
 end
 
 function getDescription(card)
-  local description = ""
-  if card.type == "Deck" then description = card.description else description = card.getDescription() end
-  return description
+	local description = ""
+	if card.type == "Deck" then description = card.description else description = card.getDescription() end
+	return description
 end
 
 function getCardAge(description)
-  return parse_card(description).age
+	return parse_card(description).age
 end
 
 function getCardColor(description)
-  return parse_card(description).color
+	return parse_card(description).color
 end
 
 function getCardsResources(description)
-  return parse_card(description).resources
+	return parse_card(description).resources
 end
 
 function getForecastCount(player)
-  local objs = Player[player].getHandObjects(2)
-  return #objs
+	local objs = Player[player].getHandObjects(2)
+	return #objs
 end
 
 function isBaseCard(description)
-  if string.sub(description, 1, 1) == "B" then
-    return true
-  end
-  return false
+	if string.sub(description, 1, 1) == "B" then
+		return true
+	end
+	return false
 end
 
 function isCities(description)
-  if string.sub(description, 1, 1) == "C" then
-    return true
-  end
-  return false
+	if string.sub(description, 1, 1) == "C" then
+		return true
+	end
+	return false
 end
 
 function isEchoes(description)
-  if string.sub(description, 1, 1) == "E" then
-    return true
-  end
-  return false
+	if string.sub(description, 1, 1) == "E" then
+		return true
+	end
+	return false
 end
 
 function isArtifacts(description)
-  if string.sub(description, 1, 1) == "A" then
-    return true
-  end
-  return false
+	if string.sub(description, 1, 1) == "A" then
+		return true
+	end
+	return false
 end
 
 function isFigures(description)
-  if string.sub(description, 1, 1) == "F" then
-    return true
-  end
-  return false
+	if string.sub(description, 1, 1) == "F" then
+		return true
+	end
+	return false
 end
 
 function isUnseen(description)
-  if string.sub(description, 1, 1) == "U" then
-    return true
-  end
-  return false
+	if string.sub(description, 1, 1) == "U" then
+		return true
+	end
+	return false
 end
 
 function isExpansion(description)
-  if isBaseCard(description) then
-    return false
-  end
-  return true
+	if isBaseCard(description) then
+		return false
+	end
+	return true
 end
 
 function parse_card(description)
-  local t = {}
-  t.type = string.sub(description, 1, 1)
-  local lookup_index = string.sub(description, 2, 2)
-  t.color = color_lookup[lookup_index]
-  local age = string.sub(description, 3, 3)
-  t.age = age
-  if t.type == "C" then
-    t.resources = string.sub(description, 4, 9)
-  else
-    t.resources = string.sub(description, 4, 7)
-  end
-  return t
+	local t = {}
+	t.type = string.sub(description, 1, 1)
+	local lookup_index = string.sub(description, 2, 2)
+	t.color = color_lookup[lookup_index]
+	local age = string.sub(description, 3, 3)
+	t.age = age
+	if t.type == "C" then
+		t.resources = string.sub(description, 4, 9)
+	else
+		t.resources = string.sub(description, 4, 7)
+	end
+	return t
 end
 
 function returnCardToDeck(card, age, description, name)
-  local return_deck_zone = getReturnDeckZone(description, age, name)
-  local return_deck_stuff = return_deck_zone.getObjects()
-  local deck_rotation = return_deck_zone.getRotation()
-  if #return_deck_stuff == 1 then
-    card.setPositionSmooth(return_deck_zone.getPosition(), false, true)
-    if isBaseCard(description) then
-      deck_rotation.y = deck_rotation.y + 90
-    end
-    deck_rotation.z = 0
-    deck_rotation.x = 180
-    card.setRotationSmooth(deck_rotation, false, true)
-  end
-  for k, return_deck in pairs(return_deck_stuff) do
-    if return_deck.type == "Deck" or return_deck.type == "Card" then
-      local deck_position = {}
+	local return_deck_zone = getReturnDeckZone(description, age, name)
+	local return_deck_stuff = return_deck_zone.getObjects()
+	local deck_rotation = return_deck_zone.getRotation()
+	if #return_deck_stuff == 1 then
+		card.setPositionSmooth(return_deck_zone.getPosition(), false, true)
+		if isBaseCard(description) then
+			deck_rotation.y = deck_rotation.y + 90
+		end
+		deck_rotation.z = 0
+		deck_rotation.x = 180
+		card.setRotationSmooth(deck_rotation, false, true)
+	end
+	for k, return_deck in pairs(return_deck_stuff) do
+		if return_deck.type == "Deck" or return_deck.type == "Card" then
+			local deck_position = {}
 
-      return_deck.highlightOn("Red",2)
+			return_deck.highlightOn("Red", 2)
 
-      deck_position = return_deck.getPosition()
+			deck_position = return_deck.getPosition()
 
-      local x_coord = 0
-      local y_coord = deck_position.y + 3
-      local z_coord = 0
-      if isExpansion(description) then
-        x_coord = deck_position.x + 3
-        z_coord = deck_position.z + 1
-      else
-        x_coord, z_coord = getBaseDeckOffsetCoords(deck_position)
-      end
-      deck_rotation = return_deck.getRotation()
-      Wait.time(function()
-        return_deck.setPositionSmooth({x_coord, y_coord, z_coord}, false, true)
-        return_deck.setLock(true)
-        --return_deck.setPosition({x_coord, y_coord, z_coord})
-        Wait.time(function()
-          card.setPositionSmooth(deck_position, false, true)
-          card.setRotationSmooth(deck_rotation, false, true)
-          Wait.time(function()
-            return_deck.setLock(false)
-            return_deck.setPositionSmooth({deck_position.x, deck_position.y + 5, deck_position.z }, false, true) end, 0.3)
-        end, 0.3)
-      end, 0.3)
-    end
-  end
+			local x_coord = 0
+			local y_coord = deck_position.y + 3
+			local z_coord = 0
+			if isExpansion(description) then
+				x_coord = deck_position.x + 3
+				z_coord = deck_position.z + 1
+			else
+				x_coord, z_coord = getBaseDeckOffsetCoords(deck_position)
+			end
+			deck_rotation = return_deck.getRotation()
+			Wait.time(function()
+				return_deck.setPositionSmooth({ x_coord, y_coord, z_coord }, false, true)
+				return_deck.setLock(true)
+				--return_deck.setPosition({x_coord, y_coord, z_coord})
+				Wait.time(function()
+					card.setPositionSmooth(deck_position, false, true)
+					card.setRotationSmooth(deck_rotation, false, true)
+					Wait.time(function()
+						return_deck.setLock(false)
+						return_deck.setPositionSmooth({ deck_position.x, deck_position.y + 5, deck_position.z }, false, true)
+					end, 0.3)
+				end, 0.3)
+			end, 0.3)
+		end
+	end
 end
 
 function returnCards()
-  local zone = getObjectFromGUID(return_zone)
-  local cards = zone.getObjects()
-  local age = 0
-  local description = ""
-  for i, card in pairs(cards) do
-    return_card = false
-    if card.type == "Deck" then
-      local deck_cards = card.getObjects()
-      description = deck_cards[1].description
-      name = ""
-      age = getAgeNum(description)
-      return_card = true
-    elseif card.type == "Card" then
-      description = card.getDescription()
-      name = card.getName()
-      age = getAgeNum(description)
-      return_card = true
-    end
-    if return_card then
-      returnCardToDeck(card, age, description, name)
-    end
-  end
+	local zone = getObjectFromGUID(return_zone)
+	local cards = zone.getObjects()
+	local age = 0
+	local description = ""
+	for i, card in pairs(cards) do
+		return_card = false
+		if card.type == "Deck" then
+			local deck_cards = card.getObjects()
+			description = deck_cards[1].description
+			name = ""
+			age = getAgeNum(description)
+			return_card = true
+		elseif card.type == "Card" then
+			description = card.getDescription()
+			name = card.getName()
+			age = getAgeNum(description)
+			return_card = true
+		end
+		if return_card then
+			returnCardToDeck(card, age, description, name)
+		end
+	end
 end

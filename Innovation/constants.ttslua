@@ -303,8 +303,8 @@ setup_button.function_owner = nil
 setup_button.width = 500
 setup_button.height = 500
 setup_button.font_size = 100
-setup_button.position = {0, 1.5, 0}
-setup_button.rotation = {0, 0, 0}
+setup_button.position = { 0, 1.5, 0 }
+setup_button.rotation = { 0, 0, 0 }
 
 player_nums = {}
 

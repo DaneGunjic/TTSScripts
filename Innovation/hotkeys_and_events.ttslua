@@ -1,325 +1,327 @@
 function errorhandler(err)
-   print( "ERROR:", err )
+	print("ERROR:", err)
 end
 
 update_timer_id = nil
 
 function UpdateGameState()
-  if update_timer_id ~= nil then return end
+	if update_timer_id ~= nil then return end
 
-  update_timer_id = Wait.time(function()
-    update_timer_id = nil
-    local err =  xpcall(doUpdate, errorhandler)
-    if err == false then
-      update_lock = false
-    end
-  end, 0.5)
+	update_timer_id = Wait.time(function()
+		update_timer_id = nil
+		local err = xpcall(doUpdate, errorhandler)
+		if err == false then
+			update_lock = false
+		end
+	end, 0.5)
 end
 
 function doUpdate()
-  --print("Do update")
-  if update_lock == false then
-    update_lock = true
-    if game_setup == true then
-      players = getSeatedPlayers()
+	--print("Do update")
+	if update_lock == false then
+		update_lock = true
+		if game_setup == true then
+			players = getSeatedPlayers()
 
-      local splays_per_player = {}
-      local resource_counts_per_player = {}
-      local top_cards_per_player = {}
+			local splays_per_player = {}
+			local resource_counts_per_player = {}
+			local top_cards_per_player = {}
 
-      for i, color in pairs(players) do
-        splays_per_player[color] = getPlayerSplays(color)
-        resource_counts_per_player[color] = getResourceCounts(color)
-        top_cards_per_player[color] = getTopCards(color)
-      end
+			for i, color in pairs(players) do
+				splays_per_player[color] = getPlayerSplays(color)
+				resource_counts_per_player[color] = getResourceCounts(color)
+				top_cards_per_player[color] = getTopCards(color)
+			end
 
-      local effective_counts_per_player = {}
-      for i, color in pairs(players) do
-        effective_counts_per_player[color] = {}
-        for resource, _ in pairs(resources) do
-           effective_counts_per_player[color][resource] = updateFromTopFiguresKarma(top_cards_per_player[color], resource_counts_per_player[color], resource, color)
-        end
-      end
+			local effective_counts_per_player = {}
+			for i, color in pairs(players) do
+				effective_counts_per_player[color] = {}
+				for resource, _ in pairs(resources) do
+					effective_counts_per_player[color][resource] = updateFromTopFiguresKarma(top_cards_per_player[color],
+						resource_counts_per_player[color], resource, color)
+				end
+			end
 
-      for i, player_color in pairs(players) do
-        local top_cards = top_cards_per_player[player_color]
-        updateResourceLabels(resource_counts_per_player[player_color], player_color, top_cards, effective_counts_per_player)
-        updateScoreCount(player_color, top_cards)
-        updateAchievementCount(player_color, top_cards, splays_per_player, resource_counts_per_player)
-        updateHandData(player_color, top_cards)
-      end
-    end
-    update_lock = false
-  end
+			for i, player_color in pairs(players) do
+				local top_cards = top_cards_per_player[player_color]
+				updateResourceLabels(resource_counts_per_player[player_color], player_color, top_cards,
+					effective_counts_per_player)
+				updateScoreCount(player_color, top_cards)
+				updateAchievementCount(player_color, top_cards, splays_per_player, resource_counts_per_player)
+				updateHandData(player_color, top_cards)
+			end
+		end
+		update_lock = false
+	end
 end
 
 function onObjectEnterScriptingZone(scripting_zone, object)
-  --print("onObjectEnterScriptingZone")
+	--print("onObjectEnterScriptingZone")
 
-  local zone_guid = scripting_zone.getGUID()
-  local is_player_zone = false
-  for _, guid in pairs(zone_zones) do
-    if guid == zone_guid then
-      is_player_zone = true
-      break
-    end
-  end
+	local zone_guid = scripting_zone.getGUID()
+	local is_player_zone = false
+	for _, guid in pairs(zone_zones) do
+		if guid == zone_guid then
+			is_player_zone = true
+			break
+		end
+	end
 
-  if is_player_zone then
-    object.registerCollisions()
-  end
+	if is_player_zone then
+		object.registerCollisions()
+	end
 
-  local f = get_zone_action_map()[zone_guid]
-  if f ~= nil then
-    f(object, scripting_zone)
-  end
+	local f = get_zone_action_map()[zone_guid]
+	if f ~= nil then
+		f(object, scripting_zone)
+	end
 
-  if is_player_zone or f ~= nil then
-    UpdateGameState()
-  end
+	if is_player_zone or f ~= nil then
+		UpdateGameState()
+	end
 end
 
 function onObjectLeaveScriptingZone(scripting_zone, object)
-  --print("onObjectLeaveScriptingZone")
-  local zone_guid = scripting_zone.getGUID()
-  local is_player_zone = false
-  for _, guid in pairs(zone_zones) do
-    if guid == zone_guid then
-      is_player_zone = true
-      break
-    end
-  end
+	--print("onObjectLeaveScriptingZone")
+	local zone_guid = scripting_zone.getGUID()
+	local is_player_zone = false
+	for _, guid in pairs(zone_zones) do
+		if guid == zone_guid then
+			is_player_zone = true
+			break
+		end
+	end
 
-  if is_player_zone then
-    object.unregisterCollisions()
-  else
-    return
-  end
+	if is_player_zone then
+		object.unregisterCollisions()
+	else
+		return
+	end
 
-  UpdateGameState()
+	UpdateGameState()
 end
 
 function onObjectCollisionEnter(object, collision_info)
-  --print("onObjectCollisionEnter")
-  if object.type == "Card" and collision_info.collision_object.type == "Card" then
-    local color = getCardColor(object.getDescription())
-    local other_color = getCardColor(collision_info.collision_object.getDescription())
+	--print("onObjectCollisionEnter")
+	if object.type == "Card" and collision_info.collision_object.type == "Card" then
+		local color = getCardColor(object.getDescription())
+		local other_color = getCardColor(collision_info.collision_object.getDescription())
 
-    if color and other_color and color == other_color then
-      local zones = object.getZones()
-      if zones then
-        for _, zone in pairs(zones) do
-          local player = player_by_zone(zone.getGUID())
-          if player then
-            local splay_state = get_splay_state(player, color)
-            if splay_state == "Left" then
-               local func = _G["splay_left_" .. color]
-               if func then func(object, player, 0) end
-            elseif splay_state == "Right" then
-               local func = _G["splay_right_" .. color]
-               if func then func(object, player, 0) end
-            elseif splay_state == "Up" then
-               local func = _G["splay_up_" .. color]
-               if func then func(object, player, 0) end
-            elseif splay_state == "Aslant" then
-               local func = _G["splay_aslant_" .. color]
-               if func then func(object, player, 0) end
-            end
-            break
-          end
-        end
-      end
-    end
-  end
+		if color and other_color and color == other_color then
+			local zones = object.getZones()
+			if zones then
+				for _, zone in pairs(zones) do
+					local player = player_by_zone(zone.getGUID())
+					if player then
+						local splay_state = get_splay_state(player, color)
+						if splay_state == "Left" then
+							local func = _G["splay_left_" .. color]
+							if func then func(object, player, 0) end
+						elseif splay_state == "Right" then
+							local func = _G["splay_right_" .. color]
+							if func then func(object, player, 0) end
+						elseif splay_state == "Up" then
+							local func = _G["splay_up_" .. color]
+							if func then func(object, player, 0) end
+						elseif splay_state == "Aslant" then
+							local func = _G["splay_aslant_" .. color]
+							if func then func(object, player, 0) end
+						end
+						break
+					end
+				end
+			end
+		end
+	end
 end
 
 function isTopPlayer(player)
-  return player == "Blue" or player == "Green"
+	return player == "Blue" or player == "Green"
 end
 
 function isBottomPlayer(player)
-  return player == "White" or player == "Red"
+	return player == "White" or player == "Red"
 end
 
 function return_hotkey(player, card)
-  if card == nil then
-    return
-  end
+	if card == nil then
+		return
+	end
 
-  if card.type == "Card" then
-    description = card.getDescription()
-    name = card.getName()
-    age = getAgeNum(description)
-    moveCardFromHand(player, card)
-    returnCardToDeck(card, age, description, name)
-    broadcastToAll(Player[player].steam_name .. " returned " .. name)
-  end
+	if card.type == "Card" then
+		description = card.getDescription()
+		name = card.getName()
+		age = getAgeNum(description)
+		moveCardFromHand(player, card)
+		returnCardToDeck(card, age, description, name)
+		broadcastToAll(Player[player].steam_name .. " returned " .. name)
+	end
 end
 
 function tuck_hotkey(player, card)
-  if card == nil then
-    return
-  end
+	if card == nil then
+		return
+	end
 
-  if card.type == "Card" then
-    tuckCardNoZone(player, card)
-    --broadcastToAll(Player[player].steam_name .. " tucked " .. card.getName())
-  end
+	if card.type == "Card" then
+		tuckCardNoZone(player, card)
+		--broadcastToAll(Player[player].steam_name .. " tucked " .. card.getName())
+	end
 end
 
 function meld_hotkey(player, card)
-  if card == nil then
-    return
-  end
+	if card == nil then
+		return
+	end
 
-  if card.type == "Card" then
-    meldCard(player, card)
-    broadcastToAll(Player[player].steam_name .. " melded " .. card.getName())
-  end
+	if card.type == "Card" then
+		meldCard(player, card)
+		broadcastToAll(Player[player].steam_name .. " melded " .. card.getName())
+	end
 end
 
 function get_max_age_for_draw(player)
-  local max_age = getHighestAge(getTopCards(player))
-  if max_age == 0 then max_age = 1 end
-  local base_deck = nil
-  for i = max_age, 11 do
-    base_deck = getDeckOrCard(i)
-    if base_deck ~= nil then
-      return i, base_deck
-    end
-  end
-  return 12, nil
+	local max_age = getHighestAge(getTopCards(player))
+	if max_age == 0 then max_age = 1 end
+	local base_deck = nil
+	for i = max_age, 11 do
+		base_deck = getDeckOrCard(i)
+		if base_deck ~= nil then
+			return i, base_deck
+		end
+	end
+	return 12, nil
 end
 
 function draw_hotkey(player)
-  local age_to_draw, base_deck = get_max_age_for_draw(player)
+	local age_to_draw, base_deck = get_max_age_for_draw(player)
 
-  if age_to_draw > 11 then
-    broadcastToAll("GAME OVER: " .. getPlayerName(player) .. " attempts to draw from Age " .. age_to_draw)
-    return
-  end
+	if age_to_draw > 11 then
+		broadcastToAll("GAME OVER: " .. getPlayerName(player) .. " attempts to draw from Age " .. age_to_draw)
+		return
+	end
 
-  local try_echoes = false
-  if expansion_is_active("echoes") then
-    local top_cards = getTopCards(player)
-    local highest_age = getHighestAge(top_cards)
+	local try_echoes = false
+	if expansion_is_active("echoes") then
+		local top_cards = getTopCards(player)
+		local highest_age = getHighestAge(top_cards)
 
-    if highest_age > 0 then
-      local count = 0
-      for _, desc in pairs(top_cards) do
-        if getAgeNum(desc) == highest_age then
-          count = count + 1
-        end
-      end
+		if highest_age > 0 then
+			local count = 0
+			for _, desc in pairs(top_cards) do
+				if getAgeNum(desc) == highest_age then
+					count = count + 1
+				end
+			end
 
-      if count == 1 then
-        try_echoes = true
-      end
-    end
-  end
+			if count == 1 then
+				try_echoes = true
+			end
+		end
+	end
 
-  if try_echoes then
-    local echoes_deck = getDeckOrCardEchoes(age_to_draw)
-    if echoes_deck ~= nil then
-      echoes_deck.deal(1, player)
-      broadcastToAll(getPlayerName(player) .. " draws echo card age " .. tostring(age_to_draw))
-      return
-    else
-      broadcastToAll("Echoes deck " .. age_to_draw .. " is empty. Drawing Base card instead.")
-    end
-  end
+	if try_echoes then
+		local echoes_deck = getDeckOrCardEchoes(age_to_draw)
+		if echoes_deck ~= nil then
+			echoes_deck.deal(1, player)
+			broadcastToAll(getPlayerName(player) .. " draws echo card age " .. tostring(age_to_draw))
+			return
+		else
+			broadcastToAll("Echoes deck " .. age_to_draw .. " is empty. Drawing Base card instead.")
+		end
+	end
 
-  if base_deck ~= nil and (base_deck.type == "Deck" or base_deck.type == "Card") then
-    base_deck.deal(1, player)
-    broadcastToAll(getPlayerName(player) .. " draws base card age " .. tostring(age_to_draw))
-  end
+	if base_deck ~= nil and (base_deck.type == "Deck" or base_deck.type == "Card") then
+		base_deck.deal(1, player)
+		broadcastToAll(getPlayerName(player) .. " draws base card age " .. tostring(age_to_draw))
+	end
 end
 
 function draw_city_hotkey(player)
-  if not expansion_is_active("cities") then return end
+	if not expansion_is_active("cities") then return end
 
-  local max_age = select(1, get_max_age_for_draw(player))
+	local max_age = select(1, get_max_age_for_draw(player))
 
-  local cards_in_hand = Player[player].getHandObjects(1)
-  local has_city = false
-  for i, card in pairs(cards_in_hand) do
-    if isCities(card.getDescription()) then
-      has_city = true
-      break
-    end
-  end
+	local cards_in_hand = Player[player].getHandObjects(1)
+	local has_city = false
+	for i, card in pairs(cards_in_hand) do
+		if isCities(card.getDescription()) then
+			has_city = true
+			break
+		end
+	end
 
-  if has_city then
-    broadcastToAll(getPlayerName(player) .. " already has a city!")
-    return
-  end
+	if has_city then
+		broadcastToAll(getPlayerName(player) .. " already has a city!")
+		return
+	end
 
-  local cities_deck = getDeckOrCardCities(max_age)
-  if cities_deck ~= nil then
-    cities_deck.deal(1, player)
-    broadcastToAll(getPlayerName(player) .. " draws city card age " .. tostring(max_age))
-    return
-  end
+	local cities_deck = getDeckOrCardCities(max_age)
+	if cities_deck ~= nil then
+		cities_deck.deal(1, player)
+		broadcastToAll(getPlayerName(player) .. " draws city card age " .. tostring(max_age))
+		return
+	end
 end
 
 function draw_figure_hotkey(player)
-  if not expansion_is_active("figures") then return end
+	if not expansion_is_active("figures") then return end
 
-  local max_age = select(1, get_max_age_for_draw(player))
+	local max_age = select(1, get_max_age_for_draw(player))
 
-  local figures_deck = getDeckOrCardFigures(max_age)
-  if figures_deck ~= nil then
-    figures_deck.deal(1, player)
-    broadcastToAll(getPlayerName(player) .. " draws figure card age " .. tostring(max_age))
-    return
-  end
+	local figures_deck = getDeckOrCardFigures(max_age)
+	if figures_deck ~= nil then
+		figures_deck.deal(1, player)
+		broadcastToAll(getPlayerName(player) .. " draws figure card age " .. tostring(max_age))
+		return
+	end
 end
 
 function copy_card_data_hotkey(player_color)
-  local zone_old = getObjectFromGUID(zoneOldCard)
-  local zone_new = getObjectFromGUID(zoneNewCard)
+	local zone_old = getObjectFromGUID(zoneOldCard)
+	local zone_new = getObjectFromGUID(zoneNewCard)
 
-  if not zone_old or not zone_new then
-    broadcastToColor("Error: Could not find one of the zones.", player_color, {1,0,0})
-    return
-  end
+	if not zone_old or not zone_new then
+		broadcastToColor("Error: Could not find one of the zones.", player_color, { 1, 0, 0 })
+		return
+	end
 
-  local card_old = nil
-  for _, obj in ipairs(zone_old.getObjects()) do
-    if obj.type == "Card" then
-      card_old = obj
-      break
-    end
-  end
+	local card_old = nil
+	for _, obj in ipairs(zone_old.getObjects()) do
+		if obj.type == "Card" then
+			card_old = obj
+			break
+		end
+	end
 
-  local card_new = nil
-  for _, obj in ipairs(zone_new.getObjects()) do
-    if obj.type == "Card" then
-      card_new = obj
-      break
-    end
-  end
+	local card_new = nil
+	for _, obj in ipairs(zone_new.getObjects()) do
+		if obj.type == "Card" then
+			card_new = obj
+			break
+		end
+	end
 
-  if card_old and card_new then
-    card_new.setName(card_old.getName())
-    card_new.setDescription(card_old.getDescription())
-    broadcastToColor("Copied data from " .. card_old.getName() .. " to new card.", player_color, {0,1,0})
-  else
-    broadcastToColor("Error: Could not find cards in both zones.", player_color, {1,0,0})
-  end
+	if card_old and card_new then
+		card_new.setName(card_old.getName())
+		card_new.setDescription(card_old.getDescription())
+		broadcastToColor("Copied data from " .. card_old.getName() .. " to new card.", player_color, { 0, 1, 0 })
+	else
+		broadcastToColor("Error: Could not find cards in both zones.", player_color, { 1, 0, 0 })
+	end
 end
 
 function register_hotkeys()
-  local h = {
-    Return = return_hotkey,
-    Tuck = tuck_hotkey,
-    Meld = meld_hotkey,
-    Draw = draw_hotkey,
-    DrawCity = draw_city_hotkey,
-    DrawFigure = draw_figure_hotkey,
-    CopyCardData = copy_card_data_hotkey
-  }
-  for name, fn in pairs(h) do
-    addHotkey(name, fn)
-  end
+	local h = {
+		Return = return_hotkey,
+		Tuck = tuck_hotkey,
+		Meld = meld_hotkey,
+		Draw = draw_hotkey,
+		DrawCity = draw_city_hotkey,
+		DrawFigure = draw_figure_hotkey,
+		CopyCardData = copy_card_data_hotkey
+	}
+	for name, fn in pairs(h) do
+		addHotkey(name, fn)
+	end
 end
