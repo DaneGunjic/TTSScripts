@@ -288,7 +288,7 @@ function meldToEmptyZone(player_color, card)
 
     if has_cards == false then
       local zone_pos = meld_zone.getPosition()
-      card.setPositionSmooth(zone_pos)
+      card.setPosition(zone_pos)
       return
     end
   end
@@ -314,7 +314,7 @@ end
 function placeCardOverObject(card, obj)
   local pos = obj.getPosition()
   pos.y = pos.y + 1
-  card.setPositionSmooth(pos, false, true)
+  card.setPosition(pos)
 end
 
 function objectInZone(object, in_zone)

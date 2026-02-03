@@ -65,15 +65,16 @@ function onObjectEnterScriptingZone(scripting_zone, object)
     end
   end
 
+  if is_player_zone then
+    object.registerCollisions()
+  end
+
   local f = get_zone_action_map()[zone_guid]
   if f ~= nil then
     f(object, scripting_zone)
-    UpdateGameState()
-    return
   end
 
-  if is_player_zone then
-    object.registerCollisions()
+  if is_player_zone or f ~= nil then
     UpdateGameState()
   end
 end
@@ -181,41 +182,56 @@ function get_max_age_for_draw(player)
   local max_age = getHighestAge(getTopCards(player))
   if max_age == 0 then max_age = 1 end
   local base_deck = nil
-  for i = max_age, 10 do
+  for i = max_age, 11 do
     base_deck = getDeckOrCard(i)
     if base_deck ~= nil then
       return i, base_deck
     end
   end
-  return max_age, base_deck
+  return 12, nil
 end
 
 function draw_hotkey(player)
-  local max_age, base_deck = get_max_age_for_draw(player)
+  local age_to_draw, base_deck = get_max_age_for_draw(player)
 
+  if age_to_draw > 11 then
+    broadcastToAll("GAME OVER: " .. getPlayerName(player) .. " attempts to draw from Age " .. age_to_draw)
+    return
+  end
+
+  local try_echoes = false
   if expansion_is_active("echoes") then
-    local cards_in_hand = Player[player].getHandObjects(1)
-    local has_echo = false
-    for i, card in pairs(cards_in_hand) do
-      if isEchoes(card.getDescription()) then
-        has_echo = true
-        break
+    local top_cards = getTopCards(player)
+    local highest_age = getHighestAge(top_cards)
+
+    if highest_age > 0 then
+      local count = 0
+      for _, desc in pairs(top_cards) do
+        if getAgeNum(desc) == highest_age then
+          count = count + 1
+        end
+      end
+
+      if count == 1 then
+        try_echoes = true
       end
     end
+  end
 
-    if not has_echo and #cards_in_hand > 0 then
-      local echoes_deck = getDeckOrCardEchoes(max_age)
-      if echoes_deck ~= nil then
-        echoes_deck.deal(1, player)
-        broadcastToAll(getPlayerName(player) .. " draws echo card age " .. tostring(max_age))
-        return
-      end
+  if try_echoes then
+    local echoes_deck = getDeckOrCardEchoes(age_to_draw)
+    if echoes_deck ~= nil then
+      echoes_deck.deal(1, player)
+      broadcastToAll(getPlayerName(player) .. " draws echo card age " .. tostring(age_to_draw))
+      return
+    else
+      broadcastToAll("Echoes deck " .. age_to_draw .. " is empty. Drawing Base card instead.")
     end
   end
 
   if base_deck ~= nil and (base_deck.type == "Deck" or base_deck.type == "Card") then
     base_deck.deal(1, player)
-    broadcastToAll(getPlayerName(player) .. " draws base card age " .. tostring(max_age))
+    broadcastToAll(getPlayerName(player) .. " draws base card age " .. tostring(age_to_draw))
   end
 end
 
