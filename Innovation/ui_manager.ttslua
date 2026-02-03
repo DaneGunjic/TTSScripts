@@ -1,124 +1,124 @@
 function createReturnButton()
-  local zone = getObjectFromGUID(return_zone)
-  return_button = {}
-  return_button.click_function = "returnCards"
-  return_button.label = "Return"
-  return_button.guid = "bad911"
-  return_button.function_owner = nil
-  return_button.width = 1000
-  return_button.height = 400
-  return_button.font_size = 300
-  return_button.position = { -0.7, -0.4, 0 }
-  return_button.rotation = { 0, -90, 0 }
-  return_button.scale = { 0.5, 0.2, 0.2 }
+	local zone = getObjectFromGUID(return_zone)
+	return_button = {}
+	return_button.click_function = "returnCards"
+	return_button.label = "Return"
+	return_button.guid = "bad911"
+	return_button.function_owner = nil
+	return_button.width = 1000
+	return_button.height = 400
+	return_button.font_size = 300
+	return_button.position = { -0.7, -0.4, 0 }
+	return_button.rotation = { 0, -90, 0 }
+	return_button.scale = { 0.5, 0.2, 0.2 }
 
-  zone.createButton(return_button)
+	zone.createButton(return_button)
 end
 
 function createSplayButtons()
-  table_obj = getObjectFromGUID("4ee1f2")
-  if table_obj == nil then return end
+	table_obj = getObjectFromGUID("4ee1f2")
+	if table_obj == nil then return end
 
-  FirstSplayButtonForColor = {
-    White = { pos = { -40, 1.50, -17.15 }, rot = { 0, 180, 0 } },
-    Red = { pos = { 6, 1.50, -17.15 }, rot = { 0, 180, 0 } },
-    Green = { pos = { 40, 1.50, 17.15 }, rot = { 0, 0, 0 } },
-    Blue = { pos = { -5, 1.50, 17.15 }, rot = { 0, 0, 0 } },
-  }
+	FirstSplayButtonForColor = {
+		White = { pos = { -40, 1.50, -17.15 }, rot = { 0, 180, 0 } },
+		Red = { pos = { 6, 1.50, -17.15 }, rot = { 0, 180, 0 } },
+		Green = { pos = { 40, 1.50, 17.15 }, rot = { 0, 0, 0 } },
+		Blue = { pos = { -5, 1.50, 17.15 }, rot = { 0, 0, 0 } },
+	}
 
-  for _, color in ipairs(getSeatedPlayers()) do
-    for i, card_color in ipairs(card_colors) do
-      local offset = Vector(0, 0, (i - 1) * 3.5)
-      offset:rotateOver('y', FirstSplayButtonForColor[color].rot[2])
-      local pos = Vector(FirstSplayButtonForColor[color].pos) + offset
+	for _, color in ipairs(getSeatedPlayers()) do
+		for i, card_color in ipairs(card_colors) do
+			local offset = Vector(0, 0, (i - 1) * 3.5)
+			offset:rotateOver('y', FirstSplayButtonForColor[color].rot[2])
+			local pos = Vector(FirstSplayButtonForColor[color].pos) + offset
 
-      table_obj.createButton({
-        click_function = "no_splay_" .. card_color,
-        label = card_color .. "\nNot Splayed",
-        function_owner = nil,
-        width = 2000,
-        height = 1500,
-        font_size = 350,
-        position = table_obj.positionToLocal(pos),
-        rotation = FirstSplayButtonForColor[color].rot,
-        scale = { 0.2, 1, 0.2 },
-        tooltip = color .. ":Reset Splay",
-        color = card_color
-      })
+			table_obj.createButton({
+				click_function = "no_splay_" .. card_color,
+				label = card_color .. "\nNot Splayed",
+				function_owner = nil,
+				width = 2000,
+				height = 1500,
+				font_size = 350,
+				position = table_obj.positionToLocal(pos),
+				rotation = FirstSplayButtonForColor[color].rot,
+				scale = { 0.2, 1, 0.2 },
+				tooltip = color .. ":Reset Splay",
+				color = card_color
+			})
 
-      -- Left splay button
-      local offset_left = Vector(-2.2, 0, 0)
-      offset_left:rotateOver('y', FirstSplayButtonForColor[color].rot[2])
-      local pos_left = table_obj.positionToLocal(Vector(pos) + offset_left)
+			-- Left splay button
+			local offset_left = Vector(-2.2, 0, 0)
+			offset_left:rotateOver('y', FirstSplayButtonForColor[color].rot[2])
+			local pos_left = table_obj.positionToLocal(Vector(pos) + offset_left)
 
-      table_obj.createButton({
-        click_function = "splay_left_" .. card_color,
-        label = "<",
-        function_owner = nil,
-        width = 500,
-        height = 500,
-        font_size = 350,
-        position = pos_left,
-        rotation = FirstSplayButtonForColor[color].rot,
-        scale = { 0.2, 1, 0.2 },
-        tooltip = "Splay Left"
-      })
+			table_obj.createButton({
+				click_function = "splay_left_" .. card_color,
+				label = "<",
+				function_owner = nil,
+				width = 500,
+				height = 500,
+				font_size = 350,
+				position = pos_left,
+				rotation = FirstSplayButtonForColor[color].rot,
+				scale = { 0.2, 1, 0.2 },
+				tooltip = "Splay Left"
+			})
 
-      -- Up splay button
-      local offset_up = Vector(0, 0, -1.5)
-      offset_up:rotateOver('y', FirstSplayButtonForColor[color].rot[2])
-      local pos_up = table_obj.positionToLocal(Vector(pos) + offset_up)
+			-- Up splay button
+			local offset_up = Vector(0, 0, -1.5)
+			offset_up:rotateOver('y', FirstSplayButtonForColor[color].rot[2])
+			local pos_up = table_obj.positionToLocal(Vector(pos) + offset_up)
 
-      table_obj.createButton({
-        click_function = "splay_up_" .. card_color,
-        label = "^",
-        function_owner = nil,
-        width = 500,
-        height = 500,
-        font_size = 350,
-        position = pos_up,
-        rotation = FirstSplayButtonForColor[color].rot,
-        scale = { 0.2, 1, 0.2 },
-        tooltip = "Splay Up"
-      })
+			table_obj.createButton({
+				click_function = "splay_up_" .. card_color,
+				label = "^",
+				function_owner = nil,
+				width = 500,
+				height = 500,
+				font_size = 350,
+				position = pos_up,
+				rotation = FirstSplayButtonForColor[color].rot,
+				scale = { 0.2, 1, 0.2 },
+				tooltip = "Splay Up"
+			})
 
-      -- Right splay button
-      local offset_right = Vector(2.2, 0, 0)
-      offset_right:rotateOver('y', FirstSplayButtonForColor[color].rot[2])
-      local pos_right = table_obj.positionToLocal(Vector(pos) + offset_right)
+			-- Right splay button
+			local offset_right = Vector(2.2, 0, 0)
+			offset_right:rotateOver('y', FirstSplayButtonForColor[color].rot[2])
+			local pos_right = table_obj.positionToLocal(Vector(pos) + offset_right)
 
-      table_obj.createButton({
-        click_function = "splay_right_" .. card_color,
-        label = ">",
-        function_owner = nil,
-        width = 500,
-        height = 500,
-        font_size = 350,
-        position = pos_right,
-        rotation = FirstSplayButtonForColor[color].rot,
-        scale = { 0.2, 1, 0.2 },
-        tooltip = "Splay Right"
-      })
+			table_obj.createButton({
+				click_function = "splay_right_" .. card_color,
+				label = ">",
+				function_owner = nil,
+				width = 500,
+				height = 500,
+				font_size = 350,
+				position = pos_right,
+				rotation = FirstSplayButtonForColor[color].rot,
+				scale = { 0.2, 1, 0.2 },
+				tooltip = "Splay Right"
+			})
 
-      -- Aslant splay button
-      local offset_aslant = Vector(2.2, 0, -1.5)
-      offset_aslant:rotateOver('y', FirstSplayButtonForColor[color].rot[2])
-      local pos_aslant = table_obj.positionToLocal(Vector(pos) + offset_aslant)
+			-- Aslant splay button
+			local offset_aslant = Vector(2.2, 0, -1.5)
+			offset_aslant:rotateOver('y', FirstSplayButtonForColor[color].rot[2])
+			local pos_aslant = table_obj.positionToLocal(Vector(pos) + offset_aslant)
 
-      table_obj.createButton({
-        click_function = "splay_aslant_" .. card_color,
-        label = "/",
-        function_owner = nil,
-        width = 500,
-        height = 500,
-        font_size = 350,
-        position = pos_aslant,
-        rotation = FirstSplayButtonForColor[color].rot,
-        scale = { 0.2, 1, 0.2 },
-        tooltip = "Splay Aslant"
-      })
-    end
-  end
+			table_obj.createButton({
+				click_function = "splay_aslant_" .. card_color,
+				label = "/",
+				function_owner = nil,
+				width = 500,
+				height = 500,
+				font_size = 350,
+				position = pos_aslant,
+				rotation = FirstSplayButtonForColor[color].rot,
+				scale = { 0.2, 1, 0.2 },
+				tooltip = "Splay Aslant"
+			})
+		end
+	end
 end
 
 function toggleEchoes(obj, color, alt) toggleExpansionHelper("echoes", "Echoes") end
@@ -132,224 +132,224 @@ function toggleFigures(obj, color, alt) toggleExpansionHelper("figures", "Figure
 function toggleUnseen(obj, color, alt) toggleExpansionHelper("unseen", "Unseen") end
 
 function toggleExpansionHelper(key, name)
-  expansions[key] = not expansions[key]
-  local status = "OFF"
-  local button_color = { 0.05, 0.05, 0.05, 1 }
-  if expansions[key] then
-    status = "ON"
-    button_color = { 0, 0.5, 0, 1 }
-  end
+	expansions[key] = not expansions[key]
+	local status = "OFF"
+	local button_color = { 0.05, 0.05, 0.05, 1 }
+	if expansions[key] then
+		status = "ON"
+		button_color = { 0, 0.5, 0, 1 }
+	end
 
-  local setup_button_obj = getObjectFromGUID(setup_button.guid)
-  local buttons = setup_button_obj.getButtons()
-  for i, btn in ipairs(buttons) do
-    if btn.click_function == "toggle" .. name then
-      setup_button_obj.editButton({
-        index = btn.index,
-        label = name .. " [" .. status .. "]",
-        color = button_color
-      })
-      break
-    end
-  end
+	local setup_button_obj = getObjectFromGUID(setup_button.guid)
+	local buttons = setup_button_obj.getButtons()
+	for i, btn in ipairs(buttons) do
+		if btn.click_function == "toggle" .. name then
+			setup_button_obj.editButton({
+				index = btn.index,
+				label = name .. " [" .. status .. "]",
+				color = button_color
+			})
+			break
+		end
+	end
 end
 
 function createSetupButtons()
-  local setup_button_obj = getObjectFromGUID(setup_button.guid)
-  if setup_button_obj ~= nil then
-    local exps = {
-      { key = "echoes",  label = "Echoes",  func = "toggleEchoes",  z = -4 },
-      { key = "cities",  label = "Cities",  func = "toggleCities",  z = -3 },
-      { key = "artifacts", label = "Artifacts", func = "toggleArtifacts", z = -2 },
-      { key = "figures", label = "Figures", func = "toggleFigures", z = -1 },
-      { key = "unseen",  label = "Unseen",  func = "toggleUnseen",  z = 0 }
-    }
+	local setup_button_obj = getObjectFromGUID(setup_button.guid)
+	if setup_button_obj ~= nil then
+		local exps = {
+			{ key = "echoes",    label = "Echoes",    func = "toggleEchoes",    z = -4 },
+			{ key = "cities",    label = "Cities",    func = "toggleCities",    z = -3 },
+			{ key = "artifacts", label = "Artifacts", func = "toggleArtifacts", z = -2 },
+			{ key = "figures",   label = "Figures",   func = "toggleFigures",   z = -1 },
+			{ key = "unseen",    label = "Unseen",    func = "toggleUnseen",    z = 0 }
+		}
 
-    for _, ex in ipairs(exps) do
-      local status = "OFF"
-      local b_color = { 0.05, 0.05, 0.05, 1 }
-      if expansions[ex.key] then
-        status = "ON"
-        b_color = { 0, 0.5, 0, 1 }
-      end
+		for _, ex in ipairs(exps) do
+			local status = "OFF"
+			local b_color = { 0.05, 0.05, 0.05, 1 }
+			if expansions[ex.key] then
+				status = "ON"
+				b_color = { 0, 0.5, 0, 1 }
+			end
 
-      setup_button_obj.createButton({
-        click_function = ex.func,
-        label = ex.label .. " [" .. status .. "]",
-        width = 4000,
-        height = 1000,
-        font_size = 500,
-        position = { 0, 12, ex.z },
-        rotation = { 0, 180, 0 },
-        scale = { 0.2, 0.2, 0.2 },
-        font_color = { 1, 1, 1 },
-        color = b_color,
-      })
-    end
+			setup_button_obj.createButton({
+				click_function = ex.func,
+				label = ex.label .. " [" .. status .. "]",
+				width = 4000,
+				height = 1000,
+				font_size = 500,
+				position = { 0, 12, ex.z },
+				rotation = { 0, 180, 0 },
+				scale = { 0.2, 0.2, 0.2 },
+				font_color = { 1, 1, 1 },
+				color = b_color,
+			})
+		end
 
-    setup_button_obj.createButton({
-      click_function = "click_setup",
-      label = "Setup",
-      function_owner = nil,
-      width = 4000,
-      height = 1000,
-      font_size = 600,
-      position = { 0, 12, -5 },
-      rotation = { 0, 180, 0 },
-      scale = { 0.2, 0.2, 0.2 },
-      color = "Green",
-      font_color = { 0, 0, 0 },
-    })
-  end
+		setup_button_obj.createButton({
+			click_function = "click_setup",
+			label = "Setup",
+			function_owner = nil,
+			width = 4000,
+			height = 1000,
+			font_size = 600,
+			position = { 0, 12, -5 },
+			rotation = { 0, 180, 0 },
+			scale = { 0.2, 0.2, 0.2 },
+			color = "Green",
+			font_color = { 0, 0, 0 },
+		})
+	end
 end
 
 function createSplayControlButtons()
-  -- These are the locations of the splay control buttons on the table
-  local ColorShiftButtonPosition = {
-    White = { pos = { -45, 1.5, -24.12 }, rot = { 0, 180, 0 } },
-    Red = { pos = { 1, 1.5, -24.12 }, rot = { 0, 180, 0 } },
-    Green = { pos = { 45, 1.5, 24.12 }, rot = { 0, 0, 0 } },
-    Blue = { pos = { -2, 1.5, 24.12 }, rot = { 0, 0, 0 } },
-  }
+	-- These are the locations of the splay control buttons on the table
+	local ColorShiftButtonPosition = {
+		White = { pos = { -45, 1.5, -24.12 }, rot = { 0, 180, 0 } },
+		Red = { pos = { 1, 1.5, -24.12 }, rot = { 0, 180, 0 } },
+		Green = { pos = { 45, 1.5, 24.12 }, rot = { 0, 0, 0 } },
+		Blue = { pos = { -2, 1.5, 24.12 }, rot = { 0, 0, 0 } },
+	}
 
-  local table_obj = getObjectFromGUID("4ee1f2")
+	local table_obj = getObjectFromGUID("4ee1f2")
 
-  if table_obj == nil then return end
+	if table_obj == nil then return end
 
-  -- This is where we create the select buttons for each player
-  for _, color in ipairs(getSeatedPlayers()) do
-    if ColorShiftButtonPosition[color] then
-      local select_btn = makeButton({
-        click_function = "splaySelectClicked",
-        label = "Red",
-        function_owner = nil,
-        width = 1000,
-        height = 800,
-        font_size = 300,
-        font_color = { 1, 1, 1 },
-        position = table_obj.positionToLocal(ColorShiftButtonPosition[color].pos),
-        rotation = ColorShiftButtonPosition[color].rot,
-        color = { 0.05, 0.05, 0.05, 1 },
-        scale = { x = 0.2, y = 0.2, z = 0.2 },
-        tooltip = color .. ":Red"
-      })
+	-- This is where we create the select buttons for each player
+	for _, color in ipairs(getSeatedPlayers()) do
+		if ColorShiftButtonPosition[color] then
+			local select_btn = makeButton({
+				click_function = "splaySelectClicked",
+				label = "Red",
+				function_owner = nil,
+				width = 1000,
+				height = 800,
+				font_size = 300,
+				font_color = { 1, 1, 1 },
+				position = table_obj.positionToLocal(ColorShiftButtonPosition[color].pos),
+				rotation = ColorShiftButtonPosition[color].rot,
+				color = { 0.05, 0.05, 0.05, 1 },
+				scale = { x = 0.2, y = 0.2, z = 0.2 },
+				tooltip = color .. ":Red"
+			})
 
-      table_obj.createButton(select_btn)
+			table_obj.createButton(select_btn)
 
-      -- Directions
-      local dirs = {
-        { name = "Left", label = "←" },
-        { name = "Right", label = "→" },
-        { name = "Up", label = "↑" },
-        { name = "Down", label = "↓" }
-      }
+			-- Directions
+			local dirs = {
+				{ name = "Left", label = "←" },
+				{ name = "Right", label = "→" },
+				{ name = "Up", label = "↑" },
+				{ name = "Down", label = "↓" }
+			}
 
-      -- This is where we create the shift (arrow) buttons for each player
-      for _, d in pairs(dirs) do
-        local offset = Vector(0, 0, 0)
-        if d.name == "Left" then
-          offset = Vector(-1.4, 0, 0)
-        elseif d.name == "Right" then
-          offset = Vector(1.4, 0, 0)
-        elseif d.name == "Up" then
-          offset = Vector(0, 0, -1)
-        elseif d.name == "Down" then
-          offset = Vector(0, 0, 1)
-        end
+			-- This is where we create the shift (arrow) buttons for each player
+			for _, d in pairs(dirs) do
+				local offset = Vector(0, 0, 0)
+				if d.name == "Left" then
+					offset = Vector(-1.4, 0, 0)
+				elseif d.name == "Right" then
+					offset = Vector(1.4, 0, 0)
+				elseif d.name == "Up" then
+					offset = Vector(0, 0, -1)
+				elseif d.name == "Down" then
+					offset = Vector(0, 0, 1)
+				end
 
-        offset:rotateOver('y', ColorShiftButtonPosition[color].rot[2])
-        local local_pos = table_obj.positionToLocal(Vector(ColorShiftButtonPosition[color].pos) + offset)
+				offset:rotateOver('y', ColorShiftButtonPosition[color].rot[2])
+				local local_pos = table_obj.positionToLocal(Vector(ColorShiftButtonPosition[color].pos) + offset)
 
-        local shift_btn = makeButton({
-          click_function = "splayShift" .. d.name,
-          label = d.label,
-          function_owner = nil,
-          width = 500,
-          height = 500,
-          font_size = 300,
-          font_color = { 1, 1, 1 },
-          position = local_pos,
-          rotation = ColorShiftButtonPosition[color].rot,
-          color = { 0.05, 0.05, 0.05, 1 },
-          scale = { x = 0.2, y = 0.2, z = 0.2 }
-        })
+				local shift_btn = makeButton({
+					click_function = "splayShift" .. d.name,
+					label = d.label,
+					function_owner = nil,
+					width = 500,
+					height = 500,
+					font_size = 300,
+					font_color = { 1, 1, 1 },
+					position = local_pos,
+					rotation = ColorShiftButtonPosition[color].rot,
+					color = { 0.05, 0.05, 0.05, 1 },
+					scale = { x = 0.2, y = 0.2, z = 0.2 }
+				})
 
-        -- We use tooltips to determine which color the button belongs to
-        table_obj.createButton(shift_btn)
-        local idx = #table_obj.getButtons() - 1
-        table_obj.editButton({ index = idx, tooltipl = color .. ":" .. d.name })
-      end
-    end
-  end
+				-- We use tooltips to determine which color the button belongs to
+				table_obj.createButton(shift_btn)
+				local idx = #table_obj.getButtons() - 1
+				table_obj.editButton({ index = idx, tooltipl = color .. ":" .. d.name })
+			end
+		end
+	end
 end
 
 function splaySelectClicked(obj, player_clicker_color, alt_click)
-  local table_obj = getObjectFromGUID("4ee1f2")
-  local buttons = table_obj.getButtons()
+	local table_obj = getObjectFromGUID("4ee1f2")
+	local buttons = table_obj.getButtons()
 
-  -- Iterate to find the button belonging to the clicker
-  for i, btn in ipairs(buttons) do
-    if btn.click_function == "splaySelectClicked" then
-      local parts = {}
-      for part in string.gmatch(btn.tooltip, "([^:]+)") do
-        table.insert(parts, part)
-      end
+	-- Iterate to find the button belonging to the clicker
+	for i, btn in ipairs(buttons) do
+		if btn.click_function == "splaySelectClicked" then
+			local parts = {}
+			for part in string.gmatch(btn.tooltip, "([^:]+)") do
+				table.insert(parts, part)
+			end
 
-      local btn_owner = parts[1]
-      local current_color = parts[2]
+			local btn_owner = parts[1]
+			local current_color = parts[2]
 
-      -- Since we don't have the button index, we have to rely on `player_clicker_color` to find their button.
-      if btn_owner == player_clicker_color then
-        local next_color = getNextColor(current_color)
-        local new_tooltip = btn_owner .. ":" .. next_color
+			-- Since we don't have the button index, we have to rely on `player_clicker_color` to find their button.
+			if btn_owner == player_clicker_color then
+				local next_color = getNextColor(current_color)
+				local new_tooltip = btn_owner .. ":" .. next_color
 
-        table_obj.editButton({
-          index = btn.index,
-          label = next_color,
-          tooltip = new_tooltip
-        })
+				table_obj.editButton({
+					index = btn.index,
+					label = next_color,
+					tooltip = new_tooltip
+				})
 
-        select_splay_color(player_clicker_color, next_color)
-        return
-      end
-    end
-  end
+				select_splay_color(player_clicker_color, next_color)
+				return
+			end
+		end
+	end
 end
 
 function getNextColor(current)
-  for i, c in ipairs(card_colors) do
-    if c == current then
-      if i == #card_colors then
-        return card_colors[1]
-      else
-        return card_colors[i + 1]
-      end
-    end
-  end
-  return card_colors[1]
+	for i, c in ipairs(card_colors) do
+		if c == current then
+			if i == #card_colors then
+				return card_colors[1]
+			else
+				return card_colors[i + 1]
+			end
+		end
+	end
+	return card_colors[1]
 end
 
 function splayShiftClicked(obj, player_clicker_color, alt_click)
-  local table_obj = getObjectFromGUID("4ee1f2")
-  local buttons = table_obj.getButtons()
+	local table_obj = getObjectFromGUID("4ee1f2")
+	local buttons = table_obj.getButtons()
 
-  -- Find the button for the clicker to determine current selected color
-  local current_selected_color = nil
+	-- Find the button for the clicker to determine current selected color
+	local current_selected_color = nil
 
-  for i, btn in ipairs(buttons) do
-    if btn.click_function == "splaySelectClicked" then
-      local parts = {}
-      for part in string.gmatch(btn.tooltip, "([^:]+)") do
-        table.insert(parts, part)
-      end
-      if parts[1] == player_clicker_color then
-        current_selected_color = parts[2]
-        break
-      end
-    end
-  end
+	for i, btn in ipairs(buttons) do
+		if btn.click_function == "splaySelectClicked" then
+			local parts = {}
+			for part in string.gmatch(btn.tooltip, "([^:]+)") do
+				table.insert(parts, part)
+			end
+			if parts[1] == player_clicker_color then
+				current_selected_color = parts[2]
+				break
+			end
+		end
+	end
 
-  if current_selected_color == nil then return end
+	if current_selected_color == nil then return end
 end
 
 function splayShiftLeft(obj, color, alt) performShift(color, "Left") end
@@ -361,325 +361,325 @@ function splayShiftUp(obj, color, alt) performShift(color, "Up") end
 function splayShiftDown(obj, color, alt) performShift(color, "Down") end
 
 function performShift(player_color, dir)
-  local table_obj = getObjectFromGUID("4ee1f2")
-  local buttons = table_obj.getButtons()
-  local current_selected_color = nil
+	local table_obj = getObjectFromGUID("4ee1f2")
+	local buttons = table_obj.getButtons()
+	local current_selected_color = nil
 
-  for i, btn in ipairs(buttons) do
-    if btn.click_function == "splaySelectClicked" then
-      local parts = {}
-      for part in string.gmatch(btn.tooltip, "([^:]+)") do
-        table.insert(parts, part)
-      end
-      if parts[1] == player_color then
-        current_selected_color = parts[2]
-        break
-      end
-    end
-  end
+	for i, btn in ipairs(buttons) do
+		if btn.click_function == "splaySelectClicked" then
+			local parts = {}
+			for part in string.gmatch(btn.tooltip, "([^:]+)") do
+				table.insert(parts, part)
+			end
+			if parts[1] == player_color then
+				current_selected_color = parts[2]
+				break
+			end
+		end
+	end
 
-  if current_selected_color == nil then return end
+	if current_selected_color == nil then return end
 
-  select_splay_color(player_color, current_selected_color)
+	select_splay_color(player_color, current_selected_color)
 
-  if dir == "Left" then
-    shift_selected_color_left(player_color)
-  elseif dir == "Right" then
-    shift_selected_color_right(player_color)
-  elseif dir == "Up" then
-    shift_selected_color_up(player_color)
-  elseif dir == "Down" then
-    shift_selected_color_down(player_color)
-  end
+	if dir == "Left" then
+		shift_selected_color_left(player_color)
+	elseif dir == "Right" then
+		shift_selected_color_right(player_color)
+	elseif dir == "Up" then
+		shift_selected_color_up(player_color)
+	elseif dir == "Down" then
+		shift_selected_color_down(player_color)
+	end
 end
 
 function splayShiftClicked(player, value, id)
-  local table_obj = getObjectFromGUID("4ee1f2")
-  local buttons = table_obj.getButtons()
-  local btn = buttons[value]
-  local tip = btn.tooltip
-  local space = string.find(tip, " ")
-  if space == nil then return end
-  local color = string.sub(tip, 1, space - 1)
-  local dir = string.sub(tip, space + 1)
-  select_splay_color(player, color)
-  if dir == "Left" then
-    shift_selected_color_left(player)
-  elseif dir == "Right" then
-    shift_selected_color_right(player)
-  elseif dir == "Up" then
-    shift_selected_color_up(player)
-  elseif dir == "Down" then
-    shift_selected_color_down(player)
-  end
+	local table_obj = getObjectFromGUID("4ee1f2")
+	local buttons = table_obj.getButtons()
+	local btn = buttons[value]
+	local tip = btn.tooltip
+	local space = string.find(tip, " ")
+	if space == nil then return end
+	local color = string.sub(tip, 1, space - 1)
+	local dir = string.sub(tip, space + 1)
+	select_splay_color(player, color)
+	if dir == "Left" then
+		shift_selected_color_left(player)
+	elseif dir == "Right" then
+		shift_selected_color_right(player)
+	elseif dir == "Up" then
+		shift_selected_color_up(player)
+	elseif dir == "Down" then
+		shift_selected_color_down(player)
+	end
 end
 
 function createResourceButtons()
-  local players = getSeatedPlayers()
-  for _, player_color in pairs(players) do
-    if resource_indicators[player_color] ~= nil then
-      for _, resource in pairs(resources) do
-        local indicator_guid = resource_indicators[player_color][resource]
-        if indicator_guid ~= nil then
-          local indicator_obj = getObjectFromGUID(indicator_guid)
-          if indicator_obj ~= nil then
-            local score_button = makeButton({
-              click_function = "click_func",
-              color = { 1, 1, 1 },
-              font_color = { 0, 0, 0 },
-              label = "0",
-              function_owner = nil,
-              width = 600,
-              height = 600,
-              font_size = 600,
-              position = { 0, 0, -5 },
-              rotation = { 0, 0, 0 },
-              scale = { 4, 4, 4 }
-            })
+	local players = getSeatedPlayers()
+	for _, player_color in pairs(players) do
+		if resource_indicators[player_color] ~= nil then
+			for _, resource in pairs(resources) do
+				local indicator_guid = resource_indicators[player_color][resource]
+				if indicator_guid ~= nil then
+					local indicator_obj = getObjectFromGUID(indicator_guid)
+					if indicator_obj ~= nil then
+						local score_button = makeButton({
+							click_function = "click_func",
+							color = { 1, 1, 1 },
+							font_color = { 0, 0, 0 },
+							label = "0",
+							function_owner = nil,
+							width = 600,
+							height = 600,
+							font_size = 600,
+							position = { 0, 0, -5 },
+							rotation = { 0, 0, 0 },
+							scale = { 4, 4, 4 }
+						})
 
-            indicator_obj.createButton(score_button)
-          else
-            print("Error: Could not find object for resource " ..
-            resource .. " for player " .. player_color .. " with GUID " .. indicator_guid)
-          end
-        else
-          print("Warning: No GUID defined for resource " .. resource .. " for player " .. player_color)
-        end
-      end
-    else
-      print("Error: No resource indicators defined for player " .. player_color)
-    end
-  end
+						indicator_obj.createButton(score_button)
+					else
+						print("Error: Could not find object for resource " ..
+							resource .. " for player " .. player_color .. " with GUID " .. indicator_guid)
+					end
+				else
+					print("Warning: No GUID defined for resource " .. resource .. " for player " .. player_color)
+				end
+			end
+		else
+			print("Error: No resource indicators defined for player " .. player_color)
+		end
+	end
 end
 
 function createScoreButtons()
-  local ScoreButtonPosition = {
-    White = { pos = { -17, 1.50, -8 }, rot = { 0, 180, 0 } },
-    Red = { pos = { 25, 1.50, -8 }, rot = { 0, 180, 0 } },
-    Blue = { pos = { -25, 1.50, 8 }, rot = { 0, 0, 0 } },
-    Green = { pos = { 17, 1.50, 8 }, rot = { 0, 0, 0 } }
-  }
+	local ScoreButtonPosition = {
+		White = { pos = { -17, 1.50, -8 }, rot = { 0, 180, 0 } },
+		Red = { pos = { 25, 1.50, -8 }, rot = { 0, 180, 0 } },
+		Blue = { pos = { -25, 1.50, 8 }, rot = { 0, 0, 0 } },
+		Green = { pos = { 17, 1.50, 8 }, rot = { 0, 0, 0 } }
+	}
 
-  local table_obj = getObjectFromGUID("4ee1f2")
-  if table_obj == nil then return end
+	local table_obj = getObjectFromGUID("4ee1f2")
+	if table_obj == nil then return end
 
-  local players = getSeatedPlayers()
-  for i, player_color in pairs(players) do
-    if ScoreButtonPosition[player_color] then
-      local score_button = makeButton({
-        click_function = "click_func",
-        label = "0",
-        function_owner = nil,
-        width = 1200,
-        height = 1200,
-        font_size = 500,
-        position = table_obj.positionToLocal(Vector(ScoreButtonPosition[player_color].pos)),
-        rotation = ScoreButtonPosition[player_color].rot,
-        scale = { 0.5, 0.5, 0.5 },
-        color = { r = 0, g = 0.15, b = 0.298 },
-        font_color = { r = 1, g = 0.796, b = 0.196 },
-        tooltip = player_color .. ":Score"
-      })
-      table_obj.createButton(score_button)
-    end
-  end
+	local players = getSeatedPlayers()
+	for i, player_color in pairs(players) do
+		if ScoreButtonPosition[player_color] then
+			local score_button = makeButton({
+				click_function = "click_func",
+				label = "0",
+				function_owner = nil,
+				width = 1200,
+				height = 1200,
+				font_size = 500,
+				position = table_obj.positionToLocal(Vector(ScoreButtonPosition[player_color].pos)),
+				rotation = ScoreButtonPosition[player_color].rot,
+				scale = { 0.5, 0.5, 0.5 },
+				color = { r = 0, g = 0.15, b = 0.298 },
+				font_color = { r = 1, g = 0.796, b = 0.196 },
+				tooltip = player_color .. ":Score"
+			})
+			table_obj.createButton(score_button)
+		end
+	end
 end
 
 function createAchievementCountButtons()
-  local AchievementButtonPosition = {
-    White = { pos = { -25, 1.50, -8 }, rot = { 0, 180, 0 } },
-    Red = { pos = { 18, 1.50, -8 }, rot = { 0, 180, 0 } },
-    Blue = { pos = { -18, 1.50, 8 }, rot = { 0, 0, 0 } },
-    Green = { pos = { 25, 1.50, 8 }, rot = { 0, 0, 0 } }
-  }
+	local AchievementButtonPosition = {
+		White = { pos = { -25, 1.50, -8 }, rot = { 0, 180, 0 } },
+		Red = { pos = { 18, 1.50, -8 }, rot = { 0, 180, 0 } },
+		Blue = { pos = { -18, 1.50, 8 }, rot = { 0, 0, 0 } },
+		Green = { pos = { 25, 1.50, 8 }, rot = { 0, 0, 0 } }
+	}
 
-  local table_obj = getObjectFromGUID("4ee1f2")
-  if table_obj == nil then return end
+	local table_obj = getObjectFromGUID("4ee1f2")
+	if table_obj == nil then return end
 
-  local players = getSeatedPlayers()
-  for i, player_color in pairs(players) do
-    if AchievementButtonPosition[player_color] then
-      local score_button = makeButton({
-        click_function = "click_func",
-        label = "0",
-        function_owner = nil,
-        width = 1200,
-        height = 1200,
-        font_size = 500,
-        position = table_obj.positionToLocal(Vector(AchievementButtonPosition[player_color].pos)),
-        rotation = AchievementButtonPosition[player_color].rot,
-        scale = { 0.5, 0.5, 0.5 },
-        color = { r = 1, g = 0.796, b = 0.196 },
-        font_color = { r = 0, g = 0.15, b = 0.298 },
-        tooltip = player_color .. ":Achievement"
-      })
-      table_obj.createButton(score_button)
-    end
-  end
+	local players = getSeatedPlayers()
+	for i, player_color in pairs(players) do
+		if AchievementButtonPosition[player_color] then
+			local score_button = makeButton({
+				click_function = "click_func",
+				label = "0",
+				function_owner = nil,
+				width = 1200,
+				height = 1200,
+				font_size = 500,
+				position = table_obj.positionToLocal(Vector(AchievementButtonPosition[player_color].pos)),
+				rotation = AchievementButtonPosition[player_color].rot,
+				scale = { 0.5, 0.5, 0.5 },
+				color = { r = 1, g = 0.796, b = 0.196 },
+				font_color = { r = 0, g = 0.15, b = 0.298 },
+				tooltip = player_color .. ":Achievement"
+			})
+			table_obj.createButton(score_button)
+		end
+	end
 end
 
 function toggleScorePanels(player, value, id)
-  local right_arrow = "▶"
-  local left_arrow = "◀"
-  local button_text = self.UI.getAttribute("scorePanelBtn", "text")
-  local attrib = {}
-  if button_text == right_arrow then
-    self.UI.hide("ResourcePanel")
-    self.UI.hide("ScorePanel")
-    self.UI.hide("BoardPanel")
-    self.UI.hide("RightPanel")
-    attrib["text"] = left_arrow
-    self.UI.setAttributes("scorePanelBtn", attrib)
-  else
-    self.UI.show("ResourcePanel")
-    self.UI.show("ScorePanel")
-    self.UI.show("BoardPanel")
-    attrib["text"] = right_arrow
-    self.UI.setAttributes("scorePanelBtn", attrib)
+	local right_arrow = "▶"
+	local left_arrow = "◀"
+	local button_text = self.UI.getAttribute("scorePanelBtn", "text")
+	local attrib = {}
+	if button_text == right_arrow then
+		self.UI.hide("ResourcePanel")
+		self.UI.hide("ScorePanel")
+		self.UI.hide("BoardPanel")
+		self.UI.hide("RightPanel")
+		attrib["text"] = left_arrow
+		self.UI.setAttributes("scorePanelBtn", attrib)
+	else
+		self.UI.show("ResourcePanel")
+		self.UI.show("ScorePanel")
+		self.UI.show("BoardPanel")
+		attrib["text"] = right_arrow
+		self.UI.setAttributes("scorePanelBtn", attrib)
 
-    local button_text = self.UI.getAttribute("scorePanelBGBtn", "text")
-    if button_text == right_arrow then
-      self.UI.show("RightPanel")
-    end
-  end
+		local button_text = self.UI.getAttribute("scorePanelBGBtn", "text")
+		if button_text == right_arrow then
+			self.UI.show("RightPanel")
+		end
+	end
 end
 
 function toggleScoreBG(player, value, id)
-  local right_arrow = "▶"
-  local left_arrow = "◀"
-  local button_text = self.UI.getAttribute("scorePanelBGBtn", "text")
-  local attrib = {}
-  if button_text == right_arrow then
-    self.UI.hide("RightPanel")
-    attrib["text"] = left_arrow
-    self.UI.setAttributes("scorePanelBGBtn", attrib)
-  else
-    self.UI.show("RightPanel")
-    attrib["text"] = right_arrow
-    self.UI.setAttributes("scorePanelBGBtn", attrib)
-  end
+	local right_arrow = "▶"
+	local left_arrow = "◀"
+	local button_text = self.UI.getAttribute("scorePanelBGBtn", "text")
+	local attrib = {}
+	if button_text == right_arrow then
+		self.UI.hide("RightPanel")
+		attrib["text"] = left_arrow
+		self.UI.setAttributes("scorePanelBGBtn", attrib)
+	else
+		self.UI.show("RightPanel")
+		attrib["text"] = right_arrow
+		self.UI.setAttributes("scorePanelBGBtn", attrib)
+	end
 end
 
 function toggleArrow(buttonId)
-  local right_arrow = "▶"
-  local left_arrow = "◀"
-  local attrib = {}
-  local button_text = self.UI.getAttribute(buttonId, "text")
-  local isRight = button_text == right_arrow
-  attrib["text"] = isRight and left_arrow or right_arrow
-  self.UI.setAttributes(buttonId, attrib)
-  return isRight
+	local right_arrow = "▶"
+	local left_arrow = "◀"
+	local attrib = {}
+	local button_text = self.UI.getAttribute(buttonId, "text")
+	local isRight = button_text == right_arrow
+	attrib["text"] = isRight and left_arrow or right_arrow
+	self.UI.setAttributes(buttonId, attrib)
+	return isRight
 end
 
 function makeButton(props)
-  local b = {}
-  b.click_function = props.click_function
-  b.label = props.label
-  b.function_owner = props.function_owner
-  b.width = props.width
-  b.height = props.height
-  b.font_size = props.font_size
-  b.position = props.position
-  b.rotation = props.rotation
-  b.scale = props.scale
-  b.color = props.color
-  b.font_color = props.font_color
-  b.tooltip = props.tooltip
-  return b
+	local b = {}
+	b.click_function = props.click_function
+	b.label = props.label
+	b.function_owner = props.function_owner
+	b.width = props.width
+	b.height = props.height
+	b.font_size = props.font_size
+	b.position = props.position
+	b.rotation = props.rotation
+	b.scale = props.scale
+	b.color = props.color
+	b.font_color = props.font_color
+	b.tooltip = props.tooltip
+	return b
 end
 
 function expansion_is_active(id)
-  if expansions[id] then
-    return true
-  end
+	if expansions[id] then
+		return true
+	end
 
-  return false
+	return false
 end
 
 function click_setup()
-  setup()
+	setup()
 
-  if not expansions["cities"] then
-    remove_cities()
-  end
-  if not expansions["echoes"] then
-    remove_echoes()
-  end
-  if not expansions["artifacts"] then
-    remove_artifacts()
-  end
-  if not expansions["figures"] then
-    remove_figures()
-  end
-  if not expansions["unseen"] then
-    remove_unseen()
-  end
+	if not expansions["cities"] then
+		remove_cities()
+	end
+	if not expansions["echoes"] then
+		remove_echoes()
+	end
+	if not expansions["artifacts"] then
+		remove_artifacts()
+	end
+	if not expansions["figures"] then
+		remove_figures()
+	end
+	if not expansions["unseen"] then
+		remove_unseen()
+	end
 
 
-  local setup_button_obj = getObjectFromGUID(setup_button.guid)
-  if setup_button_obj ~= nil then
-    local buttons = setup_button_obj.getButtons()
-    if buttons ~= nil then
-      for i = #buttons, 1, -1 do
-        local btn = buttons[i]
-        if btn.click_function == "click_setup" or
-            btn.click_function == "toggleEchoes" or
-            btn.click_function == "toggleCities" or
-            btn.click_function == "toggleArtifacts" or
-            btn.click_function == "toggleFigures" or
-            btn.click_function == "toggleUnseen" then
-          setup_button_obj.removeButton(btn.index)
-        end
-      end
-    end
-  end
+	local setup_button_obj = getObjectFromGUID(setup_button.guid)
+	if setup_button_obj ~= nil then
+		local buttons = setup_button_obj.getButtons()
+		if buttons ~= nil then
+			for i = #buttons, 1, -1 do
+				local btn = buttons[i]
+				if btn.click_function == "click_setup" or
+						btn.click_function == "toggleEchoes" or
+						btn.click_function == "toggleCities" or
+						btn.click_function == "toggleArtifacts" or
+						btn.click_function == "toggleFigures" or
+						btn.click_function == "toggleUnseen" then
+					setup_button_obj.removeButton(btn.index)
+				end
+			end
+		end
+	end
 end
 
 function getPlayerName(color)
-  local p = Player.getPlayers()
-  for _, player in ipairs(p) do
-    if player.color == color then
-      return player.steam_name
-    end
-  end
+	local p = Player.getPlayers()
+	for _, player in ipairs(p) do
+		if player.color == color then
+			return player.steam_name
+		end
+	end
 
-  return color
+	return color
 end
 
 function setupHud()
-  local p = Player.getPlayers()
-  local player_attr = {}
-  local point_value = {}
-  point_value["text"] = "0"
-  local i = 1
-  for _, player in ipairs(p) do
-    player_attr["text"] = player.steam_name
-    player_attr["color"] = player.color
+	local p = Player.getPlayers()
+	local player_attr = {}
+	local point_value = {}
+	point_value["text"] = "0"
+	local i = 1
+	for _, player in ipairs(p) do
+		player_attr["text"] = player.steam_name
+		player_attr["color"] = player.color
 
-    self.UI.setAttributes("Player" .. i, player_attr)
-    self.UI.setAttributes("SPlayer" .. i, player_attr)
-    self.UI.setAttributes("BPlayer" .. i, player_attr)
-    self.UI.setAttributes("C" .. i, point_value)
-    self.UI.setAttributes("M" .. i, point_value)
-    self.UI.setAttributes("E" .. i, point_value)
-    self.UI.setAttributes("K" .. i, point_value)
-    self.UI.setAttributes("I" .. i, point_value)
-    self.UI.setAttributes("T" .. i, point_value)
-    self.UI.setAttributes("Score" .. i, point_value)
-    self.UI.setAttributes("Ach" .. i, point_value)
-    player_nums[player.color] = i
-    i = i + 1
-  end
+		self.UI.setAttributes("Player" .. i, player_attr)
+		self.UI.setAttributes("SPlayer" .. i, player_attr)
+		self.UI.setAttributes("BPlayer" .. i, player_attr)
+		self.UI.setAttributes("C" .. i, point_value)
+		self.UI.setAttributes("M" .. i, point_value)
+		self.UI.setAttributes("E" .. i, point_value)
+		self.UI.setAttributes("K" .. i, point_value)
+		self.UI.setAttributes("I" .. i, point_value)
+		self.UI.setAttributes("T" .. i, point_value)
+		self.UI.setAttributes("Score" .. i, point_value)
+		self.UI.setAttributes("Ach" .. i, point_value)
+		player_nums[player.color] = i
+		i = i + 1
+	end
 end
 
 shown = {
-  battleInterface = false,
-  iniList = true,
-  soloMode = false,
-  spawner = false,
-  CameraControls = false
+	battleInterface = false,
+	iniList = true,
+	soloMode = false,
+	spawner = false,
+	CameraControls = false
 }
 
 function noop()
-  return
+	return
 end

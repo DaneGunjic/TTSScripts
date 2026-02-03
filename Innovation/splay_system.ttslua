@@ -1,424 +1,377 @@
+-- Constants
+SPLAY_TYPE = {
+	STACK = 0,
+	LEFT = 1,
+	RIGHT = 2,
+	UP = 3,
+	ASLANT = 4
+}
+
+SPLAY_DIR_STR = {
+	[SPLAY_TYPE.STACK] = "None",
+	[SPLAY_TYPE.LEFT] = "Left",
+	[SPLAY_TYPE.RIGHT] = "Right",
+	[SPLAY_TYPE.UP] = "Up",
+	[SPLAY_TYPE.ASLANT] = "Aslant"
+}
+
+-- Splay state storage
+splay_state = {
+	White = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" },
+	Red = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" },
+	Blue = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" },
+	Green = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" }
+}
+
 function splay_cards(paramtable)
-  --print("splay_cards")
-  local splay_type = paramtable.newsplay
-  local zone = getObjectFromGUID(paramtable.zone)
-  local player = player_by_zone(paramtable.zone)
+	local splay_type_int = paramtable.newsplay
+	local zone = getObjectFromGUID(paramtable.zone)
+	local player_color = player_by_zone(paramtable.zone)
 
-  local dir = "None"
-  if splay_type == 1 then dir = "Left" end
-  if splay_type == 2 then dir = "Right" end
-  if splay_type == 3 then dir = "Up" end
-  if splay_type == 4 then dir = "Aslant" end
+	if not player_color then
+		print("Error: Could not determine player from zone " .. tostring(paramtable.zone))
+		return
+	end
 
-  local current_splay_state = get_splay_state(player, paramtable.color)
-  if current_splay_state ~= dir then
-    broadcastToAll(Player[player].steam_name .. " splayed " .. paramtable.color .. " " .. dir)
-  end
+	local dir = SPLAY_DIR_STR[splay_type_int] or "None"
 
-  --print("new splay_type: " .. paramtable.newsplay .. " old splay_type: " .. paramtable.oldsplay)
+	local current_splay_state = get_splay_state(player_color, paramtable.color)
+	if current_splay_state ~= dir then
+		broadcastToAll(Player[player_color].steam_name .. " splayed " .. paramtable.color .. " " .. dir)
+	end
 
-  if paramtable.newsplay == 0 then --splay stack
-    set_splay_state(player, paramtable.color, "None")
-    splay_stacked(zone, paramtable.color, comparisonY)
-  elseif paramtable.newsplay == 1 then --splay left
-    --print("splay left")
-    set_splay_state(player, paramtable.color, "Left")
-    anchored_splay(zone, player, paramtable.color, "Left")
-  elseif paramtable.newsplay == 2 then --splay right
-    --print("splay right")
-    set_splay_state(player, paramtable.color, "Right")
-    anchored_splay(zone, player, paramtable.color, "Right")
-  elseif paramtable.newsplay == 3 then --splay up
-    set_splay_state(player, paramtable.color, "Up")
-    anchored_splay(zone, player, paramtable.color, "Up")
-  elseif paramtable.newsplay == 4 then --splay aslant
-    set_splay_state(player, paramtable.color, "Aslant")
-    anchored_splay(zone, player, paramtable.color, "Aslant")
-  end
+	set_splay_state(player_color, paramtable.color, dir)
 
-  updateSplayButtonLabel(player, paramtable.color, paramtable.newsplay)
+	if splay_type_int == SPLAY_TYPE.STACK then
+		splay_stacked(zone, paramtable.color, comparisonY)
+	else
+		anchored_splay(zone, player_color, paramtable.color, dir)
+	end
 
-  --UpdateGameState()
+	updateSplayButtonLabel(player_color, paramtable.color, splay_type_int)
+	--UpdateGameState() -- Uncomment if needed globally, but usually handled by specific functions
 end
 
 function splay_stacked(zone, color, sort_function, save_previous)
-  --print("splay_stacked " .. color)
-  local cards = zone.getObjects()
-  local pos = nil
-  local y_increase = 0.1
-  local cards_table = {}
-  for i, n in pairs(cards) do cards_table[i] = n end
+	local cards = zone.getObjects()
+	local pos = nil
+	local y_increase = 0.1
+	local cards_table = {}
+	for i, n in pairs(cards) do cards_table[i] = n end
 
-  table.sort(cards_table, sort_function)
-  for k, deck in ipairs(cards_table) do
-    local deck_from_guid = getObjectFromGUID(deck.guid)
-    if deck.type == "Deck" then
-      -- local deck_cards = deck_from_guid.getObjects()
-      -- for j, v in pairs(deck_cards) do
-      --   if color == getCardColor(v.description) then
-      --     if pos == nil then pos = deck_from_guid.getPosition() end
-      --     pos.y = pos.y + y_increase/3
-      --     deck_from_guid.takeObject({position=pos})
-      --   end
-      -- end
-    elseif deck.type == "Card" and getCardColor(deck.getDescription()) == color then
-      if pos == nil then pos = deck_from_guid.getPosition() end
-      pos.y = pos.y + y_increase
-      deck.setPosition(pos)
-      deck.setLock(false)
-    end
-    y_increase = y_increase + 0.1
-  end
+	table.sort(cards_table, sort_function)
 
-  UpdateGameState()
+	for k, deck in ipairs(cards_table) do
+		local deck_from_guid = getObjectFromGUID(deck.guid)
+		if deck.type == "Card" and getCardColor(deck.getDescription()) == color then
+			if pos == nil then pos = deck_from_guid.getPosition() end
+			pos.y = pos.y + y_increase
+			deck.setPosition(pos)
+			deck.setLock(false)
+		end
+		-- Note: Deck handling logic was commented out in original, assuming it's not needed for simple stack
+		y_increase = y_increase + 0.1
+	end
+
+	UpdateGameState()
 end
 
 function splay_right(zone, color, wait_time, save_previous)
-  local player = player_by_zone(zone.getGUID())
-  anchored_splay(zone, player, color, "Right")
+	local player = player_by_zone(zone.getGUID())
+	if player then
+		anchored_splay(zone, player, color, "Right")
+	end
 end
 
 function splay_up(zone, color, wait_time, save_previous)
-  local player = player_by_zone(zone.getGUID())
-  anchored_splay(zone, player, color, "Up")
+	local player = player_by_zone(zone.getGUID())
+	if player then
+		anchored_splay(zone, player, color, "Up")
+	end
 end
 
 function splay_left(zone, color, wait_time, save_previous)
-  local player = player_by_zone(zone.getGUID())
-  anchored_splay(zone, player, color, "Left")
+	local player = player_by_zone(zone.getGUID())
+	if player then
+		anchored_splay(zone, player, color, "Left")
+	end
 end
 
 function player_by_zone(zone_guid)
-  for p, g in pairs(zone_zones) do
-    if g == zone_guid then return p end
-  end
-  return nil
+	for p, g in pairs(zone_zones) do
+		if g == zone_guid then return p end
+	end
+	return nil
 end
 
 function getColorCards(player, color)
-  local zone = getObjectFromGUID(zone_zones[player])
-  local cards = zone.getObjects()
-  local list = {}
-  for i, obj in pairs(cards) do
-    if obj.type == "Card" and getCardColor(obj.getDescription()) == color then
-      table.insert(list, obj)
-    end
-  end
-  return list
+	local zone = getObjectFromGUID(zone_zones[player])
+	if not zone then return {} end
+	
+	local cards = zone.getObjects()
+	local list = {}
+	for i, obj in pairs(cards) do
+		if obj.type == "Card" and getCardColor(obj.getDescription()) == color then
+			table.insert(list, obj)
+		end
+	end
+	return list
 end
 
 function getBottomAnchor(player, color, state)
-  local list = {}
+	local list = {}
 
-  for i, obj in pairs(getColorCards(player, color)) do
-    --print("Found " .. obj.getName() .. " (" .. color .. ")")
-    table.insert(list, { obj = obj, pos = obj.getPosition() })
-  end
+	for i, obj in pairs(getColorCards(player, color)) do
+		if obj ~= nil then
+			local success, pos = pcall(function() return obj.getPosition() end)
+			if success then
+				table.insert(list, { obj = obj, pos = pos })
+			end
+		end
+	end
 
-  if #list == 0 then
-    local zone = getObjectFromGUID(zone_zones[player])
-    for i, obj in pairs(zone.getObjects()) do
-      if obj.type == "Deck" then
-        local deck_cards = obj.getObjects()
-        if deck_cards[1] ~= nil and getCardColor(deck_cards[1].description) == color then
-          --print("Found a deck." .. " (" .. color .. ") as anchor")
-          return obj, true
-        end
-      end
-    end
+	if #list == 0 then
+		local zone = getObjectFromGUID(zone_zones[player])
+		if not zone then return nil, false end
 
-    return nil, false
-  end
+		for i, obj in pairs(zone.getObjects()) do
+			if obj.type == "Deck" then
+				local deck_cards = obj.getObjects()
+				if deck_cards[1] ~= nil and getCardColor(deck_cards[1].description) == color then
+					return obj, true
+				end
+			end
+		end
 
-  -- Always find the card with the lowest Y coordinate (min Y) - lowest height
-  local min_y = 100000
-  local anchor = nil
-  for i, e in pairs(list) do
-    if e.pos.y < min_y then
-      min_y = e.pos.y; anchor = e.obj
-    end
-  end
-  return anchor, false
+		return nil, false
+	end
+
+	-- Always find the card with the lowest Y coordinate (min Y) - lowest height
+	local min_y = 100000
+	local anchor = nil
+	for i, e in pairs(list) do
+		if e.pos.y < min_y then
+			min_y = e.pos.y; anchor = e.obj
+		end
+	end
+	return anchor, false
 end
 
 function anchored_splay(zone, player, color, dir)
-  --print("anchored_splay")
-  local state = dir
-  local anchor, anchor_is_deck = getBottomAnchor(player, color, state)
+	local anchor, anchor_is_deck = getBottomAnchor(player, color, dir)
 
-  if anchor == nil then return end
+	if anchor == nil then return end
 
-  if anchor_is_deck then
-    local extracted_cards = {}
-    --print("Anchor is a deck")
+	-- Determine direction multipliers
+	local dir_x, dir_z = 0, 0
+	if dir == "Left" then dir_x = -1
+	elseif dir == "Right" then dir_x = 1
+	elseif dir == "Up" then dir_z = 1
+	elseif dir == "Aslant" then dir_x = 1; dir_z = 1
+	end
 
-    local deck_pos = anchor.getPosition()
-    local deck_rot = anchor.getRotation()
-    local deck_cards = anchor.getObjects()
-    local matching_guids = {}
-    local bottom_card_guid = nil
+	-- Flip direction for top players (Blue/Green)
+	if player == "Blue" or player == "Green" then
+		dir_x = -dir_x
+		dir_z = -dir_z
+	end
 
-    -- Find bottom-most matching card to be the new anchor
-    for i = 1, #deck_cards, 1 do
-      if getCardColor(deck_cards[i].description) == color then
-        bottom_card_guid = deck_cards[i].guid
-        --print("[1] Found " .. deck_cards[i].name .. " (" .. color .. ") as bottom card")
-        break
-      end
-    end
+	local stepX = SPLAY_SHIFT_X * dir_x
+	local stepZ = SPLAY_SHIFT_Z * dir_z
 
-    -- Collect all matching GUIDs
-    for i, c in ipairs(deck_cards) do
-      if getCardColor(c.description) == color then
-        table.insert(matching_guids, c.guid)
-      end
-    end
+	if anchor_is_deck then
+		local extracted_cards = {}
+		local deck_pos = anchor.getPosition()
+		local deck_rot = anchor.getRotation()
+		local deck_cards = anchor.getObjects()
 
-    for i, card_data in ipairs(deck_cards) do
-      --print(card_data.guid)
-      local OffsetX = 0
-      local OffsetZ = 0
+		for i, card_data in ipairs(deck_cards) do
+			local offset_x = stepX * (i - 1)
+			local offset_z = stepZ * (i - 1)
+			local target_pos = deck_pos + Vector(offset_x, (i - 1) * 0.05, offset_z)
 
-      if dir == "Left" then
-        OffsetX = -SPLAY_SHIFT_X * (i - 1)
-        if player == "Blue" or player == "Green" then OffsetX = -OffsetX end
-      elseif dir == "Right" then
-        OffsetX = SPLAY_SHIFT_X * (i - 1)
-        if player == "Blue" or player == "Green" then OffsetX = -OffsetX end
-      elseif dir == "Up" then
-        OffsetZ = SPLAY_SHIFT_Z * (i - 1)
-        if player == "Blue" or player == "Green" then
-          OffsetZ = -OffsetZ
-        end
-      elseif dir == "Aslant" then
-        OffsetX = SPLAY_SHIFT_X * (i - 1)
-        if player == "Blue" or player == "Green" then OffsetX = -OffsetX end
+			if i < #deck_cards then
+				local spawned_card = anchor.takeObject({
+					guid = card_data.guid,
+					position = target_pos,
+					rotation = deck_rot,
+					smooth = false,
+				})
+				if spawned_card then
+					spawned_card.setLock(true)
+					table.insert(extracted_cards, spawned_card)
+				end
+			else
+				-- Last card: the deck object is destroyed, find the remaining card by GUID
+				local last_card = getObjectFromGUID(card_data.guid)
+				if last_card then
+					last_card.setPosition(target_pos)
+					last_card.setRotation(deck_rot)
+					last_card.setLock(true)
+					table.insert(extracted_cards, last_card)
+				else
+					print("Error: Could not find last card " .. card_data.guid)
+				end
+			end
+		end
+	else
+		-- Anchor is a single card
+		local ax = anchor.getPosition().x
+		local az = anchor.getPosition().z
+		local ay = anchor.getPosition().y
+		local zone_pos = zone.getPosition()
+		
+		local cards = getColorCards(player, color)
+		local sorted = {}
 
-        OffsetZ = SPLAY_SHIFT_Z * (i - 1)
-        if player == "Blue" or player == "Green" then OffsetZ = -OffsetZ end
-      end
+		for i, obj in pairs(cards) do
+			table.insert(sorted, obj)
+		end
 
-      local target_pos = deck_pos + Vector(OffsetX, (i - 1) * 0.05, OffsetZ)
+		table.sort(sorted, comparisonY)
 
-      if i < #deck_cards then
-        local spawned_card = anchor.takeObject({
-          guid = card_data.guid,
-          position = target_pos,
-          rotation = deck_rot,
-          smooth = false,
-        })
-        spawned_card.setLock(true)
-        table.insert(extracted_cards, spawned_card)
-      else
-        -- Last card: the deck object is destroyed, find the remaining card by GUID
-        local last_card = getObjectFromGUID(card_data.guid)
-        if last_card then
-          last_card.setPosition(target_pos)
-          last_card.setRotation(deck_rot)
-          last_card.setLock(true)
-          table.insert(extracted_cards, last_card)
-        else
-          print("Error: Could not find last card " .. card_data.guid)
-        end
-      end
-      --print("Pulled a card")
-    end
-  else
-    --print("Anchor is not a deck")
-    --print("Anchor name: " .. anchor.getName())
-    local ax = anchor.getPosition().x
-    local az = anchor.getPosition().z
-    local flipped = zone.getPosition().z > 0
-    local stepX = SPLAY_SHIFT_X
-    local stepZ = SPLAY_SHIFT_Z
+		for i, obj in pairs(sorted) do
+			if obj ~= nil then
+				local success, pos = pcall(function() return obj.getPosition() end)
+				
+				if success then
+					-- Base position on anchor
+					pos.x = ax + ((i - 1) * stepX)
+					pos.z = az + ((i - 1) * stepZ)
 
-    if flipped then
-      stepX = -stepX
-      stepZ = -stepZ
-    end
+					-- The first card (anchor) keeps its height. Subsequent cards are stacked higher.
+					if i > 1 then
+						pos.y = ay + ((i - 1) * 0.05)
+					end
 
-    local cards = getColorCards(player, color)
-    local sorted = {}
+					pcall(function() obj.setPosition(pos) end)
+					pcall(function() obj.setLock(true) end)
+				end
+			end
+		end
+	end
 
-    for i, obj in pairs(cards) do
-      table.insert(sorted, obj)
-    end
-
-    table.sort(sorted, comparisonY)
-
-    for i, obj in pairs(sorted) do
-      local pos = obj.getPosition()
-      if dir == "Left" then
-        pos.z = az
-        pos.x = ax + ((i - 1) * -stepX)
-      elseif dir == "Right" then
-        pos.z = az
-        pos.x = ax + ((i - 1) * stepX)
-      elseif dir == "Up" then
-        pos.x = ax
-        local splay_offset = (i - 1) * SPLAY_SHIFT_Z
-        if player == "White" or player == "Red" then
-          pos.z = az + splay_offset
-        else
-          pos.z = az - splay_offset
-        end
-      elseif dir == "Aslant" then
-        pos.x = ax + ((i - 1) * stepX)
-        local splay_offset = (i - 1) * SPLAY_SHIFT_Z
-        if player == "White" or player == "Red" then
-          pos.z = az + splay_offset
-        else
-          pos.z = az - splay_offset
-        end
-      end
-
-      -- The first card (anchor) keeps its height. Subsequent cards are stacked higher.
-      if i > 1 then
-        -- Assuming the anchor is at index 1 and determines the base height
-        -- We want each subsequent card to be 0.05 higher than the previous one
-        -- Since i=1 is the base, i=2 is +0.05, i=3 is +0.10, etc.
-        local anchor_y = sorted[1].getPosition().y
-        pos.y = anchor_y + ((i - 1) * 0.05)
-      end
-
-      obj.setPosition(pos)
-      obj.setLock(true)
-    end
-  end
-
-  UpdateGameState()
+	UpdateGameState()
 end
 
 function shift_selected_color_left(player)
-  shift_selected_color(player, -SPLAY_SHIFT_X, 0)
+	shift_selected_color(player, -SPLAY_SHIFT_X, 0)
 end
 
 function shift_selected_color_right(player)
-  shift_selected_color(player, SPLAY_SHIFT_X, 0)
+	shift_selected_color(player, SPLAY_SHIFT_X, 0)
 end
 
 function shift_selected_color_up(player)
-  shift_selected_color(player, 0, SPLAY_SHIFT_Z)
+	shift_selected_color(player, 0, SPLAY_SHIFT_Z)
 end
 
 function shift_selected_color_down(player)
-  shift_selected_color(player, 0, -SPLAY_SHIFT_Z)
+	shift_selected_color(player, 0, -SPLAY_SHIFT_Z)
 end
 
 selected_color_per_player = {}
 
 function select_splay_color(player, color)
-  selected_color_per_player[player] = color
+	selected_color_per_player[player] = color
 end
 
 function shift_selected_color(player, dx, dz)
-  local color = selected_color_per_player[player]
-  if color == nil then return end
+	local color = selected_color_per_player[player]
+	if color == nil then return end
 
-  local zone_guid = zone_zones[player]
-  local zone = getObjectFromGUID(zone_guid)
-  if zone and zone.getPosition().z > 0 then
-    dx = -dx
-    dz = -dz
-  end
+	local zone_guid = zone_zones[player]
+	local zone = getObjectFromGUID(zone_guid)
+	if zone and zone.getPosition().z > 0 then
+		dx = -dx
+		dz = -dz
+	end
 
-  local anchor, anchor_is_deck = getBottomAnchor(player, color, get_splay_state(player, color))
-  if anchor == nil then return end
-  --print(anchor.getName())
-  local ax = anchor.getPosition().x
-  local az = anchor.getPosition().z
-  for i, obj in pairs(getColorCards(player, color)) do
-    local pos = obj.getPosition()
-    pos.x = pos.x + dx
-    pos.z = pos.z + dz
-    obj.setPositionSmooth(pos, false, true)
-    obj.setLock(true)
-  end
+	local anchor, anchor_is_deck = getBottomAnchor(player, color, get_splay_state(player, color))
+	if anchor == nil then return end
+	
+	for i, obj in pairs(getColorCards(player, color)) do
+		local pos = obj.getPosition()
+		pos.x = pos.x + dx
+		pos.z = pos.z + dz
+		obj.setPositionSmooth(pos, false, true)
+		obj.setLock(true)
+	end
 end
 
--- Splay state storage and accessors
-splay_state = {
-  White = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" },
-  Red = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" },
-  Blue = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" },
-  Green = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" }
-}
-
 function get_splay_state(player, color)
-  local ps = splay_state[player]
-  if ps == nil then return "None" end
-  return ps[color] or "None"
+	if not splay_state[player] then return "None" end
+	return splay_state[player][color] or "None"
 end
 
 function set_splay_state(player, color, state)
-  --print("Set splay state for " .. player .. " to " .. state .. " for " .. color)
-  if splay_state[player] == nil then
-    splay_state[player] = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" }
-  end
-  splay_state[player][color] = state
+	if splay_state[player] == nil then
+		splay_state[player] = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" }
+	end
+	splay_state[player][color] = state
 end
 
 function get_card_count(zone, color)
-  local count = 0
-  local cards = zone.getObjects()
-  for i, deck in pairs(cards) do
-    if deck.type == 'Card' then
-      if color == getCardColor(deck.getDescription()) then
-        count = count + 1
-      end
-    end
-  end
+	local count = 0
+	local cards = zone.getObjects()
+	for i, deck in pairs(cards) do
+		if deck.type == 'Card' then
+			if color == getCardColor(deck.getDescription()) then
+				count = count + 1
+			end
+		end
+	end
 
-  return count
+	return count
 end
 
 function comparisonRight(a, b)
-  return a.getPosition().x < b.getPosition().x
+	return a.getPosition().x < b.getPosition().x
 end
 
 function comparisonUp(a, b)
-  return a.getPosition().z < b.getPosition().z
+	return a.getPosition().z < b.getPosition().z
 end
 
 function comparisonY(a, b)
-  return a.getPosition().y < b.getPosition().y
+	return a.getPosition().y < b.getPosition().y
 end
 
 function updateSplayButtonLabel(player, card_color, splay_type_int)
-  local table_obj = getObjectFromGUID("4ee1f2")
-  if table_obj == nil then return end
+	local table_obj = getObjectFromGUID("4ee1f2")
+	if table_obj == nil then return end
 
-  local splay_text = "Not Splayed"
-  if splay_type_int == 1 then
-    splay_text = "Splayed Left"
-  elseif splay_type_int == 2 then
-    splay_text = "Splayed Right"
-  elseif splay_type_int == 3 then
-    splay_text = "Splayed Up"
-  elseif splay_type_int == 4 then
-    splay_text = "Splayed Aslant"
-  end
+	local splay_text = "Not Splayed"
+	if splay_type_int == SPLAY_TYPE.LEFT then
+		splay_text = "Splayed Left"
+	elseif splay_type_int == SPLAY_TYPE.RIGHT then
+		splay_text = "Splayed Right"
+	elseif splay_type_int == SPLAY_TYPE.UP then
+		splay_text = "Splayed Up"
+	elseif splay_type_int == SPLAY_TYPE.ASLANT then
+		splay_text = "Splayed Aslant"
+	end
 
-  local target_tooltip = player .. ":Reset Splay"
+	local target_tooltip = player .. ":Reset Splay"
 
-  local buttons = table_obj.getButtons()
-  if buttons then
-    for _, btn in ipairs(buttons) do
-      if btn.click_function == "no_splay_" .. card_color and btn.tooltip == target_tooltip then
-        table_obj.editButton({
-          index = btn.index,
-          label = card_color .. "\n" .. splay_text
-        })
-        break
-      end
-    end
-  end
+	local buttons = table_obj.getButtons()
+	if buttons then
+		for _, btn in ipairs(buttons) do
+			if btn.click_function == "no_splay_" .. card_color and btn.tooltip == target_tooltip then
+				table_obj.editButton({
+					index = btn.index,
+					label = card_color .. "\n" .. splay_text
+				})
+				break
+			end
+		end
+	end
 end
 
 function comparisonLeft(a, b)
-  return a.getPosition().x > b.getPosition().x
+	return a.getPosition().x > b.getPosition().x
 end
 
 function click_func(obj, color, alt_click)
-  return
+	return
 end

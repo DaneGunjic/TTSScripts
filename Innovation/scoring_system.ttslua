@@ -248,34 +248,42 @@ end
 
 function getScoreCardCount(player)
 	local zone = getZoneCached(score_zones[player])
+	if not zone then return 0 end
 	local cards = zone.getObjects()
 	local count = 0
 	for i, card in pairs(cards) do
-		if card.type == "Deck" then
-			local cards_in_deck = card.getObjects()
-			for j = 1, #cards_in_deck do
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				local cards_in_deck = card.getObjects()
+				for j = 1, #cards_in_deck do
+					count = count + 1
+				end
+			elseif card.type == "Card" then
 				count = count + 1
 			end
-		elseif card.type == "Card" then
-			count = count + 1
-		end
+		end)
+		if not success then print("Error in getScoreCardCount: " .. tostring(err)) end
 	end
 	return count
 end
 
 function getScoreCount(player)
 	local zone = getZoneCached(score_zones[player])
+	if not zone then return 0 end
 	local cards = zone.getObjects()
 	local count = 0
 	for i, card in pairs(cards) do
-		if card.type == "Deck" then
-			local cards_in_deck = card.getObjects()
-			for j, deck_card in pairs(cards_in_deck) do
-				count = count + getCachedCardData(deck_card).age
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				local cards_in_deck = card.getObjects()
+				for j, deck_card in pairs(cards_in_deck) do
+					count = count + getCachedCardData(deck_card).age
+				end
+			elseif card.type == "Card" then
+				count = count + getCachedCardData(card).age
 			end
-		elseif card.type == "Card" then
-			count = count + getCachedCardData(card).age
-		end
+		end)
+		if not success then print("Error in getScoreCount: " .. tostring(err)) end
 	end
 
 	local player_board_count = getActiveIconCount(player, "NUM")
@@ -315,14 +323,18 @@ end
 
 function updateAchievementCount(player, top_cards, splays_per_player, resource_counts_per_player)
 	local zone = getZoneCached(achievement_zones[player])
+	if not zone then return end
 	local cards = zone.getObjects()
 	local count = 0
 	for i, card in pairs(cards) do
-		if card.type == "Deck" then
-			count = count + #card.getObjects()
-		elseif card.type == "Card" then
-			count = count + 1
-		end
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				count = count + #card.getObjects()
+			elseif card.type == "Card" then
+				count = count + 1
+			end
+		end)
+		if not success then print("Error in updateAchievementCount: " .. tostring(err)) end
 	end
 
 	local player_board_count = getActiveIconCount(player, "A") + getCitiesFlagAchievementCount(player)
@@ -390,17 +402,21 @@ end
 
 function getAchievementValues(player)
 	local zone = getZoneCached(achievement_zones[player])
+	if not zone then return 0 end
 	local cards = zone.getObjects()
 	local total_values = 0
 	for i, card in pairs(cards) do
-		if card.type == "Deck" then
-			local cards_in_deck = card.getObjects()
-			for j, deck_card in pairs(cards_in_deck) do
-				total_values = total_values + getCachedCardData(deck_card).age
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				local cards_in_deck = card.getObjects()
+				for j, deck_card in pairs(cards_in_deck) do
+					total_values = total_values + getCachedCardData(deck_card).age
+				end
+			elseif card.type == "Card" then
+				total_values = total_values + getCachedCardData(card).age
 			end
-		elseif card.type == "Card" then
-			total_values = total_values + getCachedCardData(card).age
-		end
+		end)
+		if not success then print("Error in getAchievementValues: " .. tostring(err)) end
 	end
 
 	return total_values
@@ -474,24 +490,31 @@ function getFlagsPerColor(player)
 	}
 
 	local zone = getZoneCached(zone_zones[player])
+	if not zone then return colors_with_flags end
 	local cards = zone.getObjects()
 	for i, card in pairs(cards) do
-		if card.type == "Deck" then
-			local cards_in_deck = card.getObjects()
-			for j, deck_card in pairs(cards_in_deck) do
-				local data = getCachedCardData(deck_card)
-				table.insert(sorted_cards[data.color], {
-					resources = data.resources,
-					position = { x = 0, y = 0, z = 0 }
-				})
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				local cards_in_deck = card.getObjects()
+				for j, deck_card in pairs(cards_in_deck) do
+					local data = getCachedCardData(deck_card)
+					table.insert(sorted_cards[data.color], {
+						resources = data.resources,
+						position = { x = 0, y = 0, z = 0 }
+					})
+				end
+			elseif card.type == "Card" then
+				local data = getCachedCardData(card)
+				local success, pos = pcall(function() return card.getPosition() end)
+				if success then
+					table.insert(sorted_cards[data.color], {
+						resources = data.resources,
+						position = pos
+					})
+				end
 			end
-		elseif card.type == "Card" then
-			local data = getCachedCardData(card)
-			table.insert(sorted_cards[data.color], {
-				resources = data.resources,
-				position = card.getPosition()
-			})
-		end
+		end)
+		if not success then print("Error in getFlagsPerColor: " .. tostring(err)) end
 	end
 
 	for _, color in pairs(card_colors) do
@@ -519,38 +542,59 @@ function getTopCards(player)
 	local current_top_cards = {}
 	local top_cards = {}
 	local zone = getZoneCached(zone_zones[player])
+	if not zone then return {} end
+
 	local cards = zone.getObjects()
 	for i, card in pairs(cards) do
-		if card.type == "Deck" then
-			local cards_in_deck = card.getObjects()
-			if cards_in_deck[#cards_in_deck] ~= nil then
-				local deck_card = cards_in_deck[#cards_in_deck]
-				local card_color = getCardColor(deck_card.description)
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				local cards_in_deck = card.getObjects()
+				if cards_in_deck[#cards_in_deck] ~= nil then
+					local deck_card = cards_in_deck[#cards_in_deck]
+					local card_color = getCardColor(deck_card.description)
+					setCurrentTopCard(player, card, card_color, current_top_cards)
+					--top_cards[cards_in_deck[#cards_in_deck].name] = cards_in_deck[#cards_in_deck].description
+				end
+			elseif card.type == "Card" then
+				local card_color = getCachedCardData(card).color
 				setCurrentTopCard(player, card, card_color, current_top_cards)
-				--top_cards[cards_in_deck[#cards_in_deck].name] = cards_in_deck[#cards_in_deck].description
 			end
-		elseif card.type == "Card" then
-			local card_color = getCachedCardData(card).color
-			setCurrentTopCard(player, card, card_color, current_top_cards)
-		end
+		end)
+		if not success then print("Error in getTopCards (loop 1): " .. tostring(err)) end
 	end
 
 	for color, card in pairs(current_top_cards) do
-		if card.type == "Deck" then
-			local cards_in_deck = card.getObjects()
-			top_cards[cards_in_deck[#cards_in_deck].name] = cards_in_deck[#cards_in_deck].description
-		else
-			top_cards[card.getName()] = card.getDescription()
-		end
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				local cards_in_deck = card.getObjects()
+				top_cards[cards_in_deck[#cards_in_deck].name] = cards_in_deck[#cards_in_deck].description
+			else
+				top_cards[card.getName()] = card.getDescription()
+			end
+		end)
+		if not success then print("Error in getTopCards (loop 2): " .. tostring(err)) end
 	end
 
 	return top_cards
 end
 
 function setCurrentTopCard(player, card, card_color, current_top_cards)
+	local success, card_pos = pcall(function() return card.getPosition() end)
+	if not success then
+		print("Error in setCurrentTopCard (card_pos): " .. tostring(card_pos))
+		return
+	end
+
 	if current_top_cards[card_color] ~= nil then
-		local current_position = current_top_cards[card_color].getPosition().y
-		if card.getPosition().y > current_position then current_top_cards[card_color] = card end
+		local success_curr, curr_pos_y = pcall(function() return current_top_cards[card_color].getPosition().y end)
+		if success_curr then
+			if card_pos.y > curr_pos_y then current_top_cards[card_color] = card end
+		else
+			-- If the current top card is invalid/destroyed, we can treat it as gone and replace it.
+			-- We'll log it as a warning but proceed.
+			print("Warning in setCurrentTopCard (curr_pos_y): " .. tostring(curr_pos_y))
+			current_top_cards[card_color] = card
+		end
 	else
 		current_top_cards[card_color] = card
 	end
@@ -559,17 +603,22 @@ end
 function getActiveCardCount(player, color)
 	local count = 0
 	local zone = getZoneCached(zone_zones[player])
+	if not zone then return 0 end
 	local cards = zone.getObjects()
 	for i, card in pairs(cards) do
-		if card.type == "Deck" then
-			local cards_in_deck = card.getObjects()
-			if cards_in_deck[1] ~= nil then
-				local deck_color = getCardColor(cards_in_deck[1].description)
-				if deck_color == color then return 1 end
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				local cards_in_deck = card.getObjects()
+				if cards_in_deck[1] ~= nil then
+					local deck_color = getCardColor(cards_in_deck[1].description)
+					if deck_color == color then count = 1 end
+				end
+			elseif card.type == "Card" then
+				if getCachedCardData(card).color == color then count = count + 1 end
 			end
-		elseif card.type == "Card" then
-			if getCachedCardData(card).color == color then count = count + 1 end
-		end
+		end)
+		if not success then print("Error in getActiveCardCount: " .. tostring(err)) end
+		if count == 1 then return 1 end
 	end
 
 	return count
@@ -585,45 +634,56 @@ function getSortedResourcesFromCards(player, ignoreBaseCardValues, card_color)
 	}
 
 	local zone = getZoneCached(zone_zones[player])
+	if not zone then return sorted_cards end
+
 	local cards = zone.getObjects()
 	for i, card in pairs(cards) do
-		if card.type == "Deck" then
-			local cards_in_deck = card.getObjects()
-			local deck_pos = card.getPosition()
-			for j, deck_card in pairs(cards_in_deck) do
-				local data = getCachedCardData(deck_card)
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				local cards_in_deck = card.getObjects()
+				local success, deck_pos = pcall(function() return card.getPosition() end)
+				if not success then return end
+
+				for j, deck_card in pairs(cards_in_deck) do
+					local data = getCachedCardData(deck_card)
+					local c_color = data.color
+					if (card_color == nil or c_color == card_color) and sorted_cards[c_color] then
+						local resources_from_card = data.resources
+						if data.is_base == true and ignoreBaseCardValues == true then
+							resources_from_card = string.gsub(resources_from_card, "A", "-")
+							resources_from_card = string.gsub(resources_from_card, "X", "-")
+						end
+						table.insert(sorted_cards[c_color], {
+							resources = resources_from_card,
+							position = { x = deck_pos.x, y = deck_pos.y + (j * 0.1), z = deck_pos.z },
+							guid = card.getGUID()
+						})
+					end
+				end
+			elseif card.type == "Card" then
+				local data = getCachedCardData(card)
 				local c_color = data.color
 				if (card_color == nil or c_color == card_color) and sorted_cards[c_color] then
 					local resources_from_card = data.resources
-					if data.is_base == true and ignoreBaseCardValues == true then
+					if cardIsFaceDown(card) then
+						resources_from_card = "------"
+					elseif data.is_base == true and ignoreBaseCardValues == true then
 						resources_from_card = string.gsub(resources_from_card, "A", "-")
 						resources_from_card = string.gsub(resources_from_card, "X", "-")
 					end
-					table.insert(sorted_cards[c_color], {
-						resources = resources_from_card,
-						position = { x = deck_pos.x, y = deck_pos.y + (j * 0.1), z = deck_pos.z },
-						guid = card.getGUID()
-					})
+
+					local success, card_pos = pcall(function() return card.getPosition() end)
+					if success then
+						table.insert(sorted_cards[c_color], {
+							resources = resources_from_card,
+							position = card_pos,
+							guid = card.getGUID()
+						})
+					end
 				end
 			end
-		elseif card.type == "Card" then
-			local data = getCachedCardData(card)
-			local c_color = data.color
-			if (card_color == nil or c_color == card_color) and sorted_cards[c_color] then
-				local resources_from_card = data.resources
-				if cardIsFaceDown(card) then
-					resources_from_card = "------"
-				elseif data.is_base == true and ignoreBaseCardValues == true then
-					resources_from_card = string.gsub(resources_from_card, "A", "-")
-					resources_from_card = string.gsub(resources_from_card, "X", "-")
-				end
-				table.insert(sorted_cards[c_color], {
-					resources = resources_from_card,
-					position = card.getPosition(),
-					guid = card.getGUID()
-				})
-			end
-		end
+		end)
+		if not success then print("Error in getSortedResourcesFromCards: " .. tostring(err)) end
 	end
 
 	for color, list in pairs(sorted_cards) do
@@ -742,26 +802,30 @@ end
 function getScoreCardValues(player)
 	local score_values = {}
 	local zone = getZoneCached(score_zones[player])
+	if not zone then return {} end
 	local cards = zone.getObjects()
 	for i, card in pairs(cards) do
-		if card.type == "Deck" then
-			local cards_in_deck = card.getObjects()
-			for j, deck_card in pairs(cards_in_deck) do
-				local age = getCachedCardData(deck_card).age
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				local cards_in_deck = card.getObjects()
+				for j, deck_card in pairs(cards_in_deck) do
+					local age = getCachedCardData(deck_card).age
+					if score_values[age] == nil then
+						score_values[age] = 1
+					else
+						score_values[age] = score_values[age] + 1
+					end
+				end
+			elseif card.type == "Card" then
+				local age = getCachedCardData(card).age
 				if score_values[age] == nil then
 					score_values[age] = 1
 				else
 					score_values[age] = score_values[age] + 1
 				end
 			end
-		elseif card.type == "Card" then
-			local age = getCachedCardData(card).age
-			if score_values[age] == nil then
-				score_values[age] = 1
-			else
-				score_values[age] = score_values[age] + 1
-			end
-		end
+		end)
+		if not success then print("Error in getScoreCardValues: " .. tostring(err)) end
 	end
 
 	return score_values

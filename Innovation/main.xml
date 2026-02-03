@@ -1,3 +1,4 @@
+<Panel color="clear">
 <Defaults>
 	<Button color="#828282" />
 	<Button class="ini" color="rgba(0, 0, 0, 0.95)" textColor="rgb(1, 1, 1)" fontSize="16" />
@@ -380,3 +381,4 @@
 </Panel>
 <Button id="scorePanelBGBtn" onClick="toggleScoreBG" width="23" height="25" text="&#x25C0;"
 	fontSize="20" offsetXY="0 -550" rectAlignment="UpperRight" />
+</Panel>
