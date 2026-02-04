@@ -31,6 +31,7 @@ function get_zone_action_map()
 end
 
 function tuckCardNoZone(player_color, object)
+	if not game_setup then return end
 	moveCardFromHand(player_color, object)
 
 	setRotationFaceUp(object, player_color)
@@ -114,6 +115,7 @@ function card_is_in_hand(card, player_color)
 end
 
 function meldCard(player_color, object)
+	if not game_setup then return end
 	--print("meldCard")
 	moveCardFromHand(player_color, object)
 

@@ -13,6 +13,30 @@ toggle_colors = {
 	["on"] = "#00F00F|#00F00F|White|rgba(0.78,0.78,0.78,0.5)"
 }
 
+SPLAY_TYPE = {
+	STACK = 0,
+	LEFT = 1,
+	RIGHT = 2,
+	UP = 3,
+	ASLANT = 4
+}
+
+SPLAY_DIR_STR = {
+	[SPLAY_TYPE.STACK] = "None",
+	[SPLAY_TYPE.LEFT] = "Left",
+	[SPLAY_TYPE.RIGHT] = "Right",
+	[SPLAY_TYPE.UP] = "Up",
+	[SPLAY_TYPE.ASLANT] = "Aslant"
+}
+
+-- Splay state storage
+splay_state = {
+	White = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" },
+	Red = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" },
+	Blue = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" },
+	Green = { Blue = "None", Yellow = "None", Purple = "None", Red = "None", Green = "None" }
+}
+
 deck_zones = {}
 deck_zones[1] = "ee7a48"
 deck_zones[2] = "dccdd3"
@@ -63,7 +87,7 @@ deck_zones_artifacts[7] = "aeddf5"
 deck_zones_artifacts[8] = "253cd0"
 deck_zones_artifacts[9] = "8a4597"
 deck_zones_artifacts[10] = "13d0fa"
-deck_zones_artifacts[11] = "13d0fa"
+deck_zones_artifacts[11] = "968aff"
 
 deck_zones_figures = {}
 deck_zones_figures[1] = "cc34e8"
@@ -90,21 +114,6 @@ deck_zones_unseen[8] = "c62c2f"
 deck_zones_unseen[9] = "0e267b"
 deck_zones_unseen[10] = "a75236"
 deck_zones_unseen[11] = "392891"
-
-relic_names_to_zones = {}
-relic_names_to_zones["Timbuktu"] = "5c9607"
-relic_names_to_zones["Complex Numbers"] = "e93944"
-relic_names_to_zones["Newton-Wickins Telescope"] = "de6658"
-relic_names_to_zones["Ching Shih"] = "3ca0e3"
-relic_names_to_zones["Safety Pin"] = "b0520b"
-
-relic_guids = {
-	"bcddb8",
-	"db74d0",
-	"c1b3a1",
-	"e61e23",
-	"2480ea"
-}
 
 achievements = {}
 achievements["cities"] = {

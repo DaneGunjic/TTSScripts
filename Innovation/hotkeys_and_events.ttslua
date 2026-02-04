@@ -144,6 +144,7 @@ function isBottomPlayer(player)
 end
 
 function return_hotkey(player, card)
+	if not game_setup then return end
 	if card == nil then
 		return
 	end
@@ -159,6 +160,7 @@ function return_hotkey(player, card)
 end
 
 function tuck_hotkey(player, card)
+	if not game_setup then return end
 	if card == nil then
 		return
 	end
@@ -170,6 +172,7 @@ function tuck_hotkey(player, card)
 end
 
 function meld_hotkey(player, card)
+	if not game_setup then return end
 	if card == nil then
 		return
 	end
@@ -194,6 +197,7 @@ function get_max_age_for_draw(player)
 end
 
 function draw_hotkey(player)
+	if not game_setup then return end
 	local age_to_draw, base_deck = get_max_age_for_draw(player)
 
 	if age_to_draw > 11 then
@@ -238,6 +242,7 @@ function draw_hotkey(player)
 end
 
 function draw_city_hotkey(player)
+	if not game_setup then return end
 	if not expansion_is_active("cities") then return end
 
 	local max_age = select(1, get_max_age_for_draw(player))
@@ -265,6 +270,7 @@ function draw_city_hotkey(player)
 end
 
 function draw_figure_hotkey(player)
+	if not game_setup then return end
 	if not expansion_is_active("figures") then return end
 
 	local max_age = select(1, get_max_age_for_draw(player))

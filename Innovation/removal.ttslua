@@ -26,7 +26,7 @@ function remove_echoes()
 end
 
 function remove_artifacts()
-	remove_expansion("artifacts", getDeckArtifacts, remove_relics)
+	remove_expansion("artifacts", getDeckArtifacts)
 end
 
 function remove_figures()

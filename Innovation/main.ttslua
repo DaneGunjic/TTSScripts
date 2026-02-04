@@ -45,10 +45,5 @@ function onLoad(saved_data)
 
   register_hotkeys()
 
-  for i = 1, 10 do
-    deck = getDeck(i)
-    if deck then deck.setVar("age", i) end
-  end
-
   #include !\Innovation\dynamic_functions.ttslua
 end

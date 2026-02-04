@@ -8,10 +8,6 @@ function getBaseDeckOffsetCoords(deck_position)
 end
 
 function getReturnDeckZone(description, age, name)
-	if relic_names_to_zones[name] ~= nil then
-		return getObjectFromGUID(relic_names_to_zones[name])
-	end
-
 	local return_deck_zone = getObjectFromGUID(deck_zones[age])
 	if isCities(description) then return_deck_zone = getObjectFromGUID(deck_zones_cities[age]) end
 	if isEchoes(description) then return_deck_zone = getObjectFromGUID(deck_zones_echoes[age]) end
