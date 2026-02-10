@@ -25,7 +25,7 @@ function setup()
 		if deck then deck.shuffle() end
 	end
 
-	for i = 1, 11 do
+	for i = 1, 10 do
 		local deck = getDeck(i)
 		if deck then
 			deck.takeObject({
@@ -38,18 +38,9 @@ function setup()
 
 	players = getSeatedPlayers()
 	deck1 = getDeck(1)
-	echoes_deck1 = nil
-	if expansions["echoes"] then
-		echoes_deck1 = getDeckEchoes(1)
-	end
 
 	for i, v in pairs(players) do
-		if not expansions["echoes"] then
-			if deck1 then deck1.deal(2, v) end
-		else
-			if deck1 then deck1.deal(1, v) end
-			if echoes_deck1 then echoes_deck1.deal(1, v) end
-		end
+		if deck1 then deck1.deal(2, v) end
 	end
 
 	setupHud()

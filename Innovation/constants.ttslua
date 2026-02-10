@@ -144,6 +144,13 @@ achievements["unseen"] = {
 	"eda115",
 	"553bf8"
 }
+achievements["artifacts"] = {
+	"c705a1",
+	"6b426c",
+	"2284a3",
+	"02df7c",
+	"e2ba03"
+}
 
 return_zone = "1fc0b1"
 

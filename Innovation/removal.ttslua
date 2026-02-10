@@ -26,7 +26,8 @@ function remove_echoes()
 end
 
 function remove_artifacts()
-	remove_expansion("artifacts", getDeckArtifacts)
+	remove_expansion("artifacts", getDeckArtifacts, function() remove_achievements("artifacts") end)
+	getObjectFromGUID("cfe8a3").destroy()
 end
 
 function remove_figures()

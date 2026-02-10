@@ -1,0 +1,2778 @@
+-- Bundled by luabundle {"rootModuleName":"Global.-1.lua","version":"1.6.0"}
+local __bundle_require, __bundle_loaded, __bundle_register, __bundle_modules = (function(superRequire)
+	local loadingPlaceholder = {[{}] = true}
+
+	local register
+	local modules = {}
+
+	local require
+	local loaded = {}
+
+	register = function(name, body)
+		if not modules[name] then
+			modules[name] = body
+		end
+	end
+
+	require = function(name)
+		local loadedModule = loaded[name]
+
+		if loadedModule then
+			if loadedModule == loadingPlaceholder then
+				return nil
+			end
+		else
+			if not modules[name] then
+				if not superRequire then
+					local identifier = type(name) == 'string' and '\"' .. name .. '\"' or tostring(name)
+					error('Tried to require ' .. identifier .. ', but no such module has been registered')
+				else
+					return superRequire(name)
+				end
+			end
+
+			loaded[name] = loadingPlaceholder
+			loadedModule = modules[name](require, loaded, register, modules)
+			loaded[name] = loadedModule
+		end
+
+		return loadedModule
+	end
+
+	return require, loaded, register, modules
+end)(nil)
+__bundle_register("Global.-1.lua", function(require, _LOADED, __bundle_register, __bundle_modules)
+require("Burgundy.Data")
+require("Burgundy.DataDescriptions")
+require("Burgundy.DataMaps")
+require("Burgundy.DataSettings")
+require("Burgundy.Buttons")
+require("Burgundy.Setup")
+require("Burgundy.Utility")
+require("Burgundy.Map")
+require("Burgundy.Hexes")
+require("Burgundy.Vineyard")
+require("Burgundy.TradeRoute")
+require("Burgundy.Boards")
+require("Burgundy.Round")
+require("Burgundy.TradeGood")
+require("Burgundy.TurnTrack")
+require("Burgundy.DiceRoller")
+require("Burgundy.VictoryTrack")
+require("Burgundy.Initialize")
+require("Burgundy.Hooks")
+end)
+__bundle_register("Burgundy.Hooks", function(require, _LOADED, __bundle_register, __bundle_modules)
+function onLoad(saveState)
+    SetupBag = getObjectFromGUID(Guids.Bags.setup)
+    BlackBag = getObjectFromGUID(Guids.Bags.blackmarket)
+    BuildingBag = getObjectFromGUID(Guids.Bags.building)
+    ShieldBag = getObjectFromGUID(Guids.Bags.shield)
+    TradeRouteBag = getObjectFromGUID(Guids.Bags.traderoute)
+    WorkerBag = getObjectFromGUID(Guids.Bags.worker)
+
+    setPlayerBoardDuchyButtons()
+
+    local loadedData = JSON.decode(saveState)
+    if loadedData ~= nil then
+        settings = loadedData
+    end
+
+    math.randomseed(os.time())
+    -- Set items uninteractable
+    for key, object in ipairs(getObjectsWithTag('noninteractable')) do
+        object.interactable = false
+    end
+
+    if settings.setupComplete == true then
+        setupMenu('false')
+        setAdvanceButtons()
+    end
+
+    for key, object in ipairs(getObjectsWithTag('vineyardhex')) do
+        if object.guid ~= Guids.Zones.vineyard then
+            createVineyardFlipButton(object)
+        end
+    end
+end
+
+function onSave()
+    return JSON.encode(settings)
+end
+
+function onPlayerTurn(player, previous_player)
+end
+
+function onObjectLeaveContainer(container, leave_object)
+    if container.guid == Guids.Bags.vineyard then
+        createVineyardFlipButton(leave_object)
+    end
+
+    local description = Descriptions[leave_object.getName()]
+    if description == nil then return end
+    leave_object.setDescription(description)
+end
+
+function onScriptingButtonDown(number, playerColor)
+    local activePlayer
+    for _, player in ipairs(Player.getPlayers()) do
+        if player.color == playerColor then activePlayer = player end
+    end
+    if activePlayer == nil then return end
+
+    local p = activePlayer.getPointerPosition()
+
+    local pos = {p[1], 2, p[3]}
+    if number == 1 then
+        local bag = getObjectFromGUID(Guids.Bags.worker)
+        if bag == nil then return end
+        bag.takeObject({position = pos, rotation = {0, 180, 0}})
+    end
+
+    if number == 2 then
+        local bag = getObjectFromGUID(Guids.Bags.coin)
+        if bag == nil then return end
+        bag.takeObject({position = pos, rotation = {0, 180, 0}})
+    end
+end
+
+end)
+__bundle_register("Burgundy.Initialize", function(require, _LOADED, __bundle_register, __bundle_modules)
+
+
+function setupMenu(value)
+    UI.setAttribute('optionsMenu1', 'active', value)
+    UI.setAttribute('optionsMenu2', 'active', value)
+    UI.setAttribute('optionsMenu3', 'active', value)
+end
+
+function uiToggle(player,value,id)
+    local case = {
+        aimoda = function() settings.aimodes.a = coerceBoolean(value) end,
+        aimodb = function() settings.aimodes.b = coerceBoolean(value) end,
+        aimodc = function() settings.aimodes.c = coerceBoolean(value) end,
+        aimodd = function() settings.aimodes.d = coerceBoolean(value) end,
+        randomboard = function() settings.randomboard = coerceBoolean(value) end,
+        boards0110 = function() boardOptionsChange('b0110', value) end,
+        boards1118 = function() boardOptionsChange('b1118', value) end,
+        boards1922 = function() boardOptionsChange('b1922', value) end,
+        boards2330 = function() boardOptionsChange('b2330', value) end,
+        shields = function() settings.components.shields = coerceBoolean(value) end,
+        traderoutes = function() settings.components.traderoutes = coerceBoolean(value) end,
+        vineyards = function() settings.components.vineyards = coerceBoolean(value) end,
+        monastery2728 = function() settings.components.monastery2728 = coerceBoolean(value) end,
+        cranes = function() settings.components.cranes = coerceBoolean(value) end,
+        whitecastles = function() settings.components.whitecastles = coerceBoolean(value) end,
+        geese = function() settings.components.geese = coerceBoolean(value) end,
+        inns = function() settings.components.inns = coerceBoolean(value) end,
+        castleplacement = function() settings.rules.castleplacement = coerceBoolean(value) end,
+        vineyardrandomness = function() settings.rules.vineyardrandomness = coerceBoolean(value) end,
+        borderpostscoring = function() settings.rules.borderpostscoring = coerceBoolean(value) end,
+    }
+    case[id]()
+end
+
+function playStyleSelected(player, option)
+    if option == 'Normal Game' then
+        settings.playstyle = 'normal'
+    end
+    if option == 'Max 3 Players and AI Player' then
+        settings.playstyle = 'ai'
+    end
+    if option == 'Solo Game (Beginner)' then
+        settings.playstyle = 'beginnersolo'
+        settings.gameboard = '2p'
+    end
+    if option == 'Solo Game (Advanced)' then
+        settings.playstyle = 'advancedsolo'
+        settings.gameboard = '2p'
+    end
+    if option == 'Team Game (2v2, Beginner)' then
+        settings.playstyle = 'beginnerteamgame'
+        settings.gameboard = '34p'
+    end
+    if option == 'Team Game (2v2, Advanced)' then
+        settings.playstyle = 'advancedteamgame'
+        settings.gameboard = '34p'
+    end
+ end
+
+function boardOptionsChange(board, value)
+    settings.boards[board] = coerceBoolean(value)
+    local availableBoards = {}
+    if settings.boards.b0110 == true then
+        availableBoards = {1,2,3,4,5,6,7,8,9,10}
+    end
+    if settings.boards.b1118 == true then
+        availableBoards = tableConcat(availableBoards, {11,12,13,14,15,16,17,18})
+    end
+    if settings.boards.b1922 == true then
+        availableBoards = tableConcat(availableBoards, {19,20,21,22})
+    end
+    if settings.boards.b2330 == true then
+        availableBoards = tableConcat(availableBoards, {23,24,25,26,27,28,29,30})
+    end
+    settings.availableBoards = availableBoards
+end
+end)
+__bundle_register("Burgundy.VictoryTrack", function(require, _LOADED, __bundle_register, __bundle_modules)
+VictoryPositions = nil
+Victory100TokenPositions = {
+    Red = nil,
+    Purple = nil,
+    Yellow = nil,
+    Blue = nil
+}
+
+function moveToVictoryNumber(color, number)
+    if (settings.points[color] <= 100 and settings.points[color] + number > 100) or
+        (settings.points[color] <= 200 and settings.points[color] + number > 200) or
+        (settings.points[color] >= 101 and settings.points[color] + number < 101) or
+        (settings.points[color] >= 201 and settings.points[color] + number < 201)
+    then
+        moveVictoryPointToken(color, settings.points[color] + number)
+    end
+    settings.points[color] = settings.points[color] + number
+    pawn = getObjectsWithAllTags({color, 'victorytoken'})[1]
+    local victoryIndex = settings.points[color]%100
+    local verb = "gained "
+    if number < 0 then verb = "lost " end
+    printToAll(color .. " player " .. verb .. number .. " victory points and has a total of " .. settings.points[color] .. ".", stringColorToRGB(color))
+    if victoryIndex == 0 then victoryIndex = 100 end
+
+    if VictoryPositions == nil then
+        VictoryPositions = getSortedVictoryPositions()
+    end
+
+    local selectedSnap = VictoryPositions[victoryIndex]
+    local board = getGameBoard()
+    local position = board.positionToWorld(selectedSnap.position)
+    position[2] = 5
+    pawn.setPositionSmooth(position)
+    pawn.setRotationSmooth(({0,0,0}))
+end
+
+function moveVictoryPointToken(color, number)
+    if Victory100TokenPositions[color] == nil then
+        local p = getSnapPositionsWithAllTagsPositionedToWorld(getGameBoard(), {color, 'victory100'})[1]
+        Victory100TokenPositions[color] = raisePosition(p)
+    end
+
+    local rot = {0,180,0}
+    if number > 200 then rot = {0,180,180} end
+
+    local guid = Guids.Victory[color]
+    local token = getObjectFromGUID(guid)
+    if token == nil then
+        token = SetupBag.takeObject({guid = guid, position = Victory100TokenPositions[color], rotation = rot})
+    else
+        token.setPositionSmooth(Victory100TokenPositions[color])
+        token.setRotationSmooth(rot)
+    end
+
+end
+
+function getSortedVictoryPositions()
+    local board = getGameBoard()
+    local snaps = board.getSnapPoints()
+
+    local bottom = {}
+    local top = {}
+    local left = {}
+    local right = {}
+    local all = {}
+
+    -- top
+    local function sortingFunction(snap1, snap2) return snap1.position.z > snap2.position.z end
+    table.sort(snaps, sortingFunction)
+    for b = 1, 32 do
+        table.insert(bottom, snaps[b])
+    end
+    local function sortingFunction(snap1, snap2) return snap1.position.x < snap2.position.x end
+    table.sort(bottom, sortingFunction)
+
+    -- bottom
+    local function sortingFunction(snap1, snap2) return snap1.position.z < snap2.position.z end
+    table.sort(snaps, sortingFunction)
+    for b = 1, 32 do
+        table.insert(top, snaps[b])
+    end
+    local function sortingFunction(snap1, snap2) return snap1.position.x > snap2.position.x end
+    table.sort(top, sortingFunction)
+
+    -- left
+    local function sortingFunction(snap1, snap2) return snap1.position.x > snap2.position.x end
+    table.sort(snaps, sortingFunction)
+    for b = 1, 21 do
+        table.insert(left, snaps[b])
+    end
+    local function sortingFunction(snap1, snap2) return snap1.position.z > snap2.position.z end
+    table.sort(left, sortingFunction)
+
+    -- right
+    local function sortingFunction(snap1, snap2) return snap1.position.x < snap2.position.x end
+    table.sort(snaps, sortingFunction)
+    for b = 1, 21 do
+        table.insert(right, snaps[b])
+    end
+    local function sortingFunction(snap1, snap2) return snap1.position.z < snap2.position.z end
+    table.sort(right, sortingFunction)
+
+    for b = 17, 31 do
+        table.insert(all, bottom[b])
+    end
+    for b = 2, 20 do
+        table.insert(all, left[b])
+    end
+    for b = 2, 32 do
+        table.insert(all, top[b])
+    end
+    for b = 2, 20 do
+        table.insert(all, right[b])
+    end
+    for b = 1, 16 do
+        table.insert(all, bottom[b])
+    end
+
+    return all
+end
+end)
+__bundle_register("Burgundy.DiceRoller", function(require, _LOADED, __bundle_register, __bundle_modules)
+RollInProgress = {
+    White = false,
+    Red = false,
+    Purple = false,
+    Blue = false,
+    Yellow = false
+}
+
+function clickRollDice(color)
+    local settings = Global.getTable('settings')
+    rollPlayerDice(color)
+
+    -- Only roll the white die if the color is first player
+    local turnOrder = getPlayerTurnOrder()
+    if color == 'aicolor' then color = settings.aiPlayerColor end
+    if turnOrder[1] ~= color and not (settings.playstyle == 'beginnersolo' or settings.playstyle == 'advancedsolo') then return end
+    rollWhiteDie(color)
+end
+
+function getDieValue(die)
+    if (die.tag == 'Dice') then
+        return die.getRotationValue()
+    end
+    return 0
+end
+
+function rollPlayerDice(color)
+    local board = 'playerboard'
+    if color == 'aicolor' then
+        board = 'aiboard'
+        color = settings.aiPlayerColor
+    end
+
+    local playerDicePos = getPlayerBoardDicePositions(color, board)
+    local playerDice = getObjectsWithAllTags({'playerdice', color})
+    for _, d in ipairs(playerDice) do
+        d.roll()
+    end
+
+    function coroutine_monitorDice()
+        repeat
+            local allRest = true
+            for _, die in ipairs(playerDice) do
+                if die ~= nil and die.resting == false then
+                    allRest = false
+                end
+            end
+            coroutine.yield(0)
+        until allRest == true
+
+        local values = {}
+        for _, diee in ipairs(playerDice) do
+            table.insert(values, getDieValue(diee))
+        end
+
+        RollInProgress[color] = false
+        messages = {color .. ' player rolled '}
+        table.insert(messages, values[1])
+        if values[2] ~= nil then
+            table.insert(messages, ' and ' .. values[2])
+        end
+        table.insert(messages, '.')
+        printToAll(table.concat(messages), stringColorToRGB(color))
+
+        if color == settings.aiPlayerColor then
+            local slot = getAiWhiteDieSlot()
+            playerDice[1].setPositionSmooth(raisePosition(playerDicePos[slot]))
+        else
+            for i,die in ipairs(playerDice) do
+                playerDice[i].setPositionSmooth(raisePosition(playerDicePos[i]))
+            end
+        end
+        return 1
+    end
+
+    if RollInProgress[color] == false then
+        startLuaCoroutine(self, "coroutine_monitorDice")
+        RollInProgress[color] = true
+    end
+end
+
+function rollWhiteDie(playerColor)
+    local die = getObjectsWithTag('whitedie')[1]
+    die.roll()
+
+    function coroutine_monitorWhiteDie()
+        repeat
+            local rest = true
+            if die.resting == false then
+                rest = false
+            end
+            coroutine.yield(0)
+        until rest == true
+
+        local value = getDieValue(die)
+        RollInProgress.White = false
+        yellowPrint('Deploying a trade good to depot ' .. value .. '.')
+        moveWhiteDie(playerColor)
+        deployTradeGood(value)
+        return 1
+    end
+
+    if RollInProgress.White == false then
+        startLuaCoroutine(self, "coroutine_monitorWhiteDie")
+        RollInProgress.White = true
+    end
+end
+end)
+__bundle_register("Burgundy.TurnTrack", function(require, _LOADED, __bundle_register, __bundle_modules)
+function moveTurnTrack(position, color)
+    if settings.setupComplete == false then return end
+    local originalNum = removeColor(color)
+    table.insert(settings.turnTrack[position], color)
+
+    local turnPos = getAdvancementButtonLocs()
+    local pos = turnPos[position]
+
+    local token = getObjectsWithAllTags({color, 'turnordertoken'})[1]
+    if token ~= nil then
+        token.setPositionSmooth({pos[1], 3, pos[3]})
+        Wait.time(function() resetHeights(position) end, 1)
+        if position ~= originalNum then
+            Wait.time(function() resetHeights(originalNum) end, 1)
+        end
+    end
+end
+
+function setAdvanceButtons()
+    local gameBoard = getGameBoard()
+    local positions = getSnapPositionsWithAnyTags(gameBoard, {'advance'})
+    local function sortingFunction(pos1, pos2) return pos1[3] > pos2[3] end
+    table.sort(positions, sortingFunction)
+
+    for colorIndex, color in ipairs(settings.turnTrack[1]) do
+        for positionIndex, p in ipairs(positions) do
+            local x = p[1]*-1+0.12+(colorIndex%2*0.08)
+            if positionIndex > 5 then
+                x = x - 0.32
+            end
+            local z = p[3]+0.12-(colorIndex*0.04)-(colorIndex%2*0.04)
+            gameBoard.createButton({
+                click_function = "moveTrack" .. color ..  positionIndex,
+                function_owner = Global,
+                position       = {x, p[2]+0.02, z},
+                rotation       = {0, 0, 0},
+                width          = 40,
+                height         = 40,
+                color          = ColorTintAlpha[color],
+                hover_color    = ColorTintAlphaHover[color],
+                tooltip        = 'Advance ' .. color .. ' to ' .. positionIndex,
+            })
+        end
+    end
+end
+
+for _, color in ipairs(Colors) do
+    for position = 1, 7 do
+        _G['moveTrack' .. color .. position] = function() moveTurnTrack(position, color) end
+    end
+end
+
+function removeColor(color)
+    local returnIndex = 1
+    for sindex, spot in ipairs(settings.turnTrack) do
+        for vindex, vposColor in ipairs(spot) do
+            if vposColor == color then
+                returnIndex = sindex
+                table.remove(settings.turnTrack[sindex], vindex)
+            end
+        end
+    end
+    return returnIndex
+end
+
+AdvancementButtonLocs = nil
+function getAdvancementButtonLocs()
+    if AdvancementButtonLocs == nil then
+        local gameBoard = getGameBoard()
+        local turnPos = getSnapPositionsWithAnyTagsPositionedToWorld(gameBoard, {'advance'})
+        local function sortingFunction(pos1, pos2) return pos1[3] < pos2[3] end
+        table.sort(turnPos, sortingFunction)  local gameBoard = getGameBoard()
+        AdvancementButtonLocs = turnPos
+    end
+    return AdvancementButtonLocs
+end
+
+function resetHeights(spot)
+    local turnPos = getAdvancementButtonLocs()
+    for index, color in ipairs(settings.turnTrack[spot]) do
+        local token = getObjectsWithAllTags({color, 'turnordertoken'})[1]
+        if token ~= nil then
+            local pos = turnPos[spot]
+            token.setPositionSmooth({pos[1],Positions.TurnOrderY[index],pos[3]})
+        end
+    end
+end
+
+function removeUnusedTurnOrderTokens()
+    for index, color in ipairs(getNonSeatedPlayerColors()) do
+        if settings.playstyle == 'ai' and index == 1 then
+        else
+            local token = getObjectsWithAllTags({color, 'turnordertoken'})[1]
+            SetupBag.putObject(token)
+            token = getObjectsWithAllTags({color, 'victorytoken'})[1]
+            SetupBag.putObject(token)
+        end
+    end
+    settings.turnTrack[1] = getSeatedPlayerColors()
+end
+
+function setInitialPlayerOrder()
+     if settings.playstyle == 'normal' or settings.playstyle == 'ai' then
+        local colors = getSeatedPlayerColorsOrdered()
+        local playerCount = #colors
+        local start = rand(playerCount)
+        local newOrder = {}
+
+        for index = start, start + playerCount - 1 do
+            local num = index;
+            if index > playerCount then
+                num = index%playerCount
+            end
+            table.insert(newOrder, colors[num])
+        end
+
+        settings.turnTrack[1] = newOrder
+        yellowPrint('Randomly selecting starting player...  ' .. newOrder[playerCount] .. '!')
+    elseif settings.playstyle == 'beginnerteamgame' or settings.playstyle == 'advancedteamgame' then
+        settings.turnTrack[1] = {'Blue', 'Yellow', 'Purple', 'Red'}
+        yellowPrint('Setting teams variant player order to Red -> Purple -> Yellow -> Blue')
+    end
+    if settings.playstyle == 'beginnersolo' or settings.playstyle == 'advancedsolo' then
+        Turns.enable = false
+        -- Remove start new round button and helper text
+        getObjectFromGUID(Guids.StartNewRoundButton).destruct()
+        getObjectFromGUID(Guids.StartNewRoundText).destruct()
+    else
+        updatePlayerTurnOrder()
+    end
+
+end
+
+function getPlayerTurnOrder()
+    -- Order by highest spot (7,6,5,4,3,2,1)
+    -- Then by highest index (4,3,2,1)
+    local order = {}
+    for spot = #settings.turnTrack, 1, -1 do
+        for index = #settings.turnTrack[spot], 1, -1 do
+            table.insert(order, settings.turnTrack[spot][index])
+        end
+    end
+    return order
+end
+
+function updatePlayerTurnOrder()
+    local turns = getPlayerTurnOrder()
+    Turns.order = turns
+    Turns.turn_color = getFirstPlayer()
+end
+
+function getFirstPlayer()
+    local turns = getPlayerTurnOrder()
+    local firstPlayer = turns[1]
+    if turns[1] == settings.aiPlayerColor then firstPlayer = turns[2] end
+    return firstPlayer
+end
+
+function moveWhiteDie(color)
+    local whiteDie = getObjectsWithTag('whitedie')[1]
+    if settings.playstyle == 'ai' then
+        whiteDie.setPositionSmooth(getAiWhiteDiePosition())
+    else
+        local playerBoard = getObjectsWithAllTags({color, 'playerboard'})[1]
+        pos = getSnapPositionsWithAllTagsPositionedToWorld(playerBoard, {'whitedie', color})[1]
+        whiteDie.setPosition(pos + Vector(0, 1, 0))
+    end
+end
+
+function getAiWhiteDieSlot()
+    local whiteDie = getObjectsWithTag('whitedie')[1]
+    local value = whiteDie.getRotationValue()
+    if value < 5 then
+        return 1
+    else
+        return 2
+    end
+end
+
+function getAiWhiteDiePosition()
+    local aiBoard = getObjectsWithAllTags({'aiboard'})[1]
+    snaps = getSnapPositionsWithAllTagsPositionedToWorld(aiBoard, {'whitedie'})
+    local function sortingFunction(snap1, snap2) return snap1[1] < snap2[1] end
+    table.sort(snaps, sortingFunction)
+    return raisePosition(snaps[getAiWhiteDieSlot()])
+end
+
+
+function startNewRound()
+    if settings.setupComplete == false then return end
+    updatePlayerTurnOrder()
+    moveWhiteDie(Turns.order[1])
+
+    Wait.time(function()
+        local turnOrder = getPlayerTurnOrder()
+        for _, color in ipairs(turnOrder) do
+            if Player[color].seated then
+                clickRollDice(color)
+            end
+        end
+    end, 0.5)
+end
+end)
+__bundle_register("Burgundy.TradeGood", function(require, _LOADED, __bundle_register, __bundle_modules)
+function setTradeGoods()
+    local board = getGameBoard()
+    local tgbag = getObjectsWithTag('tradegoodbag')[1]
+    local snaps = board.getSnapPoints()
+    local waitCounter = 1
+
+    for _, snap in ipairs(snaps) do
+        if #snap.tags > 0 then
+            if snap.tags[1] == 'tgslota' or snap.tags[1] == 'tgslotb' or snap.tags[1] == 'tgslotc' or snap.tags[1] == 'tgslotd' or snap.tags[1] == 'tgslote' then
+                local pos = board.positionToWorld(snap.position)
+                for a = 1,5 do
+                    Wait.time(function()
+                        local tile = tgbag.takeObject({
+                            position = {pos[1], 1+a/1.5, pos[3]},
+                            rotation = {0, 180, 180},
+                            smooth = false
+                        })
+                        tile.addTag(snap.tags[1])
+                    end, waitCounter * DeploySpeed)
+                    waitCounter = waitCounter + 0.1
+                end
+            end
+        end
+    end
+end
+
+function deployTradeGoods(phase)
+    local board = getGameBoard()
+    local tiles = getObjectsWithTag(phase)
+    local snaps = board.getSnapPoints()
+    local count = 1
+    for _, snap in ipairs(snaps) do
+        if (#snap.tags > 0) then
+            if (snap.tags[1] == 'tgslot1' or snap.tags[1] == 'tgslot2' or snap.tags[1] == 'tgslot3' or snap.tags[1] == 'tgslot4' or snap.tags[1] == 'tgslot5') then
+                local pos = board.positionToWorld(snap.position)
+                tiles[count].setPosition(pos)
+                tiles[count].setRotation({0, 180, 0})
+                tiles[count].addTag(snap.tags[1])
+                count = count + 1
+            end
+        end
+    end
+end
+
+TgPlacePositions = nil
+
+function setTgPlacePositions(board)
+    TgPlacePositions = {}
+    for i = 1,6 do
+        TgPlacePositions[i] = {}
+        for j = 1,6 do
+            TgPlacePositions[i][j] = {}
+        end
+    end
+
+    for _, snap in ipairs(board.getSnapPoints()) do
+        if #snap.tags > 0 then
+            for _, tag in ipairs(snap.tags) do
+                if string.sub(tag,1,7) == 'tgplace' then
+                    TgPlacePositions[tonumber(string.sub(tag,8,8))][tonumber(string.sub(tag,9,9))] = raisePosition(board.positionToWorld(snap.position))
+                end
+            end
+        end
+    end
+end
+
+function deployTradeGood(depot)
+    local board = getGameBoard()
+    local phaseTag = 'tgslot' .. string.lower(settings.phase)
+    local tradeGoods = getObjectsWithAllTags({phaseTag})
+
+    if TgPlacePositions == nil then
+        setTgPlacePositions(board)
+    end
+
+    if #tradeGoods > 0 then
+        local function sortingFunction(good1, good2) return good1.getPosition()[3] < good2.getPosition()[3] end
+        table.sort(tradeGoods, sortingFunction)
+
+        local tileValue = tradeGoods[1].getRotationValue()
+        tradeGoods[1].setPosition(TgPlacePositions[depot][tileValue])
+
+        if depot == 4 or depot == 1 then
+            tradeGoods[1].setRotationSmooth({0, 150, 0})
+        end
+        if depot == 6 or depot == 3 then
+            tradeGoods[1].setRotationSmooth({0, 210, 0})
+        end
+        tradeGoods[1].removeTag(phaseTag)
+    end
+end
+end)
+__bundle_register("Burgundy.Round", function(require, _LOADED, __bundle_register, __bundle_modules)
+function startNextPhase()
+    if settings.setupComplete == false or settings.phase == 'E' then return end
+
+    -- If there are undeployed trade goods, do not proceed
+    local zone = getObjectFromGUID(Guids.Zones.tradegoods)
+    if #(zone.getObjects()) > 0 then
+        redPrint('There are still trade goods that have not been deployed. Unable to start the next phase.')
+        return
+    end
+    local message = 'Gain coins for placed mines.'
+    if settings.components.shields == true then
+        message = 'Pay 1 coin per placed shield. If you cannot afford to pay for your placed shields, remove shields until you can afford them. Then you may gain coins from placed mines.'
+    end
+    yellowPrint(message)
+    increasePhase()
+    resupplyVineyards()
+    removeGameBoardHexes()
+    updatePlayerTurnOrder()
+    Wait.time(function() supplyGameBoardHexes() end, 1)
+end
+
+function increasePhase()
+    local match = ''
+    for index, phase in ipairs(Phases) do
+        if phase == settings.phase then
+            match = Phases[index + 1]
+        end
+    end
+    settings.phase = match
+    deployTradeGoods('tgslot' .. match)
+
+    getObjectFromGUID(Guids.Text.phase).setValue('Phase ' .. match)
+end
+end)
+__bundle_register("Burgundy.Boards", function(require, _LOADED, __bundle_register, __bundle_modules)
+function switchGameBoard()
+    local board34p = getObjectFromGUID(Guids.Boards.mainboard34p)
+    local board2p = getObjectFromGUID(Guids.Boards.mainboard2p)
+    if board34p ~= nil then
+        board34p.setLock(false)
+        SetupBag.putObject(board34p)
+        local board2p = SetupBag.takeObject({
+            guid = Guids.Boards.mainboard2p,
+            position = {0,0.97,0},
+            rotation = {0,180,0},
+            smooth = false
+        })
+        board2p.setLock(true)
+    else
+        board2p.setLock(false)
+        SetupBag.putObject(board2p)
+        local board34p = SetupBag.takeObject({
+            guid = Guids.Boards.mainboard34p,
+            position = {0,0.97,0},
+            rotation = {0,180,0},
+            smooth = false
+        })
+        board34p.setLock(true)
+    end
+end
+
+function setShields()
+    -- Remove Shield #2 if playing AI
+    if settings.playstyle == 'ai' then
+        local shield2 = ShieldBag.takeObject({guid = Guids.Shield2})
+        SetupBag.putObject(shield2)
+    end
+    if settings.components.shields == true then
+        local tgplacements = {'tgplace11','tgplace21','tgplace31','tgplace41','tgplace51','tgplace61'}
+        if settings.playercount == 3 or settings.playercount == 4 then
+            table.insert(tgplacements, 'tgplace22')
+            table.insert(tgplacements, 'tgplace42')
+            table.insert(tgplacements, 'tgplace62')
+        end
+        if settings.playercount == 4 then
+            table.insert(tgplacements, 'tgplace12')
+            table.insert(tgplacements, 'tgplace32')
+            table.insert(tgplacements, 'tgplace52')
+        end
+
+        local gameBoard = getGameBoard()
+        local snaps = gameBoard.getSnapPoints()
+        local waitCounter = 1
+
+        for _, snap in ipairs(snaps) do
+            if #snap.tags > 0 then
+                if has_any_value(snap.tags, tgplacements) then
+                    Wait.time(function()
+                        local pos = gameBoard.positionToWorld(snap.position)
+                        local shield = ShieldBag.takeObject({position = pos})
+                        shield.setRotationSmooth({0, snap.rotation.y - 180, 0})
+                        shield.addTag('shield')
+                    end, waitCounter * DeploySpeed)
+                    waitCounter = waitCounter + 1
+                end
+            end
+        end
+    else
+        SetupBag.putObject(ShieldBag)
+    end
+end
+
+function setPlayerBoards()
+    setNormalPlayerBoards()
+    setSoloPlayerBoards()
+    setTeamPlayerBoards()
+    updateHandLocations()
+end
+
+function setNormalPlayerBoards()
+    local playerCount = #(getSeatedPlayers())
+    if settings.playstyle == 'normal' or settings.playstyle == 'ai' then
+        setPlayerDuchyNumber()
+        removeUnusedPlayerBoards()
+        if settings.playstyle == 'ai' and playerCount == 4 then
+            settings.playstyle = 'normal'
+            redPrint('You cannot play Chateauma with 4 players. Setting up the game normally.')
+        end
+        if settings.playstyle == 'ai' and playerCount < 4 then
+            setAiPlayerBoard()
+            -- Players random first player. The Châteauma is always the last player.
+            -- Add AI player token back to order track
+            if settings.aimodes.c == true then
+                settings.turnTrack[1] = tableConcat(settings.turnTrack[1],{settings.aiPlayerColor})
+            else
+                settings.turnTrack[1] = tableConcat({settings.aiPlayerColor},settings.turnTrack[1])
+            end
+        end
+    else
+        removePlayerDuchies()
+    end
+end
+
+function setSoloPlayerBoards()
+    if settings.playstyle == 'beginnersolo' then
+        local board = SetupBag.takeObject({guid = Guids.Boards.beginnersolo, position = {30.00, 0.97, -14.00}, rotation = {0,180,0}})
+        board.setLock(true)
+    end
+    if settings.playstyle == 'advancedsolo' then
+        local board = SetupBag.takeObject({guid = Guids.Boards.advancedsolo, position = {30.00, 0.97, -14.00}, rotation = {0,180,0}})
+        board.setLock(true)
+    end
+end
+
+function setTeamPlayerBoards()
+    if settings.playstyle == 'beginnerteamgame' then
+        local board = SetupBag.takeObject({guid = Guids.Boards.teams31pb, position = {34.5, 0.97, 0}})
+        board.setRotation({0,180,0})
+        board.setLock(true)
+        board = SetupBag.takeObject({guid = Guids.Boards.teams31yr, position = {-34.5, 0.97, 0}})
+        board.setRotation({0,180,0})
+        board.setLock(true)
+    end
+    if settings.playstyle == 'advancedteamgame' then
+        local board = SetupBag.takeObject({guid = Guids.Boards.teams32pb, position = {34.5, 0.97, 0}})
+        board.setRotation({0,180,0})
+        board.setLock(true)
+        board = SetupBag.takeObject({guid = Guids.Boards.teams32yr, position = {-34.5, 0.97, 0}})
+        board.setRotation({0,180,0})
+        board.setLock(true)
+    end
+end
+
+function updateHandLocations()
+    if settings.playstyle == 'beginnerteamgame' or settings.playstyle == 'advancedteamgame' or settings.playstyle == 'beginnersolo' or settings.playstyle == 'advancedsolo' then
+        local hand = getObjectFromGUID(Guids.Hands.Red)
+        hand.setPosition({-26.5,3.35, -36})
+        hand.setRotation({0,0,0})
+        hand = getObjectFromGUID(Guids.Hands.Yellow)
+        hand.setPosition({-42,3.35, -36})
+        hand.setRotation({0,0,0})
+        hand = getObjectFromGUID(Guids.Hands.Blue)
+        hand.setPosition({42.5,3.35, -36})
+        hand = getObjectFromGUID(Guids.Hands.Purple)
+        hand.setPosition({27,3.35, -36})
+    end
+end
+
+function setGameBoard()
+    settings.gameboard = '2p'
+    if settings.playercount > 2 then
+        settings.gameboard = '34p'
+    end
+    if settings.playstyle == 'beginnersolo' or settings.playstyle == 'advancedsolo' then
+        settings.gameboard = '2p'
+    end
+     if settings.playstyle == 'beginnerteamgame' or settings.playstyle == 'advancedteamgame' then
+        settings.gameboard = '34p'
+    end
+
+    -- Switch to the 3-4 player board
+    if settings.gameboard == '34p' then
+        local board2p = getObjectFromGUID(Guids.Boards.mainboard2p)
+        board2p.setLock(false)
+        SetupBag.putObject(board2p)
+        local board34p = SetupBag.takeObject({
+            guid = Guids.Boards.mainboard34p,
+            position = {0,0.97,0},
+            rotation = {0,180,0},
+            smooth = false
+        })
+        board34p.setLock(true)
+    end
+
+    setTradeGoods()
+    Wait.time(function()
+       deployTradeGoods('tgslota')
+    end, DeploySpeed * 2.1)
+
+    supplyGameBoardHexes()
+    setVictoryTokens()
+    setAdvanceButtons()
+    resetHeights(1)
+    Wait.time(function() setShields() end, 1)
+end
+
+function getGameBoard()
+    if settings.gameboard == '2p' then return getObjectFromGUID(Guids.Boards.mainboard2p) end
+    return getObjectFromGUID(Guids.Boards.mainboard34p)
+end
+
+function setVictoryToken(board, snap, color)
+    if has_value(snap.tags, color) then
+        local pos = board.positionToWorld(snap.position)
+        SetupBag.takeObject({guid = Guids.Tokens[color .. '234'], position = pos})
+        SetupBag.takeObject({guid = Guids.Tokens[color .. '567'], position = {pos[1], 1.5, pos[3]}})
+    end
+end
+
+function setVictoryTokens()
+    local board = getGameBoard()
+    local snaps = board.getSnapPoints()
+    local waitCounter = 1
+
+    for _, snap in ipairs(snaps) do
+        if #snap.tags > 0 and not has_value(snap.tags, 'victory100') then
+            Wait.time(function()
+                if settings.rules.borderpostscoring == true then
+                    setVictoryToken(board, snap, 'borderpost')
+                end
+                setVictoryToken(board, snap, 'Tan')
+                setVictoryToken(board, snap, 'Red')
+                setVictoryToken(board, snap, 'Blue')
+                setVictoryToken(board, snap, 'Black')
+                setVictoryToken(board, snap, 'Green')
+                setVictoryToken(board, snap, 'Yellow')
+            end, waitCounter * DeploySpeed)
+        waitCounter = waitCounter + 1
+        end
+    end
+end
+
+function setPlayerDuchyNumber()
+    -- Loop through all players and set board numbers
+    for _, color in ipairs(getSeatedPlayerColors()) do
+        if (settings.randomboard) then
+            settings.mapNumberIndex[color] = rand(#settings.availableBoards)
+        end
+        local playerBoard = getObjectsWithAllTags({color, 'playerboard'})[1]
+        setMap(settings.mapNumberIndex[color], color, playerBoard)
+    end
+end
+
+function removeUnusedPlayerBoards()
+    for _, color in ipairs(getNonSeatedPlayerColors()) do
+        removePlayerDuchy(color)
+    end
+end
+
+function getAiBoardGuid()
+    local guid = Guids.Boards.aiboard35
+    if settings.aimodes.a == true or settings.aimodes.b == true or settings.aimodes.d == true then
+        guid = Guids.Boards.aiboard36
+    end
+    return guid
+end
+
+function setAiPlayerBoard()
+    local nonSeated = getNonSeatedPlayerColors()
+    if #nonSeated < 1 then return end
+    settings.aiPlayerColor = nonSeated[1]
+    local aiBoard = SetupBag.takeObject({
+        guid = getAiBoardGuid(),
+        position = Positions.PlayerBoards[settings.aiPlayerColor],
+        rotation = {0,180,0},
+        smooth = false
+    })
+    aiBoard.setLock(true)
+end
+
+function removePlayerDuchy(color)
+    despawnNumberTiles(color)
+    for _, item in ipairs(getObjectsWithAllTags({'playerboard', color})) do
+        item.setLock(false)
+        SetupBag.putObject(item)
+    end
+    for _, item in ipairs(getObjectsWithAllTags({'victory100', color})) do
+        item.setLock(false)
+        SetupBag.putObject(item)
+    end
+    for _, item in ipairs(getObjectsWithAllTags({'vineyard', color})) do
+        item.setLock(false)
+        SetupBag.putObject(item)
+    end
+    for _, item in ipairs(getObjectsWithAllTags({'soldtradegoods', color})) do
+        item.setLock(false)
+        SetupBag.putObject(item)
+    end
+end
+
+function setPlayerBoardDuchyButtons()
+    for _, color in ipairs(Colors) do
+        local board = getObjectsWithAllTags({color, 'playerboard'})[1]
+        if board ~= nil then
+            board.setVar('Color', color)
+            setDuchyButtons(board)
+        end
+    end
+end
+
+function removePlayerDuchies()
+    for _, color in ipairs(Colors) do
+        removePlayerDuchy(color)
+    end
+end
+end)
+__bundle_register("Burgundy.TradeRoute", function(require, _LOADED, __bundle_register, __bundle_modules)
+function setTradeRoutes()
+    if settings.components.traderoutes == true then
+        local routeBoard = SetupBag.takeObject({guid = Guids.Boards['traderoute' .. settings.playercount]})
+
+        for _, color in ipairs(getSeatedPlayerColors()) do
+            local board = getObjectsWithAllTags({color, 'playerboard'})[1]
+            local pos = board.getPosition()
+            local rotation = {0,180,0}
+            local cloned = routeBoard.clone()
+            cloned.setPosition({pos[1], 0.97, pos[3] + 10})
+            cloned.setRotation(rotation)
+            cloned.addTag(color)
+            cloned.addTag('traderouteboard')
+            cloned.setLock(true)
+            local rotationY = 180
+            local snaps = cloned.getSnapPoints()
+            for _, snap in ipairs(snaps) do
+                local pos = cloned.positionToWorld(snap.position)
+                local route = TradeRouteBag.takeObject({position = pos})
+                route.setRotation({0,rotationY,0})
+            end
+        end
+        SetupBag.putObject(routeBoard)
+    else
+        SetupBag.putObject(getObjectFromGUID(Guids.Bags.traderoute))
+    end
+end
+end)
+__bundle_register("Burgundy.Vineyard", function(require, _LOADED, __bundle_register, __bundle_modules)
+function setVineyards()
+    if settings.components.vineyards == false then
+        for _, vineyard in ipairs(getObjectsWithTag('vineyard')) do
+            SetupBag.putObject(vineyard)
+        end
+        return
+    end
+
+    local vines = shuffleArray(Vines)
+
+    -- Set 2-3 Player Board
+    if settings.playercount < 4 then
+        local vine4p = getObjectFromGUID(Guids.Boards.vineyard4p)
+        local pos = vine4p.getPosition()
+        vine4p.setLock(false)
+        SetupBag.putObject(vine4p)
+        local vine23p = SetupBag.takeObject({ guid = Guids.Boards.vineyard23p, position = pos })
+        vine23p.setLock(true)
+
+        -- If it is a 2-3 player game, limit randomness
+        if coerceBoolean(settings.rules.vineyardrandomness) == true then
+            -- Remove one color in a 3 player game
+            removeVineColor(vines)
+            if settings.playercount == 2 then
+                -- Remove a second color if only 2 players
+                removeVineColor(vines)
+            end
+        end
+        settings.availableVines = vines
+    end
+
+    for index, color in ipairs(getSeatedPlayers()) do
+        local token = getObjectsWithAllTags({vines[index], 'vinebonus'})[1]
+        token.setPositionSmooth(Positions.PlayerVine[color])
+    end
+
+    Wait.time(function() resupplyVineyards() end, 2)
+end
+
+-- Remove 1 chosen color of grapes from the game – each double hex tile containing at least one grape (16 double hexes) and each vine bonus tile in that color. Place theremoved components back into the game box. If you are instructed to do something with all double hex tiles/vine bonus tiles, skip the ones you have removed.
+function removeVineColor(colors)
+    local color = colors[1]
+    yellowPrint('Removing ' .. color .. ' vines.')
+    table.remove(colors, 1)
+    for _, object in ipairs(getObjectsWithAllTags({color, 'vinebonus'})) do
+        destroyObject(object)
+    end
+
+    local bag = getObjectFromGUID(Guids.Bags.vineyard)
+    local guidsToRemove = {}
+    for _, object in ipairs(bag.getObjects()) do
+        if has_value(object.tags, color) then
+            table.insert(guidsToRemove, object.guid)
+        end
+    end
+    for index, guid in ipairs(guidsToRemove) do
+        destroyObject(bag.takeObject({guid = guid}))
+    end
+end
+
+function resupplyVineyards()
+    -- Vineyard Depot
+    -- 4 player game, fill all 6 depot
+    -- 2 or 3 player game, fill spots 1, 3, and 5
+
+    -- Vineyard Store
+    -- 3 or 4 player game, place 3 tiles on the store
+    -- 2 player, place 1 tile on the store
+
+    if settings.components.vineyards == false then return end
+    local zone = getObjectFromGUID(Guids.Zones.vineyard)
+    for _, object in ipairs(zone.getObjects()) do
+        SetupBag.putObject(object)
+    end
+
+    local bag = getObjectFromGUID(Guids.Bags.vineyard)
+
+    local depot = getObjectFromGUID(Guids.Boards.vineyarddepot)
+    local snaps = depot.getSnapPoints()
+    for index, snap in ipairs(snaps) do
+        if #bag.getObjects() == 0 then return end
+        if settings.playercount == 4 or index % 2 == 1 then
+            local pos = depot.positionToWorld(snap.position)
+            local tile = bag.takeObject()
+            tile.setPosition({pos[1],pos[2]+2,pos[3]})
+            tile.setRotation({0,90,0})
+        end
+    end
+
+    local store = getObjectFromGUID(Guids.Boards.vineyard4p)
+    if settings.playercount < 4 then
+        store = getObjectFromGUID(Guids.Boards.vineyard23p)
+    end
+    local snaps = store.getSnapPoints()
+    for index, snap in ipairs(snaps) do
+        if settings.playercount > 2 or index == 2 then
+            local pos = store.positionToWorld(snap.position)
+            local tile = bag.takeObject()
+            tile.setPosition({pos[1],pos[2]+2,pos[3]})
+            tile.setRotation({0,180,0})
+        end
+    end
+end
+end)
+__bundle_register("Burgundy.Hexes", function(require, _LOADED, __bundle_register, __bundle_modules)
+function setIncludedHexes()
+    if settings.components.geese == false then
+        SetupBag.putObject(BlackBag.takeObject({guid = Guids.Hexes.geese}))
+    end
+    if settings.components.cranes == false then
+        SetupBag.putObject(BlackBag.takeObject({guid = Guids.Hexes.crane}))
+    end
+    if settings.components.whitecastles == false then
+        SetupBag.putObject(BlackBag.takeObject({guid = Guids.Hexes.blackwhitecastle}))
+        SetupBag.putObject(BlackBag.takeObject({guid = Guids.Hexes.blackwhitecastle2}))
+        SetupBag.putObject(BuildingBag.takeObject({guid = Guids.Hexes.whitecastle1}))
+        SetupBag.putObject(BuildingBag.takeObject({guid = Guids.Hexes.whitecastle2}))
+        SetupBag.putObject(BuildingBag.takeObject({guid = Guids.Hexes.whitecastle3}))
+        SetupBag.putObject(BuildingBag.takeObject({guid = Guids.Hexes.whitecastle4}))
+        SetupBag.putObject(BuildingBag.takeObject({guid = Guids.Hexes.whitecastle5}))
+        SetupBag.putObject(BuildingBag.takeObject({guid = Guids.Hexes.whitecastle6}))
+    end
+    if settings.components.monastery2728 == false then
+        local monasteryBag = getObjectFromGUID(Guids.Bags.monastery)
+        SetupBag.putObject(monasteryBag.takeObject({guid = Guids.Hexes.monastery27}))
+        SetupBag.putObject(monasteryBag.takeObject({guid = Guids.Hexes.monastery28}))
+    end
+    if settings.components.inns == false then
+        SetupBag.putObject(getObjectFromGUID(Guids.Bags.inn))
+    end
+end
+
+function removeGameBoardHexes()
+    local zone = getObjectFromGUID(Guids.Zones.gameboard)
+    for _, object in ipairs(zone.getObjects()) do
+        if not object.hasTag('inn') then
+            SetupBag.putObject(object)
+        end
+    end
+end
+
+function removePlayerBoardHexes()
+    for _, obj in ipairs(getObjectsWithTag('Map')) do
+        destroyObject(obj)
+
+    end
+end
+
+function supplyGameBoardHexes()
+    GameBoard = getGameBoard()
+    local snaps = GameBoard.getSnapPoints()
+
+    local waitCounter = 1
+    for _, snap in ipairs(snaps) do
+        if #snap.tags > 0 then
+            local deployHex = true
+
+            if settings.playercount == 3 then
+                if has_value(snap.tags, 'fourplayer') then
+                    deployHex = false
+                end
+
+                local isPhaseACE = settings.phase == 'A' or settings.phase == 'C' or settings.phase == 'E'
+                if has_value(snap.tags, 'threeplayerbd') and isPhaseACE then
+                    deployHex = false
+                end
+            end
+
+            if deployHex then
+                local bag = nil
+                if has_value(snap.tags, 'building') then bag = getObjectFromGUID(Guids.Bags.building) end
+                if has_value(snap.tags, 'monastery') then bag = getObjectFromGUID(Guids.Bags.monastery) end
+                if has_value(snap.tags, 'blackmarket') then bag = getObjectFromGUID(Guids.Bags.blackmarket) end
+                if has_value(snap.tags, 'inn') and settings.phase ~= 'E' then bag = getObjectFromGUID(Guids.Bags.inn) end
+                if has_value(snap.tags, 'livestock') then bag = getObjectFromGUID(Guids.Bags.livestock) end
+                if has_value(snap.tags, 'castle') then bag = getObjectFromGUID(Guids.Bags.castle) end
+                if has_value(snap.tags, 'mine') then bag = getObjectFromGUID(Guids.Bags.mine) end
+                if has_value(snap.tags, 'Ship') then bag = getObjectFromGUID(Guids.Bags.Ship) end
+
+                if bag ~= nil then
+                    Wait.time(function()
+                        local pos = GameBoard.positionToWorld(snap.position)
+                        pos[2] = 2
+                        local hex = bag.takeObject({position = pos, rotation = {0, snap.rotation.y - 180, 0}, smooth = false})
+                        if Descriptions[hex.getName()] ~= nil then
+                            hex.setDescription(Descriptions[hex.getName()])
+                        end
+                    end, waitCounter * DeploySpeed)
+                    waitCounter = waitCounter + 1
+                end
+            end
+        end
+    end
+end
+
+function setPlayerBoardInitialHexes()
+    for _, color in ipairs(Colors) do
+        local playerboard = getObjectsWithAllTags({color, 'playerboard'})[1]
+        sampleToken = SetupBag.takeObject({guid = Guids.AllHexesToken, position = {-17.50, 1.02, 46.93}, smooth = false})
+        spawnNumberTiles(playerboard)
+        SetupBag.putObject(sampleToken)
+    end
+end
+
+function flipDoubleHex(object)
+    local rotationY = round(object.getRotation()[2])
+    local position = object.getPosition()
+    object.setRotationSmooth({0, rotationY + 180, 0})
+    local c = 1.76
+    local radians = rotationY * math.pi/180
+    local a = c * math.sin(radians)
+    local b = c * math.cos(radians)
+    position = {
+        position[1] + b,
+        1.2,
+        position[3] - a,
+    }
+    object.setPositionSmooth(position)
+end
+end)
+__bundle_register("Burgundy.Map", function(require, _LOADED, __bundle_register, __bundle_modules)
+function setDuchyButtons(obj)
+    obj.setLock(true)
+    local color = getTagColor(obj)
+    local objectPosition = obj.getPosition()
+    local x = objectPosition[1]
+    local y = objectPosition[3]
+    obj.UI.setXml([[<Text id="mapnumber" fontSize="16" rotation="0 0 180" position="0 180 -1" color="#DDDDDD">Map 1</Text>]])
+    obj.createButton({
+        click_function = "changeDuchyPositive",
+        function_owner = self,
+        label          = "+",
+        position       = {.4, .1, 1.8},
+        rotation       = {0, 0, 0},
+        width          = 70,
+        height         = 70,
+        font_size      = 80,
+        color          = {0.5, 0.5, 0.5},
+        font_color     = {1, 1, 1},
+    })
+    obj.createButton({
+        click_function = "changeDuchyNegative",
+        function_owner = self,
+        label          = "-",
+        position       = {-0.4, .1, 1.8},
+        rotation       = {0, 0, 0},
+        width          = 70,
+        height         = 70,
+        font_size      = 80,
+        color          = {0.5, 0.5, 0.5},
+        font_color     = {1, 1, 1},
+    })
+
+    function changeDuchyPositive(obj) changeDuchy(obj, 'positive') end
+    function changeDuchyNegative(obj) changeDuchy(obj, 'negative') end
+
+    function changeDuchy(obj, direction)
+        local settings = Global.getTable('settings')
+        local color = getTagColor(obj)
+        local value = settings.mapNumberIndex[color]
+
+        if direction == 'negative' and value > 1 then
+            settings.mapNumberIndex[color] = value - 1
+        end
+        if direction == 'positive' and value < #settings.availableBoards then
+            settings.mapNumberIndex[color] = value + 1
+        end
+        Global.setTable('settings', settings)
+        setMap(settings.mapNumberIndex[color], color, obj)
+    end
+
+    return color
+end
+
+function getAvailableMapNumbers()
+    local boards = Global.getTable('settings').availableBoards
+end
+
+function spawnNumberTiles(obj)
+    local color = getTagColor(obj)
+    local mapCheck = getObjectsWithAllTags({color, 'map-slot-11'})
+    if #mapCheck > 0 then return false end
+
+    local objectPosition = obj.getPosition()
+    local x = objectPosition[1]
+    local y = objectPosition[3]
+
+    startX = x - 6.2
+    startY = y + 4.5
+    hStep = 1.76
+    vStep = 1.53
+
+    sampleToken = getObjectFromGUID(Global.getTable('Guids').AllHexesToken)
+
+    local map = MapColors[1]
+
+    for b = 1,#map do
+        for a = 1, #map[b] do
+            local xSkipStep = {2,1,1,0,1,1,2}
+
+            local x = startX + (hStep * (a-1+xSkipStep[b])) + (((b+1)%2) * hStep/2)
+            local y = startY - vStep * (b-1)
+
+            local tokenTypeColor = map[b][a]
+            local tokenTypeNumber = MapNumbers[b][a]
+            local tokenType = tokenTypeColor .. tokenTypeNumber
+
+            local cloned = sampleToken.clone({position = {x,0,y}})
+
+            cloned.setRotation({0.00, 150.00, 0.00})
+
+            if MapStates[tokenType] ~= 1 then
+                cloned = cloned.setState(MapStates[tokenType])
+            end
+            cloned.setLock(false)
+            cloned.addTag('Map')
+
+            cloned.addTag('map-slot-' .. b .. a)
+            cloned.addTag(color)
+        end
+    end
+end
+
+function despawnNumberTiles(color)
+    for key, object in ipairs(getObjectsWithAllTags({'Map', color})) do
+        object.destruct()
+    end
+end
+
+-- value, color, obj
+function setMap(value, color, obj)
+    local mapNumber = Global.getTable('settings').availableBoards[value]
+    local map = MapColors[tonumber(mapNumber)]
+
+    for b = 1,#map do
+        for a = 1,#map[b] do
+            local mapTileTag = 'map-slot-' .. b .. a
+            local tokenTypeColor = map[b][a]
+            local tokenTypeNumber = MapNumbers[b][a]
+            local tokenType = tokenTypeColor .. tokenTypeNumber
+            local mapTile = getObjectsWithAllTags({mapTileTag, color})[1]
+            local stateId = MapStates[tokenType]
+            if mapTile.getStateId() ~= stateId then
+                mapTile = mapTile.setState(stateId)
+                mapTile.addTag(mapTileTag)
+                mapTile.addTag(color)
+                mapTile.tooltip = false
+                Wait.time(function() mapTile.setLock(true) end, 5)
+            end
+        end
+    end
+
+    obj.UI.setValue('mapnumber', 'Map ' .. mapNumber)
+end
+
+function setBoardPosition(x, y, color)
+    local board = getObjectsWithAllTags({color, 'playerboard'})[1]
+
+    board.setRotation({0,180,0})
+    board.setPosition({x, 0.97, y+6.8})
+    board.setLock(true)
+end
+
+function setColor(obj, color)
+    local colors = {
+        Blue = "rgb(0.52,0.76,0.94)",
+        Yellow = "rgb(1,0.89,0.16)",
+        Purple = "rgb(0.57,0.47,0.73)",
+        Red = "rgb(0.96,0.5,0.35)",
+    }
+    obj.UI.setAttribute("title", "color", colors[color])
+end
+
+function getTagColor(obj)
+    local color = ''
+    if obj.hasTag('Blue') then color = 'Blue' end
+    if obj.hasTag('Yellow') then color = 'Yellow' end
+    if obj.hasTag('Purple') then color = 'Purple' end
+    if obj.hasTag('Red') then color = 'Red' end
+    return color
+end
+end)
+__bundle_register("Burgundy.Utility", function(require, _LOADED, __bundle_register, __bundle_modules)
+function rand(number)
+    return math.ceil(math.random() * number)
+end
+
+function getNonSeatedPlayerColors()
+    local allColors = {'Purple', 'Red', 'Blue', 'Yellow'}
+    local seatedColors = getSeatedPlayerColors()
+    local nonSeatedColors = {}
+    for _, color in ipairs(allColors) do
+        if has_value(seatedColors, color) == false then
+            table.insert(nonSeatedColors, color)
+        end
+    end
+    return nonSeatedColors
+end
+
+function shuffleArray(t)
+  local tbl = {}
+  for i = 1, #t do
+    tbl[i] = t[i]
+  end
+  for i = #tbl, 2, -1 do
+    local j = math.random(i)
+    tbl[i], tbl[j] = tbl[j], tbl[i]
+  end
+  return tbl
+end
+
+-- Lua doesn't have a round function!
+function round(a)
+    return math.floor(a+0.5)
+end
+
+function coerceBoolean(value)
+    if value == 'True' then return true end
+    if value == 'False' then return false end
+    return value
+end
+
+
+function has_value(tab, val)
+    for _, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+    return false
+end
+
+function has_all_values(tab, values)
+    local valueCount = 0
+    for _, value in ipairs(values) do
+        if has_value(tab, value) then
+            valueCount = valueCount + 1
+        end
+    end
+    return valueCount == #values
+end
+
+function has_any_value(tab, values)
+    for _, value in ipairs(values) do
+        if has_value(tab, value) then
+            return true
+        end
+    end
+    return false
+end
+
+function coerceBoolean(value)
+    if value == 'True' then return true end
+    if value == 'False' then return false end
+    return value
+end
+
+function tableConcat(t1,t2)
+    for i=1,#t2 do
+        t1[#t1+1] = t2[i]
+    end
+    return t1
+end
+
+function yellowPrint(message)
+    printToAll(message, stringColorToRGB('Yellow'))
+end
+
+function greenPrint(message)
+    printToAll(message, stringColorToRGB('Green'))
+end
+
+function redPrint(message)
+    printToAll(message, stringColorToRGB('Red'))
+end
+
+function getSeatedPlayerColors()
+    local playerColors = {}
+    for _, player in ipairs(Player.getPlayers()) do
+        if has_value(Colors, player.color) == true then
+            table.insert(playerColors, player.color)
+        end
+    end
+    return playerColors
+end
+
+function getSeatedPlayerColorsOrdered()
+    local playerColors = {}
+    for _, player in ipairs(Player.getPlayers()) do
+        table.insert(playerColors, player.color)
+    end
+    local ordered = {}
+    for _, color in ipairs(Colors) do
+        if has_value(playerColors, color) == true then
+            table.insert(ordered, color)
+        end
+    end
+    return ordered
+end
+
+function getSnapPositionsWithAllTagsPositionedToWorld(obj, tags)
+    local snaps = getSnapPositionsWithAllTags(obj, tags)
+    local positions = {}
+    for _, snap in ipairs(snaps) do
+        table.insert(positions, obj.positionToWorld(snap))
+    end
+    return positions
+end
+
+function getSnapPositionsWithAllTags(obj, tags)
+    local snaps = obj.getSnapPoints()
+    local positions = {}
+    for _, snap in ipairs(snaps) do
+        if #snap.tags > 0 then
+            if has_all_values(snap.tags, tags) then
+                table.insert(positions, snap.position)
+            end
+        end
+    end
+    return positions
+end
+
+function getSnapPositionsWithAnyTagsPositionedToWorld(obj, tags)
+    local snaps = getSnapPositionsWithAnyTags(obj, tags)
+    local positions = {}
+    for _, snap in ipairs(snaps) do
+        table.insert(positions, obj.positionToWorld(snap))
+    end
+    return positions
+end
+
+function getSnapPositionsWithAnyTags(obj, tags)
+    local snaps = obj.getSnapPoints()
+    local positions = {}
+    for _, snap in ipairs(snaps) do
+        if #snap.tags > 0 then
+            if has_any_value(snap.tags, tags) then
+                table.insert(positions, snap.position)
+            end
+        end
+    end
+    return positions
+end
+
+function getObjectSnapsWithTag(obj, tag)
+    local snaps = obj.getSnapPoints()
+    local taggedSnaps = {}
+    for _, snap in ipairs(snaps) do
+        if #snap.tags > 0 then
+            if has_value(snap.tags, tag) then
+                table.insert(taggedSnaps, snap)
+            end
+        end
+    end
+    return taggedSnaps
+end
+
+function objectHasTag(objInfo, tag)
+    for _, t in ipairs(objInfo.tags) do
+        if t == tag then
+            return true
+        end
+    end
+    return false
+end
+
+function getObjectGuidWithTag(container, tag)
+    for _, obj in ipairs(container.getObjects()) do
+        if objectHasTag(obj, tag) then
+            return obj.guid
+        end
+    end
+end
+
+function getPlayerBoardDicePositions(color, boardType)
+    local playerBoard = getObjectsWithAllTags({color, boardType})[1]
+    local playerDicePos = getSnapPositionsWithAnyTagsPositionedToWorld(playerBoard, {color})
+    local function sortingFunction(pos1, pos2) return pos1[3] > pos2[3] end
+    table.sort(playerDicePos, sortingFunction)
+    return playerDicePos
+end
+
+function raisePosition(pos)
+    return {pos[1], pos[2]+1, pos[3]}
+end
+
+function getTokensAbovePointByTag(pos, tag)
+    local hitList = Physics.cast({
+        origin       = pos,
+        direction    = {0,1,0},
+        type         = 3,
+        size         = { 1.3, 1, 3.10},
+        max_distance = 1
+    })
+
+    local tokens = {}
+
+    for key, value in ipairs(hitList) do
+        if value.hit_object.hasTag(tag) then
+            table.insert(tokens, value.hit_object)
+        end
+    end
+
+    return tokens
+end
+
+end)
+__bundle_register("Burgundy.Setup", function(require, _LOADED, __bundle_register, __bundle_modules)
+function setup()
+    local playerCount = #(getSeatedPlayers())
+    if playerCount == 0 then
+        broadcastToAll('Everyone must select their player color before starting.')
+        return
+    end
+    setupMenu('false')
+    if settings.playstyle == 'ai' and playerCount < 4 then
+        playerCount = playerCount + 1
+    end
+    settings.playercount = playerCount
+
+    if settings.rules.castleplacement == false then
+        SetupBag.putObject(getObjectFromGUID(Guids.Text.boardrule))
+    end
+    if settings.rules.borderpostscoring == false then
+        SetupBag.putObject(getObjectFromGUID(Guids.Text.borderscoring))
+    end
+
+    setIncludedHexes()
+    removeUnusedTurnOrderTokens()
+    setInitialPlayerOrder()
+    Wait.time(function() setVineyards() end, 0.5)
+    Wait.time(function() setTradeRoutes() end, 1.0)
+    Wait.time(function() setPlayerBoards() end, 1.5)
+    Wait.time(function() setGameBoard() end, 3.0)
+    Wait.time(function() giveStartingItems() end, 5.0)
+    Wait.time(function() settings.setupComplete = true end, 6.0)
+end
+
+function giveStartingItems()
+    local function supplyWorker(playerBoard, workerAmount)
+        local workerPos = getSnapPositionsWithAnyTagsPositionedToWorld(playerBoard, {'worker'})[1]
+        local rotation = {0,180,0}
+        local waitCounter = 1
+
+        for i = 1, workerAmount do
+            Wait.time(function()
+                WorkerBag.takeObject({position = workerPos, rotation = rotation})
+            end, waitCounter * DeploySpeed)
+            waitCounter = waitCounter + 1
+        end
+    end
+
+    local function supplyAiTradeGoods(playerBoard)
+        -- Get 1 of each type of good and place on each trade good spot
+        local tradeGoodBag = getObjectsWithTag('tradegoodbag')[1]
+        local waitCounter = 1
+
+        for _, key in ipairs({'tradegood1','tradegood2','tradegood3','tradegood4','tradegood5','tradegood6'}) do
+            for _, tradeGoodPos in ipairs(getSnapPositionsWithAnyTagsPositionedToWorld(playerBoard, {key})) do
+                Wait.time(function()
+                    local tradeGuid = getObjectGuidWithTag(tradeGoodBag, key)
+                    tradeGoodBag.takeObject({position = tradeGoodPos, guid = tradeGuid})
+                end, waitCounter * DeploySpeed)
+                waitCounter = waitCounter + 1
+            end
+        end
+    end
+
+    local function supplyTradeGoods(playerBoard)
+        local tradeGoodBag = getObjectsWithTag('tradegoodbag')[1]
+        local rotation = {0,150,0}
+        local waitCounter = 1
+
+        if settings.playstyle == 'beginnerteamgame' or settings.playstyle == 'advancedteamgame' or settings.playstyle == 'beginnersolo' or settings.playstyle == 'advancedsolo' then rotation = {0,0,0} end
+        for _, tradeGoodPos in ipairs(getSnapPositionsWithAnyTagsPositionedToWorld(playerBoard, {'tradegood'})) do
+            Wait.time(function()
+                tradeGoodBag.takeObject({position = tradeGoodPos, rotation = rotation})
+            end, waitCounter * DeploySpeed)
+            waitCounter = waitCounter + 2
+        end
+    end
+
+    local function supplyCastle(playerBoard)
+        local castleBag = getObjectFromGUID(Guids.Bags.castle)
+        local storagePos
+        if settings.playstyle == 'beginnerteamgame' then
+            storagePos = getSnapPositionsWithAnyTagsPositionedToWorld(playerBoard, {'castle'})[1]
+        else
+            storagePos = getSnapPositionsWithAnyTagsPositionedToWorld(playerBoard, {'storage'})[1]
+        end
+        castleBag.takeObject({position = storagePos, rotation = {0,180,0}})
+    end
+
+    local function supplyCoin(playerBoard)
+        local coinBag = getObjectFromGUID(Guids.Bags.coin)
+        local storagePos = getSnapPositionsWithAnyTagsPositionedToWorld(playerBoard, {'coin'})[1]
+        coinBag.takeObject({position = storagePos, rotation = {0,180,0}})
+        if settings.playstyle == 'beginnerteamgame' or settings.playstyle == 'advancedteamgame' then
+            coinBag.takeObject({position = storagePos, rotation = {0,180,0}})
+        end
+    end
+
+    local function supplyDice(playerBoard, color, amount, board)
+        local playerDicePos = getPlayerBoardDicePositions(color, board)
+        local playerDie = getObjectFromGUID(Guids.PlayerDie)
+        local rotation = {0,330,0}
+        if settings.playstyle == 'beginnersolo' or settings.playstyle == 'advancedsolo' then rotation = {0,30,0} end
+        local function spawnDie(position)
+            spawnObject({
+                type = 'Die_6_Rounded',
+                position = {position[1],position[2]+1,position[3]},
+                rotation = rotation,
+                callback_function = function(die)
+                    die.setColorTint(ColorTint[color])
+                    die.setTags({color, 'playerdice'})
+                end
+            })
+        end
+        for i = 1, amount do
+            spawnDie(playerDicePos[i])
+        end
+    end
+
+    local function supplyAiDeck(p)
+        local aiDeckPosition = {p[1]-12.6, 1.1, p[3]-10.8}
+        local aiDeckZone = getObjectFromGUID(Guids.Zones.aideck)
+        aiDeckZone.setPosition(aiDeckPosition)
+        local aiDeckGuid = Guids.Decks.aibasic
+        if settings.components.vineyards == true then
+            aiDeckGuid = Guids.Decks.aivineyard
+        end
+
+        local aiDeck = SetupBag.takeObject({guid = aiDeckGuid, position = aiDeckPosition, rotation = {0,180,180}})
+        aiDeck.shuffle()
+        local castleCardGuid = getObjectGuidWithTag(aiDeck, 'castlecard')
+        Wait.time(function()
+            aiDeck.takeObject({
+                guid = castleCardGuid,
+                position = {aiDeckPosition[1]+7.15, 1.1, aiDeckPosition[3]},
+                flip = true,
+                callback_function = function(spawnedObject)
+                    local castlePos = getSnapPositionsWithAnyTagsPositionedToWorld(spawnedObject, {'castle'})[1]
+                    local castleBag = getObjectFromGUID(Guids.Bags.castle)
+                    castleBag.takeObject({position = castlePos, rotation = {0,180,0}})
+                end
+            })
+        end, 2)
+        Wait.time(function()
+            aiDeck.takeObject({position = {aiDeckPosition[1]+12.86, 1.1, aiDeckPosition[3]}, flip = true})
+        end, 2.4)
+    end
+
+    local function supplyAiBoard()
+        getObjectFromGUID(Guids.Hands[settings.aiPlayerColor]).setPosition({0.00, -15.00, 0.00})
+
+        local aiBoard = getObjectFromGUID(getAiBoardGuid())
+        supplyAiTradeGoods(aiBoard)
+        supplyCoin(aiBoard)
+        supplyDice(aiBoard, settings.aiPlayerColor, 1, 'aiboard')
+        local p = aiBoard.getPosition()
+        supplyAiDeck(p)
+
+        if settings.aimodes.a == true then
+            local modeAPositions = getSnapPositionsWithAnyTagsPositionedToWorld(aiBoard, {'modea'})
+            local blackBag = getObjectFromGUID(Guids.Bags.blackmarket)
+            for _, modeAPos in ipairs(modeAPositions) do
+                blackBag.takeObject({
+                    position = modeAPos,
+                    rotation = {0,180,180}
+                })
+            end
+        end
+
+        if settings.aimodes.b == true then
+            getObjectFromGUID(Guids.Bags.mine).takeObject({
+                position = getSnapPositionsWithAnyTagsPositionedToWorld(aiBoard, {'mine'})[1],
+                rotation = {0,180,0}
+            })
+            getObjectFromGUID(Guids.Bags.castle).takeObject({
+                position = getSnapPositionsWithAnyTagsPositionedToWorld(aiBoard, {'castle'})[1],
+                rotation = {0,180,0}
+            })
+            getObjectFromGUID(Guids.Bags.building).takeObject({
+                position = getSnapPositionsWithAnyTagsPositionedToWorld(aiBoard, {'building'})[1],
+                rotation = {0,180,0}
+            })
+        end
+
+        SetupBag.takeObject({guid = Guids.AiCheatSheet, position = {p[1], 1.1, p[3]+13.5}, rotation = {0,180,0}})
+    end
+
+    local function supplyBoard(playerBoard, workerAmount, colors)
+        supplyWorker(playerBoard, workerAmount)
+        supplyTradeGoods(playerBoard)
+        supplyCastle(playerBoard)
+        supplyCoin(playerBoard)
+        for _, color in ipairs(colors) do
+            supplyDice(playerBoard, color, 2, 'playerboard')
+        end
+    end
+
+    local playerCount = #(getSeatedPlayers())
+    if settings.playstyle == 'ai' and playerCount < 4 then
+        supplyAiBoard()
+    end
+    if settings.playstyle == 'beginnersolo' then
+        supplyBoard(getObjectFromGUID(Guids.Boards.beginnersolo), 2, {'Yellow'})
+        moveWhiteDie('Yellow')
+    elseif settings.playstyle == 'advancedsolo' then
+        supplyBoard(getObjectFromGUID(Guids.Boards.advancedsolo), 2, {'Yellow'})
+        moveWhiteDie('Yellow')
+    elseif settings.playstyle == 'beginnerteamgame' then
+        supplyBoard(getObjectFromGUID(Guids.Boards.teams31yr), 3, {'Yellow', 'Red'})
+        supplyBoard(getObjectFromGUID(Guids.Boards.teams31pb), 5, {'Purple', 'Blue'})
+        moveWhiteDie('Red')
+    elseif settings.playstyle == 'advancedteamgame' then
+        supplyBoard(getObjectFromGUID(Guids.Boards.teams32yr), 3, {'Yellow', 'Red'})
+        supplyBoard(getObjectFromGUID(Guids.Boards.teams32pb), 5, {'Purple', 'Blue'})
+        moveWhiteDie('Red')
+    else
+        local order = getPlayerTurnOrder()
+        for index, color in ipairs(order) do
+            if settings.aiPlayerColor ~= color then
+                local playerBoard = getObjectsWithAllTags({color, 'playerboard'})[1]
+                supplyBoard(playerBoard, index, {color})
+
+                if index == 1 then
+                    -- Give first player the white die
+                    yellowPrint('Giving the ' .. color .. ' player the white die, 3 trade goods, 1 castle, and 1 worker.')
+                    moveWhiteDie(color)
+                else
+                    yellowPrint('Giving the ' .. color .. ' player 3 trade goods, 1 castle, and ' .. index .. ' workers.')
+                end
+            end
+        end
+        yellowPrint('All players may place their starting castle in their duchy.')
+    end
+end
+end)
+__bundle_register("Burgundy.Buttons", function(require, _LOADED, __bundle_register, __bundle_modules)
+for _, color in ipairs(Colors) do
+    _G["clickRollDice" .. color]                = function() clickRollDice(color) end
+    _G["clickVictoryTrack" .. color .. '-10']   = function() moveToVictoryNumber(color, -10) end
+    _G["clickVictoryTrack" .. color .. '-4']    = function() moveToVictoryNumber(color, -4) end
+    _G["clickVictoryTrack" .. color .. '-1']    = function() moveToVictoryNumber(color, -1) end
+    _G["clickVictoryTrack" .. color .. '+1']    = function() moveToVictoryNumber(color, 1) end
+    _G["clickVictoryTrack" .. color .. '+4']    = function() moveToVictoryNumber(color, 4) end
+    _G["clickVictoryTrack" .. color .. '+10']   = function() moveToVictoryNumber(color, 10) end
+    _G["clickWorker" .. color .. '-1']   = function() gainWorker(color, -1) end
+    _G["clickWorker" .. color .. '+1']   = function() gainWorker(color, 1) end
+    _G["clickCoin" .. color .. '-1']   = function() gainCoin(color, -1) end
+    _G["clickCoin" .. color .. '+1']   = function() gainCoin(color, 1) end
+end
+_G["clickRollDiceaicolor"]                = function() clickRollDice('aicolor') end
+
+-- color, playerBoard, altPosition
+function createDiceRollButton(input)
+    local isAiBoard = false
+    if input.color == 'aicolor' then isAiBoard = true end
+
+    local p = getSnapPositionsWithAllTags(input.playerBoard, {'whitedie', input.color})[1]
+
+    local pos = {p[1] * -1 + 0.9, p[2]+0.1, p[3] - 0.45}
+    if input.altPosition == true then
+        pos[1] = pos[1] - 1.8
+    end
+
+    if isAiBoard == true then
+        pos[1] = pos[1] + 3.4
+        pos[3] = pos[3] - 2.3
+    end
+
+    input.playerBoard.createButton({
+        click_function = "clickRollDice" .. input.color,
+        label          = "Roll",
+        position       = pos,
+        rotation       = {0, 0, 0},
+        width          = 700,
+        height         = 400,
+        scale          = {0.5, 0.5, 0.5},
+        font_size      = 300,
+        color          = {0.2, 0.2, 0.2, 1},
+        font_color     = {1, 1, 1},
+        disabled       = true
+    })
+    createVictoryTrackButtons(input, p)
+    createWorkerButtons(input, p)
+    createCoinButtons(input, p)
+end
+
+-- color, playerBoard, altPosition
+function createVictoryTrackButtons(input, p)
+    local isAiBoard = false
+    if input.color == 'aicolor' then isAiBoard = true end
+
+    local color = input.color
+    if input.color == 'aicolor' and settings.aiPlayerColor ~= '' then color = settings.aiPlayerColor end
+    for index, num in ipairs{'-10','-4','-1','+1','+4','+10'} do
+        local pos = {p[1] + (index-1) * 0.65 , p[2] + 0.1, p[3] - 0.7}
+        if input.altPosition == true then
+            pos[1] = pos[1] - 1.8
+        end
+        if isAiBoard == true then
+            pos[1] = pos[1] + 3.4
+            pos[3] = pos[3] - 2.3
+        end
+        input.playerBoard.createButton({
+            click_function = "clickVictoryTrack" .. color .. num,
+            label          = num .. " VP",
+            tooltip        = "Score " .. num .. " VP",
+            position       = pos,
+            rotation       = {0, 0, 0},
+            width          = 1000,
+            height         = 500,
+            scale          = {0.2, 0.2, 0.2},
+            font_size      = 300,
+            color          = ColorTintAlpha[color],
+            font_color     = {1, 1, 1},
+            disabled       = true
+        })
+    end
+end
+
+-- color, playerBoard, altPosition
+function createWorkerButtons(input, p)
+    local isAiBoard = false
+    if input.color == 'aicolor' then isAiBoard = true end
+
+    local color = input.color
+    if input.color == 'aicolor' and settings.aiPlayerColor ~= '' then return end
+
+    for index, num in ipairs{'-1','+1'} do
+        local pos = {p[1]-0.8, p[2]+0.1, p[3]+1.2 - 0.6*(index-1)}
+        if input.altPosition == true then
+            pos[1] = pos[1] - 1.8
+        end
+        input.playerBoard.createButton({
+            click_function = "clickWorker" .. color .. num,
+            label          = num .. " Worker",
+            position       = pos,
+            rotation       = {0, 0, 0},
+            width          = 900,
+            height         = 400,
+            scale          = {0.3, 0.3, 0.3},
+            font_size      = 200,
+            color          = ColorTintAlpha[color],
+            font_color     = {1, 1, 1},
+            disabled       = true
+        })
+    end
+end
+
+-- color, playerBoard, altPosition
+function createCoinButtons(input, p)
+    local isAiBoard = false
+    if input.color == 'aicolor' then isAiBoard = true end
+
+    local color = input.color
+    if input.color == 'aicolor' and settings.aiPlayerColor ~= '' then color = settings.aiPlayerColor end
+
+    for index, num in ipairs{'-1','+1'} do
+        local pos = {p[1]-0.8, p[2]+0.1, p[3]+0.1 - 0.3*(index-1)}
+         if input.altPosition == true then
+            pos[1] = pos[1] - 1.8
+        end
+        if isAiBoard == true then
+            pos[1] = pos[1] + 3.4
+            pos[3] = pos[3] - 2.7
+        end
+        input.playerBoard.createButton({
+            click_function = "clickCoin" .. color .. num,
+            label          = num .. " Coin",
+            position       = pos,
+            rotation       = {0, 0, 0},
+            width          = 900,
+            height         = 400,
+            scale          = {0.3, 0.3, 0.3},
+            font_size      = 200,
+            color          = ColorTintAlpha[color],
+            font_color     = {1, 1, 1},
+            disabled       = true
+        })
+    end
+end
+
+function gainWorker(color, amount)
+    local bag = getObjectFromGUID(Guids.Bags.worker)
+    if bag == nil then return end
+    local playerBoard = getObjectsWithAllTags({color, 'playerboard'})[1]
+    local pos = getSnapPositionsWithAnyTagsPositionedToWorld(playerBoard, {"worker"})[1]
+
+    local name = color
+    if Player[color] and Player[color].steam_name then
+        name = Player[color].steam_name
+    end
+
+     if amount > 0 then
+        bag.takeObject({position = raisePosition(pos), rotation = {0, 180, 0}, smooth = false})
+        broadcastToAll(name .. " gained " .. amount .. " worker.", color)
+    else
+        decreaseStackAboveSnapPoint(pos, "worker", amount, name, color, "worker")
+    end
+end
+
+function gainCoin(color, amount)
+    local bag = getObjectFromGUID(Guids.Bags.coin)
+    if bag == nil then return end
+
+    local playerBoard
+    if settings.aiPlayerColor == color then
+        playerBoard = getObjectsWithAllTags({'aiboard'})[1]
+    else
+        playerBoard = getObjectsWithAllTags({color, 'playerboard'})[1]
+    end
+    local pos = getSnapPositionsWithAnyTagsPositionedToWorld(playerBoard, {"coin"})[1]
+
+    local name = color
+    if Player[color] and Player[color].steam_name then
+        name = Player[color].steam_name
+    end
+
+    if amount > 0 then
+        bag.takeObject({position = raisePosition(pos), rotation = {0, 180, 0}, smooth = false})
+        broadcastToAll(name .. " gained " .. amount .. " coin.", color)
+    else
+        decreaseStackAboveSnapPoint(pos, "coin", amount, name, color, "coin")
+    end
+end
+
+function decreaseStackAboveSnapPoint(pos, tag, amount, player_name, player_color, resource_name)
+    local tokenOrStack = getTokensAbovePointByTag(pos, tag)
+    if #tokenOrStack == 0 then return end
+
+    if (tokenOrStack[1].name == 'Custom_Tile_Stack') then
+        destroyObject(tokenOrStack[1].takeObject())
+    else
+        destroyObject(tokenOrStack[1])
+    end
+
+    if player_name and player_color and resource_name then
+        broadcastToAll(player_name .. " used " .. math.abs(amount) .. " " .. resource_name .. ".", player_color)
+    end
+end
+
+function createVineyardFlipButton(object)
+    object.clearButtons()
+    object.createButton({
+        click_function = "flipDoubleHex",
+        function_owner = Global,
+        position       = {-0.9,0.1,0},
+        rotation       = {0, 0, 0},
+        width          = 300,
+        height         = 200,
+        color          = {0,0,0,0.8},
+        hover_color    = {1,1,1,0.5},
+        font_color     = {1,1,1},
+        label          = 'Flip',
+        tooltip        = 'Flip the hex 180 degrees'
+    })
+end
+end)
+__bundle_register("Burgundy.DataSettings", function(require, _LOADED, __bundle_register, __bundle_modules)
+settings = {
+    playercount = 1,
+    playstyle = 'normal',
+    gameboard = '2p',
+    aimodes = {
+        a = false,
+        b = false,
+        c = false,
+        d = false,
+    },
+    aiPlayerColor = '',
+    randomboard = true,
+    boards = {
+        b0110 = true,
+        b1118 = false,
+        b1922 = false,
+        b2330 = false,
+    },
+    availableBoards = {1,2,3,4,5,6,7,8,9,10},
+    availableVines = {},
+    components = {
+        shields = false,
+        traderoutes = false,
+        vineyards = false,
+        monastery2728 = true,
+        cranes = true,
+        whitecastles = true,
+        geese = true,
+        inns = true,
+    },
+    rules = {
+        castleplacement = false,
+        vineyardrandomness = true,
+        borderpostscoring = false
+    },
+    mapNumberIndex = {
+        Red = 1,
+        Blue = 1,
+        Yellow = 1,
+        Purple = 1
+    },
+    setupComplete = false,
+    phase = 'A',
+    turnTrack = {
+        {'Blue', 'Yellow', 'Purple', 'Red'},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+    },
+    points = {
+        Red = 0,
+        Purple = 0,
+        Yellow = 0,
+        Blue = 0
+    }
+}
+end)
+__bundle_register("Burgundy.DataMaps", function(require, _LOADED, __bundle_register, __bundle_modules)
+MapStates = {
+    y1 = 1,y2 = 2,y3 = 3,y4 = 4,y5 = 5,y6 = 6,
+    t1 = 7,t2 = 8,t3 = 9,t4 = 10,t5 = 11,t6 = 12,
+    g1 = 13,g2 = 14,g3 = 15,g4 = 16,g5 = 17,g6 = 18,
+    e1 = 19,e2 = 20,e3 = 21,e4 = 22,e5 = 23,e6 = 24,
+    b1 = 25,b2 = 26,b3 = 27,b4 = 28,b5 = 29,b6 = 30,
+    r1 = 31,r2 = 32,r3 = 33,r4 = 34,r5 = 35,r6 = 36
+}
+MapNumbers = {
+    {'6','5','4','3'},
+    {'2','1','6','5','4'},
+    {'5','4','3','1','2','3'},
+    {'6','1','2','6','5','4','1'},
+    {'2','5','4','3','1','2'},
+    {'6','1','2','5','6'},
+    {'3','4','1','3'}
+}
+MapColors = {
+    -- #1
+    {
+        {'g','r','r','y'},
+        {'g','g','r','y','t'},
+        {'g','g','t','y','t','t'},
+        {'b','b','b','r','b','b','b'},
+        {'t','t','e','t','t','g'},
+        {'t','e','y','t','t'},
+        {'e','y','y','t'}
+    },
+    -- #2
+    {
+        {'y','y','y','r'},
+        {'t','t','b','g','e'},
+        {'e','t','t','b','g','b'},
+        {'r','t','b','r','y','t','b'},
+        {'y','b','t','g','y','t'},
+        {'t','t','g','t','e'},
+        {'g','g','t','r'}
+    },
+    -- #3
+    {
+        {'g','g','g','g'},
+        {'b','b','r','b','b'},
+        {'t','e','y','y','b','t'},
+        {'t','t','y','r','y','t','t'},
+        {'t','t','y','y','t','t'},
+        {'r','g','e','e','r'},
+        {'t','g','b','t'}
+    },
+    -- #4
+    {
+        {'r','t','b','t'},
+        {'g','g','t','b','b'},
+        {'t','g','t','b','r','e'},
+        {'g','g','g','y','y','e','b'},
+        {'t','r','y','t','t','y'},
+        {'t','e','t','y','t'},
+        {'b','t','y','r'}
+    },
+    -- #5
+    {
+        {'g','t','t','b'},
+        {'g','g','t','e','e'},
+        {'t','r','y','b','b','b'},
+        {'t','t','g','y','r','t','t'},
+        {'y','r','g','y','b','t'},
+        {'t','g','t','r','b'},
+        {'y','y','t','e'}
+    },
+    -- #6
+    {
+        {'y','y','r','b'},
+        {'y','t','t','b','t'},
+        {'g','g','e','b','t','t'},
+        {'y','t','t','r','b','t','t'},
+        {'y','t','t','e','b','t'},
+        {'y','e','g','g','b'},
+        {'r','g','g','r'}
+    },
+    -- #7
+    {
+        {'y','r','r','b'},
+        {'y','g','g','g','b'},
+        {'b','e','t','t','e','g'},
+        {'b','y','t','t','t','g','t'},
+        {'t','y','t','t','g','t'},
+        {'t','b','e','y','t'},
+        {'b','r','r','y'}
+    },
+    -- #8
+    {
+        {'t','t','b','t'},
+        {'t','r','y','r','t'},
+        {'t','y','e','y','y','b'},
+        {'b','g','y','e','g','y','b'},
+        {'b','g','g','e','g','t'},
+        {'t','r','g','r','t'},
+        {'t','b','t','t'}
+    },
+    -- #9
+    {
+        {'t','t','r','y'},
+        {'t','t','g','g','b'},
+        {'t','t','g','g','b','b'},
+        {'r','y','y','e','b','r','y'},
+        {'b','b','y','e','t','g'},
+        {'y','t','t','t','g'},
+        {'e','r','t','t'}
+    },
+    -- #10
+    {
+        {'b','t','g','r'},
+        {'g','b','t','g','t'},
+        {'g','g','g','t','y','t'},
+        {'t','t','t','t','t','y','r'},
+        {'y','y','e','y','e','b'},
+        {'t','t','e','y','b'},
+        {'r','b','b','r'}
+    },
+    -- #11
+    {
+        {'t','t','t','t'},
+        {'y','y','r','g','g'},
+        {'y','y','b','b','g','g'},
+        {'r','t','t','t','t','t','r'},
+        {'b','g','g','y','y','e'},
+        {'b','b','r','e','e'},
+        {'b','t','t','t'}
+    },
+    -- #12
+    {
+        {'g','g','g','g'},
+        {'t','t','t','g','t'},
+        {'b','e','e','r','t','t'},
+        {'b','r','b','g','b','b','e'},
+        {'b','y','t','t','y','r'},
+        {'y','y','t','y','t'},
+        {'y','r','t','t'}
+    },
+    -- #13
+    {
+        {'t','t','y','t'},
+        {'e','r','y','y','t'},
+        {'e','t','y','y','y','r'},
+        {'r','g','t','g','g','g','t'},
+        {'t','e','r','b','g','t'},
+        {'t','b','t','b','g'},
+        {'b','b','t','b'}
+    },
+    -- #14
+    {
+        {'e','t','t','b'},
+        {'t','r','e','r','t'},
+        {'t','g','g','e','g','t'},
+        {'y','t','g','y','g','t','b'},
+        {'y','t','g','y','t','b'},
+        {'y','r','b','r','b'},
+        {'y','t','t','b'}
+    },
+    -- #15
+    {
+        {'e','y','y','r'},
+        {'r','y','t','t','g'},
+        {'b','g','t','t','t','g'},
+        {'b','g','e','t','t','t','g'},
+        {'b','b','e','b','b','g'},
+        {'y','r','t','t','r'},
+        {'y','y','t','t'}
+    },
+    -- #16
+    {
+        {'t','t','t','t'},
+        {'r','y','y','y','g'},
+        {'y','t','y','y','g','g'},
+        {'t','t','e','e','r','b','b'},
+        {'t','e','b','b','g','g'},
+        {'r','t','t','t','g'},
+        {'b','b','t','r'}
+    },
+    -- #17
+    {
+        {'y','y','r','t'},
+        {'b','b','t','t','t'},
+        {'t','b','g','g','g','r'},
+        {'t','t','r','e','g','g','y'},
+        {'b','b','b','g','e', 'y'},
+        {'t','t','r','e','y'},
+        {'t','y','t','t'}
+    },
+    -- #18
+    {
+        {'t','t','t','t'},
+        {'t','t','r','b','b'},
+        {'g','g','g','r','b','b'},
+        {'e','e','e','r','t','t','t'},
+        {'b','b','r','y','y','t'},
+        {'y','y','g','g','t'},
+        {'y','y','g','t'}
+    },
+    -- #19
+    {
+        {'t','g','t','r'},
+        {'g','g','g','y','e'},
+        {'r','g','e','b','e','t'},
+        {'y','y','t','b','b','t','b'},
+        {'y','t','t','y','t','b'},
+        {'t','g','t','y','r'},
+        {'r','t','t','b'}
+    },
+    -- #20
+    {
+        {'t','t','t','r'},
+        {'r','t','t','e','e'},
+        {'y','y','g','e','y','y'},
+        {'b','b','g','t','y','g','g'},
+        {'t','b','t','g','g','r'},
+        {'t','r','b','t','t'},
+        {'t','b','b','y'}
+    },
+    -- #21
+    {
+        {'r','e','e','b'},
+        {'r','t','t','e','b'},
+        {'t','t','t','y','t','g'},
+        {'t','t','r','g','t','t','g'},
+        {'b','g','g','y','r','g'},
+        {'y','t','t','y','b'},
+        {'y','b','y','b'}
+    },
+    -- #22
+    {
+        {'y','y','t','t'},
+        {'y','r','t','r','t'},
+        {'t','b','t','t','b','t'},
+        {'t','t','e','e','e','b','t'},
+        {'t','y','g','y','y','g'},
+        {'b','r','g','r','g'},
+        {'b','b','g','g'}
+    },
+    -- #23
+    {
+        {'r','t','t','r'},
+        {'y','y','y','y','y'},
+        {'b','g','t','t','b','g'},
+        {'t','b','t','t','t','g','e'},
+        {'t','b','t','t','g','e'},
+        {'r','b','y','g','r'},
+        {'e','b','g','t'}
+    },
+    -- #24
+    {
+        {'t','t','t','r'},
+        {'t','e','y','y','t'},
+        {'t','e','e','g','y','t'},
+        {'r','b','b','g','y','y','t'},
+        {'b','b','b','g','y','r'},
+        {'b','g','g','g','t'},
+        {'t','r','t','t'}
+    },
+    -- #25
+    {
+        {'r','t','t','y'},
+        {'e','g','t','t','g'},
+        {'t','t','r','g','g','g'},
+        {'y','t','t','e','b','b','g'},
+        {'y','y','y','r','b','b'},
+        {'b','t','t','y','e'},
+        {'b','t','t','r'}
+    },
+    -- #26
+    {
+        {'b','r','r','t'},
+        {'b','b','y','t','t'},
+        {'b','b','b','t','t','t'},
+        {'g','g','e','e','e','y','y'},
+        {'g','t','g','g','t','y'},
+        {'t','t','g','y','t'},
+        {'r','t','y','r'}
+    },
+    -- #27
+    {
+        {'e','e','y','y'},
+        {'y','t','t','b','t'},
+        {'r','y','t','y','b','r'},
+        {'g','g','g','y','t','t','e'},
+        {'g','b','b','t','t','t'},
+        {'g','b','b','t','t'},
+        {'g','r','r','t'}
+    },
+    -- #28
+    {
+        {'t','t','t','b'},
+        {'y','y','r','t','b'},
+        {'b','t','t','e','t','t'},
+        {'r','t','t','e','g','b','r'},
+        {'y','t','e','g','b','b'},
+        {'y','t','r','y','y'},
+        {'g','g','g','g'}
+    },
+    -- #29
+    {
+        {'t','t','e','b'},
+        {'t','g','g','t','t'},
+        {'t','r','t','y','r','t'},
+        {'b','b','t','r','y','t','b'},
+        {'g','g','t','y','b','b'},
+        {'e','g','r','t','y'},
+        {'g','y','y','e'}
+    },
+    -- #30
+    {
+        {'b','b','y','e'},
+        {'b','t','y','y','b'},
+        {'g','t','t','t','t','r'},
+        {'r','b','r','g','g','g','g'},
+        {'t','t','t','y','t','r'},
+        {'t','t','y','y','t'},
+        {'e','g','b','e'}
+    }
+}
+end)
+__bundle_register("Burgundy.DataDescriptions", function(require, _LOADED, __bundle_register, __bundle_modules)
+Descriptions = {}
+Descriptions['Bank'] = 'When you place a bank in your duchy, immediately gain 2 silver coins from the supply.'
+Descriptions['Boarding House'] = 'When you place a boarding house in your duchy, immediately gain 4 worker tokens from the supply.'
+Descriptions["Carpenter's Workshop"] = "When you place a carpenter's workshop in your duchy, you may immediately take a beige building tile from any of the six depots on the game board (except the central black depot) and place it on an empty key space in the bottom right of your player board."
+Descriptions['Castle'] = 'Whenever you place a castle tile in your duchy, you immediately take an additional action, just as if you had another die with your choice of result at your disposal.'
+Descriptions['Church'] = 'When you place a church in your duchy, you may immediately take a mine (gray), monastery (yellow), or castle (burgundy) tile from any of the six depots on the game board (except the central black depot) and place it on an empty key space in the bottom right of your player board.'
+Descriptions['Crane'] = 'When you place a crane in your duchy, you may immediately trigger the effect of any building (beige) tile you want, even if that building is not in your duchy.\n\nFor example, you could sell goods (warehouse), or gain 2 silver coins (bank), or take a castle tile from the game board (church), etc.\n\n Additionally, during final scoring at the end of the game, the crane counts as a building of your choice for the corresponding monastery tiles (16-23 + 29).\n\nThis may be a different building from the one you triggered when placing the crane.'
+Descriptions['Geese'] = 'When you place the two geese in your duchy, you score 2 victory points as normal, plus victory points for one other type of livestock that is in the same pasture. Later, whenever you place another livestock tile in the same pasture, you score 2 victory points for the geese tile. In addition, geese count as additional type of livestock for monastery tiles #7 and #24.\n\nExample: Carla places the geese tile on a pasture that already has a 2 and a 3 cow tile. Carla scores 2+2+3 = 7 victory points. During a later turn, she places a 4 pig tile in the same pasture and scores 4+2 = 6 victory points.'
+Descriptions['Inn'] = "At the beginning of each phase, place one inn on the indicated space next to the central black depot. Unlike other hex tiles, inns are not removed from the board at the end of each phase. If there is already an inn next to the central black depot, stack the new one on top.\n\nLike every other hex tile from the black depot, inns may be bought by paying 2 silver coins, and placed on a key space on the player's board.\n\nAn inn may be placed on any empty hex space on your duchy (according to the regular rules). However, you may only place up to one inn per color area!\n\nThe inn itself has no effect, its only function is to complete an area.\n\nImportant: By placing an inn, you increase the size of that area by 1. A 9-space area scores 45 victory points."
+Descriptions['Livestock'] = 'Whenever you place a livestock tile in your duchy, you immediately score victory points. Each tile shows 2-4 livestock, which is the amount of victory points you score.\n\nAdditionally, if you already have at least one other tile with the same livestock in the same pasture (a contiguous area of green hex spaces), you also score victory points for those other tiles.'
+Descriptions['Mine'] = 'Mines are tiles with no immediate effect when they are placed. At the end of each phase you gain one silver coin from the supply for each mine in your duchy.'
+Descriptions['Market'] = 'When you place a market in your duchy, you may immediately take a ship (blue) or livestock (green) tile from any of the six depots (except the central black depot) and place it on an empty key space in the bottom right of your player board.'
+Descriptions['Monastery 1'] = 'You are no longer limited to one building (beige) tile per type in each of your towns. In other words, you may build more than one building of the same type within a single town.'
+Descriptions['Monastery 2'] = 'For each mine you have placed, you gain a worker in addition to the silver coin at the end of each phase.'
+Descriptions['Monastery 3'] = 'You gain 2 silver coins instead of 1 whenever you sell goods (either when taking the die action or when placing a warehouse).'
+Descriptions['Monastery 4'] = 'Whenever you sell a type of goods (either when taking the die action or when placing a warehouse), you gain a worker in addition to the silver coin you normally receive.'
+Descriptions['Monastery 5'] = 'Whenever you place a ship tile, in addition to taking all goods tiles from a depot of your choice, you may also take all goods tiles from an adjacent depot.'
+Descriptions['Monastery 6'] = 'Once per turn, you may spend 2 worker tokens to immediately take a building (beige) tile from any of the six depots on the game board (except the central black depot) and place it on an empty key space in the bottom right of your player board.'
+Descriptions['Monastery 7'] = 'Whenever you place a livestock tile, in addition to the usual bonus for existing livestock of the same type in the same pasture, you also score 1 victory point for each livestock tile that scores at that time.\n\nExample: Ben places a 3 sheep tile on the pasture that already contains a 4 sheep tile: He gains (3+1) + (4+1) = 9 victory points. If he places a 2 pig tile, he gets 3 victory points.'
+Descriptions['Monastery 8'] = 'Whenever you use a worker to change the result of a die, you may add or subtract 2 instead of 1.\n\nExample: To change a 3 to a 6, Carla only needs to use 2 workers instead of 3.'
+Descriptions['Monastery 9'] = 'Whenever you want to place a building (beige) tile in your duchy, you may change the die result by 1 (just as if you were using a worker).'
+Descriptions['Monastery 10'] = 'Whenever you want to place a ship or a livestock tile (blue and green tiles) in your duchy, you may change the die result by 1 (just as if you were using a worker).'
+Descriptions['Monastery 11'] = 'Whenever you want to place a castle, mine, or monastery tile (burgundy, gray, and yellow tiles) in your duchy, you may change the die result by 1 (just as if you were using a worker).'
+Descriptions['Monastery 12'] = 'Whenever you want to take a hex tile from the game board, you may change the die result by 1 (just as if you were using a worker).'
+Descriptions['Monastery 13'] = 'Whenever you use the "Take 2 worker tokens" action, you gain 1 silver coin in addition to the 2 worker tokens from the supply.\n\nNote: This and the next tile have no effect when placing a Boarding house.'
+Descriptions['Monastery 14'] = 'Whenever you use the "Take 2 worker tokens" action, you gain 4 worker tokens instead of the usual 2.'
+Descriptions['Monastery 15'] = 'At the end of the game, you score 2 victory points for each different type of goods tile in your sold goods pile. Unsold goods are ignored.\n\nNote: You may look at your sold goods pile at any time during the game.\n\nExample: Dario has sold the following goods tiles: 4x red, 3x purple, 3x pink and 1x orange. He scores 4 types x 2 = 8 victory points.'
+Descriptions['Monastery 16'] = 'At the end of the game, you score 4 victory points for each Warehouse that you placed in your duchy.'
+Descriptions['Monastery 17'] = 'At the end of the game, you score 4 victory points for each Watchtower that you placed in your duchy.'
+Descriptions['Monastery 18'] = "At the end of the game, you score 4 victory points for each Carpenter's Workshop that you placed in your duchy."
+Descriptions['Monastery 19'] = 'At the end of the game, you score 4 victory points for each Church that you placed in your duchy.'
+Descriptions['Monastery 20'] = 'At the end of the game, you score 4 victory points for each Market that you placed in your duchy.'
+Descriptions['Monastery 21'] = 'At the end of the game, you score 4 victory points for each Boarding House that you placed in your duchy.'
+Descriptions['Monastery 22'] = 'At the end of the game, you score 4 victory points for each Bank that you placed in your duchy.'
+Descriptions['Monastery 23'] = 'At the end of the game, you score 4 victory points for each Town Hall that you placed in your duchy.'
+Descriptions['Monastery 24'] = 'At the end of the game, you score 4 victory points for each different livestock type that you placed in your duchy.\n\nExample: Anna has placed 3 sheep, 1 cow, and 1 pig tile in her duchy. At the end of the game she scores 3 types x 4 = 12 victory points.'
+Descriptions['Monastery 25'] = 'At the end of the game, you score 1 victory point for each goods tile you sold. Unsold goods are ignored.\n\nExample: If Dario had placed this tile as well, he would score 11 additional victory points.\n\nExample: Dario has sold the following goods tiles: 4x red, 3x purple, 3x pink and 1x orange. He scores 4 types x 2 = 8 victory points.'
+Descriptions['Monastery 26'] = 'At the end of the game, you score 3 victory points for each bonus tile (large and small) you own.'
+Descriptions['Monastery 27'] = 'If your turn order marker is in a stack with other markers, it is always placed on top. This applies both actively and passively (i.e. whenever another marker is moved onto the same space, yours is placed on top).'
+Descriptions['Monastery 28'] = 'If this tile is in your duchy, you can buy workers from the supply at any time. 2 workers cost 1 silver coin.'
+Descriptions['Monastery 29'] = 'At the end of the game, you score 4 victory points for each White Castle that you placed in your duchy.'
+Descriptions['Ships'] = 'Take all goods from 1 depot. Advance 1 space on the turn order track.'
+Descriptions['Town Hall'] = 'When you place a town hall in your duchy, you may immediately choose a second hex tile from your storage and place it in your duchy. Placing the tile triggers its effect, as usual.'
+Descriptions['Watchtower'] = 'When you place a watchtower in your duchy, you immediately score 4 victory points.'
+Descriptions['Warehouse'] = ' When you place a warehouse in your duchy, you may immediately (without having to use a die) choose a type of goods tile you own and sell that stack, just as if you had taken the “Sell goods” action.'
+Descriptions['White Castle'] = "When you place a white castle in your duchy, immediately take an action using the current result of the white die. You are allowed to use workers to change the rolled number (don't change the actual white die result)."
+end)
+__bundle_register("Burgundy.Data", function(require, _LOADED, __bundle_register, __bundle_modules)
+WorkshopId = '3281151120'
+
+Vines = {'Orange', 'Yellow', 'Green', 'Red', 'Black', 'Blue'}
+Colors = {'Yellow','Purple','Red','Blue'}
+Phases = {'A', 'B', 'C', 'D', 'E'}
+DeploySpeed = 0.2
+
+Guids = {
+    Boards = {
+        mainboard2p = '61fa13',
+        mainboard34p = 'ed5016',
+        beginnersolo = '5b998f',
+        advancedsolo = 'cca96f',
+        teams31pb = '76c053',
+        teams31yr = 'c8e5f5',
+        teams32pb = 'edc374',
+        teams32yr = '158d3a',
+        aiboard35 = '8b4626',
+        aiboard36 = '977deb',
+        vineyarddepot = 'b4e585',
+        vineyard23p = '9806c3',
+        vineyard4p = '56368e',
+        traderoute4 = 'd3eb55',
+        traderoute3 = 'ef6fcf',
+        traderoute2 = 'fc3766',
+    },
+    Decks = {
+        aibasic = '65dc4e',
+        aivineyard = '41baef'
+    },
+    AllHexesToken = '6cb7b0',
+    Bags = {
+        building = 'ff455f',
+        monastery = '22d394',
+        blackmarket = '3a779f',
+        inn = '341be2',
+        livestock = 'b6e19b',
+        castle = '27d3a4',
+        mine = '622583',
+        Ship = 'c878c8',
+        traderoute = '423ed9',
+        vineyard = '6394c8',
+        shield = 'bf2a10',
+        setup = 'f8f2fb',
+        worker = '240f8b',
+        coin = 'c94dda'
+    },
+    Zones = {
+        gameboard = '82f251',
+        vineyard = '58f596',
+        aideck = '71e23f',
+        tradegoods = 'c30c38'
+    },
+    Hands = {
+        Red = '727836',
+        Yellow = 'd8a545',
+        Purple = '306b40',
+        Blue = 'c071ab'
+    },
+    Tokens = {
+        borderpost234 = 'f992d9',
+        borderpost567 = 'c4e8c1',
+        Black234 = 'd3def9',
+        Black567 = 'da5205',
+        Tan234 = '63ddde',
+        Tan567 = 'e222a9',
+        Blue234 = 'bdd6b1',
+        Blue567 = '6a872e',
+        Green234 = 'ae90fc',
+        Green567 = '24718a',
+        Red234 = 'e6dabb',
+        Red567 = 'a64643',
+        Yellow234 = 'b66475',
+        Yellow567 = '3b87f1'
+    },
+    Hexes = {
+        geese = 'c15c04',
+        blackwhitecastle = '22533c',
+        blackwhitecastle2 = 'e2df18',
+        whitecastle1 = '3b5397',
+        whitecastle2 = '40c03b',
+        whitecastle3 = '376df4',
+        whitecastle4 = '1276a4',
+        whitecastle5 = 'ed3b0c',
+        whitecastle6 = '3ab130',
+        crane = '4a97d9',
+        monastery27 = '786989',
+        monastery28 = 'b2387b'
+    },
+    Scripts = {
+        vineyard = '5147db',
+        utility = '47fd87',
+        map = '97996f',
+        round = 'ecde2b',
+        gameboard = '300972',
+        traderoute = '7669dc',
+        hexes = '70daf0',
+        tradegood = '4887fd',
+        data = '99734f',
+        turntrack = '335c88'
+    },
+    Text = {
+        phase = '21f255',
+        boardrule = '923383',
+        borderscoring = '7d9ac6'
+    },
+    PlayerDie = '8fe639',
+    AiCheatSheet = '3e20e0',
+    Shield2 = '6b83d8',
+    Victory = {
+        Red = '6a9bd3',
+        Yellow = '72aca5',
+        Purple = '02cee6',
+        Blue = 'a7c615'
+    },
+    StartNewRoundButton = '2501ec',
+    StartNewRoundText = 'f6351f'
+}
+
+Positions = {
+    -- TurnOrder12 = {
+    --     {0,0,0},
+    --     {-0.83, 0, 2.35},
+    --     {-0.72, 0, 4.85},
+    --     {-0.69, 0, 7.30},
+    --     {-1.10, 0, 9.55},
+    --     {-1.72, 0, 11.55},
+    --     {-1.72, 0, 13.95},
+    -- },
+    -- TurnOrder34 = {
+    --     {0.14,0,0.13},
+    --     {-0.7, 0, 2.48},
+    --     {-0.58, 0, 4.94},
+    --     {-0.52, 0, 7.36},
+    --     {-0.95, 0, 9.51},
+    --     {-1.52, 0, 11.45},
+    --     {-1.52, 0, 13.75},
+    -- },
+    TurnOrderY = {
+        1.20,
+        1.57,
+        1.93,
+        2.30,
+    },
+    PlayerBoards = {
+        Red = {-30.00, 0.97, -14.00},
+        Blue = {30.00, 0.97, -14.00},
+        Purple = {-30.00, 0.97, 17.44},
+        Yellow = {30.00, 0.97, 17.44}
+    },
+    PlayerVine = {
+        Red = {-49.08, 1.5, -6.61},
+        Yellow = {42.85, 1.5, 25},
+        Purple = {-49.08, 1.5, 25},
+        Blue = {42.85, 1.5, -6.61}
+    }
+}
+
+ColorTint = {
+    Red = {0.96, 0.5, 0.35},
+    Yellow = {0.8, 0.71, 0.16},
+    Purple = {0.57, 0.47, 0.73},
+    Blue = {0.38, 0.58, 0.87}
+}
+ColorTintAlpha = {
+    Red = {0.96, 0.5, 0.35, 1},
+    Yellow = {0.8, 0.71, 0.16, 1},
+    Purple = {0.57, 0.47, 0.73, 1},
+    Blue = {0.38, 0.58, 0.87, 1}
+}
+ColorTintAlphaHover = {
+    Red = {0.96, 0.5, 0.35, 1},
+    Yellow = {0.8, 0.71, 0.16, 1},
+    Purple = {0.57, 0.47, 0.73, 1},
+    Blue = {0.38, 0.58, 0.87, 1}
+}
+-- ColorTint = {
+--     Red = 'F57F59',
+--     Yellow = 'CBB529',
+--     Purple = '9178BA',
+--     Blue = '6095DE'
+-- }
+end)
+return __bundle_require("Global.-1.lua")
