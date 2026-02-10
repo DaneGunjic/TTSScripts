@@ -377,8 +377,9 @@ function updateAchievementUI(player, count)
 	end
 end
 
-function updateAchievementCountFromFiguresKarma(player, top_cards, achievement_count, splays_per_player,
-																								resource_counts_per_player)
+function updateAchievementCountFromFiguresKarma(
+	player, top_cards, achievement_count,
+	splays_per_player, resource_counts_per_player)
 	local max_achievement_update = 0
 	for name, _ in pairs(top_cards) do
 		local effect = figure_effects_achievement[name]
@@ -455,6 +456,8 @@ function getCitiesFlagAchievementCount(player)
 	end
 
 	local colors_with_flags = getFlagsPerColor(player)
+	--log("colors_with_flags for " .. tostring(player))
+	--log(colors_with_flags)
 
 	for color, has_flag in pairs(colors_with_flags) do
 		should_get_achievement = false
@@ -481,44 +484,10 @@ function getFlagsPerColor(player)
 		Green = false
 	}
 
-	local sorted_cards = {
-		Blue = {},
-		Yellow = {},
-		Purple = {},
-		Red = {},
-		Green = {}
-	}
-
-	local zone = getZoneCached(zone_zones[player])
-	if not zone then return colors_with_flags end
-	local cards = zone.getObjects()
-	for i, card in pairs(cards) do
-		local success, err = pcall(function()
-			if card.type == "Deck" then
-				local cards_in_deck = card.getObjects()
-				for j, deck_card in pairs(cards_in_deck) do
-					local data = getCachedCardData(deck_card)
-					table.insert(sorted_cards[data.color], {
-						resources = data.resources,
-						position = { x = 0, y = 0, z = 0 }
-					})
-				end
-			elseif card.type == "Card" then
-				local data = getCachedCardData(card)
-				local success, pos = pcall(function() return card.getPosition() end)
-				if success then
-					table.insert(sorted_cards[data.color], {
-						resources = data.resources,
-						position = pos
-					})
-				end
-			end
-		end)
-		if not success then print("Error in getFlagsPerColor: " .. tostring(err)) end
-	end
+	local sorted_cards = getSortedResourcesFromCards(player, false)
 
 	for _, color in pairs(card_colors) do
-		for resources, position in pairs(sorted_cards[color]) do
+		if #sorted_cards[color] > 0 then
 			local color_resources = getActiveResourcesByColor(sorted_cards, player, color)
 			if string.match(color_resources, "F") then colors_with_flags[color] = true end
 		end
@@ -601,26 +570,31 @@ function setCurrentTopCard(player, card, card_color, current_top_cards)
 end
 
 function getActiveCardCount(player, color)
+	--print("getActiveCardCount for player " .. player .. " with color " .. color)
 	local count = 0
-	local zone = getZoneCached(zone_zones[player])
-	if not zone then return 0 end
+	local zone = getObjectFromGUID(zone_zones[player])
+
+	if not zone then print("Error in getActiveCardCount: zone is nil") return 0 end
+
 	local cards = zone.getObjects()
 	for i, card in pairs(cards) do
-		local success, err = pcall(function()
-			if card.type == "Deck" then
-				local cards_in_deck = card.getObjects()
-				if cards_in_deck[1] ~= nil then
-					local deck_color = getCardColor(cards_in_deck[1].description)
-					if deck_color == color then count = 1 end
-				end
-			elseif card.type == "Card" then
-				if getCachedCardData(card).color == color then count = count + 1 end
+		if card.type == "Deck" then
+			local cards_in_deck = card.getObjects()
+			if cards_in_deck[#cards_in_deck] then
+				--print("getActiveCardCount Deck with color " .. getCardColor(cards_in_deck[#cards_in_deck].description))
 			end
-		end)
-		if not success then print("Error in getActiveCardCount: " .. tostring(err)) end
-		if count == 1 then return 1 end
+
+			if cards_in_deck[#cards_in_deck] ~= nil then
+				local deck_color = getCardColor(cards_in_deck[#cards_in_deck].description)
+				if deck_color == color then count = 1 end
+			end
+		elseif card.type == "Card" then
+			--print("getActiveCardCount Card with color " .. getCardColor(card.getDescription()))
+			if getCachedCardData(card).color == color then count = count + 1 end
+		end
 	end
 
+	--print("Found " .. count .. " active cards of color " .. color .. " for player " .. player)
 	return count
 end
 
@@ -732,9 +706,11 @@ function getActiveResourcesByColor(list, player, color)
 			end
 			r = r .. getInverseBottomResources(top_card)
 		elseif splay_state == "Aslant" then
+			top_card = getUpmostCard(cards, player, false)
 			for j, card in pairs(cards) do
-				r = r .. string.sub(card.resources, 1, 4)
+				r = r .. getAslantResources(card)
 			end
+			r = r .. getInverseAslantResources(top_card)
 		end
 	end
 
@@ -951,10 +927,7 @@ function updateFromTopFiguresKarma(top_cards, resource_counts, resource, player)
 end
 
 function getLeftmostCard(cards, player, redirected)
-	if (player == "Blue" or player == "Green") and redirected == false then
-		return getRightmostCard(cards, player, true)
-	end
-	return extremeByAxis(cards, 'x', 'min')
+	return getHighestCard(cards)
 end
 
 function getPlayerSplays(player)
@@ -977,21 +950,23 @@ function getSplayCount(player)
 end
 
 function getRightmostCard(cards, player, redirected)
-	if (player == "Blue" or player == "Green") and redirected == false then
-		return getLeftmostCard(cards, player, true)
-	end
-	return extremeByAxis(cards, 'x', 'max')
+	return getHighestCard(cards)
 end
 
 function getUpmostCard(cards, player, redirected)
-	if (player == "Blue" or player == "Green") and redirected == false then
-		return getDownmostCard(cards, player, true)
-	end
-	return extremeByAxis(cards, 'z', 'max')
+	return getHighestCard(cards)
 end
 
-function getDownmostCard(cards, player, redirected)
-	return extremeByAxis(cards, 'z', 'min')
+function getHighestCard(cards)
+	local highest_card = nil
+	local max_y = -10000
+	for i, card in pairs(cards) do
+		if card.position.y > max_y then
+			max_y = card.position.y
+			highest_card = card
+		end
+	end
+	return highest_card
 end
 
 function getLeftResources(card)
@@ -1016,6 +991,14 @@ end
 
 function getInverseBottomResources(card)
 	return string.sub(card.resources, 1, 1) .. string.sub(card.resources, 5, 6)
+end
+
+function getAslantResources(card)
+	return string.sub(card.resources, 1, 4)
+end
+
+function getInverseAslantResources(card)
+	return string.sub(card.resources, 5, 6)
 end
 
 function getAgeNum(description)
