@@ -174,6 +174,10 @@ function shuffleAndDealPeopleFromBag()
 end
 
 function checkHost()
+  if playersOrder and #playersOrder > 0 then
+      UI.setAttribute("StartButtonNonHost", "visibility", "nil")
+      return
+  end
   nonAdmins = {}
   for k, playerColor in pairs(getSeatedPlayers()) do
       if not Player[playerColor].admin then
@@ -188,6 +192,11 @@ end
 
 function onPlayerChangeColor(player_color)
   checkHost()
+  if playersOrder and #playersOrder > 0 then
+      scoreTable()
+      scoreTableVisibility(getPlayers())
+      UI.setAttribute("StartButton", "visibility", "nil")
+  end
 end
 
 function scoreTableVisibility (players)

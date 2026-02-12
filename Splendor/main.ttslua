@@ -29,12 +29,4 @@ function onLoad()
 
     Wait.frames(function () getXmlTable() end, 50)
     Wait.frames(function () checkHost() end, 50)
-
-    -- if dev2 then
-    --   local object = peopleBag
-    --   local table = UI.getXmlTable()
-    --   table = serializeTable(table)
-    --   object.setLuaScript(table)
-    --   object.interactable = true
-    -- end
 end

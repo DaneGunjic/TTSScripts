@@ -12,12 +12,17 @@ end
 
 function isValidPlay(player, isReturn)
     local valid = true
-    if currentPlayer != player then
+    if currentPlayer == 'none' then
+        valid = false
+    elseif currentPlayer != player then
         valid = false
         Player[player].broadcast('Please wait for your turn', CHAT_WARNING_COLOR)
     elseif returnMode and not isReturn then
         valid = false
         Player[player].broadcast(RETURN_TOKENS_MESSAGE, CHAT_WARNING_COLOR)
+    elseif noblePickMode then
+        valid = false
+        Player[player].broadcast('You must pick a noble person card.', CHAT_WARNING_COLOR)
     end
     return valid
 end
@@ -143,6 +148,31 @@ end
 
 function setPlayerTurn(colour)
     currentPlayer = colour
+    if playmat ~= nil then
+        playmat.highlightOn(stringColorToRGB(colour))
+    end
+    
+    if tokenWarningText ~= nil then
+        tokenWarningText.destruct()
+        tokenWarningText = nil
+    end
+
+    if countCurrentPlayerTokens(colour) >= 8 then
+        local greenZone = gemZones['green']
+        if greenZone ~= nil then
+            local pos = greenZone.getPosition()
+             local params = {
+                type = "3DText",
+                position = {pos.x - 1.5, pos.y, pos.z + 1},
+                rotation = {90, 0, 0},
+            }
+            tokenWarningText = spawnObject(params)
+            tokenWarningText.TextTool.setValue("!")
+            tokenWarningText.TextTool.setFontSize(500)
+            tokenWarningText.TextTool.setFontColor({1, 0, 0})
+        end
+    end
+
     Player[colour].broadcast('It is your turn now', CHAT_INFO_COLOR)
 
     if soundToggle == 'ding' then
@@ -472,14 +502,16 @@ function parsePerson(object)
     }
 end
 
-function getNoblePerson(player, person)
+function getNoblePerson(player, person, suppressNextTurn)
     local destination = playerCardPosition(player, playerZones[player:lower()].people)
     local rotation = {x = 0, y = PLAYER_Y_ROTATION[player], z = 0}
     person.object.setRotation(rotation, false, false)
     person.object.setPosition(destination, false, false)
     table.remove(availablePeople, getIndex(availablePeople, person))
-    awardPoints(player, 3)
-    nextTurn()
+    awardPoints(player, PERSON_SCORE)
+    if not suppressNextTurn then
+        nextTurn()
+    end
 end
 
 function dealNewCardInPlaceOf(object)
@@ -650,7 +682,7 @@ function checkPeopleStatus(player)
         return false
     end
     if noblePickMode == false then
-      getNoblePerson(player, peopleAcquired[1])
+      getNoblePerson(player, peopleAcquired[1], true)
     end
   end
   return true

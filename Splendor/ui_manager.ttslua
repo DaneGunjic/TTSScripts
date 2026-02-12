@@ -5,9 +5,9 @@ function scoreTable()
         UI.setAttribute("scoreRow"..index , "color", colour)
         UI.setAttribute("scoreRow"..index , "visibility", "" )
     end
-	      UI.setAttribute("StartButton", "visibility", "nil")
-        UI.setAttribute("ScoreSheetPanel", "visibility", "" )
-	      updateTable(playersOrder[1])
+    UI.setAttribute("StartButton", "visibility", "nil")
+    UI.setAttribute("ScoreSheetPanel", "visibility", "" )
+    updateTable(playersOrder[1])
 end
 
 function getNoblePerson(player, person)

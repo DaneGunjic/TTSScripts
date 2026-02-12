@@ -20,7 +20,6 @@ SCORE_TO_WIN = 15
 noblePickMode = false
 tintHelper = true
 dev = false
-dev2 = false
 xmlTable = {}
 xmlStart = {}
 turns = {}
