@@ -1,0 +1,179 @@
+Spawner = {}
+
+Spawner.boards = {}
+Spawner.defaultPlacementPattern = { vector(0, 0, 0) }
+Spawner.thingInfos = {}
+
+function Spawner.SetUpSpawnables(spawnables, homes, placementPattern)
+  Spawner.thingInfos = spawnables
+  Spawner.thingInfosByName = {}
+  Spawner.resourceObjsByName = {}
+  Spawner.resourceObjsByGuid = {}
+  for guid, info in pairs(spawnables) do
+    if info and info.name then
+      info.guid = guid
+      Spawner.thingInfosByName[info.name] = info
+      local obj = getObjectFromGUID(guid)
+      if obj then
+        Spawner.resourceObjsByGuid[guid] = obj
+        Spawner.resourceObjsByName[info.name] = obj
+      end
+    end
+  end
+  Spawner.defaultPlacementPattern = placementPattern or { vector(0, 0, 0) }
+  Spawner.homes = homes
+
+  for k, home in pairs(Spawner.homes) do
+    home.sensor = getObjectFromGUID(home.sensorId)
+  end
+end
+
+function SpawnResource(resourceObj, playerColor, alt_click) Spawner.SpawnResource(resourceObj, playerColor, 1) end
+function Spawner.SpawnResource(resourceObj, playerColor, amount)
+  local thingInfo = Spawner.thingInfos[resourceObj.guid] or Spawner.thingInfosByName[resourceObj.getName()]
+  local resourceName = thingInfo.name or (resourceObj.getName() or "meeple")
+  local playerName = (Player[playerColor] and Player[playerColor].steam_name) or playerColor
+  local times = tonumber(amount) or 1
+  broadcastToAll(playerName .. " spawned " .. tostring(times) .. " " .. resourceName)
+
+  function embedded()
+    local playerBoard = getObjectFromGUID(Spawner.homes[playerColor].boardId)
+    local thingInfo = Spawner.thingInfos[resourceObj.guid] or Spawner.thingInfosByName[resourceObj.getName()]
+
+    -- Don't pile token on top of eachother by using a placement pattern
+    -- Use the next placement offset using the pattern, and advance the index
+    local placementPattern = thingInfo.placementPattern or Spawner.defaultPlacementPattern
+    local rotation = playerBoard.getRotation() + (thingInfo.rotation or vector(0, 0, 0))
+
+    local times = times
+
+    local index = 1
+    for i = 1, times do
+      local scale = (thingInfo.scale or resourceObj.getScale()) * playerBoard.getScale()
+      placementOffset = Spawner.getFirstUnoccupiedPlacementOffset(Spawner.homes[playerColor].sensor, playerBoard, placementPattern, thingInfo.offset, scale, rotation, index)
+
+      index = placementOffset.index
+
+      Spawner.spawnThing(resourceObj, playerBoard, placementOffset.offset, thingInfo, rotation)
+    end
+
+    return 1
+  end
+
+  startLuaCoroutine(Global, "embedded")
+end
+
+function Spawner.getFirstUnoccupiedPlacementOffset(sensor, playerBoard, placementPattern, initialOffset, scale, rotation, startAt)
+  startAt = math.min(startAt or 1, # placementPattern)
+  for i=startAt,# placementPattern do
+    local placementOffset = placementPattern[i]
+    local pos = initialOffset + placementOffset
+    if not isUnlockedInSensor(sensor, playerBoard.positionToWorld(pos), scale, rotation, {playerBoard.guid}) then
+      return { index = i, offset = placementOffset}
+    end
+  end
+
+  return { index = #placementPattern, offset = placementPattern[1]}
+end
+
+function Spawner.spawnThing(resourceObj, playerBoard, placementOffset, thingInfo, rotation)
+  local targetPos = playerBoard.positionToWorld(placementOffset + thingInfo.offset) + playerBoard.getTransformUp() * 3
+  local spawned = nil
+  local ok, taken = pcall(function()
+    return resourceObj.takeObject({
+      position = targetPos,
+      rotation = rotation,
+      smooth = false
+    })
+  end)
+  if ok and taken then
+    spawned = taken
+  else
+    spawned = resourceObj.clone({
+      position = targetPos,
+      snap_to_grid = false,
+      rotation = rotation
+    })
+  end
+  spawned.setName(thingInfo.name or "")
+  spawned.setScale((thingInfo.scale or resourceObj.getScale()) * playerBoard.getScale())
+  spawned.setLock(false)
+end
+
+-- Some simple patterns that can be useful
+function Spawner.Pattern3by3(xUnit, zUnit)
+  return {
+    vector(0, 0, 0),
+    vector(xUnit, 0, 0),
+    vector(xUnit * 2, 0, 0),
+    vector(0, 0, zUnit),
+    vector(xUnit, 0, zUnit),
+    vector(xUnit * 2, 0, zUnit),
+    vector(0, 0, zUnit * 2),
+    vector(xUnit, 0, zUnit * 2),
+    vector(xUnit * 2, 0, zUnit * 2),
+  }
+end
+
+function Spawner.Pattern3by5(xUnit, zUnit)
+  return {
+    vector(0, 0, 0),
+    vector(xUnit, 0, 0),
+    vector(xUnit * 2, 0, 0),
+    vector(0, 0, zUnit),
+    vector(xUnit, 0, zUnit),
+    vector(xUnit * 2, 0, zUnit),
+    vector(0, 0, zUnit * 2),
+    vector(xUnit, 0, zUnit * 2),
+    vector(xUnit * 2, 0, zUnit * 2),
+    vector(0, 0, zUnit * 3),
+    vector(xUnit, 0, zUnit * 3),
+    vector(xUnit * 2, 0, zUnit * 3),
+    vector(0, 0, zUnit * 4),
+    vector(xUnit, 0, zUnit * 4),
+    vector(xUnit * 2, 0, zUnit * 4),
+  }
+end
+
+function SpawnTwoWarriors(obj, playerColor, alt_click)
+  local fighter = Spawner.resourceObjsByName['Fighter'] or getObjectFromGUID('79fc35')
+  Spawner.SpawnResource(fighter, playerColor, 2)
+end
+
+function SpawnOneWizard(obj, playerColor, alt_click)
+  local wizard = Spawner.resourceObjsByName['Wizard'] or getObjectFromGUID('c57614')
+  Spawner.SpawnResource(wizard, playerColor, 1)
+end
+
+function SpawnTwoRogues(obj, playerColor, alt_click)
+  local rogue = Spawner.resourceObjsByName['Rogue'] or getObjectFromGUID('695801')
+  Spawner.SpawnResource(rogue, playerColor, 2)
+end
+
+function SpawnOneCleric(obj, playerColor, alt_click)
+  local cleric = Spawner.resourceObjsByName['Cleric'] or getObjectFromGUID('4a9cda')
+  Spawner.SpawnResource(cleric, playerColor, 1)
+end
+
+function Spawn4Coins(obj, playerColor, alt_click)
+  local coin = Spawner.resourceObjsByName['Gold'] or getObjectFromGUID('94320b')
+  Spawner.SpawnResource(coin, playerColor, 4)
+end
+
+function Spawn2Coins(obj, playerColor, alt_click)
+  local coin = Spawner.resourceObjsByName['Gold'] or getObjectFromGUID('94320b')
+  Spawner.SpawnResource(coin, playerColor, 2)
+end
+
+function HallOfTheVoiceBenefit(obj, playerColor, alt_click)
+  DrawIntrigue(playerColor, 1)
+  local coin = Spawner.resourceObjsByName['Gold'] or getObjectFromGUID('94320b')
+  Spawner.SpawnResource(coin, playerColor, 5)
+end
+
+function Spawn2WarriorsAndRogues(obj, playerColor, alt_click)
+  local fighter = Spawner.resourceObjsByName['Fighter'] or getObjectFromGUID('79fc35')
+  local rogue = Spawner.resourceObjsByName['Rogue'] or getObjectFromGUID('695801')
+  Spawner.SpawnResource(fighter, playerColor, 2)
+  Spawner.SpawnResource(rogue, playerColor, 2)
+end

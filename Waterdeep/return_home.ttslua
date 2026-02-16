@@ -1,0 +1,97 @@
+ReturnHome = {}
+
+ReturnHome.defaults = {
+  spaceBetweenPawns = nil,
+  offset = nil
+}
+ReturnHome.agentDiffuse = "https://steamusercontent-a.akamaihd.net/ugc/1025076968517618382/05FC1C25F3EF79CDFC25C7E8138C6800CCFA35A9/"
+ReturnHome.agentDiffuseSig = "05FC1C25F3EF79CDFC25C7E8138C6800CCFA35A9"
+
+function ReturnHome.init(defaultSpaceBetweenPawns, defaultOffset)
+  ReturnHome.defaults.spaceBetweenPawns = defaultSpaceBetweenPawns or 0.8
+  ReturnHome.defaults.offset = defaultOffset or vector(0, 3, 0)
+end
+
+-- #########################################
+-- Return pawns to their homes
+-- #########################################
+-- The parameter needs to be an object that follows this data-shape
+--       homes = {
+--         redHome = {  -- The name has no effect and is optional, but can be useful to self-document
+--           homeId = string,  -- Id of the player's home board
+--           pawnIds = {list of strings}, -- Ids of the pawns that belong to the player
+--           spaceBetweenPawns = number,  -- [optional override] The space to leave between pawns
+--           offset = vector(x, y, z)  -- [optional override] The offset of the player pawns from the center of the player board
+--         },
+--         ...
+--       }
+--
+-- Only unlocked pawns will be affected. Use this feature to lock pawns that you get later in the game.
+-- The space between pawns and the offset from the player board are both optional, and will override any
+-- value set during initialization
+-- ##########################################
+function ReturnHome.returnHome(homes)
+  local board = getObjectFromGUID(boardId)
+  if not board then return end
+  local bounds = board.getBounds()
+  local size = vector(bounds.size.x * 0.7, bounds.size.y, bounds.size.z)
+  local origin = bounds.center
+
+  local hits = Physics.cast({
+    origin = origin,
+    direction = vector(0, 1, 0),
+    type = 3, -- Box
+    size = size,
+    max_distance = 5,
+    debug = true
+  })
+
+  local nameToHome = {}
+  for color, homeInfo in pairs(homes) do
+    if homeInfo and homeInfo.name then
+      nameToHome[homeInfo.name] = homeInfo
+    end
+  end
+
+  for _, hit in ipairs(hits) do
+    local obj = hit.hit_object
+    if obj and obj ~= board then
+      local co = obj.getCustomObject()
+      local diffuse = co and (co.diffuse or co.image) or nil
+      local isAgent = diffuse and (string.find(diffuse, ReturnHome.agentDiffuseSig, 1, true) ~= nil)
+      if isAgent then
+        local name = obj.getName()
+        local homeInfo = nameToHome[name]
+        if homeInfo then
+          local homeBoard = getObjectFromGUID(homeInfo.boardId)
+          if homeBoard then
+            local pawnRotation = homeBoard.getRotation()
+            if homeInfo.pawnRotation ~= nil then
+              pawnRotation = pawnRotation + homeInfo.pawnRotation
+            elseif obj.getBoundsNormalized().size.x > obj.getBoundsNormalized().size.z then
+              pawnRotation = pawnRotation + vector(0, 90, 0)
+            end
+            obj.setRotationSmooth(pawnRotation, false, false)
+            local offset = homeInfo.offset or ReturnHome.defaults.offset
+            obj.setLock(false)
+            obj.setPositionSmooth(homeBoard.positionToWorld(offset), false, false)
+          end
+        end
+      end
+    end
+  end
+end
+
+function ReturnHome.getAverageWidthOfPawns(pawns)
+  local totalPawnWidth = 0
+  for k, pawn in pairs(pawns) do
+    if pawn then
+      totalPawnWidth = totalPawnWidth + math.min(pawn.getBoundsNormalized().size.x, pawn.getBoundsNormalized().size.z)
+    end
+  end
+  return totalPawnWidth / # pawns
+end
+
+function ReturnHome.getPawnArrangementWidth(pawns, pawnWidth, spaceBetween)
+  return (# pawns * (pawnWidth + spaceBetween)) - spaceBetween
+end

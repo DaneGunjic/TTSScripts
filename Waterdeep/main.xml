@@ -1,0 +1,110 @@
+<Defaults>
+  <Text
+    outline="#333333ff"
+    color="#eeeeeeff"
+    fontSize="20"/>
+</Defaults>
+<Panel
+  active="false"
+  id="setupScreen"
+  height="900"
+  width="711"
+  color="rgba(0,0,0,1)"
+  allowDragging="true"
+  returnToOriginalPositionWhenReleased="false">
+    <Image image="Cover" />
+    <Text
+      text="Scripted by John McDonald"
+      fontSize="20"
+      offsetXY="0 190"
+      color="#333333ff"
+      outline=""
+      height="50"
+      width="500" />
+    <Button
+      onClick="dismissSetup"
+      height="40"
+      width="40"
+      color="#ffffffff"
+      text="X"
+      textColor="#000000ff"
+      fontStyle="Bold"
+      fontSize="20"
+      rectAlignment="UpperRight"
+      />
+    
+    <Panel
+      height="100"
+      width="711"
+      offsetXY="0 -100">
+      <Text
+        text="Number of Players"
+        fontSize="20"
+        height="50"
+        width="500"
+        offsetXY="0 30" />
+      <ToggleGroup height="30" width="300">
+        <HorizontalLayout>
+          <ToggleButton id="numPlayers2" onValueChanged="playerCountToggle" value="2">2</ToggleButton>
+          <ToggleButton id="numPlayers3" onValueChanged="playerCountToggle" value="3">3</ToggleButton>
+          <ToggleButton id="numPlayers4" onValueChanged="playerCountToggle" value="4">4</ToggleButton>
+          <ToggleButton id="numPlayers5" onValueChanged="playerCountToggle" value="5">5</ToggleButton>
+          <ToggleButton id="numPlayers6" onValueChanged="playerCountToggle" value="6">6</ToggleButton>
+        </HorizontalLayout>
+      </ToggleGroup>
+    </Panel>
+    
+    <Panel
+      height="200"
+      width="711"
+      offsetXY="0 -220">
+      <Toggle
+        id="UseSkullport"
+        onValueChanged="onToggle"
+        height="40"
+        width="250"
+        offsetXY="0 70">
+        <Text id="UseSkullportText" text="Skullport Expansion" />
+      </Toggle>
+      <Toggle
+        id="UseUndermountain"
+        onValueChanged="onToggle"
+        height="40"
+        width="250"
+        offsetXY="0 20">
+        <Text id="UseUndermountainText" text="Undermountain Expansion" /></Toggle>
+      <Toggle
+        id="LongGame"
+        onValueChanged="onToggle"
+        height="40"
+        width="250"
+        offsetXY="0 -30"
+        tooltip="Gives all players an extra meeple. Mandatory when using both expansions. 6 player games are always long games.">
+        <Text id="LongGameText" text="Long Game" />
+      </Toggle>
+      <Toggle
+        id="Promo"
+        onValueChanged="onToggle"
+        height="40"
+        width="250"
+        offsetXY="0 -80"
+        tooltip="Promo card given out at GenCon 2013.">
+        <Text id="PromoText" text='"Rapid Expansion" Promo Card' />
+      </Toggle>
+      <Button
+        height="40"
+        width="130"
+        offsetXY="-75 -130"
+        onClick="setupGame">
+        Start Game
+      </Button>
+      <Button
+        height="40"
+        width="130"
+        offsetXY="75 -130"
+        onClick="skipSetup">
+        Skip Setup
+      </Button>
+    </Panel>
+    
+  </Panel>

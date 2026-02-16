@@ -1,0 +1,80 @@
+-- Gets all unlocked objects in the given zone
+function getUnlockedIn(zone, exceptions)
+  local all = nil
+  if type(zone) == "string" then
+    all = getObjectFromGUID(zone).getObjects()
+  else
+    all = zone.getObjects()
+  end
+
+  local unlocked = {}
+
+  -- Loop through all objects, and only add the unlocked ones to the return value
+  for k, object in pairs(all) do
+    if not object.getLock() and not hasValue(exceptions or {}, object.guid) then
+      table.insert(unlocked, object)
+    end
+  end
+
+  return unlocked
+end
+
+function hasValue (tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+    return false
+end
+
+function isUnlockedNearby(position, dist)
+  local posVector = Vector.new(position.x, 0, position.z)
+  local all = getAllObjects()
+  for k, obj in pairs(all) do
+    local objPos = obj.getPosition()
+    objPos:setAt('y', 0)
+    if objPos:distance(posVector) < (dist or 0.5) then
+      return true
+    end
+  end
+  return false
+end
+
+-- Needs to be run inside a co-routine
+function isUnlockedInSensor(sensor, position, scale, rotation, exceptions)
+  sensor.setScale({scale.x, 20, scale.z})
+  sensor.setPosition({position.x, 2, position.z})
+  sensor.setRotation(rotation)
+  coroutine.yield(0)
+
+  return # getUnlockedIn(sensor, exceptions) > 0
+end
+
+-- Needs to be run inside a co-routine
+function isUnlockedNearbySmartCreateDestroy(position, scale, rotation)
+  local sensorZoneDetails = {
+    position = {position.x, 2, position.z},
+    scale = {scale.x, 20, scale.z},
+    type = 'ScriptingTrigger',
+    rotation = rotation
+  }
+  local createdSensorZone = spawnObject(sensorZoneDetails)
+
+  coroutine.yield(0)
+  local objectCount = # getUnlockedIn(createdSensorZone)
+  destroyObject(createdSensorZone)
+
+  return objectCount > 0
+end
+
+function getUnlockedInSet(set)
+  local unlocked = {}
+  for k, objId in pairs(set) do
+    local obj = getObjectFromGUID(objId)
+    if obj and obj.getLock() == false then
+      table.insert(unlocked, obj)
+    end
+  end
+  return unlocked
+end

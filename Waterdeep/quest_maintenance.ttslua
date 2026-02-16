@@ -1,0 +1,79 @@
+local Quests = {}
+
+Quests.resetQuestsButton = {
+    label='Reset\nQuests',
+    click_function='resetQuests',
+    position={0.327,0.3,-0.67},
+    width=650,
+    height=500,
+    font_size=180,
+    scale={0.06, 0.06, 0.06},
+    rotation={0, 0, 0}
+}
+
+Quests.refillQuestsButton = {
+    label='Refill Quests',
+    click_function='refillQuests',
+    position={0,0.3,-0.45},
+    width=1300,
+    height=320,
+    font_size=200,
+    scale={0.06, 0.06, 0.06},
+    rotation={0, 0, 0}
+}
+
+Quests.questDeckId = '143f20'
+Quests.questDrawZoneId = '7e3767'
+Quests.questDiscardZoneId = 'e0d4c5'
+Quests.slots = {
+  {
+    sensorId = 'b194f0',
+    position = {30.76, 1.65, 3.14},
+    rotation = {0,270,0}
+  },
+  {
+    sensorId = 'eec865',
+    position = {30.76, 1.65, -3.32},
+    rotation = {0,270,0}
+  },
+  {
+    sensorId = '3d06fa',
+    position = {26.16, 1.66, 3.14},
+    rotation = {0,270,0}
+  },
+  {
+    sensorId = 'd7f961',
+    position = {26.16, 1.66, -3.32},
+    rotation = {0,270,0}
+  }
+}
+Quests.questDiscard = {28.54, 2, -11.11}
+
+function Quests.init(board)
+  board.createButton(Quests.resetQuestsButton)
+  board.createButton(Quests.refillQuestsButton)
+end
+
+function resetQuests() Quests.reset() end
+function Quests.reset()
+  Quests.clear()
+  Wait.condition(Quests.refill, Quests.discardIsResting, 1, Quests.refill)
+end
+
+function Quests.clear()
+  FillUtil.clear(Quests.slots, Quests.questDiscard)
+end
+
+function refillQuests() Quests.refill() end
+function Quests.refill()
+  print("refilling")
+  FillUtil.fillFromZone(Quests.slots, Quests.questDrawZoneId, Quests.questDiscardZoneId)
+end
+
+function Quests.discardIsResting()
+  local objectsInDiscardArea = getUnlockedIn(Quests.questDiscardZoneId)
+  if # objectsInDiscardArea == 1  then
+    return objectsInDiscardArea[1].resting
+  end
+  return false
+end

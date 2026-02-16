@@ -1,0 +1,86 @@
+#include !\Waterdeep\waterdeep_core.ttslua
+#include !\Waterdeep\return_home.ttslua
+#include !\Waterdeep\fill_util.ttslua
+#include !\Waterdeep\resource_spawner.ttslua
+#include !\Waterdeep\quest_maintenance.ttslua
+#include !\Waterdeep\building_maintenance.ttslua
+#include !\Waterdeep\Ambassador.ttslua
+#include !\Waterdeep\Rounds.ttslua
+#include !\Waterdeep\game_setup.ttslua
+#include !\Waterdeep\utils.ttslua
+#include !\Waterdeep\dev.ttslua
+
+function onLoad(save_state)
+  #include !\Waterdeep\CoreConstants.ttslua
+
+  local savedData = {}
+  if save_state ~= "" then
+    savedData = JSON.decode(save_state)
+  end
+
+  local board = getObjectFromGUID(boardId)
+  board.createButton({
+      label='Fill VPs',
+      click_function='addVpTokens',
+      position={-0.15,0.3,0.77},
+      width=1100,
+      height=400,
+      font_size=150,
+      scale={0.07, 0.07, 0.07},
+      rotation={0, 0, 0},
+      color = {1, 1, 1}
+  })
+
+  board.createButton({
+      label='Return Agents',
+      click_function='returnAgentsHome',
+      position={-0.15,0.3,0.84},
+      width=1100,
+      height=400,
+      font_size=150,
+      scale={0.07, 0.07, 0.07},
+      rotation={0, 0, 0}
+  })
+
+  board.createButton({
+      label='Unlock 5th Round Agents',
+      click_function='unlockFifthRoundAgents',
+      position={0.15,0.3,0.76},
+      width=1800,
+      height=300,
+      font_size=150,
+      scale={0.07, 0.07, 0.07},
+      rotation={0, 0, 0}
+  })
+
+  ReturnHome.init(nil, vector(0, 2, -9))
+  Quests.init(board)
+  Buildings.Init(board)
+  Amb.Init(savedData and savedData.Amb or nil, homes)
+
+  Spawner.SetUpSpawnables(spawnables, homes, Spawner.Pattern3by5(1.5, 1))
+
+  Setup.init(homes)
+end
+
+function onSave()
+  local data = {}
+  local ambData = Amb.save()
+  if ambData then
+    data.Amb = ambData
+  end
+
+  if next(data) ~= nil then
+    return JSON.encode(data)
+  else
+    return ""
+  end
+end
+
+function onObjectEnterContainer(container, obj)
+  if container and container.getName() == "Trash" then
+    local name = obj.getName()
+    if name == nil or name == "" then name = obj.guid end
+    printToAll("Trashed: " .. tostring(name))
+  end
+end

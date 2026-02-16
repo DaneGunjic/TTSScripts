@@ -1,0 +1,107 @@
+function addVpTokens()
+  -- Make sure the buildings are full (they should always be, but the next code relies on it)
+  Buildings.refill()
+
+  local marketIsFullAndAtRest = function()
+    local marketIds = Buildings.GetBuildingIdsInMarket()
+    if # marketIds != 3 then return false end
+
+    return getObjectFromGUID(marketIds[1]).resting and
+           getObjectFromGUID(marketIds[2]).resting and
+           getObjectFromGUID(marketIds[3]).resting
+  end
+
+  local getMarketAndPlaceVps = function()
+    local buildingMarket = Buildings.GetBuildingIdsInMarket()
+    Rounds.moveVpsToBuildings(buildingMarket)
+  end
+
+  -- Wait until buildings settle (or 2 seconds)
+  Wait.condition(getMarketAndPlaceVps, marketIsFullAndAtRest, 2, getMarketAndPlaceVps)
+end
+
+function returnAgentsHome()
+  ReturnHome.returnHome(homes)
+end
+
+function unlockFifthRoundAgents()
+  Rounds.unlockFifthRoundAgents(boardId)
+  ReturnHome.returnHome(homes)
+end
+
+function AddBoardActionButtons(useSkullport, useUndermountain)
+  local board = getObjectFromGUID(boardId)
+  local total = #BoardActions
+  for i, action in ipairs(BoardActions) do
+    local isUndermountain = i > (total - 3)
+    local isSkullport = i > (total - 6) and i <= (total - 3)
+    local allowed = true
+    if isUndermountain and not useUndermountain then allowed = false end
+    if isSkullport and not useSkullport then allowed = false end
+    if not isUndermountain and not isSkullport then allowed = true end
+    if action and action.position and action.click_function then
+      local worldPos = vector(action.position[1], action.position[2], action.position[3])
+      local localPos = board.positionToLocal(worldPos)
+      localPos.x = -localPos.x
+      localPos.y = 0.3
+      if allowed then
+        local funcName = "BoardActionClick" .. tostring(i)
+        board.createButton({
+          click_function = funcName,
+          label = "",
+          position = localPos,
+          rotation = {0, 0, 0},
+          width = 100,
+          height = 100,
+          scale = {0.2, 0.2, 0.2}
+        })
+        _G[funcName] = function(obj, playerColor, alt_click)
+          local actionDef = BoardActions[i]
+          local playerName = (Player[playerColor] and Player[playerColor].steam_name) or playerColor
+          local home = homes[playerColor]
+          if home and home.pawnIds then
+            local unlocked = getUnlockedInSet(home.pawnIds)
+            if #unlocked >= 1 then
+              local agent = unlocked[1]
+              agent.setLock(false)
+              agent.setPositionSmooth(vector(actionDef.position[1], actionDef.position[2], actionDef.position[3]), false, false)
+              agent.setLock(true)
+              broadcastToAll(playerName .. " sent an agent to " .. (actionDef.name or ""), stringColorToRGB(playerColor))
+              local fn = _G[actionDef.click_function]
+              if type(fn) == "function" then fn(obj, playerColor, alt_click) end
+            else
+              broadcastToColor("You have no agents available", playerColor, stringColorToRGB("Red"))
+            end
+          else
+            print(playerName .. " has no home configuration")
+          end
+        end
+      end
+    end
+  end
+end
+
+function NoOp(obj, playerColor, alt_click)
+end
+
+function DrawIntrigue(playerColor, count)
+  local deckId = (Setup and Setup.intrigueDeckId) or '916295'
+  local intrigue = getObjectFromGUID(deckId)
+  local n = tonumber(count) or 1
+  if intrigue then
+    intrigue.deal(n, playerColor)
+    broadcastToAll(Player[playerColor].steam_name .. " drew " .. tostring(n) .. " Intrigue", stringColorToRGB(playerColor))
+  end
+end
+
+function DrawIntrigueCliffwatch(obj, playerColor, alt_click)
+  DrawIntrigue(playerColor, 1)
+end
+
+function DrawIntrigueWaterdeep(obj, playerColor, alt_click)
+  DrawIntrigue(playerColor, 1)
+end
+
+function DrawIntrigueGrimmStatue(obj, playerColor, alt_click)
+  DrawIntrigue(playerColor, 2)
+end
