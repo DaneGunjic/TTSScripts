@@ -1,18 +1,17 @@
-local zone_cache = {}
-local card_info_cache = {}
-local table_button_indices = {}
-local last_score_values = {}
-local last_achievement_values = {}
-local TABLE_GUID = "4ee1f2"
+zone_cache = {}
+card_info_cache = {}
+table_button_indices = {}
+last_score_values = {}
+last_achievement_values = {}
 
-local function getZoneCached(guid)
+function getZoneCached(guid)
 	if not zone_cache[guid] then
 		zone_cache[guid] = getObjectFromGUID(guid)
 	end
 	return zone_cache[guid]
 end
 
-local function getCachedCardData(card_or_data)
+function getCachedCardData(card_or_data)
 	local guid = nil
 	local description = ""
 
@@ -35,7 +34,32 @@ local function getCachedCardData(card_or_data)
 	return card_info_cache[guid]
 end
 
-local figure_effects_score = {
+function getValuedJunkScore()
+	if JUNK_ZONE_GUID == nil or JUNK_ZONE_GUID == "" then return 0 end
+	local zone = getZoneCached(JUNK_ZONE_GUID)
+	if not zone then return 0 end
+	local cards = zone.getObjects()
+	local total_values = 0
+	for i, card in pairs(cards) do
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				local cards_in_deck = card.getObjects()
+				for j, deck_card in pairs(cards_in_deck) do
+					local age = getCachedCardData(deck_card).age
+					if age ~= nil and age > 0 then total_values = total_values + age end
+				end
+			elseif card.type == "Card" then
+				local age = getCachedCardData(card).age
+				if age ~= nil and age > 0 then total_values = total_values + age end
+			end
+		end)
+		if not success then print("Error in getValuedJunkScore: " .. tostring(err)) end
+	end
+
+	return total_values
+end
+
+figure_effects_score = {
 	["Tigernmas"] = function(player, max_score)
 		local cards = Player[player].getHandObjects(1)
 		return math.max(max_score, #cards)
@@ -61,23 +85,24 @@ local figure_effects_score = {
 		return math.max(max_score, getActiveIconCount(player, "H"))
 	end,
 	["Christopher Polhem"] = function(player, max_score)
-		return math.max(max_score, getActiveIconCount(player, "I") * 2)
+		local industries = getActiveIconCount(player, "I")
+		if industries == 0 then return max_score end
+		local achievements = getAchievementsCount(player)
+		local bonus = industries * achievements
+		return math.max(max_score, bonus)
 	end,
 	["Emmy Noether"] = function(player, max_score)
 		local active_clock_count = getActiveIconCount(player, "T")
 		return math.max(max_score, active_clock_count * active_clock_count)
 	end,
 	["Wernher Von Braun"] = function(player, max_score)
-		local cards_in_hand = Player[player].getHandObjects(2)
-		local score_count = 0
-		for i, card in pairs(cards_in_hand) do
-			score_count = score_count + getCachedCardData(card).age
-		end
-		return math.max(max_score, score_count)
+		local junk_score = getValuedJunkScore()
+		if junk_score == 0 then return max_score end
+		return math.max(max_score, junk_score)
 	end
 }
 
-local figure_effects_achievement = {
+figure_effects_achievement = {
 	["Niccolo Machiavelli"] = function(player, max_score, splays_per_player, resource_counts_per_player)
 		local achievements_per_color = {}
 		for _, card_color in pairs(card_colors) do
@@ -128,12 +153,16 @@ local figure_effects_achievement = {
 		return math.max(max_score, additional_achievements)
 	end,
 	["Nelson Mandela"] = function(player, max_score, splays_per_player, resource_counts_per_player)
-		-- TODO
-		return max_score
+		local person_count = 0
+		if resource_counts_per_player[player] ~= nil and resource_counts_per_player[player]["P"] ~= nil then
+			person_count = resource_counts_per_player[player]["P"]
+		end
+		local extra_achievements = math.floor(person_count / 2)
+		return math.max(max_score, extra_achievements)
 	end
 }
 
-local figure_effects_resource = {
+figure_effects_resource = {
 	-- ["Sneferu"] = function(resource, counts, player)
 	-- 	if resource == "M" then return counts["M"] + counts["C"] end
 	-- end,
@@ -187,6 +216,9 @@ local figure_effects_resource = {
 	["James Clerk Maxwell"] = function(resource, counts, player)
 		local objs = Player[player].getHandObjects(1)
 		if counts[resource] > 0 then return counts[resource] + #objs end
+	end,
+	["Nelson Mandela"] = function(resource, counts, player)
+		
 	end,
 	-- ["J.P. Morgan"] = function(resource, counts, player)
 	-- 	local icon_count = 0
@@ -432,6 +464,26 @@ function getAchievementValues(player)
 	end
 
 	return total_values
+end
+
+function getAchievementsCount(player)
+	local zone = getZoneCached(achievement_zones[player])
+	if not zone then return 0 end
+	local cards = zone.getObjects()
+	local count = 0
+	for i, card in pairs(cards) do
+		local success, err = pcall(function()
+			if card.type == "Deck" then
+				count = count + #card.getObjects()
+			elseif card.type == "Card" then
+				count = count + 1
+			end
+		end)
+		if not success then print("Error in getAchievementsCount: " .. tostring(err)) end
+	end
+
+	local player_board_count = getActiveIconCount(player, "A") + getCitiesFlagAchievementCount(player)
+	return count + player_board_count
 end
 
 function getResourceCounts(player, card_color)

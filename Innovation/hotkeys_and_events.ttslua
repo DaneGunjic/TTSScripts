@@ -60,6 +60,7 @@ function onObjectEnterScriptingZone(scripting_zone, object)
 
 	local zone_guid = scripting_zone.getGUID()
 	local is_player_zone = false
+	local is_junk_zone = (JUNK_ZONE_GUID ~= nil and JUNK_ZONE_GUID ~= "" and zone_guid == JUNK_ZONE_GUID)
 	for _, guid in pairs(zone_zones) do
 		if guid == zone_guid then
 			is_player_zone = true
@@ -76,7 +77,7 @@ function onObjectEnterScriptingZone(scripting_zone, object)
 		f(object, scripting_zone)
 	end
 
-	if is_player_zone or f ~= nil then
+	if is_player_zone or is_junk_zone or f ~= nil then
 		UpdateGameState()
 	end
 end
@@ -85,6 +86,7 @@ function onObjectLeaveScriptingZone(scripting_zone, object)
 	--print("onObjectLeaveScriptingZone")
 	local zone_guid = scripting_zone.getGUID()
 	local is_player_zone = false
+	local is_junk_zone = (JUNK_ZONE_GUID ~= nil and JUNK_ZONE_GUID ~= "" and zone_guid == JUNK_ZONE_GUID)
 	for _, guid in pairs(zone_zones) do
 		if guid == zone_guid then
 			is_player_zone = true
@@ -94,7 +96,7 @@ function onObjectLeaveScriptingZone(scripting_zone, object)
 
 	if is_player_zone then
 		object.unregisterCollisions()
-	else
+	elseif not is_junk_zone then
 		return
 	end
 

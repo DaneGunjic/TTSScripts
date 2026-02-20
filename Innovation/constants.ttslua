@@ -1,5 +1,8 @@
 game_setup = false
 
+TABLE_GUID = "4ee1f2"
+JUNK_ZONE_GUID = "133e2c"
+
 expansions = {
 	['cities'] = false,
 	['echoes'] = false,
