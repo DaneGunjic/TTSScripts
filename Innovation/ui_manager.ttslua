@@ -23,7 +23,7 @@ function createSplayButtons()
 		White = { pos = { -40, 1.50, -17.15 }, rot = { 0, 180, 0 } },
 		Red = { pos = { 6, 1.50, -17.15 }, rot = { 0, 180, 0 } },
 		Green = { pos = { 40, 1.50, 17.15 }, rot = { 0, 0, 0 } },
-		Blue = { pos = { -5, 1.50, 17.15 }, rot = { 0, 0, 0 } },
+		Blue = { pos = { -6, 1.50, 17.15 }, rot = { 0, 0, 0 } },
 	}
 
 	for _, color in ipairs(getSeatedPlayers()) do
@@ -209,7 +209,7 @@ function createSplayControlButtons()
 		White = { pos = { -45, 1.5, -24.12 }, rot = { 0, 180, 0 } },
 		Red = { pos = { 1, 1.5, -24.12 }, rot = { 0, 180, 0 } },
 		Green = { pos = { 45, 1.5, 24.12 }, rot = { 0, 0, 0 } },
-		Blue = { pos = { -2, 1.5, 24.12 }, rot = { 0, 0, 0 } },
+		Blue = { pos = { -1, 1.5, 24.12 }, rot = { 0, 0, 0 } },
 	}
 
 	local table_obj = getObjectFromGUID("4ee1f2")

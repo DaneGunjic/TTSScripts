@@ -25,7 +25,7 @@ function setup()
 		if deck then deck.shuffle() end
 	end
 
-	for i = 1, 10 do
+	for i = 10, 1, -1 do
 		local deck = getDeck(i)
 		if deck then
 			deck.takeObject({

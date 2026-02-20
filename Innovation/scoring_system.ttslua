@@ -134,66 +134,77 @@ local figure_effects_achievement = {
 }
 
 local figure_effects_resource = {
-	["Sneferu"] = function(resource, counts, player)
-		if resource == "M" then return counts["M"] + counts["C"] end
-	end,
-	["Fu Xi"] = function(resource, counts, player)
-		if resource == "K" then return counts["K"] + getScoreCardCount(player) + getForecastCount(player) end
-	end,
+	-- ["Sneferu"] = function(resource, counts, player)
+	-- 	if resource == "M" then return counts["M"] + counts["C"] end
+	-- end,
+	-- ["Fu Xi"] = function(resource, counts, player)
+	-- 	if resource == "K" then return counts["K"] + getScoreCardCount(player) + getForecastCount(player) end
+	-- end,
 	["Gilgamesh"] = function(resource, counts, player, top_cards)
+		local castles = counts["C"]
+		if castles == 0 then return nil end
 		if resource == "C" then
-			local num_top_cards = 0
-			for _ in pairs(top_cards) do num_top_cards = num_top_cards + 1 end
-			return counts["C"] + (num_top_cards * getActiveBonusCount(counts))
+			return counts["C"] + castles
+		end
+		if resource == "I" then
+			return counts["I"] + castles
 		end
 	end,
-	["Huang Di"] = function(resource, counts, player)
-		if resource == "E" then return counts["E"] + counts["K"] end
-	end,
-	["Plato"] = function(resource, counts, player)
-		if resource == "E" or resource == "K" or resource == "C" or resource == "M" then
-			return counts[resource] + getSplayCount(player)
-		end
-	end,
+	-- ["Huang Di"] = function(resource, counts, player)
+	-- 	if resource == "E" then return counts["E"] + counts["K"] end
+	-- end,
+	-- ["Plato"] = function(resource, counts, player)
+	-- 	if resource == "E" or resource == "K" or resource == "C" or resource == "M" then
+	-- 		return counts[resource] + getSplayCount(player)
+	-- 	end
+	-- end,
 	["Tran Huang Dao"] = function(resource, counts, player)
 		if resource ~= "C" then
-			if counts[resource] == 0 then return 0 end
-			return counts[resource] + math.floor(counts["C"] / 2)
+			local fresh_counts = getResourceCounts(player)
+			if fresh_counts[resource] == 0 then return 0 end
+			return fresh_counts[resource] + math.floor(fresh_counts["C"] / 2)
 		end
 	end,
-	["Christopher Columbus"] = function(resource, counts, player)
-		if resource == "M" then return counts["M"] + (2 * counts["I"]) end
-	end,
+	-- ["Pedro Alvares Cabral"] = function(resource, counts, player)
+	-- 	if resource == "M" then return counts["M"] + (2 * counts["I"]) end
+	-- end,
 	["Adam Smith"] = function(resource, counts, player)
 		if resource == "M" then return counts["M"] * 3 end
 	end,
 	["Catherine the Great"] = function(resource, counts, player)
-		if resource == "K" then return counts["K"] * 3 end
+		local knowledge = counts["K"]
+		if knowledge == 0 then return nil end
+		if resource == "K" then
+			return counts["K"] + knowledge
+		end
+		if resource == "T" then
+			return counts["T"] + knowledge
+		end
 	end,
-	["John Ericsson"] = function(resource, counts, player)
-		if resource == "T" then return counts["T"] + 2 * counts["I"] end
-	end,
+	-- ["John Ericsson"] = function(resource, counts, player)
+	-- 	if resource == "T" then return counts["T"] + 2 * counts["I"] end
+	-- end,
 	["James Clerk Maxwell"] = function(resource, counts, player)
 		local objs = Player[player].getHandObjects(1)
 		if counts[resource] > 0 then return counts[resource] + #objs end
 	end,
-	["J.P. Morgan"] = function(resource, counts, player)
-		local icon_count = 0
-		for _, card_color in pairs(card_colors) do
-			local splay_state = get_splay_state(player, card_color)
-			if splay_state == "Up" then
-				local active_resources = getResourceCounts(player, card_color)
-				icon_count = icon_count + active_resources[resource]
-			end
-		end
-		return counts[resource] + icon_count
-	end,
-	["John Von Neumann"] = function(resource, counts, player)
-		if resource == "T" then
-			local objs = Player[player].getHandObjects(1)
-			return counts["T"] + (2 * #objs)
-		end
-	end
+	-- ["J.P. Morgan"] = function(resource, counts, player)
+	-- 	local icon_count = 0
+	-- 	for _, card_color in pairs(card_colors) do
+	-- 		local splay_state = get_splay_state(player, card_color)
+	-- 		if splay_state == "Up" then
+	-- 			local active_resources = getResourceCounts(player, card_color)
+	-- 			icon_count = icon_count + active_resources[resource]
+	-- 		end
+	-- 	end
+	-- 	return counts[resource] + icon_count
+	-- end,
+	-- ["John Von Neumann"] = function(resource, counts, player)
+	-- 	if resource == "T" then
+	-- 		local objs = Player[player].getHandObjects(1)
+	-- 		return counts["T"] + (2 * #objs)
+	-- 	end
+	-- end
 }
 
 function updateScoreCount(player, top_cards)

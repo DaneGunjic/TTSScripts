@@ -159,6 +159,23 @@ function CountCardsInZone(zone)
   return count
 end
 
+function getDecksInZone(zone)
+  if not zone or not zone.getObjects then
+    return {}
+  end
+
+  local decks = {}
+  local objects = zone.getObjects()
+
+  for _, obj in ipairs(objects) do
+    if obj.tag == "Deck" then
+      table.insert(decks, obj)
+    end
+  end
+
+  return decks
+end
+
 -- Generic function to find objects by tag in a zone
 function FindObjectsByTag(zone, tag)
   if not zone or not zone.getObjects then

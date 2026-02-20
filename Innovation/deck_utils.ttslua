@@ -196,15 +196,15 @@ function returnCardToDeck(card, age, description, name)
 	local return_deck_zone = getReturnDeckZone(description, age, name)
 	local return_deck_stuff = return_deck_zone.getObjects()
 	local deck_rotation = return_deck_zone.getRotation()
-	if #return_deck_stuff == 1 then
-		card.setPositionSmooth(return_deck_zone.getPosition(), false, true)
-		if isBaseCard(description) then
-			deck_rotation.y = deck_rotation.y + 90
-		end
-		deck_rotation.z = 0
-		deck_rotation.x = 180
-		card.setRotationSmooth(deck_rotation, false, true)
+
+	if isBaseCard(description) then
+		deck_rotation.y = deck_rotation.y + 90
+	else
+		deck_rotation.y = deck_rotation.y + 180
 	end
+	
+	deck_rotation.z = 180
+
 	for k, return_deck in pairs(return_deck_stuff) do
 		if return_deck.type == "Deck" or return_deck.type == "Card" then
 			local deck_position = {}
@@ -222,11 +222,10 @@ function returnCardToDeck(card, age, description, name)
 			else
 				x_coord, z_coord = getBaseDeckOffsetCoords(deck_position)
 			end
-			deck_rotation = return_deck.getRotation()
+
 			Wait.time(function()
 				return_deck.setPositionSmooth({ x_coord, y_coord, z_coord }, false, true)
 				return_deck.setLock(true)
-				--return_deck.setPosition({x_coord, y_coord, z_coord})
 				Wait.time(function()
 					card.setPositionSmooth(deck_position, false, true)
 					card.setRotationSmooth(deck_rotation, false, true)
@@ -237,6 +236,11 @@ function returnCardToDeck(card, age, description, name)
 				end, 0.3)
 			end, 0.3)
 		end
+	end
+	
+	if #return_deck_stuff == 1 then -- Only the table is detected
+		card.setPositionSmooth(return_deck_zone.getPosition(), false, true)
+		card.setRotationSmooth(deck_rotation, false, true)
 	end
 end
 
