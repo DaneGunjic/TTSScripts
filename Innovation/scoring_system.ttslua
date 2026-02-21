@@ -71,7 +71,11 @@ figure_effects_score = {
 		return math.max(max_score, getAchievementValues(player))
 	end,
 	["Shen Kuo"] = function(player, max_score)
-		return math.max(max_score, getSplayCount(player) * 3)
+		local visible_card_count = 0
+		for _, card_color in pairs(card_colors) do
+			visible_card_count = visible_card_count + getActiveCardCount(player, card_color)
+		end
+		return math.max(max_score, visible_card_count)
 	end,
 	["Michelangelo"] = function(player, max_score)
 		local cards_in_hand = Player[player].getHandObjects(1)
@@ -643,10 +647,6 @@ function getActiveCardCount(player, color)
 	for i, card in pairs(cards) do
 		if card.type == "Deck" then
 			local cards_in_deck = card.getObjects()
-			if cards_in_deck[#cards_in_deck] then
-				--print("getActiveCardCount Deck with color " .. getCardColor(cards_in_deck[#cards_in_deck].description))
-			end
-
 			if cards_in_deck[#cards_in_deck] ~= nil then
 				local deck_color = getCardColor(cards_in_deck[#cards_in_deck].description)
 				if deck_color == color then count = 1 end
