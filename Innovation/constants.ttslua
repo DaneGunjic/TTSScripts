@@ -2,6 +2,8 @@ game_setup = false
 
 TABLE_GUID = "4ee1f2"
 JUNK_ZONE_GUID = "133e2c"
+RETURN_BUTTON_GUID = "bad911"
+AGE0_DECK_GUID = "cfe8a3"
 
 expansions = {
 	['cities'] = false,

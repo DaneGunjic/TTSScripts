@@ -71,11 +71,12 @@ figure_effects_score = {
 		return math.max(max_score, getAchievementValues(player))
 	end,
 	["Shen Kuo"] = function(player, max_score)
-		local visible_card_count = 0
+		local counts = getActiveCardCounts(player)
+		local sum = 0
 		for _, card_color in pairs(card_colors) do
-			visible_card_count = visible_card_count + getActiveCardCount(player, card_color)
+			sum = sum + (counts[card_color] or 0)
 		end
-		return math.max(max_score, visible_card_count)
+		return math.max(max_score, sum)
 	end,
 	["Michelangelo"] = function(player, max_score)
 		local cards_in_hand = Player[player].getHandObjects(1)
@@ -243,8 +244,8 @@ figure_effects_resource = {
 	-- end
 }
 
-function updateScoreCount(player, top_cards)
-	local updated_count = getScoreCount(player)
+function updateScoreCount(player, top_cards, resource_counts)
+	local updated_count = getScoreCount(player, top_cards, resource_counts)
 	updated_count = updateScoreCountWithFiguresKarma(player, updated_count, top_cards)
 	updateScoreUI(player, updated_count)
 end
@@ -314,7 +315,7 @@ function getScoreCardCount(player)
 	return count
 end
 
-function getScoreCount(player)
+function getScoreCount(player, top_cards, resource_counts)
 	local zone = getZoneCached(score_zones[player])
 	if not zone then return 0 end
 	local cards = zone.getObjects()
@@ -333,7 +334,27 @@ function getScoreCount(player)
 		if not success then print("Error in getScoreCount: " .. tostring(err)) end
 	end
 
-	local player_board_count = getActiveIconCount(player, "NUM")
+	local player_board_count = 0
+	if resource_counts ~= nil then
+		local point_vals_with_counts = {}
+		for i, point_shorthand in pairs(point_values) do
+			local pv = pointValue(point_shorthand)
+			point_vals_with_counts[pv] = resource_counts[point_shorthand] or 0
+		end
+		point_vals_with_counts = updateBonusValuesFromFiguresKarma(player, point_vals_with_counts, top_cards)
+		local point_count = 0
+		local max_point_val = 0
+		for val, cnt in pairs(point_vals_with_counts) do
+			if cnt > 0 and val > max_point_val then
+				max_point_val = val
+			end
+			point_count = point_count + cnt
+		end
+		player_board_count = max_point_val
+		if point_count > 0 then player_board_count = player_board_count + point_count - 1 end
+	else
+		player_board_count = getActiveIconCount(player, "NUM", top_cards)
+	end
 	return count + player_board_count
 end
 
@@ -509,9 +530,9 @@ function getResourceCounts(player, card_color)
 	return resource_counts
 end
 
-function getActiveIconCount(player, icon)
+function getActiveIconCount(player, icon, top_cards)
 	local sorted_cards = getSortedResourcesFromCards(player, true)
-	return getIconCountFromCardList(sorted_cards, player, icon)
+	return getIconCountFromCardList(sorted_cards, player, icon, top_cards)
 end
 
 function getCitiesFlagAchievementCount(player)
@@ -639,7 +660,7 @@ end
 function getActiveCardCount(player, color)
 	--print("getActiveCardCount for player " .. player .. " with color " .. color)
 	local count = 0
-	local zone = getObjectFromGUID(zone_zones[player])
+	local zone = getZoneCached(zone_zones[player])
 
 	if not zone then print("Error in getActiveCardCount: zone is nil") return 0 end
 
@@ -659,6 +680,32 @@ function getActiveCardCount(player, color)
 
 	--print("Found " .. count .. " active cards of color " .. color .. " for player " .. player)
 	return count
+end
+
+function getActiveCardCounts(player)
+	local counts = {
+		Blue = 0,
+		Yellow = 0,
+		Purple = 0,
+		Red = 0,
+		Green = 0
+	}
+	local zone = getZoneCached(zone_zones[player])
+	if not zone then return counts end
+	local cards = zone.getObjects()
+	for i, card in pairs(cards) do
+		if card.type == "Deck" then
+			local cards_in_deck = card.getObjects()
+			if cards_in_deck[#cards_in_deck] ~= nil then
+				local deck_color = getCardColor(cards_in_deck[#cards_in_deck].description)
+				counts[deck_color] = 1
+			end
+		elseif card.type == "Card" then
+			local c = getCachedCardData(card).color
+			counts[c] = counts[c] + 1
+		end
+	end
+	return counts
 end
 
 function getSortedResourcesFromCards(player, ignoreBaseCardValues, card_color)
@@ -780,7 +827,7 @@ function getActiveResourcesByColor(list, player, color)
 	return r
 end
 
-function getIconCountFromCardList(list, player, icon)
+function getIconCountFromCardList(list, player, icon, top_cards)
 	local num_count = 0
 	local r = getActiveResources(list, player)
 
@@ -795,7 +842,7 @@ function getIconCountFromCardList(list, player, icon)
 			end
 		end
 
-		point_vals_with_counts = updateBonusValuesFromFiguresKarma(player, point_vals_with_counts)
+		point_vals_with_counts = updateBonusValuesFromFiguresKarma(player, point_vals_with_counts, top_cards)
 
 		local point_count = 0
 		local max_point_val = 0
@@ -822,9 +869,11 @@ function count_occurrences(str, token)
 	return count
 end
 
-function updateBonusValuesFromFiguresKarma(player, active_point_vals)
-	local top_cards = getTopCards(player)
-	if top_cards["Zhang Heng"] ~= nill then
+function updateBonusValuesFromFiguresKarma(player, active_point_vals, top_cards)
+	if top_cards == nil then
+		top_cards = getTopCards(player)
+	end
+	if top_cards["Zhang Heng"] ~= nil then
 		local score_card_vals = getScoreCardValues(player)
 		for val, count in pairs(score_card_vals) do
 			if active_point_vals[val] == nil then

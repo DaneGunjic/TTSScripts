@@ -46,7 +46,7 @@ function doUpdate()
 				local top_cards = top_cards_per_player[player_color]
 				updateResourceLabels(resource_counts_per_player[player_color], player_color, top_cards,
 					effective_counts_per_player)
-				updateScoreCount(player_color, top_cards)
+				updateScoreCount(player_color, top_cards, resource_counts_per_player[player_color])
 				updateAchievementCount(player_color, top_cards, splays_per_player, resource_counts_per_player)
 				updateHandData(player_color, top_cards)
 			end
@@ -178,10 +178,41 @@ function meld_hotkey(player, card)
 	if card == nil then
 		return
 	end
-
 	if card.type == "Card" then
+		local color = getCardColor(card.getDescription())
+		local player_zone = getZoneCached(zone_zones[player])
+		local had_color_before = false
+		if player_zone ~= nil then
+			had_color_before = (get_card_count(player_zone, color) or 0) > 0
+		end
+
 		meldCard(player, card)
-		broadcastToAll(Player[player].steam_name .. " melded " .. card.getName())
+		broadcastToAll(getPlayerName(player) .. " melded " .. card.getName())
+
+		if not had_color_before and expansion_is_active("cities") then
+			Wait.time(function()
+				local has_city = false
+				local hand_cards = Player[player].getHandObjects(1)
+				for _, obj in ipairs(hand_cards) do
+					if isCities(obj.getDescription()) then
+						has_city = true
+						break
+					end
+				end
+				if has_city then return end
+				local anchor = select(1, getBottomAnchor(player, color, get_splay_state(player, color)))
+				local ping_pos = nil
+				if anchor ~= nil then
+					ping_pos = anchor.getPosition()
+				elseif player_zone ~= nil then
+					ping_pos = player_zone.getPosition()
+				end
+				if ping_pos ~= nil and Player[player] ~= nil then
+					Player[player].pingTable(ping_pos)
+					broadcastToAll(getPlayerName(player) .. " should draw a city for melding " .. color)
+				end
+			end, 0.2)
+		end
 	end
 end
 
@@ -236,10 +267,21 @@ function draw_hotkey(player)
 			broadcastToAll("Echoes deck " .. age_to_draw .. " is empty. Drawing Base card instead.")
 		end
 	end
+	
+	local draw_age = age_to_draw
+	local deck_to_draw = base_deck
 
-	if base_deck ~= nil and (base_deck.type == "Deck" or base_deck.type == "Card") then
-		base_deck.deal(1, player)
-		broadcastToAll(getPlayerName(player) .. " draws base card age " .. tostring(age_to_draw))
+	while (deck_to_draw == nil or (deck_to_draw.type ~= "Deck" and deck_to_draw.type ~= "Card")) and draw_age <= 11 do
+		draw_age = draw_age + 1
+		local next_base = getDeckOrCard(draw_age)
+		if next_base ~= nil then
+			deck_to_draw = next_base
+		end
+	end
+
+	if deck_to_draw ~= nil and (deck_to_draw.type == "Deck" or deck_to_draw.type == "Card") then
+		deck_to_draw.deal(1, player)
+		broadcastToAll(getPlayerName(player) .. " draws base card age " .. tostring(draw_age))
 	end
 end
 
@@ -247,7 +289,7 @@ function draw_city_hotkey(player)
 	if not game_setup then return end
 	if not expansion_is_active("cities") then return end
 
-	local max_age = select(1, get_max_age_for_draw(player))
+	local max_age, base_deck = get_max_age_for_draw(player)
 
 	local cards_in_hand = Player[player].getHandObjects(1)
 	local has_city = false
@@ -269,13 +311,40 @@ function draw_city_hotkey(player)
 		broadcastToAll(getPlayerName(player) .. " draws city card age " .. tostring(max_age))
 		return
 	end
+
+	if base_deck ~= nil then
+		base_deck.deal(1, player)
+		broadcastToAll(getPlayerName(player) .. " draws base card age " .. tostring(max_age))
+		return
+	end
+
+	local draw_age = max_age
+	local deck_to_draw = nil
+	while draw_age <= 11 and (deck_to_draw == nil) do
+		draw_age = draw_age + 1
+		local next_base = getDeckOrCard(draw_age)
+		if next_base ~= nil then
+			local next_cities = getDeckOrCardCities(draw_age)
+			if next_cities ~= nil then
+				deck_to_draw = next_cities
+			else
+				deck_to_draw = next_base
+			end
+		end
+	end
+
+	if deck_to_draw ~= nil then
+		deck_to_draw.deal(1, player)
+		local label = isCities(deck_to_draw.getDescription() or "") and "city card age " or "base card age "
+		broadcastToAll(getPlayerName(player) .. " draws " .. label .. tostring(draw_age))
+	end
 end
 
 function draw_figure_hotkey(player)
 	if not game_setup then return end
 	if not expansion_is_active("figures") then return end
 
-	local max_age = select(1, get_max_age_for_draw(player))
+	local max_age, base_deck = get_max_age_for_draw(player)
 
 	local figures_deck = getDeckOrCardFigures(max_age)
 	if figures_deck ~= nil then
@@ -283,11 +352,38 @@ function draw_figure_hotkey(player)
 		broadcastToAll(getPlayerName(player) .. " draws figure card age " .. tostring(max_age))
 		return
 	end
+
+	if base_deck ~= nil then
+		base_deck.deal(1, player)
+		broadcastToAll(getPlayerName(player) .. " draws base card age " .. tostring(max_age))
+		return
+	end
+
+	local draw_age = max_age
+	local deck_to_draw = nil
+	while draw_age <= 11 and (deck_to_draw == nil) do
+		draw_age = draw_age + 1
+		local next_base = getDeckOrCard(draw_age)
+		if next_base ~= nil then
+			local next_figures = getDeckOrCardFigures(draw_age)
+			if next_figures ~= nil then
+				deck_to_draw = next_figures
+			else
+				deck_to_draw = next_base
+			end
+		end
+	end
+
+	if deck_to_draw ~= nil then
+		deck_to_draw.deal(1, player)
+		local label = isFigures(deck_to_draw.getDescription() or "") and "figure card age " or "base card age "
+		broadcastToAll(getPlayerName(player) .. " draws " .. label .. tostring(draw_age))
+	end
 end
 
 function copy_card_data_hotkey(player_color)
-	local zone_old = getObjectFromGUID(zoneOldCard)
-	local zone_new = getObjectFromGUID(zoneNewCard)
+	local zone_old = getZoneCached(zoneOldCard)
+	local zone_new = getZoneCached(zoneNewCard)
 
 	if not zone_old or not zone_new then
 		broadcastToColor("Error: Could not find one of the zones.", player_color, { 1, 0, 0 })

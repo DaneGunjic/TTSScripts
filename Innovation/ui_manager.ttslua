@@ -1,9 +1,9 @@
 function createReturnButton()
-	local zone = getObjectFromGUID(return_zone)
+local zone = getZoneCached(return_zone)
 	return_button = {}
 	return_button.click_function = "returnCards"
 	return_button.label = "Return"
-	return_button.guid = "bad911"
+	return_button.guid = RETURN_BUTTON_GUID
 	return_button.function_owner = nil
 	return_button.width = 1000
 	return_button.height = 400
@@ -16,7 +16,7 @@ function createReturnButton()
 end
 
 function createSplayButtons()
-	table_obj = getObjectFromGUID("4ee1f2")
+	table_obj = getZoneCached(TABLE_GUID)
 	if table_obj == nil then return end
 
 	FirstSplayButtonForColor = {
@@ -212,7 +212,7 @@ function createSplayControlButtons()
 		Blue = { pos = { -1, 1.5, 24.12 }, rot = { 0, 0, 0 } },
 	}
 
-	local table_obj = getObjectFromGUID("4ee1f2")
+	local table_obj = getZoneCached(TABLE_GUID)
 
 	if table_obj == nil then return end
 
@@ -284,7 +284,7 @@ function createSplayControlButtons()
 end
 
 function splaySelectClicked(obj, player_clicker_color, alt_click)
-	local table_obj = getObjectFromGUID("4ee1f2")
+	local table_obj = getZoneCached(TABLE_GUID)
 	local buttons = table_obj.getButtons()
 
 	-- Iterate to find the button belonging to the clicker
@@ -330,7 +330,7 @@ function getNextColor(current)
 end
 
 function splayShiftClicked(obj, player_clicker_color, alt_click)
-	local table_obj = getObjectFromGUID("4ee1f2")
+	local table_obj = getZoneCached(TABLE_GUID)
 	local buttons = table_obj.getButtons()
 
 	-- Find the button for the clicker to determine current selected color
@@ -361,7 +361,7 @@ function splayShiftUp(obj, color, alt) performShift(color, "Up") end
 function splayShiftDown(obj, color, alt) performShift(color, "Down") end
 
 function performShift(player_color, dir)
-	local table_obj = getObjectFromGUID("4ee1f2")
+	local table_obj = getZoneCached(TABLE_GUID)
 	local buttons = table_obj.getButtons()
 	local current_selected_color = nil
 
@@ -394,7 +394,7 @@ function performShift(player_color, dir)
 end
 
 function splayShiftClicked(player, value, id)
-	local table_obj = getObjectFromGUID("4ee1f2")
+	local table_obj = getZoneCached(TABLE_GUID)
 	local buttons = table_obj.getButtons()
 	local btn = buttons[value]
 	local tip = btn.tooltip
@@ -460,7 +460,7 @@ function createScoreButtons()
 		Green = { pos = { 17, 1.50, 8 }, rot = { 0, 0, 0 } }
 	}
 
-	local table_obj = getObjectFromGUID("4ee1f2")
+	local table_obj = getZoneCached(TABLE_GUID)
 	if table_obj == nil then return end
 
 	local players = getSeatedPlayers()
@@ -493,7 +493,7 @@ function createAchievementCountButtons()
 		Green = { pos = { 25, 1.50, 8 }, rot = { 0, 0, 0 } }
 	}
 
-	local table_obj = getObjectFromGUID("4ee1f2")
+	local table_obj = getZoneCached(TABLE_GUID)
 	if table_obj == nil then return end
 
 	local players = getSeatedPlayers()

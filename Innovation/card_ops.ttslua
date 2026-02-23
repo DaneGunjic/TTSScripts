@@ -50,7 +50,7 @@ function tuckCard(player_color, object)
 	local card_color = getCardColor(object.getDescription())
 	local splay_state = get_splay_state(player_color, card_color)
 	local move_distance = 0
-	local player_zone_obj = getObjectFromGUID(zone_zones[player_color])
+	local player_zone_obj = getZoneCached(zone_zones[player_color])
 
 	if splay_state == "None" then
 		tuckStacked(player_color, object)
@@ -124,7 +124,7 @@ function meldCard(player_color, object)
 	local card_color = getCardColor(object.getDescription())
 	local splay_state = get_splay_state(player_color, card_color)
 	local move_distance = 0
-	local player_zone_obj = getObjectFromGUID(zone_zones[player_color])
+	local player_zone_obj = getZoneCached(zone_zones[player_color])
 
 	if splay_state == "None" then
 		meldStacked(player_color, object)
@@ -236,7 +236,7 @@ function tuckStacked(player_color, card)
 	broadcastToAll(Player[player_color].steam_name ..
 		" tucked " .. card.getName() .. " under " .. getCardColor(card.getDescription()) .. " stack")
 	local card_color = getCardColor(card.getDescription())
-	local player_zone = getObjectFromGUID(zone_zones[player_color])
+	local player_zone = getZoneCached(zone_zones[player_color])
 	local cards = player_zone.getObjects()
 
 	for i, deck in pairs(cards) do
@@ -262,7 +262,7 @@ end
 
 function meldStacked(player_color, card)
 	local card_color = getCardColor(card.getDescription())
-	local player_zone = getObjectFromGUID(zone_zones[player_color])
+	local player_zone = getZoneCached(zone_zones[player_color])
 	local cards = player_zone.getObjects()
 
 	for i, deck in pairs(cards) do
@@ -288,7 +288,7 @@ end
 
 function meldToEmptyZone(player_color, card)
 	for i, zone in pairs(meld_zones[player_color]) do
-		local meld_zone = getObjectFromGUID(zone)
+		local meld_zone = getZoneCached(zone)
 		local cards = meld_zone.getObjects()
 		local has_cards = false
 		for i, deck in pairs(cards) do

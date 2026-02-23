@@ -11,7 +11,8 @@
 function onSave()
   local data_to_save = {
     splay_state = splay_state,
-    game_setup = game_setup
+    game_setup = game_setup,
+    expansions = expansions
   }
   return JSON.encode(data_to_save)
 end
@@ -25,6 +26,9 @@ function onLoad(saved_data)
     end
     if loaded_data.game_setup ~= nil then
       game_setup = loaded_data.game_setup
+    end
+    if loaded_data.expansions ~= nil then
+      expansions = loaded_data.expansions
     end
   end
 

@@ -31,7 +31,7 @@ end
 
 function remove_figures()
 	remove_expansion("figures", getDeckFigures, function() remove_achievements("figures") end)
-	local obj = getObjectFromGUID("cfe8a3")
+	local obj = getObjectFromGUID(AGE0_DECK_GUID)
 	if obj ~= nil then
 		obj.destroy()
 	else
