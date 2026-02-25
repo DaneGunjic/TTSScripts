@@ -1,0 +1,236 @@
+
+-- Default relative positions for wonder stages based on stage count
+WonderStagePositions = {
+    [1] = {
+        Vector(0, 0.2, 0.65)
+    },
+    [2] = {
+        Vector(-0.5, 0.2, 0.65),
+        Vector(0.5, 0.2, 0.65)
+    },
+    [3] = {
+        Vector(-0.75, 0.2, 0.65),
+        Vector(0, 0.2, 0.65),
+        Vector(0.75, 0.2, 0.65)
+    },
+    [4] = {
+        Vector(-1.05, 0.2, 0.65),
+        Vector(-0.35, 0.2, 0.65),
+        Vector(0.35, 0.2, 0.65),
+        Vector(1.05, 0.2, 0.65)
+    },
+    [5] = {
+        Vector(-1.2, 0.2, 0.65),
+        Vector(-0.6, 0.2, 0.65),
+        Vector(0, 0.2, 0.65),
+        Vector(0.6, 0.2, 0.65),
+        Vector(1.2, 0.2, 0.65)
+    },
+    [6] = {
+        Vector(-1.25, 0.2, 0.65),
+        Vector(-0.75, 0.2, 0.65),
+        Vector(-0.25, 0.2, 0.65),
+        Vector(0.25, 0.2, 0.65),
+        Vector(0.75, 0.2, 0.65),
+        Vector(1.25, 0.2, 0.65)
+    }
+}
+
+WonderData = {
+    ["The Colossus of Rhódos"] = {
+        Day = {
+            Stages = 3,
+            Resource = "Produces Ore",
+            StageEffects = {
+                "3 Victory Points",
+                "2 Shields",
+                "7 Victory Points"
+            }
+        },
+        Night = {
+            Stages = 2,
+            Resource = "Produces Ore",
+            StageEffects = {
+                "1 Shield, 3 Coins, 3 Victory Points",
+                "1 Shield, 4 Coins, 4 Victory Points"
+            }
+        }
+    },
+    ["The Lighthouse of Alexandria"] = {
+        Day = {
+            Stages = 3,
+            Resource = "Produces Glass",
+            StageEffects = {
+                "3 Victory Points",
+                "Produces Raw Material",
+                "7 Victory Points"
+            }
+        },
+        Night = {
+            -- Inherits Stages=3 from Day
+            -- Inherits Resource from Day
+            StageEffects = {
+                "Produces Raw Material",
+                "Produces Manufactured Good",
+                "7 Victory Points"
+            }
+        }
+    },
+    ["The Temple of Artemis in Ephesus"] = {
+        Day = {
+            Stages = 3,
+            Resource = "Produces Papyrus",
+            StageEffects = {
+                "3 Victory Points",
+                "9 Coins",
+                "7 Victory Points"
+            }
+        },
+        Night = {
+            -- Inherits Stages=3 from Day
+            -- Inherits Resource from Day
+            StageEffects = {
+                "2 Coins, 4 Victory Points",
+                "3 Coins, 4 Victory Points",
+                "4 Coins, 4 Victory Points"
+            }
+        }
+    },
+    ["The Hanging Gardens of Babylon"] = {
+        Day = {
+            Stages = 3,
+            Resource = "Produces Clay",
+            StageEffects = {
+                "3 Victory Points",
+                "Scientific Symbol (wild)",
+                "7 Victory Points"
+            }
+        },
+        Night = {
+            -- Inherits Stages=3 from Day
+            -- Inherits Resource from Day
+            StageEffects = {
+                "3 Victory Points",
+                "Play last card of age",
+                "Scientific Symbol (Tablet)"
+            }
+        }
+    },
+    ["The Statue of Zeus in Olympia"] = {
+        Day = {
+            Stages = 3,
+            Resource = "Produces Wood",
+            StageEffects = {
+                "3 Victory Points",
+                "Build structures for free once per age",
+                "7 Victory Points"
+            }
+        },
+        Night = {
+            -- Inherits Stages=3 from Day
+            -- Inherits Resource from Day
+            StageEffects = {
+                "Guild (copy from neighbor)",
+                "5 Victory Points",
+                "Copy Guild (purple) card"
+            }
+        }
+    },
+    ["The Mausoleum of Halicarnassus"] = {
+        Day = {
+            Stages = 3,
+            Resource = "Produces Textile",
+            StageEffects = {
+                "3 Victory Points",
+                "Build from discard pile",
+                "7 Victory Points"
+            }
+        },
+        Night = {
+            -- Inherits Stages=3 from Day
+            -- Inherits Resource from Day
+            StageEffects = {
+                "2 Victory Points, Build from discard",
+                "1 Victory Points, Build from discard",
+                "Build from discard"
+            }
+        }
+    },
+    ["The Pyramids of Giza"] = {
+        Day = {
+            Stages = 3,
+            Resource = "Produces Stone",
+            StageEffects = {
+                "3 Victory Points",
+                "5 Victory Points",
+                "7 Victory Points"
+            }
+        },
+        Night = {
+            Stages = 4,
+            -- Inherits Resource from Day
+            StageEffects = {
+                "3 Victory Points",
+                "5 Victory Points",
+                "5 Victory Points",
+                "7 Victory Points"
+            }
+        }
+    }
+}
+
+-- Post-processing to merge Day/Night and assign positions
+function InitializeWonderData()
+    for name, data in pairs(WonderData) do
+        -- Ensure Night table exists
+        if not data.Night then data.Night = {} end
+
+        -- 1. Inherit Stages
+        if not data.Night.Stages then 
+            data.Night.Stages = data.Day.Stages 
+        end
+
+        -- 2. Inherit Resource
+        if not data.Night.Resource then 
+            data.Night.Resource = data.Day.Resource 
+        end
+
+        -- 3. Inherit StageEffects (partial inheritance)
+        if not data.Night.StageEffects then 
+            data.Night.StageEffects = {} 
+        end
+
+        for i = 1, data.Night.Stages do
+            if not data.Night.StageEffects[i] then
+                if data.Day.StageEffects and data.Day.StageEffects[i] then
+                    data.Night.StageEffects[i] = data.Day.StageEffects[i]
+                else
+                    data.Night.StageEffects[i] = "Stage " .. i .. " Effect"
+                end
+            end
+        end
+
+        -- 4. Assign Positions
+        -- Day Positions
+        if not data.Day.Positions then
+            data.Day.Positions = WonderStagePositions[data.Day.Stages] or {}
+        end
+
+        -- Night Positions
+        if not data.Night.Positions then
+            -- If stage count is same, try to inherit from Day positions if custom positions were used there?
+            -- Or just use default for Night stage count.
+            -- Spec says: "If anything isn't defined for the night side, it should pull the info from the day side"
+            -- But positions depend on stage count.
+            if data.Night.Stages == data.Day.Stages and data.Day.Positions then
+                 -- If Day has custom positions (or defaults assigned above), use them?
+                 -- Let's just use defaults for Night stage count, unless Day has custom ones and stages match.
+                 data.Night.Positions = WonderStagePositions[data.Night.Stages] or {}
+            else
+                 data.Night.Positions = WonderStagePositions[data.Night.Stages] or {}
+            end
+        end
+    end
+end
+
+InitializeWonderData()

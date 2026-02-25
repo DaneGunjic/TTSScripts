@@ -30,6 +30,7 @@ function onLoad()
 
   #include !\7Wonders\config\guids\bags.ttslua
   #include !\7Wonders\config\guids\zones.ttslua
+  #include !\7Wonders\config\wonder_data.ttslua
 
   MakeSetupButtons()
   MakeSetupBoardText()

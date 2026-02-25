@@ -260,11 +260,16 @@ function HandleKeepButton(obj, color, alt)
 
 	-- Based on rotation we know if it's Day or Night
 	local Side = "Day / A"
+    local SideKey = "Day"
 	if IsPlayerWonderFlipped(color) then
 		Side = "Night / B"
+        SideKey = "Night"
 	end
 
 	broadcastToAll(Player[color].steam_name .. " chose " .. GetPlayerCurrentWonder(color).getName() .. " (" .. Side .. ")")
+    
+  -- Spawn tooltips for wonder stages
+  SpawnWonderTooltip(GetPlayerCurrentWonder(color), GetPlayerCurrentWonder(color).getName(), SideKey)
 
 	obj.clearButtons()
 
@@ -437,3 +442,93 @@ function HandleCoinButton(obj, color, alt)
 		AddCoins(color, 1, false)
 	end
 end
+
+function SpawnWonderTooltip(wonderObj, wonderName, sideKey)
+    if not WonderData then
+        print("Error: WonderData not found.")
+        return
+    end
+
+    local data = WonderData[wonderName]
+    if not data then
+        -- Fallback: try finding a key that contains the wonderName
+        for k, v in pairs(WonderData) do
+            if string.find(wonderName, k, 1, true) or string.find(k, wonderName, 1, true) then
+                data = v
+                break
+            end
+        end
+        
+        if not data then
+            print("No tooltip data for wonder: " .. tostring(wonderName))
+            return
+        end
+    end
+
+    local sideData = data[sideKey]
+    if not sideData then
+        if sideKey == "Night" then
+            sideData = data["Day"]
+        end
+        if not sideData then return end
+    end
+
+    local positions = sideData.Positions
+    local effects = sideData.StageEffects
+
+    if not positions or not effects then 
+        return 
+    end
+
+    for i, pos in ipairs(positions) do
+        local effect = effects[i] or "Effect " .. i
+        
+        local finalPos = Vector(pos.x, pos.y, pos.z)
+        
+        if sideKey == "Night" then
+             finalPos.x = -finalPos.x
+             finalPos.y = -finalPos.y
+        end
+        
+        local worldPos = wonderObj.positionToWorld(finalPos)
+        
+        spawnObject({
+            type = "BlockSquare",
+            position = worldPos,
+            rotation = wonderObj.getRotation(),
+            scale = {0.5, 0.1, 0.5},
+            sound = false,
+            callback_function = function(obj)
+                obj.setName(effect)
+                obj.setDescription("") 
+                --obj.setColorTint({0,0,0,0})
+                obj.setLock(true)
+            end
+        })
+    end
+    
+    if sideData.Resource then
+        local resourcePos = Vector(-1.3, 0.2, -0.65)
+        
+        if sideKey == "Night" then
+             resourcePos.x = -resourcePos.x
+             resourcePos.y = -resourcePos.y
+        end
+        
+        local worldPos = wonderObj.positionToWorld(resourcePos)
+        
+        spawnObject({
+            type = "BlockSquare",
+            position = worldPos,
+            rotation = wonderObj.getRotation(),
+            scale = {0.4, 0.1, 0.4},
+            sound = false,
+            callback_function = function(obj)
+                obj.setName(sideData.Resource)
+                obj.setColorTint({0,0,0,0})
+                obj.setLock(true)
+            end
+        })
+    end
+end
+
