@@ -1,38 +1,37 @@
-
 -- Default relative positions for wonder stages based on stage count
 WonderStagePositions = {
     [1] = {
         Vector(0, 0.2, 0.65)
     },
     [2] = {
-        Vector(-0.5, 0.2, 0.65),
-        Vector(0.5, 0.2, 0.65)
+        Vector(0.5, 0.2, 0.65),
+        Vector(-0.5, 0.2, 0.65)
     },
     [3] = {
-        Vector(-0.75, 0.2, 0.65),
+        Vector(0.75, 0.2, 0.65),
         Vector(0, 0.2, 0.65),
-        Vector(0.75, 0.2, 0.65)
+        Vector(-0.75, 0.2, 0.65)
     },
     [4] = {
-        Vector(-1.05, 0.2, 0.65),
-        Vector(-0.35, 0.2, 0.65),
+        Vector(1.05, 0.2, 0.65),
         Vector(0.35, 0.2, 0.65),
-        Vector(1.05, 0.2, 0.65)
+        Vector(-0.35, 0.2, 0.65),
+        Vector(-1.05, 0.2, 0.65)
     },
     [5] = {
-        Vector(-1.2, 0.2, 0.65),
-        Vector(-0.6, 0.2, 0.65),
-        Vector(0, 0.2, 0.65),
+        Vector(1.2, 0.2, 0.65),
         Vector(0.6, 0.2, 0.65),
-        Vector(1.2, 0.2, 0.65)
+        Vector(0, 0.2, 0.65),
+        Vector(-0.6, 0.2, 0.65),
+        Vector(-1.2, 0.2, 0.65)
     },
     [6] = {
-        Vector(-1.25, 0.2, 0.65),
-        Vector(-0.75, 0.2, 0.65),
-        Vector(-0.25, 0.2, 0.65),
-        Vector(0.25, 0.2, 0.65),
+        Vector(1.25, 0.2, 0.65),
         Vector(0.75, 0.2, 0.65),
-        Vector(1.25, 0.2, 0.65)
+        Vector(0.25, 0.2, 0.65),
+        Vector(-0.25, 0.2, 0.65),
+        Vector(-0.75, 0.2, 0.65),
+        Vector(-1.25, 0.2, 0.65)
     }
 }
 
@@ -156,7 +155,7 @@ WonderData = {
             }
         }
     },
-    ["The Pyramids of Giza"] = {
+    ["The Pyramids of Gizah"] = {
         Day = {
             Stages = 3,
             Resource = "Produces Stone",

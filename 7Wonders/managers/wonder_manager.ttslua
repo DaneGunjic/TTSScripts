@@ -269,7 +269,7 @@ function HandleKeepButton(obj, color, alt)
 	broadcastToAll(Player[color].steam_name .. " chose " .. GetPlayerCurrentWonder(color).getName() .. " (" .. Side .. ")")
     
   -- Spawn tooltips for wonder stages
-  SpawnWonderTooltip(GetPlayerCurrentWonder(color), GetPlayerCurrentWonder(color).getName(), SideKey)
+  --SpawnWonderTooltip(GetPlayerCurrentWonder(color), GetPlayerCurrentWonder(color).getName(), SideKey)
 
 	obj.clearButtons()
 
@@ -502,7 +502,12 @@ function SpawnWonderTooltip(wonderObj, wonderName, sideKey)
                 obj.setName(effect)
                 obj.setDescription("") 
                 --obj.setColorTint({0,0,0,0})
-                obj.setLock(true)
+                obj.setLock(false)
+                obj.interactable = false
+                obj.jointTo(wonderObj, {
+                    type = "Fixed",
+                    collision = false
+                })
             end
         })
     end
@@ -526,7 +531,12 @@ function SpawnWonderTooltip(wonderObj, wonderName, sideKey)
             callback_function = function(obj)
                 obj.setName(sideData.Resource)
                 obj.setColorTint({0,0,0,0})
-                obj.setLock(true)
+                obj.setLock(false)
+                obj.interactable = false
+                obj.jointTo(wonderObj, {
+                    type = "Fixed",
+                    collision = false
+                })
             end
         })
     end
