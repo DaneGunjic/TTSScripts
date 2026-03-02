@@ -43,6 +43,7 @@ function onLoad(saved_data)
     createSplayButtons()
     createResourceButtons()
     setupHud()
+    UpdateGameState()
   else
     createSetupButtons()
   end
