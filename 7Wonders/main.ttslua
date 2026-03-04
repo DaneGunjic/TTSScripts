@@ -23,8 +23,8 @@
 
 #include !\utils.ttslua
 
-function onLoad()
-  -- Once the game loads initialize  all global variables
+function onLoad(saved_data)
+  -- Once the game loads initialize all global variables
   #include !\7Wonders\globals_general.ttslua
   #include !\7Wonders\globals_players.ttslua
 
@@ -32,14 +32,175 @@ function onLoad()
   #include !\7Wonders\config\guids\zones.ttslua
   #include !\7Wonders\config\wonder_data.ttslua
 
-  MakeSetupButtons()
-  MakeSetupBoardText()
   --disableAllTiles()
   InitializeZoneSystem()
 
-  -- Set host camera to focus on setup board
-  SetHostCameraToSetupBoard()
-
   -- Pre-load all game audio files
   PreloadGameAudio()
+
+  -- Restore saved game state
+  local saveDataLoaded = false
+  if saved_data and saved_data ~= "" then
+    local loaded_data = JSON.decode(saved_data)
+    if loaded_data then
+      saveDataLoaded = true
+      GameState = loaded_data.GameState or GameState
+      CurrentPasses = loaded_data.CurrentPasses or CurrentPasses
+      MaximumPasses = loaded_data.MaximumPasses or MaximumPasses
+      CurrentAge = loaded_data.CurrentAge or CurrentAge
+      CurrentPhaseName = loaded_data.CurrentPhaseName or CurrentPhaseName
+      CurrentPhaseDescription = loaded_data.CurrentPhaseDescription or CurrentPhaseDescription
+      NumberOfPlayers = loaded_data.NumberOfPlayers or NumberOfPlayers
+      NumberOfReadyPlayers = 0
+      --log("onLoad: Initializing NumberOfReadyPlayers to 0")
+
+      if #getSeatedPlayers() < 3 then
+        NumberOfReadyPlayers = 3 - #getSeatedPlayers()
+        --log("onLoad: NumberOfPlayers < 3, setting NumberOfReadyPlayers to " .. NumberOfReadyPlayers)
+      else
+        --log("onLoad: NumberOfPlayers >= 3, NumberOfReadyPlayers remains " .. NumberOfReadyPlayers)
+      end
+
+      RandomWonders = loaded_data.RandomWonders
+      if loaded_data.RandomWonders == nil then RandomWonders = true end
+
+      DraftMode = loaded_data.DraftMode
+      if loaded_data.DraftMode == nil then DraftMode = false end
+
+      DraftModeNumber = loaded_data.DraftModeNumber or DraftModeNumber
+
+      -- Load tables if they exist
+      if loaded_data.ExpansionConfig then ExpansionConfig = loaded_data.ExpansionConfig end
+      if loaded_data.WonderExpansionConfig then WonderExpansionConfig = loaded_data.WonderExpansionConfig end
+      if loaded_data.GameModeConfig then GameModeConfig = loaded_data.GameModeConfig end
+
+      if loaded_data.PlayerCoins then PlayerCoins = loaded_data.PlayerCoins end
+      if loaded_data.PlayerKeepStatus then PlayerKeepStatus = loaded_data.PlayerKeepStatus end
+      if loaded_data.PlayerCurrentlyChosenWonder then PlayerCurrentlyChosenWonder = loaded_data.PlayerCurrentlyChosenWonder end
+      if loaded_data.PlayerShipMovements then PlayerShipMovements = loaded_data.PlayerShipMovements end
+      if loaded_data.PlayerFrontiersChoice then PlayerFrontiersChoice = loaded_data.PlayerFrontiersChoice end
+
+      -- Restore Phase Callbacks
+      if loaded_data.PhaseCallbacks then
+        local callbacks = loaded_data.PhaseCallbacks
+        if callbacks.PhaseAfterResolving then
+            PhaseHandlers.ResolveCardAction.PhaseAfterResolving = callbacks.PhaseAfterResolving
+        end
+        if callbacks.PhaseBeforeResolving then
+            PhaseHandlers.ResolveCardAction.PhaseBeforeResolving = callbacks.PhaseBeforeResolving
+        end
+      end
+
+
+      -- Restore Player Timers
+      if loaded_data.PlayerTimers then
+        local currentTime = os.time()
+        for color, savedTimer in pairs(loaded_data.PlayerTimers) do
+          if PlayerTimers[color] then
+            PlayerTimers[color].totalTime = savedTimer.totalTime
+            PlayerTimers[color].isRunning = savedTimer.isRunning
+            if savedTimer.isRunning then
+              PlayerTimers[color].startTime = currentTime
+            else
+              PlayerTimers[color].startTime = nil
+            end
+          end
+        end
+      end
+
+      GameTimerActive = loaded_data.GameTimerActive
+      if GameTimerActive then
+        startLuaCoroutine(self, "UpdateTimerDisplay")
+      end
+
+      -- Restore UI
+      if CurrentPhaseName and CurrentPhaseDescription then
+        updatePhaseUI(CurrentPhaseName, CurrentPhaseDescription)
+      end
+
+      -- Unready everyone and show buttons if game is in progress
+      if GameState ~= "Setup" then
+        RestoreAllCoinButtons()
+
+        InitializeReadyStatusCircles()
+
+        -- Hide tutorial panel
+	      UI.hide("TutorialPanel")
+
+        -- Explicitly reset ReadyList for all seated players
+        for _, color in ipairs(getSeatedPlayers()) do
+          ReadyList[color] = false
+        end
+
+        -- Conditionally show ready buttons based on GameState
+        if GameState == "ResolveCardAction" or
+           GameState == "EdificeStage" or
+           GameState == "ConflictResolution" or
+           GameState == "NavalCombat" or
+           GameState == "LeaderSelectionStage" then
+           ShowReadyButtons()
+        end
+      end
+    end
+  end
+
+  if not saveDataLoaded or GameState == "Setup" then
+    -- Set host camera to focus on setup board
+    SetHostCameraToSetupBoard()
+
+    MakeSetupButtons()
+    MakeSetupBoardText()
+  end
+end
+
+function onSave()
+  -- Calculate current timer values for saving
+  local saved_timers = {}
+  local currentTime = os.time()
+  for color, timer in pairs(PlayerTimers) do
+    saved_timers[color] = {
+      totalTime = timer.totalTime,
+      isRunning = timer.isRunning
+    }
+    if timer.isRunning and timer.startTime then
+      saved_timers[color].totalTime = saved_timers[color].totalTime + (currentTime - timer.startTime)
+    end
+  end
+
+  local data_to_save = {
+    -- Game State
+    GameState = GameState,
+    CurrentPasses = CurrentPasses,
+    MaximumPasses = MaximumPasses,
+    CurrentAge = CurrentAge,
+    CurrentPhaseName = CurrentPhaseName,
+    CurrentPhaseDescription = CurrentPhaseDescription,
+    NumberOfPlayers = NumberOfPlayers,
+
+    -- Timers
+    PlayerTimers = saved_timers,
+    GameTimerActive = GameTimerActive,
+
+    -- Configs
+    RandomWonders = RandomWonders,
+    DraftMode = DraftMode,
+    DraftModeNumber = DraftModeNumber,
+    ExpansionConfig = ExpansionConfig,
+    WonderExpansionConfig = WonderExpansionConfig,
+    GameModeConfig = GameModeConfig,
+
+    -- Player State
+    PlayerCoins = PlayerCoins,
+    PlayerKeepStatus = PlayerKeepStatus,
+    PlayerCurrentlyChosenWonder = PlayerCurrentlyChosenWonder,
+    PlayerShipMovements = PlayerShipMovements,
+    PlayerFrontiersChoice = PlayerFrontiersChoice,
+
+    -- Phase Callbacks
+    PhaseCallbacks = {
+        PhaseAfterResolving = PhaseHandlers.ResolveCardAction.PhaseAfterResolving,
+        PhaseBeforeResolving = PhaseHandlers.ResolveCardAction.PhaseBeforeResolving
+    }
+  }
+  return JSON.encode(data_to_save)
 end

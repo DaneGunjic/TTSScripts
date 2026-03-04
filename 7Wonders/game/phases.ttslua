@@ -312,9 +312,13 @@ function ValidatePhaseHandler(phaseName)
 end
 
 function TransitionPhase()
-  --print(string.format("TransitionPhase: %d/%d players ready", NumberOfReadyPlayers, NumberOfPlayers))
+  -- log("TransitionPhase called")
+  -- log("NumberOfReadyPlayers: " .. tostring(NumberOfReadyPlayers))
+  -- log("NumberOfPlayers: " .. tostring(NumberOfPlayers))
+  -- log("GameState: " .. tostring(GameState))
 
   if NumberOfReadyPlayers >= NumberOfPlayers then
+    --log("All players ready, proceeding with transition")
     -- Play ready sound
     MusicPlayer.setCurrentAudioclip({url=Audio.Ready, title = "All Players Ready"})
     MusicPlayer.repeat_track = false

@@ -72,6 +72,7 @@ function HandleCardHolderEnter(zone, enter_object, zoneInfo)
   --print("Object entered " .. zoneInfo.color .. "'s zone")
 
   local color = zoneInfo.color
+  if not Player[color].seated then return end
   local data = zoneInfo.data
   local cardCount = CountCardsInZone(zone)
 

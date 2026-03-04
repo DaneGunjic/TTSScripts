@@ -274,27 +274,7 @@ function HandleKeepButton(obj, color, alt)
 	obj.clearButtons()
 
 	-- Create coin tracking button at middle-top of wonder
-	local coinButtonParams = {
-		label = "Coins: 0",
-		tooltip = "Victory points: 0",
-		click_function = "HandleCoinButton",
-		position = {0, 0.2, -0.8},
-		rotation = {0, 0, 0},
-		scale = {0.3, 0.3, 0.3},
-		width = 1400,
-		height = 500,
-		font_size = 350,
-		color = {0, 0, 0, 0.9},
-		font_color = {1, 1, 1}
-	}
-
-	-- Adjust button position if wonder is flipped
-	if IsPlayerWonderFlipped(color) then
-		coinButtonParams.position = {0, 0, -0.8}
-		coinButtonParams.rotation = {0, 0, 180}
-	end
-
-	obj.createButton(coinButtonParams)
+	CreateCoinButton(obj, color)
 
 	-- Mark wonder as kept
 	PlayerKeepStatus[color].Wonder = true
@@ -539,6 +519,78 @@ function SpawnWonderTooltip(wonderObj, wonderName, sideKey)
                 })
             end
         })
+    end
+end
+
+function CreateCoinButton(wonderObj, color)
+    local coins = 0
+    if PlayerCoins and PlayerCoins[color] then
+        coins = PlayerCoins[color]
+    end
+    local vp = math.floor(coins / 3)
+
+    local coinButtonParams = {
+        label = "Coins: " .. coins,
+        tooltip = "Victory points: " .. vp,
+        click_function = "HandleCoinButton",
+        position = {0, 0.2, -0.8},
+        rotation = {0, 0, 0},
+        scale = {0.3, 0.3, 0.3},
+        width = 1400,
+        height = 500,
+        font_size = 350,
+        color = {0, 0, 0, 0.9},
+        font_color = {1, 1, 1}
+    }
+
+    -- Adjust button position if wonder is flipped
+    if IsPlayerWonderFlipped(color) then
+        coinButtonParams.position = {0, 0, -0.8}
+        coinButtonParams.rotation = {0, 0, 180}
+    end
+
+    wonderObj.createButton(coinButtonParams)
+end
+
+function RestoreAllCoinButtons()
+    for _, color in ipairs(getSeatedPlayers()) do
+        if PlayerKeepStatus[color] and PlayerKeepStatus[color].Wonder then
+            local wonderZone = WonderZones[color]
+            if wonderZone then
+                local objects = wonderZone.getObjects()
+                local foundWonder = nil
+                
+                -- Find the wonder object (non-coin object)
+                for _, obj in ipairs(objects) do
+                    -- Skip coins
+                    if not obj.hasTag("Coin1") and not obj.hasTag("Coin3") and not obj.hasTag("Coin6") and obj.tag ~= "Card" and obj.tag ~= "Deck" then
+                        -- Check distance to WonderPos to be sure it's the board
+                        local wonderPos = PlayerInfo[color].WonderPos
+                        local objPos = obj.getPosition()
+                        -- Ignore Y, check X/Z distance (allow some wiggle room)
+                        local dist = math.sqrt( (wonderPos[1]-objPos.x)^2 + (wonderPos[3]-objPos.z)^2 )
+                        
+                        if dist < 2.0 then -- 2.0 tolerance
+                            foundWonder = obj
+                            break
+                        end
+                    end
+                end
+                
+                if foundWonder then
+                     -- Populate global table for IsPlayerWonderFlipped
+                     if DraftMode then
+                         if not DraftWonders[color] then DraftWonders[color] = {} end
+                         local idx = PlayerCurrentlyChosenWonder[color] or 1
+                         DraftWonders[color][idx] = foundWonder
+                     else
+                         RandomWonderObj[color] = foundWonder
+                     end
+                     
+                     CreateCoinButton(foundWonder, color)
+                end
+            end
+        end
     end
 end
 

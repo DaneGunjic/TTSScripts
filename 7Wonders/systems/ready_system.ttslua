@@ -33,12 +33,14 @@ end
 
 -- Called when a player pressed the "Ready" button
 function ReadyUp(player)
+	--log("ReadyUp called by: " .. player.steam_name .. " (" .. player.color .. ")")
 	ReadyList[player.color] = not ReadyList[player.color]
 
 	broadcastToAll(player.steam_name .. " is " .. (ReadyList[player.color] and "ready" or "not ready"))
 
 	if ReadyList[player.color] then
 		NumberOfReadyPlayers = NumberOfReadyPlayers + 1
+		--log("Player became ready. Total ready: " .. NumberOfReadyPlayers)
 		-- Hide the circle when player is ready
 		UI.setAttribute("Ready" .. player.color, "active", "false")
 		-- Stop timer when player becomes ready
@@ -47,6 +49,7 @@ function ReadyUp(player)
 		UpdateWonderBoardHighlight(player.color, true)
 	else
 		NumberOfReadyPlayers = NumberOfReadyPlayers - 1
+		--log("Player became unready. Total ready: " .. NumberOfReadyPlayers)
 		-- Show the circle when player is not ready
 		UI.setAttribute("Ready" .. player.color, "active", "true")
 		-- Start timer when player becomes unready

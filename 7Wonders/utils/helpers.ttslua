@@ -389,7 +389,7 @@ function preloadAllAudioTracks()
 		return
 	end
 
-	log("Starting audio pre-loading for " .. #playlist .. " tracks...")
+	--log("Starting audio pre-loading for " .. #playlist .. " tracks...")
 
 	-- Pre-load each track in the playlist
 	for i = 1, #playlist do
@@ -400,10 +400,10 @@ function preloadAllAudioTracks()
 			coroutine.yield(0)
 		end
 
-		log("Pre-loaded audio track: " .. playlist[i].title)
+		--log("Pre-loaded audio track: " .. playlist[i].title)
 	end
 
-	log("All game audio files pre-loaded successfully!")
+	--log("All game audio files pre-loaded successfully!")
 
 	-- Clear the playlist to restore original empty state
 	MusicPlayer.setPlaylist({})

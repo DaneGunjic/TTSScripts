@@ -1,4 +1,6 @@
 function updatePhaseUI(phase, description)
+  CurrentPhaseName = phase
+  CurrentPhaseDescription = description
   UI.setAttribute("CurrentPhase", "text", "Phase: " .. phase)
   UI.setAttribute("PhaseDesc", "text", description)
 end
