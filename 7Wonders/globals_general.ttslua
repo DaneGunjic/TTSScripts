@@ -39,3 +39,6 @@ Audio = {
   ReadyAlt = "https://drive.google.com/uc?export=download&id=1JAXFta5BudxY0XuqyRd2wJXm8hfuGNMX",
   EndGame = "https://drive.google.com/uc?export=download&id=1VkJicHYzS4tB37MzqfRpKn6J9bj0NHNg"
 }
+
+TestingGame = false
+TestingGamePlayers = 0

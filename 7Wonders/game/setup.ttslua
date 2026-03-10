@@ -4,6 +4,8 @@ function HandleStartGameButtonCo()
 	NumberOfPlayers = #getSeatedPlayers()
 
 	if NumberOfPlayers < 3 then
+		TestingGame = true
+		TestingGamePlayers = NumberOfPlayers
 		-- This simulates the other players, which are always ready
 		NumberOfReadyPlayers = 3 - NumberOfPlayers
 		-- For now we allow starting the game even with less than 3 players
