@@ -90,8 +90,6 @@ function PauseAllTimers()
   end
 end
 
--- Background timer tracking (no UI updates during gameplay)
-
 -- Update timer display (coroutine function)
 function UpdateTimerDisplay()
   while GameTimerActive do

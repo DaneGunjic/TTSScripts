@@ -46,29 +46,42 @@ function StorePlayerShip(player, shipType, shipObject)
     if not PlayerShips[player] then
         PlayerShips[player] = {}
     end
+
     PlayerShips[player][shipType] = shipObject
     shipObject.setLock(true)
 
-    -- Create a button behind the ship for movement
-    local buttonPosition = {0, 0.2, 4} -- Behind the ship
-    shipObject.createButton({
-        click_function = "MoveShipButton_" .. player .. "_" .. shipType,
-        function_owner = self,
-        label = "+",
-        position = buttonPosition,
-        rotation = {0, 0, 0},
-        width = 1000,
-        height = 1000,
-        font_size = 1000
-    })
-
-    -- Create the click function for this specific ship
-    _G["MoveShipButton_" .. player .. "_" .. shipType] = function(obj, color, alt)
+    local clickFnName = "MoveShipButton_" .. player .. "_" .. shipType
+    _G[clickFnName] = function(obj, color, alt)
         if alt then
             MoveShipBackward(color, shipType)
         else
             MoveShip(color, shipType)
         end
+    end
+
+    local hasButton = false
+    local buttons = shipObject.getButtons()
+    if buttons then
+        for _, b in ipairs(buttons) do
+            if b and b.click_function == clickFnName then
+                hasButton = true
+                break
+            end
+        end
+    end
+
+    if not hasButton then
+        local buttonPosition = {0, 0.2, 4}
+        shipObject.createButton({
+            click_function = clickFnName,
+            function_owner = self,
+            label = "+",
+            position = buttonPosition,
+            rotation = {0, 0, 0},
+            width = 1000,
+            height = 1000,
+            font_size = 1000
+        })
     end
 end
 

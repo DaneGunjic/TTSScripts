@@ -3,7 +3,7 @@ function DealWonders()
 	updatePhaseUI("Wonder Selection", "Choose your wonder")
 
 	-- Random Wonders
-	if RandomWonders then
+	if GameModeConfig and GameModeConfig.randomWonders then
 		for _, player in ipairs(getSeatedPlayers()) do
 			RandomWonderObj[player] = WonderBags.Base.takeObject({
 				position = PlayerInfo[player].WonderPos,
@@ -27,9 +27,9 @@ function DealWonders()
 			RandomWonderObj[player].createButton(DefaultButtonParams)
 		end
 	-- Draft Wonders
-	elseif DraftMode then
+	elseif GameModeConfig and GameModeConfig.draftMode then
 		for _, player in ipairs(getSeatedPlayers()) do
-			for i = 1, DraftModeNumber do
+			for i = 1, GameModeConfig.draftModeNumber do
 				DraftWonders[player][i] = WonderBags.Base.takeObject({
 					smooth = false,
 					position = PlayerInfo[player].DraftModePos,
@@ -94,9 +94,10 @@ function HideReadyButton()
 end
 
 function GetPlayerCurrentWonder(color)
-	if DraftMode then
+	if GameModeConfig and GameModeConfig.draftMode then
 		return DraftWonders[color][PlayerCurrentlyChosenWonder[color]]
 	else
+		print("GetPlayerCurrentWonder color=" .. color)
 		return RandomWonderObj[color]
 	end
 end
@@ -122,7 +123,7 @@ function HandleFlipButton(obj, color, alt)
 	end
 
 	-- Random Mode
-	if not DraftMode then
+	if not (GameModeConfig and GameModeConfig.draftMode) then
 		local tempDefaultRot = {table.unpack(PlayerInfo[color].ComponentRotation)}
 		local tempCurrentRot = RandomWonderObj[color].getRotation()
 
@@ -269,7 +270,7 @@ function HandleKeepButton(obj, color, alt)
 	broadcastToAll(Player[color].steam_name .. " chose " .. GetPlayerCurrentWonder(color).getName() .. " (" .. Side .. ")")
     
   -- Spawn tooltips for wonder stages
-  --SpawnWonderTooltip(GetPlayerCurrentWonder(color), GetPlayerCurrentWonder(color).getName(), SideKey)
+  -- SpawnWonderTooltip(GetPlayerCurrentWonder(color), GetPlayerCurrentWonder(color).getName(), SideKey)
 
 	obj.clearButtons()
 
@@ -280,7 +281,7 @@ function HandleKeepButton(obj, color, alt)
 	PlayerKeepStatus[color].Wonder = true
 
 	-- If in Draft mode, destroy all unpicked wonders
-	if DraftMode then
+	if GameModeConfig and GameModeConfig.draftMode then
 		for i, wonder in ipairs(DraftWonders[color]) do
 			-- Don't destroy the currently chosen wonder
 			if i ~= PlayerCurrentlyChosenWonder[color] then
@@ -320,7 +321,7 @@ function HandleCycleLeftButton(obj, color, alt)
 	-- Find the previous (left) index
 	PlayerCurrentlyChosenWonder[color] = PlayerCurrentlyChosenWonder[color] - 1
 	if PlayerCurrentlyChosenWonder[color] == 0 then
-		PlayerCurrentlyChosenWonder[color] = DraftModeNumber
+		PlayerCurrentlyChosenWonder[color] = GameModeConfig.draftModeNumber
 	end
 
 	DraftWonders[color][PlayerCurrentlyChosenWonder[color]].setPosition(CurrentWonderPos)
@@ -343,7 +344,7 @@ function HandleCycleRightButton(obj, color, alt)
 
 	-- Find the next (right) index
 	PlayerCurrentlyChosenWonder[color] = PlayerCurrentlyChosenWonder[color] + 1
-	if PlayerCurrentlyChosenWonder[color] > DraftModeNumber then
+	if PlayerCurrentlyChosenWonder[color] > GameModeConfig.draftModeNumber then
 		PlayerCurrentlyChosenWonder[color] = 1
 	end
 
@@ -523,6 +524,7 @@ function SpawnWonderTooltip(wonderObj, wonderName, sideKey)
 end
 
 function CreateCoinButton(wonderObj, color)
+	print("CreateCoinButton color=" .. color)
     local coins = 0
     if PlayerCoins and PlayerCoins[color] then
         coins = PlayerCoins[color]
@@ -579,7 +581,7 @@ function RestoreAllCoinButtons()
                 
                 if foundWonder then
                      -- Populate global table for IsPlayerWonderFlipped
-                     if DraftMode then
+                     if GameModeConfig and GameModeConfig.draftMode then
                          if not DraftWonders[color] then DraftWonders[color] = {} end
                          local idx = PlayerCurrentlyChosenWonder[color] or 1
                          DraftWonders[color][idx] = foundWonder

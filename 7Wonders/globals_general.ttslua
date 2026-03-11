@@ -17,11 +17,6 @@ DefaultTextParams = {
   rotation = {90, 0, 0}
 }
 
--------------------[[ GAME MODE SETTINGS ]]-------------------
-RandomWonders = true
-DraftMode = false
-DraftModeNumber = 3
-
 -------------------[[ GAME STATE ]]-------------------
 NumberOfReadyPlayers = 0
 CurrentPasses = 0

@@ -722,7 +722,7 @@ function MakeSetupButtons()
 	-- Change default parameters of draft number button
 	DefaultButtonParams.position = {0.20, 0.1, 0.68}
 	DefaultButtonParams.click_function = "AdjustDraftNumber"
-	DefaultButtonParams.label = "[" .. DraftModeNumber .. "]"
+	DefaultButtonParams.label = "[" .. (GameModeConfig and GameModeConfig.draftModeNumber or DraftModeNumber) .. "]"
 	DefaultButtonParams.font_color={1, 1, 1}
 	SetupBoard.createButton(DefaultButtonParams)
 

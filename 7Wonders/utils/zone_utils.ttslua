@@ -257,7 +257,7 @@ end
 function UpdateWonderCoinButton(color)
 	-- Get the player's current wonder object
 	local wonderObj = nil
-	if DraftMode then
+	if GameModeConfig and GameModeConfig.draftMode then
 		wonderObj = DraftWonders[color][PlayerCurrentlyChosenWonder[color]]
 	else
 		wonderObj = RandomWonderObj[color]

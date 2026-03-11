@@ -108,7 +108,7 @@ function HandleCollectionButton() -- Button index 10
 		SetupBoard.editButton({index = 10, label = "[    ]", font_color={1,1,1}})
 
 		-- If Collection is off but Draft is on, disable Draft
-		if DraftMode then
+		if GameModeConfig and GameModeConfig.draftMode then
 			HandleDraftButton()
 		end
 	end
@@ -133,58 +133,58 @@ function HandleOtherWondersButton() -- Button index 12
 end
 
 function HandleRandomButton() -- Button index 13
-	RandomWonders = not RandomWonders
-	-- If both are true then disable Draft
-	if RandomWonders then
+	GameModeConfig.randomWonders = not GameModeConfig.randomWonders
+	if GameModeConfig.randomWonders then
+		GameModeConfig.draftMode = false
 		SetupBoard.editButton({index = 13, label = "[✓]", font_color={0,1,0}})
-		if DraftMode then
-			HandleDraftButton()
-		end
+		SetupBoard.editButton({index = 14, label = "[    ]", font_color={1,1,1}})
 	else
+		GameModeConfig.draftMode = true
 		SetupBoard.editButton({index = 13, label = "[    ]", font_color={1,1,1}})
-		if not DraftMode then
-			HandleDraftButton()
+		SetupBoard.editButton({index = 14, label = "[✓]", font_color={0,1,0}})
+
+		if not WonderExpansionConfig.Collection then
+			broadcastToAll("Using Draft Mode without Collection Wonders is not possible. Toggling Collection.")
+			HandleCollectionButton()
 		end
 	end
 end
 
 function HandleDraftButton() -- Button index 14
-	DraftMode = not DraftMode
+	GameModeConfig.draftMode = not GameModeConfig.draftMode
 
-	if DraftMode and not WonderExpansionConfig.Collection then
+	if GameModeConfig.draftMode and not WonderExpansionConfig.Collection then
 		broadcastToAll("Using Draft Mode without Collection Wonders is not possible. Toggling Collection.")
 		HandleCollectionButton()
 	end
 
-	if DraftMode then
+	if GameModeConfig.draftMode then
 		SetupBoard.editButton({index = 14, label = "[✓]", font_color={0,1,0}})
-		if RandomWonders then
-			HandleRandomButton()
-		end
+		GameModeConfig.randomWonders = false
+		SetupBoard.editButton({index = 13, label = "[    ]", font_color={1,1,1}})
 	else
 		SetupBoard.editButton({index = 14, label = "[    ]", font_color={1,1,1}})
-		if not RandomWonders then
-			HandleRandomButton()
-		end
+		GameModeConfig.randomWonders = true
+		SetupBoard.editButton({index = 13, label = "[✓]", font_color={0,1,0}})
 	end
 end
 
 function AdjustDraftNumber(obj, color, alt) -- Button index 15
 	if alt then
-		DraftModeNumber = DraftModeNumber - 1
-		if DraftModeNumber == 2 then
-			DraftModeNumber = 9
+		GameModeConfig.draftModeNumber = GameModeConfig.draftModeNumber - 1
+		if GameModeConfig.draftModeNumber == 2 then
+			GameModeConfig.draftModeNumber = 9
 		end
 	else
-		DraftModeNumber = DraftModeNumber + 1
-		if DraftModeNumber == 10 then
-			DraftModeNumber = 3
+		GameModeConfig.draftModeNumber = GameModeConfig.draftModeNumber + 1
+		if GameModeConfig.draftModeNumber == 10 then
+			GameModeConfig.draftModeNumber = 3
 		end
 	end
 
 	SetupBoard.editButton({
             index = 15,
-            label = "[" .. DraftModeNumber .. "]"
+            label = "[" .. GameModeConfig.draftModeNumber .. "]"
 					})
 end
 

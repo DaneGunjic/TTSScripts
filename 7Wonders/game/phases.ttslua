@@ -318,12 +318,12 @@ function TransitionPhase()
   -- log("GameState: " .. tostring(GameState))
 
   if NumberOfReadyPlayers >= NumberOfPlayers then
-    --log("All players ready, proceeding with transition")
+    -- log("All players ready, proceeding with transition")
     -- Play ready sound
     MusicPlayer.setCurrentAudioclip({url=Audio.Ready, title = "All Players Ready"})
     MusicPlayer.repeat_track = false
 
-    --print("TransitionPhase, GameState is " .. GameState)
+    -- print("TransitionPhase, GameState is " .. GameState)
     local currentHandler = PhaseHandlers[GameState]
     if ValidatePhaseHandler(GameState) then
       local previousPhase = GameState
@@ -358,7 +358,7 @@ function ResolvePlayerActions()
   -- Execute all player actions
   for _, color in ipairs(seatedPlayers) do
     local action = PlayerSelectedAction[color]
-    --print(string.format("%s selected action: %s", color, action))
+    -- print(string.format("%s selected action: %s", color, action))
 
     local resolver = ActionResolvers[action]
     if resolver then
