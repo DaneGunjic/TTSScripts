@@ -82,7 +82,7 @@ function onLoad(saved_data)
       for color, timerData in pairs(loaded_data.PlayerTimers) do
         if PlayerTimers[color] and timerData then
           PlayerTimers[color].totalTime = timerData.totalTime or 0
-          PlayerTimers[color].isRunning = true -- Probably not accurate, but we'll keep it running
+          PlayerTimers[color].isRunning = true -- Probably not accurate, but whatever
           PlayerTimers[color].startTime = os.time()
         end
       end
@@ -91,7 +91,7 @@ function onLoad(saved_data)
     if loaded_data.RandomWonderObjGUIDs then
       for color, guid in pairs(loaded_data.RandomWonderObjGUIDs) do
         if guid then
-          print("RandomWonderObjGUIDs color=" .. color .. " guid=" .. guid)
+          --print("RandomWonderObjGUIDs color=" .. color .. " guid=" .. guid)
           RandomWonderObj[color] = getObjectFromGUID(guid)
         end
       end

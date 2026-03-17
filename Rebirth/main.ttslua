@@ -1,0 +1,35 @@
+#include !\Rebirth\hexrecorder.ttslua
+#include !\Rebirth\hexdata.ttslua
+
+function findMapBoard()
+  local hits = Physics.cast({
+    origin = {0, 5, 0},
+    direction = {0, -1, 0},
+    type = 3,
+    size = {1, 1, 1},
+    max_distance = 20,
+    debug = true
+  })
+
+  for _, hit in ipairs(hits) do
+    local obj = hit.hit_object
+    if obj ~= nil and obj.hasTag("GameBoard") then
+      return obj
+    end
+  end
+  return nil
+end
+
+function onLoad()
+  map = findMapBoard()
+
+  if HexData ~= nil then
+    autoBuildAdjacencyFromHexData(HexData)
+    assignSettlementGroupsFromHexData(HexData)
+    createHexPlacementButtonsFromHexData(HexData)
+  end
+
+  -- Register the hotkey — player must bind it in Options > Game Keys
+  addHotkey("Record Hex", onRecordHotkey, false)
+  addHotkey("Print", printAll, false)
+end

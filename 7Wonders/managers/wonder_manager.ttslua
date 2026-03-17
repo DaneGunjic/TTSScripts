@@ -565,7 +565,7 @@ function RestoreAllCoinButtons()
                 -- Find the wonder object (non-coin object)
                 for _, obj in ipairs(objects) do
                     -- Skip coins
-                    if not obj.hasTag("Coin1") and not obj.hasTag("Coin3") and not obj.hasTag("Coin6") and obj.tag ~= "Card" and obj.tag ~= "Deck" then
+                    if not obj.hasTag("Coin1") and not obj.hasTag("Coin3") and not obj.hasTag("Coin6") then
                         -- Check distance to WonderPos to be sure it's the board
                         local wonderPos = PlayerInfo[color].WonderPos
                         local objPos = obj.getPosition()

@@ -1,0 +1,585 @@
+recordedHexes = {}
+currentType = "energy"   -- default type for next recorded hex
+hexCounter = 1
+map = nil
+MAP_GUID = "50883d"
+
+TYPE_COLORS = {
+    energy     = {0.2, 0.8, 0.2},
+    food       = {0.8, 0.6, 0.1},
+    settlement = {0.3, 0.5, 1.0},
+    blank      = {0.6, 0.6, 0.6},
+    castle     = {0.8, 0.2, 0.8},
+    cathedral  = {0.9, 0.9, 0.2},
+    water      = {0.1, 0.5, 0.9},
+    port       = {0.1, 0.8, 0.8},
+}
+
+TAG_TO_TYPE = {
+    energy = "energy",
+    food = "food",
+    settlement = "settlement",
+    blank = "blank",
+    castle = "castle",
+    cathedral = "cathedral",
+    water = "water",
+    port = "port",
+}
+
+
+
+function buildAdjacencyFromHexData(hexData, hexRadius)
+    if hexData == nil or hexRadius == nil then return end
+
+    local ids = {}
+    for id, hex in pairs(hexData) do
+        if type(hex) == "table" and type(hex.x) == "number" and type(hex.z) == "number" then
+            --log(type(hex) .. " " .. hex.x .. " " .. hex.z)
+            table.insert(ids, id)
+        end
+    end
+    table.sort(ids)
+
+    for _, idA in ipairs(ids) do
+        local a = hexData[idA]
+        a.adjacent = {}
+        for _, idB in ipairs(ids) do
+            if idA ~= idB then
+                local b = hexData[idB]
+                local dx = a.x - b.x
+                local dz = a.z - b.z
+                local dist = math.sqrt(dx * dx + dz * dz)
+                local threshold = hexRadius * 2.1
+                local nA = tonumber(string.match(idA, "^hex_(%d+)$"))
+                local nB = tonumber(string.match(idB, "^hex_(%d+)$"))
+                if dist < threshold then
+                    table.insert(a.adjacent, idB)
+                    if nA < 15 and nB < 15 then
+                        log("Hex " .. idA .. " is adjacent to " .. idB .. " (dist=" .. dist .. ")")
+                    end
+                else
+                    if nA < 10 and nB < 10 then
+                        --log("Hex " .. idA .. " not adjacent to " .. idB .. " (dist=" .. dist .. " >= " .. threshold .. ")")
+                    end
+                end
+            end
+        end
+        table.sort(a.adjacent)
+    end
+end
+
+function autoBuildAdjacencyFromHexData(hexData, hexRadius)
+    if hexRadius == nil then
+        hexRadius = 0.13 --estimateHexRadiusFromHexData(hexData)
+        print("Estimated hex radius: " .. hexRadius)
+    end
+    buildAdjacencyFromHexData(hexData, hexRadius)
+    return hexRadius
+end
+
+function settlementGroupLetters(index)
+    if type(index) ~= "number" or index < 1 then return "A" end
+    index = math.floor(index)
+    local letters = ""
+    while index > 0 do
+        index = index - 1
+        local rem = index % 26
+        letters = string.char(65 + rem) .. letters
+        index = math.floor(index / 26)
+    end
+    return letters
+end
+
+function assignSettlementGroupsFromHexData(hexData)
+    if type(hexData) ~= "table" then return 0 end
+
+    local debug = false
+    local debugMsgCount = 0
+    local function dbg(msg)
+        if not debug then return end
+        if debugMsgCount >= 300 then return end
+        debugMsgCount = debugMsgCount + 1
+        log("[SettlementGrouping] " .. tostring(msg))
+    end
+
+    local function hexNum(id)
+        local n = tonumber(string.match(tostring(id), "^hex_(%d+)$"))
+        return n or math.huge
+    end
+
+    local settlementIds = {}
+    for id, hex in pairs(hexData) do
+        if type(hex) == "table" and hex.type == "settlement" then
+            hex.settlement_group = nil
+            table.insert(settlementIds, id)
+        end
+    end
+    dbg("Settlement hex count: " .. tostring(#settlementIds))
+
+    table.sort(settlementIds, function(a, b)
+        local na = hexNum(a)
+        local nb = hexNum(b)
+        if na == nb then
+            return tostring(a) < tostring(b)
+        end
+        return na < nb
+    end)
+
+    local visited = {}
+    local groupIndex = 0
+
+    for _, startId in ipairs(settlementIds) do
+        if not visited[startId] then
+            groupIndex = groupIndex + 1
+            local groupName = "Settlement" .. settlementGroupLetters(groupIndex)
+            dbg("Start group " .. groupName .. " at " .. tostring(startId))
+
+            local stack = { startId }
+            visited[startId] = true
+
+            while #stack > 0 do
+                local id = table.remove(stack)
+                local hex = hexData[id]
+                if type(hex) == "table" and hex.type == "settlement" then
+                    hex.settlement_group = groupName
+                    dbg("Assign " .. tostring(id) .. " -> " .. groupName .. " (stack=" .. tostring(#stack) .. ")")
+                    local adjacent = hex.adjacent
+                    if type(adjacent) == "table" then
+                        dbg("Neighbors of " .. tostring(id) .. ": " .. tostring(#adjacent))
+                        for _, neighborId in ipairs(adjacent) do
+                            if not visited[neighborId] then
+                                local neighbor = hexData[neighborId]
+                                if type(neighbor) == "table" and neighbor.type == "settlement" then
+                                    visited[neighborId] = true
+                                    table.insert(stack, neighborId)
+                                    dbg("  push settlement neighbor " .. tostring(neighborId) .. " (stack=" .. tostring(#stack) .. ")")
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    dbg("Groups assigned: " .. tostring(groupIndex))
+    return groupIndex
+end
+
+function inferTypeFromObject(obj)
+    if obj == nil then return nil end
+    local tags = obj.getTags()
+    if tags == nil then return nil end
+    for _, tag in ipairs(tags) do
+        local normalized = string.lower(tostring(tag))
+        local inferred = TAG_TO_TYPE[normalized]
+        if inferred ~= nil then
+            return inferred
+        end
+    end
+    return nil
+end
+
+HexPlacementButtons = HexPlacementButtons or { indices = {}, fnByHexId = {}, indexByHexId = {} }
+
+function clearHexPlacementButtons()
+    if map == nil then return end
+    if type(HexPlacementButtons) ~= "table" or type(HexPlacementButtons.indices) ~= "table" then
+        HexPlacementButtons = { indices = {}, fnByHexId = {}, indexByHexId = {} }
+        return
+    end
+
+    table.sort(HexPlacementButtons.indices, function(a, b)
+        return (type(a) == "number" and a or -1) > (type(b) == "number" and b or -1)
+    end)
+
+    for _, index in ipairs(HexPlacementButtons.indices) do
+        if type(index) == "number" then
+            map.removeButton(index)
+        end
+    end
+
+    HexPlacementButtons.indices = {}
+    HexPlacementButtons.fnByHexId = {}
+    HexPlacementButtons.indexByHexId = {}
+end
+
+function removeHexPlacementButton(hexId)
+    if map == nil then return false end
+    if type(HexPlacementButtons) ~= "table" or type(HexPlacementButtons.indexByHexId) ~= "table" then
+        return false
+    end
+
+    local index = HexPlacementButtons.indexByHexId[hexId]
+    if type(index) ~= "number" then
+        return false
+    end
+
+    map.removeButton(index)
+    HexPlacementButtons.indexByHexId[hexId] = nil
+
+    if type(HexPlacementButtons.indices) == "table" then
+        for i = #HexPlacementButtons.indices, 1, -1 do
+            if HexPlacementButtons.indices[i] == index then
+                table.remove(HexPlacementButtons.indices, i)
+                break
+            end
+        end
+    end
+
+    return true
+end
+
+function inferTileTypeFromObject(obj)
+    local inferred = inferTypeFromObject(obj)
+    if inferred ~= nil then return inferred end
+    if obj == nil then return nil end
+    local name = string.lower(tostring(obj.getName() or ""))
+    if name == "" then return nil end
+    for key, value in pairs(TAG_TO_TYPE) do
+        if string.find(name, key, 1, true) ~= nil then
+            return value
+        end
+    end
+    return nil
+end
+
+function getSingleHandTileObject(playerColor)
+    local player = Player[playerColor]
+    if player == nil then return nil end
+    local handObjects = player.getHandObjects() or {}
+    if #handObjects == 1 then
+        return handObjects[1]
+    end
+    if #handObjects == 0 then
+        return nil
+    end
+
+    local typed = {}
+    for _, obj in ipairs(handObjects) do
+        if inferTileTypeFromObject(obj) ~= nil then
+            table.insert(typed, obj)
+        end
+    end
+    if #typed == 1 then
+        return typed[1]
+    end
+    return nil
+end
+
+function onHexTilePlaced(playerColor, hexId, hexEntry, tileType, tileObject)
+    log("[HexPlacement] placed " .. tostring(tileType) .. " on " .. tostring(hexId) .. " by " .. tostring(playerColor))
+end
+
+HexScores = HexScores or {}
+
+function scoreEnergyFoodGroupForPlacement(playerColor, startHexId, tileType)
+    if HexData == nil then return 0 end
+    if tileType ~= "energy" and tileType ~= "food" and tileType ~= "farm" then
+        return 0
+    end
+
+    local startHex = HexData[startHexId]
+    if type(startHex) ~= "table" then return 0 end
+    if startHex.occupant == nil then return 0 end
+
+    local visited = {}
+    local stack = { startHexId }
+    visited[startHexId] = true
+    local count = 0
+
+    while #stack > 0 do
+        local id = table.remove(stack)
+        local hex = HexData[id]
+        if type(hex) == "table"
+            and hex.type == tileType
+            and hex.occupant ~= nil then
+            count = count + 1
+            if type(hex.adjacent) == "table" then
+                for _, nId in ipairs(hex.adjacent) do
+                    if not visited[nId] then
+                        local nHex = HexData[nId]
+                        if type(nHex) == "table"
+                            and nHex.type == tileType
+                            and nHex.occupant ~= nil then
+                            visited[nId] = true
+                            table.insert(stack, nId)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if count > 0 then
+        HexScores[playerColor] = (HexScores[playerColor] or 0) + count
+        printToAll(
+            "[Score] " .. tostring(playerColor) .. " gained " .. tostring(count)
+                .. " (" .. tostring(tileType) .. " group size " .. tostring(count) .. ")"
+                .. " — Total: " .. tostring(HexScores[playerColor]),
+            { 0.7, 1, 0.7 }
+        )
+    end
+
+    return count
+end
+
+function handleHexPlacementClick(hexId, playerColor, altClick)
+    if map == nil then
+        printToColor("Map not found.", playerColor, {1, 0.3, 0.3})
+        return
+    end
+    if HexData == nil then
+        printToColor("HexData not loaded.", playerColor, {1, 0.3, 0.3})
+        return
+    end
+
+    local hex = HexData[hexId]
+    if type(hex) ~= "table" then
+        printToColor("Invalid hex: " .. tostring(hexId), playerColor, {1, 0.3, 0.3})
+        return
+    end
+
+    if hex.occupant ~= nil then
+        printToColor("Hex already occupied: " .. tostring(hexId), playerColor, {1, 0.6, 0.1})
+        return
+    end
+
+    local tileObj = getSingleHandTileObject(playerColor)
+    if tileObj == nil then
+        printToColor("Hold exactly one valid tile in your hand.", playerColor, {1, 0.6, 0.1})
+        return
+    end
+
+    local tileType = inferTileTypeFromObject(tileObj)
+    if tileType == nil then
+        printToColor("Couldn't infer tile type from your hand object.", playerColor, {1, 0.6, 0.1})
+        return
+    end
+
+    if tileType ~= hex.type then
+        printToColor("Type mismatch. Hex expects " .. tostring(hex.type) .. ", but tile is " .. tostring(tileType) .. ".", playerColor, {1, 0.6, 0.1})
+        return
+    end
+
+    local worldPos = map.positionToWorld({ x = -hex.x, y = 0, z = hex.z })
+    tileObj.setPosition({ -worldPos.x, worldPos.y + 2, worldPos.z })
+
+    hex.occupant = {
+        player_color = playerColor,
+        tile_type = tileType,
+        object_guid = tileObj.getGUID(),
+    }
+
+    onHexTilePlaced(playerColor, hexId, hex, tileType, tileObj)
+    removeHexPlacementButton(hexId)
+    scoreEnergyFoodGroupForPlacement(playerColor, hexId, tileType)
+end
+
+function createHexPlacementButtonsFromHexData(hexData)
+    if map == nil then return 0 end
+    if type(hexData) ~= "table" then return 0 end
+
+    clearHexPlacementButtons()
+
+    local ids = {}
+    for id, hex in pairs(hexData) do
+        if type(hex) == "table" and type(hex.x) == "number" and type(hex.z) == "number" then
+            table.insert(ids, id)
+        end
+    end
+    table.sort(ids)
+
+    local created = 0
+    for _, hexId in ipairs(ids) do
+        local hex = hexData[hexId]
+        local fnName = "onHexPlace_" .. tostring(hexId)
+        HexPlacementButtons.fnByHexId[hexId] = fnName
+        _G[fnName] = function(_, playerColor, altClick)
+            handleHexPlacementClick(hexId, playerColor, altClick)
+        end
+
+        local index = map.createButton({
+            click_function = fnName,
+            function_owner = Global,
+            label = "",
+            position = { -hex.x, 0.3, hex.z },
+            rotation = { 0, 0, 0 },
+            width = 50,
+            height = 50,
+            font_size = 40,
+            color = { 1, 1, 1, 0.5 },
+            tooltip = tostring(hexId) .. " (" .. tostring(hex.type) .. ")",
+        })
+        if type(index) == "number" then
+            table.insert(HexPlacementButtons.indices, index)
+            HexPlacementButtons.indexByHexId[hexId] = index
+        end
+        created = created + 1
+    end
+
+    --log("[HexPlacement] buttons created: " .. tostring(created))
+    return created
+end
+
+function inferTypeAtWorldPos(worldPos)
+    if worldPos == nil then return nil end
+
+    local castOrigin = {worldPos.x, worldPos.y + 3, worldPos.z}
+    local hits = Physics.cast({
+        origin = castOrigin,
+        direction = {0, -1, 0},
+        type = 3,
+        size = {0.4, 0.4, 0.4},
+        max_distance = 6,
+    })
+
+    for _, hit in ipairs(hits) do
+        local obj = hit.hit_object
+        if obj ~= nil and obj ~= map then
+            local inferred = inferTypeFromObject(obj)
+            if inferred ~= nil then
+                return inferred
+            end
+        end
+    end
+
+    return nil
+end
+
+-- ============================================================
+--  Core: record a hex at the current pointer position
+-- ============================================================
+function recordHex(recorderObj, playerColor, altClick)
+    if map == nil then
+        printToAll("[HexRecorder] ERROR: Map not found!", {1,0,0})
+        return
+    end
+
+    -- Get the clicking player's pointer position (world space)
+    local player    = Player[playerColor]
+    local worldPos  = player.getPointerPosition()
+
+    -- Convert world position → map local position
+    local localPos  = map.positionToLocal(worldPos)
+    local inferredType = inferTypeAtWorldPos(worldPos)
+    if inferredType ~= nil then
+        currentType = inferredType
+    end
+
+    -- Round to 3 decimal places to keep data clean
+    local lx = math.floor(localPos.x * 1000 + 0.5) / 1000
+    local lz = math.floor(localPos.z * 1000 + 0.5) / 1000
+
+    local hexId = string.format("hex_%02d", hexCounter)
+
+    local entry = {
+        id       = hexId,
+        type     = currentType,
+        x        = lx,
+        z        = lz,
+        -- Optional fields you can fill in later in HexData.lua:
+        -- settlement_group = nil,
+        -- influence        = nil,   (for settlement tiles: 1-4)
+        -- castle_id        = nil,
+        -- cathedral_id     = nil,
+        -- port             = false,
+    }
+    table.insert(recordedHexes, entry)
+
+    printToAll(
+        string.format("[HexRecorder] #%02d recorded — type: %-12s  x: %7.3f  z: %7.3f",
+            hexCounter, currentType, lx, lz),
+        {0.8, 1.0, 0.8}
+    )
+
+    hexCounter = hexCounter + 1
+end
+
+-- ============================================================
+--  Clear: wipe all recorded data
+-- ============================================================
+function clearAll()
+    recordedHexes = {}
+    hexCounter    = 1
+    printToAll("[HexRecorder] All data cleared.", {1,0.3,0.3})
+end
+
+-- ============================================================
+--  Print: dump full Lua table to chat
+-- ============================================================
+function printAll()
+    if #recordedHexes == 0 then
+        printToAll("[HexRecorder] No hexes recorded yet.", {1,0.7,0})
+        return
+    end
+
+    printToAll("HexData = {", {1,1,1})
+
+    for _, h in ipairs(recordedHexes) do
+        local line = string.format(
+            '    ["%s"] = { type = "%s", x = %s, z = %s, adjacent = {}, port = false, settlement_group = nil, castle_id = nil, cathedral_id = nil, occupant = nil },',
+            h.id, h.type, formatNum(h.x), formatNum(h.z)
+        )
+        printToAll(line, {1,1,1})
+    end
+
+    printToAll("}", {1,1,1})
+    printToAll("-- ========================================", {0.7, 0.9, 1})
+    printToAll(string.format("-- Total hexes recorded: %d", #recordedHexes), {0.5,1,0.5})
+    printToAll("-- ========================================", {0.7, 0.9, 1})
+end
+
+-- ============================================================
+--  Helper: format a number without trailing .0 noise
+-- ============================================================
+function formatNum(n)
+    -- If it's a whole number, don't add decimals
+    if n == math.floor(n) then
+        return string.format("%d", n)
+    else
+        return string.format("%.3f", n)
+    end
+end
+
+-- ============================================================
+--  Hotkey callback — fired by TTS with pointer position built in
+--  pointerPosition: world space position of the player's cursor
+-- ============================================================
+function onRecordHotkey(playerColor, hoveredObject, pointerPosition, isKeyUp)
+    -- Only fire on key DOWN, not release
+    if isKeyUp then return end
+
+    -- Convert world position to map-local position
+    if map == nil then return end
+    local inferredType = inferTypeFromObject(hoveredObject)
+    if inferredType == nil then
+        inferredType = inferTypeAtWorldPos(pointerPosition)
+    end
+    if inferredType ~= nil then
+        currentType = inferredType
+    end
+
+    local localPos = map.positionToLocal(hoveredObject.getPosition())
+
+    -- Round to 3 decimal places to keep data clean
+    local lx = math.floor(localPos.x * 1000 + 0.5) / 1000
+    local lz = math.floor(localPos.z * 1000 + 0.5) / 1000
+
+    local hexId = string.format("hex_%02d", hexCounter)
+
+    table.insert(recordedHexes, {
+        id   = hexId,
+        type = currentType,
+        x    = lx,
+        z    = lz,
+    })
+
+    printToAll(
+        string.format('["%s"] = { type = "%s", x = %.3f, z = %.3f, adjacent = {}, port = false, settlement_group = "", castle_id = nil, cathedral_id = nil, occupant = nil },',
+            hexId, currentType, lx, lz),
+        TYPE_COLORS[currentType] or {1, 1, 1}
+    )
+
+    hexCounter = hexCounter + 1
+end
