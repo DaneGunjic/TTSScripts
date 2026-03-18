@@ -3,11 +3,11 @@ currentType = "energy"
 hexCounter = 1
 map = nil
 
-PlayerBagGuids = {
-    White = { castle = nil, hex = nil, cathedral = nil },
-    Blue  = { castle = nil, hex = nil, cathedral = nil },
-    Yellow= { castle = nil, hex = nil, cathedral = nil },
-    Red   = { castle = nil, hex = nil, cathedral = nil },
+PlayerGUIDs = {
+    White = { castle = "f038e9", hex = "e58602", cathedral = "464501", marker100 = "48ed98", marker200 = "f0d7a5", hand = "d49e15" },
+    Blue = { castle = "82f455", hex = "d0ed1e", cathedral = "f0b9ee", marker100 = "5616f8", marker200 = "13f1a2", hand = "d1d155" },
+    Orange = { castle = "3a4626", hex = "42113a", cathedral = "a75cb1", marker100 = "67fda8", marker200 = "4798cf", hand = "964c7e" },
+    Red = { castle = "edc6e7", hex = "d9a598", cathedral = "c1b551", marker100 = "2b9225", marker200 = "09e654", hand = "ba05b7" },
 }
 
 TYPE_COLORS = {
@@ -31,6 +31,104 @@ TAG_TO_TYPE = {
 }
 
 HexPlacementButtons = { indices = {}, fnByHexId = {}, indexByHexId = {} }
+
+function noopHexPlace()
+end
+
+function getHexBagObjectForPlayer(playerColor)
+    return getObjectFromGUID(PlayerGUIDs[playerColor].hex)
+end
+
+function getContainerCount(obj)
+    if obj == nil then
+        return 0
+    end
+    if type(obj.getQuantity) == "function" then
+        local ok, qty = pcall(function() return obj.getQuantity() end)
+        if ok and type(qty) == "number" then
+            return qty
+        end
+    end
+    if type(obj.getObjects) == "function" then
+        local ok, objs = pcall(function() return obj.getObjects() end)
+        if ok and type(objs) == "table" then
+            return #objs
+        end
+    end
+    return 0
+end
+
+function areAllHexBagsEmpty()
+    for _, guids in pairs(PlayerGUIDs) do
+        local bag = getObjectFromGUID(guids.hex)
+        if getContainerCount(bag) > 0 then
+            return false
+        end
+    end
+
+    return true
+end
+
+function dealOneHexTileToPlayer(playerColor)
+    local bag = getHexBagObjectForPlayer(playerColor)
+    if getContainerCount(bag) <= 0 then
+        return false
+    end
+
+    bag.shuffle()
+
+    bag.deal(1, playerColor)
+
+    return false
+end
+
+function handleHexPlacementClick(hexId, playerColor, altClick)
+    local hex = HexData[hexId]
+
+    local tileObj = getSingleHandTileObject(playerColor)
+    if tileObj == nil then
+        printToColor("Hold exactly one valid tile in your hand.", playerColor, {1, 0.6, 0.1})
+        return
+    end
+
+    local tileType = inferTileTypeFromObject(tileObj)
+    if tileType == nil then
+        printToColor("Couldn't infer tile type from your hand object.", playerColor, {1, 0.6, 0.1})
+        return
+    end
+
+    local blankOverrideAllowed = (hex.type == "blank") and (tileType == "energy" or tileType == "food")
+
+    if tileType ~= hex.type and not blankOverrideAllowed then
+        printToColor("Type mismatch. Hex expects " .. tostring(hex.type) .. ", but tile is " .. tostring(tileType) .. ".", playerColor, {1, 0.6, 0.1})
+        return
+    end
+
+    if blankOverrideAllowed then
+        if hex.base_type == nil then
+            hex.base_type = hex.type
+        end
+        hex.type = tileType
+    end
+
+    local worldPos = map.positionToWorld({ x = -hex.x, y = 0, z = hex.z })
+    tileObj.setPosition({ -worldPos.x, worldPos.y + 1, worldPos.z })
+    tileObj.setRotation({ 0, 180, 0 })
+
+    hex.occupant = {
+        player_color = playerColor,
+        tile_type = tileType,
+        object_guid = tileObj.getGUID(),
+    }
+
+    onHexTilePlaced(playerColor, hexId, hex, tileType, tileObj)
+    removeHexPlacementButton(hexId)
+    scoreEnergyFoodGroupForPlacement(playerColor, hexId, tileType)
+    dealOneHexTileToPlayer(playerColor)
+    if areAllHexBagsEmpty() then
+        printToAll("[Game End] All hex bags are empty.", { 1, 0.3, 0.3 })
+    end
+end
 
 function buildAdjacencyFromHexData(hexData, hexRadius)
     if hexData == nil or hexRadius == nil then return end
@@ -167,10 +265,8 @@ function assignSettlementGroupsFromHexData(hexData)
     return groupIndex
 end
 
-function inferTypeFromObject(obj)
-    if obj == nil then return nil end
+function inferTileTypeFromObject(obj)
     local tags = obj.getTags()
-    if tags == nil then return nil end
     for _, tag in ipairs(tags) do
         local normalized = string.lower(tostring(tag))
         local inferred = TAG_TO_TYPE[normalized]
@@ -178,11 +274,11 @@ function inferTypeFromObject(obj)
             return inferred
         end
     end
+
     return nil
 end
 
 function rebuildHexPlacementButtonIndexCache()
-    if map == nil then return 0 end
     if type(HexPlacementButtons) ~= "table" then
         HexPlacementButtons = { indices = {}, fnByHexId = {}, indexByHexId = {} }
     end
@@ -210,65 +306,66 @@ function rebuildHexPlacementButtonIndexCache()
 end
 
 function removeHexPlacementButton(hexId)
-    if type(HexPlacementButtons) ~= "table" or type(HexPlacementButtons.indexByHexId) ~= "table" then
-        HexPlacementButtons = { indices = {}, fnByHexId = {}, indexByHexId = {} }
+    local expectedFn = nil
+    if type(HexPlacementButtons.fnByHexId) == "table" then
+        expectedFn = HexPlacementButtons.fnByHexId[hexId]
+    end
+    if type(expectedFn) ~= "string" or expectedFn == "" then
+        expectedFn = "onHexPlace_" .. tostring(hexId)
     end
 
-    local index = HexPlacementButtons.indexByHexId[hexId]
-    if type(index) ~= "number" then
-        rebuildHexPlacementButtonIndexCache()
-        index = HexPlacementButtons.indexByHexId[hexId]
+    local buttons = map.getButtons() or {}
+    local indicesToHide = {}
+    for i, b in ipairs(buttons) do
+        if type(b) == "table" and b.click_function == expectedFn then
+            local idx = b.index
+            if type(idx) ~= "number" then
+                idx = i - 1
+            end
+            table.insert(indicesToHide, idx)
+        end
     end
-    if type(index) ~= "number" then
+
+    if #indicesToHide == 0 then
+        local cached = HexPlacementButtons.indexByHexId[hexId]
+        if type(cached) ~= "number" then
+            rebuildHexPlacementButtonIndexCache()
+            cached = HexPlacementButtons.indexByHexId[hexId]
+        end
+        if type(cached) == "number" then
+            table.insert(indicesToHide, cached)
+        end
+    end
+
+    if #indicesToHide == 0 then
+        print("Warning: Could not find button index for hex " .. tostring(hexId))
         return false
     end
 
-    map.editButton({
-        index = index,
-        width = 0,
-        height = 0,
-        font_size = 0,
-        click_function = "noopHexPlace",
-        color = { 0, 0, 0, 0 },
-    })
+    for _, idx in ipairs(indicesToHide) do
+        map.editButton({
+            index = idx,
+            width = 0,
+            height = 0,
+            font_size = 0,
+            click_function = "noopHexPlace",
+            color = { 0, 0, 0, 0 },
+        })
+    end
+
     HexPlacementButtons.indexByHexId[hexId] = nil
     return true
 end
 
-function inferTileTypeFromObject(obj)
-    local inferred = inferTypeFromObject(obj)
-    if inferred ~= nil then return inferred end
-    if obj == nil then return nil end
-    local name = string.lower(tostring(obj.getName() or ""))
-    if name == "" then return nil end
-    for key, value in pairs(TAG_TO_TYPE) do
-        if string.find(name, key, 1, true) ~= nil then
-            return value
-        end
-    end
-    return nil
-end
-
 function getSingleHandTileObject(playerColor)
     local player = Player[playerColor]
-    if player == nil then return nil end
     local handObjects = player.getHandObjects()
+
     if #handObjects == 1 then
+        --print("Found single hand object: " .. handObjects[1].guid)
         return handObjects[1]
     end
-    if #handObjects == 0 then
-        return nil
-    end
 
-    local typed = {}
-    for _, obj in ipairs(handObjects) do
-        if inferTileTypeFromObject(obj) ~= nil then
-            table.insert(typed, obj)
-        end
-    end
-    if #typed == 1 then
-        return typed[1]
-    end
     return nil
 end
 
@@ -279,317 +376,79 @@ function onHexTilePlaced(playerColor, hexId, hexEntry, tileType, tileObject)
     updateCastlesAdjacentToHex(hexId)
 end
 
-CastleClaims = CastleClaims or {}
-
 function getHexWorldPosition(hexEntry, yOffset)
-    if map == nil then return nil end
-    if type(hexEntry) ~= "table" then return nil end
-    yOffset = tonumber(yOffset) or 1
+    yOffset = tonumber(yOffset)
     local worldPos = map.positionToWorld({ x = -hexEntry.x, y = 0, z = hexEntry.z })
     return { -worldPos.x, worldPos.y + yOffset, worldPos.z }
 end
 
 function inferPlayerColorFromObject(obj)
-    if obj == nil then return nil end
-    local candidates = { "White", "Blue", "Yellow", "Red" }
-    local name = string.lower(tostring(obj.getName() or ""))
-    for _, color in ipairs(candidates) do
-        if type(obj.hasTag) == "function" and obj.hasTag(color) then
+    if obj == nil then
+        return nil
+    end
+    return obj.memo
+end
+
+function getPlayerColorFromHandZoneGuid(handZoneGuid)
+    for color, bags in pairs(PlayerGUIDs) do
+        if bags.hand == handZoneGuid then
             return color
         end
-        if string.find(name, string.lower(color), 1, true) ~= nil then
-            return color
-        end
     end
+
     return nil
 end
 
-function isCastleLikeObject(obj)
-    if obj == nil then return false end
-    local tag = tostring(obj.tag or "")
-    if tag == "Bag" or tag == "Deck" then return false end
-    local name = string.lower(tostring(obj.getName() or ""))
-    if string.find(name, "castle", 1, true) ~= nil then
-        return true
-    end
-    if type(obj.hasTag) == "function" and obj.hasTag("Castle") then
-        return true
-    end
-    return false
-end
-
-function findCastleSupplyBag(playerColor)
-    local guid = CastleSupplyBagGuids[playerColor]
-    if type(guid) == "string" and guid ~= "" then
-        local obj = getObjectFromGUID(guid)
-        if obj ~= nil then
-            return obj
-        end
-    end
-
-    local colorLower = string.lower(tostring(playerColor))
-    for _, obj in ipairs(getAllObjects()) do
-        if obj ~= nil and tostring(obj.tag or "") == "Bag" then
-            if type(obj.hasTag) == "function" and obj.hasTag("CastleSupply") and obj.hasTag(playerColor) then
-                return obj
-            end
-            local name = string.lower(tostring(obj.getName() or ""))
-            if string.find(name, "castle", 1, true) ~= nil and string.find(name, colorLower, 1, true) ~= nil then
-                return obj
-            end
-        end
-    end
-    return nil
-end
-
-function findCastleObjectAtHex(castleHexId)
-    if HexData == nil then return nil end
-    local hexEntry = HexData[castleHexId]
-    if type(hexEntry) ~= "table" then return nil end
-    local pos = getHexWorldPosition(hexEntry, 1)
-    if type(pos) ~= "table" then return nil end
-    local hits = Physics.cast({
-        origin = { pos[1], pos[2] + 3, pos[3] },
-        direction = { 0, -1, 0 },
-        type = 3,
-        size = { 0.6, 0.6, 0.6 },
-        max_distance = 6,
-    })
-    for _, hit in ipairs(hits or {}) do
-        local obj = hit.hit_object
-        if obj ~= nil and obj ~= map and isCastleLikeObject(obj) then
-            return obj
-        end
-    end
-    return nil
-end
-
-function findLooseCastlePieceForPlayer(playerColor)
-    local used = {}
-    for _, claim in pairs(CastleClaims) do
-        if type(claim) == "table" and type(claim.guid) == "string" then
-            used[claim.guid] = true
-        end
-    end
-
-    local colorLower = string.lower(tostring(playerColor))
-    for _, obj in ipairs(getAllObjects()) do
-        if obj ~= nil and isCastleLikeObject(obj) then
-            local guid = obj.getGUID()
-            if not used[guid] then
-                local name = string.lower(tostring(obj.getName() or ""))
-                if (type(obj.hasTag) == "function" and obj.hasTag(playerColor)) or string.find(name, colorLower, 1, true) ~= nil then
-                    return obj
-                end
-            end
-        end
-    end
-    return nil
-end
-
-function returnCastleToPlayer(playerColor, castleObj)
-    if castleObj == nil then return false end
-    local bag = findCastleSupplyBag(playerColor)
-    if bag ~= nil and type(bag.putObject) == "function" then
-        bag.putObject(castleObj)
-        return true
-    end
-
-    local player = Player[playerColor]
-    if player ~= nil and type(player.getHandTransform) == "function" then
-        local ok, handTransform = pcall(function()
-            return player.getHandTransform(1)
-        end)
-        if ok and type(handTransform) == "table" and type(handTransform.position) == "table" then
-            local p = handTransform.position
-            castleObj.setPositionSmooth({ p[1], p[2] + 2, p[3] }, false, true)
-            return true
-        end
-    end
-
-    castleObj.setPositionSmooth({ 0, 5, 0 }, false, true)
-    return true
-end
-
-function getCastleAdjacencyStats(castleHexId)
-    local stats = {}
-    if HexData == nil then return stats end
-    local castleHex = HexData[castleHexId]
-    if type(castleHex) ~= "table" or type(castleHex.adjacent) ~= "table" then
-        return stats
-    end
-
-    for _, neighborId in ipairs(castleHex.adjacent) do
-        local neighbor = HexData[neighborId]
-        if type(neighbor) == "table" and type(neighbor.occupant) == "table" then
-            local owner = neighbor.occupant.player_color
-            if type(owner) == "string" and owner ~= "" then
-                local entry = stats[owner]
-                if type(entry) ~= "table" then
-                    entry = { total = 0, foodEnergy = 0 }
-                    stats[owner] = entry
-                end
-                entry.total = entry.total + 1
-                if neighbor.type == "food" or neighbor.type == "energy" then
-                    entry.foodEnergy = entry.foodEnergy + 1
-                end
-            end
-        end
-    end
-
-    return stats
-end
-
-function chooseCastleWinner(stats)
-    local leaders = {}
-    local bestTotal = -1
-    for color, entry in pairs(stats) do
-        local total = tonumber(entry.total) or 0
-        if total > bestTotal then
-            bestTotal = total
-            leaders = { color }
-        elseif total == bestTotal then
-            table.insert(leaders, color)
-        end
-    end
-
-    if #leaders == 0 then return nil end
-    if #leaders == 1 then return leaders[1] end
-
-    local feLeaders = {}
-    local bestFE = -1
-    for _, color in ipairs(leaders) do
-        local fe = tonumber((stats[color] or {}).foodEnergy) or 0
-        if fe > bestFE then
-            bestFE = fe
-            feLeaders = { color }
-        elseif fe == bestFE then
-            table.insert(feLeaders, color)
-        end
-    end
-
-    if #feLeaders == 1 then
-        return feLeaders[1]
-    end
-    return nil
-end
-
-function setCastleControl(castleHexId, winnerColor)
-    if HexData == nil then return false end
-    local castleHex = HexData[castleHexId]
-    if type(castleHex) ~= "table" then return false end
-
-    local claim = CastleClaims[castleHexId]
-    if type(claim) ~= "table" then
-        local existingObj = findCastleObjectAtHex(castleHexId)
-        if existingObj ~= nil then
-            claim = { owner = inferPlayerColorFromObject(existingObj), guid = existingObj.getGUID() }
-            CastleClaims[castleHexId] = claim
-        end
-    end
-
-    if type(claim) == "table" and claim.owner == winnerColor then
-        return false
-    end
-
-    if type(claim) == "table" and type(claim.guid) == "string" and claim.guid ~= "" then
-        local oldObj = getObjectFromGUID(claim.guid)
-        if oldObj ~= nil then
-            local oldOwner = claim.owner or inferPlayerColorFromObject(oldObj)
-            if type(oldOwner) == "string" and oldOwner ~= "" then
-                returnCastleToPlayer(oldOwner, oldObj)
-            end
-        end
-    end
-
-    local targetPos = getHexWorldPosition(castleHex, 1)
-    if type(targetPos) ~= "table" then return false end
-    local targetRot = { 0, 180, 0 }
-
-    local bag = findCastleSupplyBag(winnerColor)
-    if bag ~= nil and type(bag.takeObject) == "function" then
-        bag.takeObject({
-            position = targetPos,
-            rotation = targetRot,
-            smooth = false,
-            callback_function = function(obj)
-                if obj == nil then return end
-                CastleClaims[castleHexId] = { owner = winnerColor, guid = obj.getGUID() }
-            end
-        })
-        return true
-    end
-
-    local loose = findLooseCastlePieceForPlayer(winnerColor)
-    if loose ~= nil then
-        loose.setPositionSmooth(targetPos, false, true)
-        loose.setRotationSmooth(targetRot, false, true)
-        CastleClaims[castleHexId] = { owner = winnerColor, guid = loose.getGUID() }
-        return true
-    end
-
-    return false
-end
-
-function updateCastleControlForHex(castleHexId)
-    local stats = getCastleAdjacencyStats(castleHexId)
-    local winner = chooseCastleWinner(stats)
-    if winner == nil then
-        return false
-    end
-    return setCastleControl(castleHexId, winner)
-end
-
-function updateCastlesAdjacentToHex(hexId)
-    if HexData == nil then return end
-    local hex = HexData[hexId]
-    if type(hex) ~= "table" or type(hex.adjacent) ~= "table" then return end
-    local seen = {}
-    for _, neighborId in ipairs(hex.adjacent) do
-        local neighbor = HexData[neighborId]
-        if type(neighbor) == "table" and neighbor.type == "castle" and not seen[neighborId] then
-            seen[neighborId] = true
-            updateCastleControlForHex(neighborId)
-        end
+-- When objects enter hand zones, set their memo to the player color
+function onObjectEnterZone(zone, object)
+    if zone.type == "Hand" then
+        object.memo = getPlayerColorFromHandZoneGuid(zone.guid)
+        --print("Set memo of " .. object.guid .. " to " .. object.memo)
     end
 end
 
+-- Score energy and food groups for placement
 function scoreEnergyFoodGroupForPlacement(playerColor, startHexId, tileType)
-    if HexData == nil then return 0 end
     if tileType ~= "energy" and tileType ~= "food" then
         return 0
     end
 
-    if type(HexScores) ~= "table" then
-        HexScores = {}
-    end
-
     local startHex = HexData[startHexId]
-    if type(startHex) ~= "table" then return 0 end
-    if startHex.occupant == nil then return 0 end
-
     local visited = {}
     local stack = { startHexId }
-    visited[startHexId] = true
     local count = 0
 
+    visited[startHexId] = true
+
+    -- Count a "connected group" of tiles (touching each other), but only for this player.
+    -- We keep:
+    --   visited: hexes we've already queued/checked (prevents loops and double counting)
+    --   stack: a simple "to-check" list of hex ids
+    -- We only count/travel through hexes that:
+    --   1) match the same tileType (energy/food)
+    --   2) have a tile on them
+    --   3) have a tile whose memo == playerColor
     while #stack > 0 do
+        -- Grab the next hex id to check.
         local id = table.remove(stack)
         local hex = HexData[id]
-        if type(hex) == "table"
-            and hex.type == tileType
-            and hex.occupant ~= nil then
+        -- occupant.object_guid points to the physical tile object sitting on the hex.
+        -- inferPlayerColorFromObject returns the tile's owner (stored in obj.memo).
+        local objectOwner = inferPlayerColorFromObject(getObjectFromGUID(hex.occupant.object_guid))
+        if hex.type == tileType and objectOwner == playerColor then
+            -- This hex is part of the player's connected group.
             count = count + 1
-            if type(hex.adjacent) == "table" then
-                for _, nId in ipairs(hex.adjacent) do
-                    if not visited[nId] then
-                        local nHex = HexData[nId]
-                        if type(nHex) == "table"
-                            and nHex.type == tileType
-                            and nHex.occupant ~= nil then
-                            visited[nId] = true
-                            table.insert(stack, nId)
-                        end
+            -- Add neighboring hexes that are also eligible group members.
+            for _, nId in ipairs(hex.adjacent) do
+                if not visited[nId] then
+                    local nHex = HexData[nId]
+                    if type(nHex) == "table"
+                        and nHex.type == tileType
+                        and nHex.occupant ~= nil
+                        and inferPlayerColorFromObject(getObjectFromGUID(nHex.occupant.object_guid)) == playerColor then
+                        -- Mark visited now so we don't add the same neighbor multiple times.
+                        visited[nId] = true
+                        table.insert(stack, nId)
                     end
                 end
             end
@@ -598,59 +457,19 @@ function scoreEnergyFoodGroupForPlacement(playerColor, startHexId, tileType)
 
     if count > 0 then
         local total = addPlayerScore(playerColor, count)
+        local pointsWord = "points"
+        if count == 1 then
+            pointsWord = "point"
+        end
         printToAll(
             "[Score] " .. tostring(playerColor) .. " gained " .. tostring(count)
-                .. " (" .. tostring(tileType) .. " group size " .. tostring(count) .. ")"
-                .. " — Total: " .. tostring(total),
-            { 0.7, 1, 0.7 }
+                .. " " .. pointsWord .. " (" .. tostring(tileType) .. ")"
+                .. " | Total: " .. tostring(total),
+           playerColor
         )
     end
 
     return count
-end
-
-function handleHexPlacementClick(hexId, playerColor, altClick)
-    local hex = HexData[hexId]
-
-    local tileObj = getSingleHandTileObject(playerColor)
-    if tileObj == nil then
-        printToColor("Hold exactly one valid tile in your hand.", playerColor, {1, 0.6, 0.1})
-        return
-    end
-
-    local tileType = inferTileTypeFromObject(tileObj)
-    if tileType == nil then
-        printToColor("Couldn't infer tile type from your hand object.", playerColor, {1, 0.6, 0.1})
-        return
-    end
-
-    local blankOverrideAllowed = (hex.type == "blank") and (tileType == "energy" or tileType == "food")
-
-    if tileType ~= hex.type and not blankOverrideAllowed then
-        printToColor("Type mismatch. Hex expects " .. tostring(hex.type) .. ", but tile is " .. tostring(tileType) .. ".", playerColor, {1, 0.6, 0.1})
-        return
-    end
-
-    if blankOverrideAllowed then
-        if hex.base_type == nil then
-            hex.base_type = hex.type
-        end
-        hex.type = tileType
-    end
-
-    local worldPos = map.positionToWorld({ x = -hex.x, y = 0, z = hex.z })
-    tileObj.setPosition({ -worldPos.x, worldPos.y + 1, worldPos.z })
-    tileObj.setRotation({ 0, 180, 0 })
-
-    hex.occupant = {
-        player_color = playerColor,
-        tile_type = tileType,
-        object_guid = tileObj.getGUID(),
-    }
-
-    onHexTilePlaced(playerColor, hexId, hex, tileType, tileObj)
-    removeHexPlacementButton(hexId)
-    scoreEnergyFoodGroupForPlacement(playerColor, hexId, tileType)
 end
 
 function createHexPlacementButtonsFromHexData(hexData)

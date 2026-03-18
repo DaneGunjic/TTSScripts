@@ -1,6 +1,7 @@
 #include !\Rebirth\hexdata.ttslua
 #include !\Rebirth\hex_handler.ttslua
 #include !\Rebirth\scoring_system.ttslua
+#include !\Rebirth\castle_handler.ttslua
 
 function findMapBoard()
   local hits = Physics.cast({
@@ -21,18 +22,88 @@ function findMapBoard()
   return nil
 end
 
+function StartGame()
+  local buttons = map.getButtons()
+  for i = #buttons - 1, 0, -1 do
+    map.removeButton(i)
+  end
+
+  autoBuildAdjacencyFromHexData(HexData)
+  assignSettlementGroupsFromHexData(HexData)
+  createHexPlacementButtonsFromHexData(HexData)
+
+  setupTurnsClockwiseRandomStart()
+
+  for color, guids in pairs(PlayerGUIDs) do
+    if Player[color].seated then
+      local bag = getObjectFromGUID(guids.hex)
+      bag.shuffle()
+      bag.deal(1, color)
+    end
+  end
+end
+
 function onLoad()
   map = findMapBoard()
   map.interactable = false
   initScoringSystem()
+  Turns.enable = true
+  math.randomseed(os.time())
 
-  if HexData ~= nil then
-    autoBuildAdjacencyFromHexData(HexData)
-    assignSettlementGroupsFromHexData(HexData)
-    createHexPlacementButtonsFromHexData(HexData)
-  end
+  map.createButton({
+    click_function = "StartGame",
+    label = "Start Game",
+    position = { 0, 0.1, 0 },
+    rotation = { 0, 0, 0 },
+    width = 3000,
+    height = 1000,
+    font_size = 500,
+    color = { 0, 0, 0, 1 },
+    font_color = { 1, 1, 1, 1 },
+    scale = {0.2, 0.2, 0.2},
+  })
 
   -- Register the hotkey — player must bind it in Options > Game Keys
   addHotkey("Record Hex", onRecordHotkey, false)
   addHotkey("Print", printAll, false)
 end
+
+function setupTurnsClockwiseRandomStart()
+  local clockwise = { "White", "Red", "Orange", "Blue" }
+
+  local seated = {}
+  for _, color in ipairs(clockwise) do
+    if Player[color].seated then
+      table.insert(seated, color)
+    end
+  end
+
+  if #seated == 0 then
+    seated = clockwise
+  end
+
+  local startColor = seated[math.random(#seated)]
+  local startIndex = 1
+  for i, c in ipairs(seated) do
+    if c == startColor then
+      startIndex = i
+      break
+    end
+  end
+
+  local order = {}
+  for i = startIndex, #seated do
+    table.insert(order, seated[i])
+  end
+  for i = 1, startIndex - 1 do
+    table.insert(order, seated[i])
+  end
+
+  Turns.type = 2
+  Turns.order = order
+  Turns.reverse_order = false
+  Turns.turn_color = startColor
+  Turns.enable = true
+end
+
+

@@ -1,14 +1,14 @@
 ScoringMarkers = {
     White = "0001a9",
     Blue = "28924e",
-    Yellow = "bc77fe",
+    Orange = "bc77fe",
     Red = "5e21c3",
 }
 
 PlayerScores = {
     White = 0,
     Blue = 0,
-    Yellow = 0,
+    Orange = 0,
     Red = 0,
 }
 
