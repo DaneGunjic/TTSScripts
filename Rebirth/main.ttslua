@@ -1,5 +1,6 @@
-#include !\Rebirth\hexrecorder.ttslua
 #include !\Rebirth\hexdata.ttslua
+#include !\Rebirth\hex_handler.ttslua
+#include !\Rebirth\scoring_system.ttslua
 
 function findMapBoard()
   local hits = Physics.cast({
@@ -22,6 +23,8 @@ end
 
 function onLoad()
   map = findMapBoard()
+  map.interactable = false
+  initScoringSystem()
 
   if HexData ~= nil then
     autoBuildAdjacencyFromHexData(HexData)

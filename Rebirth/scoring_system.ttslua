@@ -1,0 +1,110 @@
+ScoringMarkers = {
+    White = "0001a9",
+    Blue = "28924e",
+    Yellow = "bc77fe",
+    Red = "5e21c3",
+}
+
+PlayerScores = {
+    White = 0,
+    Blue = 0,
+    Yellow = 0,
+    Red = 0,
+}
+
+ScoringPositions = {
+    [0] = {-11.05, 2.30, 16.77},
+    [1] = {-9.99, 1.70, 17.11},
+    [19] = {9.71, 1.67, 17.10},
+    [20] = {10.73, 1.67, 16.79},
+    [21] = {11.08, 1.67, 15.74},
+    [49] = {11.14, 1.66, -15.59},
+    [50] = {10.85, 1.66, -16.61},
+    [51] = {9.80, 1.66, -16.93},
+    [69] = {-9.81, 1.69, -16.97},
+    [70] = {-10.78, 1.69, -16.70},
+    [71] = {-11.13, 1.69, -15.61},
+    [99] = {-11.34, 1.70, 15.75}
+}
+
+ScoringTrackPositions = {}
+HexScores = {}
+
+function initScoringSystem()
+    buildScoringTrackPositions()
+
+    for color in pairs(ScoringMarkers) do
+        HexScores[color] = 0
+    end
+end
+
+function buildScoringTrackPositions()
+    local keys = {}
+    for k in pairs(ScoringPositions) do
+      table.insert(keys, k)
+    end
+    table.sort(keys)
+
+    local interpolatedPositions = {}
+
+    for i = 1, #keys - 1 do
+        local startScore = keys[i]
+        local endScore = keys[i + 1]
+        local startPos = ScoringPositions[startScore]
+        local endPos = ScoringPositions[endScore]
+
+        if type(startPos) == "table" and type(endPos) == "table" then
+            local scoreSpan = endScore - startScore
+            --print("[ScoringTrack] span=" .. tostring(span))
+            for scoreValue = startScore, endScore do
+                local lerpT = 0
+                if scoreSpan > 0 then
+                    lerpT = (scoreValue - startScore) / scoreSpan
+                end
+                interpolatedPositions[scoreValue] = {
+                    startPos[1] + (endPos[1] - startPos[1]) * lerpT,
+                    startPos[2] + (endPos[2] - startPos[2]) * lerpT,
+                    startPos[3] + (endPos[3] - startPos[3]) * lerpT,
+                }
+            end
+        end
+    end
+
+    ScoringTrackPositions = interpolatedPositions
+    return interpolatedPositions
+end
+
+function normalizeTrackIndex(score)
+    score = tonumber(score) or 0
+    score = math.floor(score)
+    return score % 100
+end
+
+function getScoreMarkerObject(playerColor)
+    return getObjectFromGUID(ScoringMarkers[playerColor])
+end
+
+function setScoreMarkerPosition(playerColor, score)
+    local trackIndex = normalizeTrackIndex(score)
+    if type(ScoringTrackPositions) ~= "table" or ScoringTrackPositions[trackIndex] == nil then
+        buildScoringTrackPositions()
+    end
+    local pos = ScoringTrackPositions[trackIndex] or ScoringPositions[trackIndex]
+    if type(pos) ~= "table" then return false end
+
+    local marker = getScoreMarkerObject(playerColor)
+    marker.setPositionSmooth({ pos[1], 2.5, pos[3] }, false, false)
+end
+
+function addPlayerScore(playerColor, delta)
+    if type(HexScores) ~= "table" then
+        HexScores = {}
+    end
+    delta = tonumber(delta) or 0
+    local current = tonumber(HexScores[playerColor]) or 0
+    current = math.floor(current)
+    local nextScore = current + delta
+    HexScores[playerColor] = nextScore
+    setScoreMarkerPosition(playerColor, nextScore)
+    return nextScore
+end
