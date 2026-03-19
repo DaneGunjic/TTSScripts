@@ -1,216 +1,216 @@
 CastleClaims = {}
 
 function isCastle(obj)
-    if obj.hasTag("Castle") then
-        return true
-    end
+		if obj.hasTag("Castle") then
+				return true
+		end
 
-    return false
+		return false
 end
 
 function findCastleSupplyBag(playerColor)
-    local obj = getObjectFromGUID(PlayerGUIDs[playerColor].castle)
-    return obj
+		local obj = getObjectFromGUID(PlayerGUIDs[playerColor].castle)
+		return obj
 end
 
 function updateCastlesAdjacentToHex(hexId)
-    local hex = HexData[hexId]
-    local seen = {}
-    for _, neighborId in ipairs(hex.adjacent) do
-        local neighbor = HexData[neighborId]
-        if neighbor.type == "castle" and not seen[neighborId] then
-            seen[neighborId] = true
-            updateCastleControlForHex(neighborId)
-        end
-    end
+		local hex = HexData[hexId]
+		local seen = {}
+		for _, neighborId in ipairs(hex.adjacent) do
+				local neighbor = HexData[neighborId]
+				if neighbor.type == "castle" and not seen[neighborId] then
+						seen[neighborId] = true
+						updateCastleControlForHex(neighborId)
+				end
+		end
 end
 
 function findCastleObjectAtHex(castleHexId)
-    local hexEntry = HexData[castleHexId]
-    local pos = getHexWorldPosition(hexEntry, 1)
-    local hits = Physics.cast({
-        origin = { pos[1], pos[2] + 3, pos[3] },
-        direction = { 0, -1, 0 },
-        type = 3,
-        size = { 0.6, 0.6, 0.6 },
-        max_distance = 6,
-        debug = true
-    })
+		local hexEntry = HexData[castleHexId]
+		local pos = getHexWorldPosition(hexEntry, 1)
+		local hits = Physics.cast({
+				origin = { pos[1], pos[2] + 3, pos[3] },
+				direction = { 0, -1, 0 },
+				type = 3,
+				size = { 0.6, 0.6, 0.6 },
+				max_distance = 6,
+				debug = true
+		})
 
-    for _, hit in ipairs(hits) do
-        local obj = hit.hit_object
-        if obj ~= nil and obj ~= map and isCastle(obj) then
-            return obj
-        end
-    end
+		for _, hit in ipairs(hits) do
+				local obj = hit.hit_object
+				if obj ~= nil and obj ~= map and isCastle(obj) then
+						return obj
+				end
+		end
 
-    return nil
+		return nil
 end
 
 function findLooseCastlePieceForPlayer(playerColor)
-    local used = {}
-    for _, claim in pairs(CastleClaims) do
-        if type(claim) == "table" and type(claim.guid) == "string" then
-            used[claim.guid] = true
-        end
-    end
+		local used = {}
+		for _, claim in pairs(CastleClaims) do
+				if type(claim) == "table" and type(claim.guid) == "string" then
+						used[claim.guid] = true
+				end
+		end
 
-    local colorLower = string.lower(tostring(playerColor))
-    for _, obj in ipairs(getAllObjects()) do
-        if obj ~= nil and isCastle(obj) then
-            local guid = obj.getGUID()
-            if not used[guid] then
-                if obj.memo == playerColor then
-                    return obj
-                end
-                local name = string.lower(tostring(obj.getName() or ""))
-                if (type(obj.hasTag) == "function" and obj.hasTag(playerColor)) or string.find(name, colorLower, 1, true) ~= nil then
-                    return obj
-                end
-            end
-        end
-    end
-    return nil
+		local colorLower = string.lower(tostring(playerColor))
+		for _, obj in ipairs(getAllObjects()) do
+				if obj ~= nil and isCastle(obj) then
+						local guid = obj.getGUID()
+						if not used[guid] then
+								if obj.memo == playerColor then
+										return obj
+								end
+								local name = string.lower(tostring(obj.getName() or ""))
+								if (type(obj.hasTag) == "function" and obj.hasTag(playerColor)) or string.find(name, colorLower, 1, true) ~= nil then
+										return obj
+								end
+						end
+				end
+		end
+		return nil
 end
 
 function returnCastleToPlayer(playerColor, castleObj)
-    if castleObj == nil then return false end
-    local bag = findCastleSupplyBag(playerColor)
-    if bag ~= nil and type(bag.putObject) == "function" then
-        bag.putObject(castleObj)
-        return true
-    end
+		if castleObj == nil then return false end
+		local bag = findCastleSupplyBag(playerColor)
+		if bag ~= nil and type(bag.putObject) == "function" then
+				bag.putObject(castleObj)
+				return true
+		end
 
-    local player = Player[playerColor]
-    if player ~= nil and type(player.getHandTransform) == "function" then
-        local ok, handTransform = pcall(function()
-            return player.getHandTransform(1)
-        end)
-        if ok and type(handTransform) == "table" and type(handTransform.position) == "table" then
-            local p = handTransform.position
-            castleObj.setPositionSmooth({ p[1], p[2] + 2, p[3] }, false, true)
-            return true
-        end
-    end
+		local player = Player[playerColor]
+		if player ~= nil and type(player.getHandTransform) == "function" then
+				local ok, handTransform = pcall(function()
+						return player.getHandTransform(1)
+				end)
+				if ok and type(handTransform) == "table" and type(handTransform.position) == "table" then
+						local p = handTransform.position
+						castleObj.setPositionSmooth({ p[1], p[2] + 2, p[3] }, false, true)
+						return true
+				end
+		end
 
-    castleObj.setPositionSmooth({ 0, 5, 0 }, false, true)
-    return true
+		castleObj.setPositionSmooth({ 0, 5, 0 }, false, true)
+		return true
 end
 
 function getCastleAdjacencyStats(castleHexId)
-    local stats = {}
-    local castleHex = HexData[castleHexId]
-    if castleHex == nil or type(castleHex.adjacent) ~= "table" then
-        return stats
-    end
+		local stats = {}
+		local castleHex = HexData[castleHexId]
+		if castleHex == nil or type(castleHex.adjacent) ~= "table" then
+				return stats
+		end
 
-    for _, neighborId in ipairs(castleHex.adjacent) do
-        local neighbor = HexData[neighborId]
-        if type(neighbor) == "table" and type(neighbor.occupant) == "table" then
-            local owner = neighbor.occupant.player_color
-            if (type(owner) ~= "string" or owner == "") and type(neighbor.occupant.object_guid) == "string" then
-                local obj = getObjectFromGUID(neighbor.occupant.object_guid)
-                owner = inferPlayerColorFromObject(obj)
-            end
+		for _, neighborId in ipairs(castleHex.adjacent) do
+				local neighbor = HexData[neighborId]
+				if type(neighbor) == "table" and type(neighbor.occupant) == "table" then
+						local owner = neighbor.occupant.player_color
+						if (type(owner) ~= "string" or owner == "") and type(neighbor.occupant.object_guid) == "string" then
+								local obj = getObjectFromGUID(neighbor.occupant.object_guid)
+								owner = inferPlayerColorFromObject(obj)
+						end
 
-            if type(owner) == "string" and owner ~= "" then
-                local entry = stats[owner]
-                if type(entry) ~= "table" then
-                    entry = { total = 0, foodEnergy = 0 }
-                    stats[owner] = entry
-                end
-                entry.total = entry.total + 1
-                if neighbor.type == "food" or neighbor.type == "energy" then
-                    entry.foodEnergy = entry.foodEnergy + 1
-                end
-            end
-        end
-    end
+						if type(owner) == "string" and owner ~= "" then
+								local entry = stats[owner]
+								if type(entry) ~= "table" then
+										entry = { total = 0, foodEnergy = 0 }
+										stats[owner] = entry
+								end
+								entry.total = entry.total + 1
+								if neighbor.type == "food" or neighbor.type == "energy" then
+										entry.foodEnergy = entry.foodEnergy + 1
+								end
+						end
+				end
+		end
 
-    return stats
+		return stats
 end
 
 function chooseCastleWinner(stats)
-    local leaders = {}
-    local bestTotal = -1
-    for color, entry in pairs(stats) do
-        local total = tonumber(entry.total) or 0
-        if total > bestTotal then
-            bestTotal = total
-            leaders = { color }
-        elseif total == bestTotal then
-            table.insert(leaders, color)
-        end
-    end
+		local leaders = {}
+		local bestTotal = -1
+		for color, entry in pairs(stats) do
+				local total = tonumber(entry.total) or 0
+				if total > bestTotal then
+						bestTotal = total
+						leaders = { color }
+				elseif total == bestTotal then
+						table.insert(leaders, color)
+				end
+		end
 
-    if #leaders == 0 then return nil end
-    if #leaders == 1 then return leaders[1] end
+		if #leaders == 0 then return nil end
+		if #leaders == 1 then return leaders[1] end
 
-    local feLeaders = {}
-    local bestFE = -1
-    for _, color in ipairs(leaders) do
-        local fe = tonumber((stats[color] or {}).foodEnergy) or 0
-        if fe > bestFE then
-            bestFE = fe
-            feLeaders = { color }
-        elseif fe == bestFE then
-            table.insert(feLeaders, color)
-        end
-    end
+		local feLeaders = {}
+		local bestFE = -1
+		for _, color in ipairs(leaders) do
+				local fe = tonumber((stats[color] or {}).foodEnergy) or 0
+				if fe > bestFE then
+						bestFE = fe
+						feLeaders = { color }
+				elseif fe == bestFE then
+						table.insert(feLeaders, color)
+				end
+		end
 
-    if #feLeaders == 1 then
-        return feLeaders[1]
-    end
-    return nil
+		if #feLeaders == 1 then
+				return feLeaders[1]
+		end
+		return nil
 end
 
 function setCastleControl(castleHexId, winnerColor)
-    local castleHex = HexData[castleHexId]
-    local claim = CastleClaims[castleHexId]
-    local existingObj = findCastleObjectAtHex(castleHexId)
+		local castleHex = HexData[castleHexId]
+		local claim = CastleClaims[castleHexId]
+		local existingObj = findCastleObjectAtHex(castleHexId)
 
-    if existingObj ~= nil then
-        claim = { owner = inferPlayerColorFromObject(existingObj), guid = existingObj.getGUID() }
-        CastleClaims[castleHexId] = claim
-    end
+		if existingObj ~= nil then
+				claim = { owner = inferPlayerColorFromObject(existingObj), guid = existingObj.getGUID() }
+				CastleClaims[castleHexId] = claim
+		end
 
-    if claim ~= nil and claim.owner == winnerColor then
-        return false
-    end
+		if claim ~= nil and claim.owner == winnerColor then
+				return false
+		end
 
-    if type(claim) == "table" and type(claim.guid) == "string" and claim.guid ~= "" then
-        local oldObj = getObjectFromGUID(claim.guid)
-        if oldObj ~= nil then
-            local oldOwner = claim.owner or inferPlayerColorFromObject(oldObj)
-            if type(oldOwner) == "string" and oldOwner ~= "" then
-                returnCastleToPlayer(oldOwner, oldObj)
-            end
-        end
-    end
+		if type(claim) == "table" and type(claim.guid) == "string" and claim.guid ~= "" then
+				local oldObj = getObjectFromGUID(claim.guid)
+				if oldObj ~= nil then
+						local oldOwner = claim.owner or inferPlayerColorFromObject(oldObj)
+						if type(oldOwner) == "string" and oldOwner ~= "" then
+								returnCastleToPlayer(oldOwner, oldObj)
+						end
+				end
+		end
 
-    local targetPos = getHexWorldPosition(castleHex, 1)
-    local targetRot = { 0, 180, 0 }
-    local bag = findCastleSupplyBag(winnerColor)
+		local targetPos = getHexWorldPosition(castleHex, 1)
+		local targetRot = { 0, 180, 0 }
+		local bag = findCastleSupplyBag(winnerColor)
 
-    bag.takeObject({
-        position = targetPos,
-        rotation = targetRot,
-        smooth = false,
-        callback_function = function(obj)
-            if obj == nil then return end
-            obj.memo = winnerColor
-            CastleClaims[castleHexId] = { owner = winnerColor, guid = obj.getGUID() }
-        end
-    })
+		bag.takeObject({
+				position = targetPos,
+				rotation = targetRot,
+				smooth = false,
+				callback_function = function(obj)
+						if obj == nil then return end
+						obj.memo = winnerColor
+						CastleClaims[castleHexId] = { owner = winnerColor, guid = obj.getGUID() }
+				end
+		})
 
-    return true
+		return true
 end
 
 function updateCastleControlForHex(castleHexId)
-    local stats = getCastleAdjacencyStats(castleHexId)
-    local winner = chooseCastleWinner(stats)
-    if winner == nil then
-        return false
-    end
-    return setCastleControl(castleHexId, winner)
+		local stats = getCastleAdjacencyStats(castleHexId)
+		local winner = chooseCastleWinner(stats)
+		if winner == nil then
+				return false
+		end
+		return setCastleControl(castleHexId, winner)
 end

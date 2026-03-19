@@ -1,114 +1,114 @@
 function checkAndScoreSettlement(hexId, playerColor)
-    local hex = HexData[hexId]
-    if hex == nil or hex.type ~= "settlement" or hex.settlement_group == nil or hex.settlement_group == "" then
-        return
-    end
+		local hex = HexData[hexId]
+		if hex == nil or hex.type ~= "settlement" or hex.settlement_group == nil or hex.settlement_group == "" then
+				return
+		end
 
-    local groupName = hex.settlement_group
-    local groupHexes = {}
-    local allOccupied = true
+		local groupName = hex.settlement_group
+		local groupHexes = {}
+		local allOccupied = true
 
-    -- Find all hexes in the same group and check occupancy
-    for id, h in pairs(HexData) do
-        if h.settlement_group == groupName then
-            table.insert(groupHexes, { id = id, hex = h })
-            if h.occupant == nil or h.occupant.object_guid == nil then
-                allOccupied = false
-            end
-        end
-    end
+		-- Find all hexes in the same group and check occupancy
+		for id, h in pairs(HexData) do
+				if h.settlement_group == groupName then
+						table.insert(groupHexes, { id = id, hex = h })
+						if h.occupant == nil or h.occupant.object_guid == nil then
+								allOccupied = false
+						end
+				end
+		end
 
-    if not allOccupied then
-        return
-    end
+		if not allOccupied then
+				return
+		end
 
-    -- Settlement is complete, calculate scoring
-    local settlementSize = #groupHexes
-    local playerInfluence = {} -- { [color] = influence }
-    local colors = { "White", "Red", "Orange", "Blue" }
-    for _, color in ipairs(colors) do
-        playerInfluence[color] = 0
-    end
+		-- Settlement is complete, calculate scoring
+		local settlementSize = #groupHexes
+		local playerInfluence = {} -- { [color] = influence }
+		local colors = { "White", "Red", "Orange", "Blue" }
+		for _, color in ipairs(colors) do
+				playerInfluence[color] = 0
+		end
 
-    for _, entry in ipairs(groupHexes) do
-        local occupant = entry.hex.occupant
-        local obj = getObjectFromGUID(occupant.object_guid)
-        if obj ~= nil then
-            local influence = tonumber(obj.getGMNotes()) or 0
-            local color = occupant.player_color
-            if color then
-                playerInfluence[color] = playerInfluence[color] + influence
-            end
-        end
-    end
+		for _, entry in ipairs(groupHexes) do
+				local occupant = entry.hex.occupant
+				local obj = getObjectFromGUID(occupant.object_guid)
+				if obj ~= nil then
+						local influence = tonumber(obj.getGMNotes()) or 0
+						local color = occupant.player_color
+						if color then
+								playerInfluence[color] = playerInfluence[color] + influence
+						end
+				end
+		end
 
-    -- Prepare ranking
-    local ranking = {}
-    for color, influence in pairs(playerInfluence) do
-        if influence > 0 then
-            table.insert(ranking, { color = color, influence = influence })
-        end
-    end
+		-- Prepare ranking
+		local ranking = {}
+		for color, influence in pairs(playerInfluence) do
+				if influence > 0 then
+						table.insert(ranking, { color = color, influence = influence })
+				end
+		end
 
-    -- Tie-breaking: 
-    -- 1. Most influence
-    -- 2. NOT the player who completed it (playerColor)
-    -- 3. Clockwise order: White -> Red -> Orange -> Blue
-    local orderMap = { White = 1, Red = 2, Orange = 3, Blue = 4 }
-    
-    table.sort(ranking, function(a, b)
-        if a.influence ~= b.influence then
-            return a.influence > b.influence
-        end
-        
-        -- Player who completed loses the tie
-        if a.color == playerColor then return false end
-        if b.color == playerColor then return true end
-        
-        -- Clockwise order
-        return orderMap[a.color] < orderMap[b.color]
-    end)
+		-- Tie-breaking: 
+		-- 1. Most influence
+		-- 2. NOT the player who completed it (playerColor)
+		-- 3. Clockwise order: White -> Red -> Orange -> Blue
+		local orderMap = { White = 1, Red = 2, Orange = 3, Blue = 4 }
+		
+		table.sort(ranking, function(a, b)
+				if a.influence ~= b.influence then
+						return a.influence > b.influence
+				end
+				
+				-- Player who completed loses the tie
+				if a.color == playerColor then return false end
+				if b.color == playerColor then return true end
+				
+				-- Clockwise order
+				return orderMap[a.color] < orderMap[b.color]
+		end)
 
-    -- Score based on size
-    if settlementSize == 1 then
-        local p1 = ranking[1]
-        if p1 then
-            addPlayerScore(p1.color, p1.influence)
-            broadcastToAll("[Settlement] " .. p1.color .. " scored " .. p1.influence .. " influence points for a size 1 settlement!", p1.color)
-        end
-    elseif settlementSize == 2 then
-        if #ranking == 1 then
-            local p1 = ranking[1]
-            addPlayerScore(p1.color, 8)
-            broadcastToAll("[Settlement] " .. p1.color .. " scored 8 points for controlling a size 2 settlement!", p1.color)
-        else
-            local p1 = ranking[1]
-            local p2 = ranking[2]
-            if p1 then
-                addPlayerScore(p1.color, 5)
-                broadcastToAll("[Settlement] " .. p1.color .. " scored 5 points (1st) for a size 2 settlement!", p1.color)
-            end
-            if p2 then
-                addPlayerScore(p2.color, 3)
-                broadcastToAll("[Settlement] " .. p2.color .. " scored 3 points (2nd) for a size 2 settlement!", p2.color)
-            end
-        end
-    elseif settlementSize >= 3 then
-        if #ranking == 1 then
-            local p1 = ranking[1]
-            addPlayerScore(p1.color, 13)
-            broadcastToAll("[Settlement] " .. p1.color .. " scored 13 points for controlling a size " .. settlementSize .. " settlement!", p1.color)
-        else
-            local p1 = ranking[1]
-            local p2 = ranking[2]
-            if p1 then
-                addPlayerScore(p1.color, 8)
-                broadcastToAll("[Settlement] " .. p1.color .. " scored 8 points (1st) for a size " .. settlementSize .. " settlement!", p1.color)
-            end
-            if p2 then
-                addPlayerScore(p2.color, 5)
-                broadcastToAll("[Settlement] " .. p2.color .. " scored 5 points (2nd) for a size " .. settlementSize .. " settlement!", p2.color)
-            end
-        end
-    end
+		-- Score based on size
+		if settlementSize == 1 then
+				local p1 = ranking[1]
+				if p1 then
+						addPlayerScore(p1.color, p1.influence)
+						broadcastToAll("[Settlement] " .. p1.color .. " scored " .. p1.influence .. " influence points for a size 1 settlement!", p1.color)
+				end
+		elseif settlementSize == 2 then
+				if #ranking == 1 then
+						local p1 = ranking[1]
+						addPlayerScore(p1.color, 8)
+						broadcastToAll("[Settlement] " .. p1.color .. " scored 8 points for controlling a size 2 settlement!", p1.color)
+				else
+						local p1 = ranking[1]
+						local p2 = ranking[2]
+						if p1 then
+								addPlayerScore(p1.color, 5)
+								broadcastToAll("[Settlement] " .. p1.color .. " scored 5 points (1st) for a size 2 settlement!", p1.color)
+						end
+						if p2 then
+								addPlayerScore(p2.color, 3)
+								broadcastToAll("[Settlement] " .. p2.color .. " scored 3 points (2nd) for a size 2 settlement!", p2.color)
+						end
+				end
+		elseif settlementSize >= 3 then
+				if #ranking == 1 then
+						local p1 = ranking[1]
+						addPlayerScore(p1.color, 13)
+						broadcastToAll("[Settlement] " .. p1.color .. " scored 13 points for controlling a size " .. settlementSize .. " settlement!", p1.color)
+				else
+						local p1 = ranking[1]
+						local p2 = ranking[2]
+						if p1 then
+								addPlayerScore(p1.color, 8)
+								broadcastToAll("[Settlement] " .. p1.color .. " scored 8 points (1st) for a size " .. settlementSize .. " settlement!", p1.color)
+						end
+						if p2 then
+								addPlayerScore(p2.color, 5)
+								broadcastToAll("[Settlement] " .. p2.color .. " scored 5 points (2nd) for a size " .. settlementSize .. " settlement!", p2.color)
+						end
+				end
+		end
 end

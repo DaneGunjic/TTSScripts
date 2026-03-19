@@ -6,148 +6,148 @@
 #include !\Rebirth\settlements_handler.ttslua
 
 function findMapBoard()
-  local hits = Physics.cast({
-    origin = {0, 5, 0},
-    direction = {0, -1, 0},
-    type = 3,
-    size = {1, 1, 1},
-    max_distance = 20,
-    debug = true
-  })
+	local hits = Physics.cast({
+		origin = {0, 5, 0},
+		direction = {0, -1, 0},
+		type = 3,
+		size = {1, 1, 1},
+		max_distance = 20,
+		debug = true
+	})
 
-  for _, hit in ipairs(hits) do
-    local obj = hit.hit_object
-    if obj ~= nil and obj.hasTag("GameBoard") then
-      return obj
-    end
-  end
-  
-  return nil
+	for _, hit in ipairs(hits) do
+		local obj = hit.hit_object
+		if obj ~= nil and obj.hasTag("GameBoard") then
+			return obj
+		end
+	end
+	
+	return nil
 end
 
 function StartGame()
-  local buttons = map.getButtons()
-  for i = #buttons - 1, 0, -1 do
-    map.removeButton(i)
-  end
+	local buttons = map.getButtons()
+	for i = #buttons - 1, 0, -1 do
+		map.removeButton(i)
+	end
 
-  autoBuildAdjacencyFromHexData(HexData)
-  assignSettlementGroupsFromHexData(HexData)
-  createHexPlacementButtonsFromHexData(HexData)
+	autoBuildAdjacencyFromHexData(HexData)
+	assignSettlementGroupsFromHexData(HexData)
+	createHexPlacementButtonsFromHexData(HexData)
 
-  setupTurnsClockwiseRandomStart()
+	setupTurnsClockwiseRandomStart()
 
-  local seatedPlayers = {}
-  local unusedColors = {}
-  local allColors = { "White", "Red", "Orange", "Blue" }
-  
-  for _, color in ipairs(allColors) do
-    if Player[color].seated then
-      table.insert(seatedPlayers, color)
-    else
-      table.insert(unusedColors, color)
-    end
-  end
+	local seatedPlayers = {}
+	local unusedColors = {}
+	local allColors = { "White", "Red", "Orange", "Blue" }
+	
+	for _, color in ipairs(allColors) do
+		if Player[color].seated then
+			table.insert(seatedPlayers, color)
+		else
+			table.insert(unusedColors, color)
+		end
+	end
 
-  if #seatedPlayers <= 2 then
-    local blockerColor = unusedColors[1]
-    setupBlockedHexesFor2Players(blockerColor)
-  end
+	if #seatedPlayers <= 2 then
+		local blockerColor = unusedColors[1]
+		setupBlockedHexesFor2Players(blockerColor)
+	end
 
-  if #seatedPlayers == 4 then
-    for _, color in ipairs(seatedPlayers) do
-      removeExtraTilesFor4PlayerGame(color)
-    end
-  end
+	if #seatedPlayers == 4 then
+		for _, color in ipairs(seatedPlayers) do
+			removeExtraTilesFor4PlayerGame(color)
+		end
+	end
 
-  for _, color in ipairs(seatedPlayers) do
-    local bag = getObjectFromGUID(PlayerGUIDs[color].hex)
-    bag.shuffle()
+	for _, color in ipairs(seatedPlayers) do
+		local bag = getObjectFromGUID(PlayerGUIDs[color].hex)
+		bag.shuffle()
 
-    -- Deal 2 tiles below the bag
-    local bagPos = bag.getPosition()
-    local leftPos = { bagPos.x - 1, bagPos.y, bagPos.z - 4 }
-    local rightPos = { bagPos.x + 1, bagPos.y, bagPos.z - 4 }
+		-- Deal 2 tiles below the bag
+		local bagPos = bag.getPosition()
+		local leftPos = { bagPos.x - 1, bagPos.y, bagPos.z - 4 }
+		local rightPos = { bagPos.x + 1, bagPos.y, bagPos.z - 4 }
 
-    bag.takeObject({ 
-      position = leftPos, 
-      rotation = { 0, 180, 0 }, 
-      smooth = true,
-      callback_function = function(obj) obj.setLock(true) end
-    })
-    bag.takeObject({ 
-      position = rightPos, 
-      rotation = { 0, 180, 0 }, 
-      smooth = true,
-      callback_function = function(obj) obj.setLock(true) end
-    })
+		bag.takeObject({ 
+			position = leftPos, 
+			rotation = { 0, 180, 0 }, 
+			smooth = true,
+			callback_function = function(obj) obj.setLock(true) end
+		})
+		bag.takeObject({ 
+			position = rightPos, 
+			rotation = { 0, 180, 0 }, 
+			smooth = true,
+			callback_function = function(obj) obj.setLock(true) end
+		})
 
-    bag.deal(1, color)
-  end
+		bag.deal(1, color)
+	end
 end
 
 function onLoad()
-  map = findMapBoard()
-  map.interactable = false
-  initScoringSystem()
-  Turns.enable = true
-  math.randomseed(os.time())
+	map = findMapBoard()
+	map.interactable = false
+	initScoringSystem()
+	Turns.enable = true
+	math.randomseed(os.time())
 
-  map.createButton({
-    click_function = "StartGame",
-    label = "Start Game",
-    position = { 0, 0.1, 0 },
-    rotation = { 0, 0, 0 },
-    width = 3000,
-    height = 1000,
-    font_size = 500,
-    color = { 0, 0, 0, 1 },
-    font_color = { 1, 1, 1, 1 },
-    scale = {0.2, 0.2, 0.2},
-    tooltip = "Make sure everyone is seated before clicking."
-  })
+	map.createButton({
+		click_function = "StartGame",
+		label = "Start Game",
+		position = { 0, 0.1, 0 },
+		rotation = { 0, 0, 0 },
+		width = 3000,
+		height = 1000,
+		font_size = 500,
+		color = { 0, 0, 0, 1 },
+		font_color = { 1, 1, 1, 1 },
+		scale = {0.2, 0.2, 0.2},
+		tooltip = "Make sure everyone is seated before clicking."
+	})
 
-  -- Register the hotkey — player must bind it in Options > Game Keys
-  addHotkey("Record Hex", onRecordHotkey, false)
-  addHotkey("Print", printAll, false)
+	-- Register the hotkey — player must bind it in Options > Game Keys
+	addHotkey("Record Hex", onRecordHotkey, false)
+	addHotkey("Print", printAll, false)
 end
 
 function setupTurnsClockwiseRandomStart()
-  local clockwise = { "White", "Red", "Orange", "Blue" }
+	local clockwise = { "White", "Red", "Orange", "Blue" }
 
-  local seated = {}
-  for _, color in ipairs(clockwise) do
-    if Player[color].seated then
-      table.insert(seated, color)
-    end
-  end
+	local seated = {}
+	for _, color in ipairs(clockwise) do
+		if Player[color].seated then
+			table.insert(seated, color)
+		end
+	end
 
-  if #seated == 0 then
-    seated = clockwise
-  end
+	if #seated == 0 then
+		seated = clockwise
+	end
 
-  local startColor = seated[math.random(#seated)]
-  local startIndex = 1
-  for i, c in ipairs(seated) do
-    if c == startColor then
-      startIndex = i
-      break
-    end
-  end
+	local startColor = seated[math.random(#seated)]
+	local startIndex = 1
+	for i, c in ipairs(seated) do
+		if c == startColor then
+			startIndex = i
+			break
+		end
+	end
 
-  local order = {}
-  for i = startIndex, #seated do
-    table.insert(order, seated[i])
-  end
-  for i = 1, startIndex - 1 do
-    table.insert(order, seated[i])
-  end
+	local order = {}
+	for i = startIndex, #seated do
+		table.insert(order, seated[i])
+	end
+	for i = 1, startIndex - 1 do
+		table.insert(order, seated[i])
+	end
 
-  Turns.type = 2
-  Turns.order = order
-  Turns.reverse_order = false
-  Turns.turn_color = startColor
-  Turns.enable = true
+	Turns.type = 2
+	Turns.order = order
+	Turns.reverse_order = false
+	Turns.turn_color = startColor
+	Turns.enable = true
 end
 
 

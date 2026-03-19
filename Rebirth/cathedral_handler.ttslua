@@ -1,87 +1,87 @@
 CathedralClaims = {} -- { [hexId] = { [playerColor] = guid } }
 
 function updateCathedralsAdjacentToHex(hexId, playerColor)
-    local hex = HexData[hexId]
-    if hex == nil or type(hex.adjacent) ~= "table" then
-        return
-    end
+		local hex = HexData[hexId]
+		if hex == nil or type(hex.adjacent) ~= "table" then
+				return
+		end
 
-    for _, neighborId in ipairs(hex.adjacent) do
-        local neighbor = HexData[neighborId]
-        if neighbor ~= nil and neighbor.type == "cathedral" then
-            handleCathedralPlacement(neighborId, playerColor)
-        end
-    end
+		for _, neighborId in ipairs(hex.adjacent) do
+				local neighbor = HexData[neighborId]
+				if neighbor ~= nil and neighbor.type == "cathedral" then
+						handleCathedralPlacement(neighborId, playerColor)
+				end
+		end
 end
 
 function handleCathedralPlacement(cathedralHexId, playerColor)
-    -- Initialize claims for this hex if not present
-    if CathedralClaims[cathedralHexId] == nil then
-        CathedralClaims[cathedralHexId] = {}
-    end
+		-- Initialize claims for this hex if not present
+		if CathedralClaims[cathedralHexId] == nil then
+				CathedralClaims[cathedralHexId] = {}
+		end
 
-    -- Check if player already has a cathedral on this hex
-    if CathedralClaims[cathedralHexId][playerColor] ~= nil then
-        return
-    end
+		-- Check if player already has a cathedral on this hex
+		if CathedralClaims[cathedralHexId][playerColor] ~= nil then
+				return
+		end
 
-    -- Draw a card for the player
-    drawCardForCathedral(playerColor)
+		-- Draw a card for the player
+		drawCardForCathedral(playerColor)
 
-    -- Place cathedral marker
-    placeCathedralMarker(cathedralHexId, playerColor)
+		-- Place cathedral marker
+		placeCathedralMarker(cathedralHexId, playerColor)
 end
 
 function drawCardForCathedral(playerColor)
-    if deckGUID == nil or deckGUID == "" then
-        printToAll("deckGUID is not defined!", {1, 0, 0})
-        return
-    end
+		if deckGUID == nil or deckGUID == "" then
+				printToAll("deckGUID is not defined!", {1, 0, 0})
+				return
+		end
 
-    local mainDeck = getObjectFromGUID(deckGUID)
-    if mainDeck ~= nil then
-        mainDeck.deal(1, playerColor)
-        printToAll(playerColor .. " drew a card!", playerColor)
-    else
-        printToAll("Deck with GUID " .. deckGUID .. " not found!", {1, 0, 0})
-    end
+		local mainDeck = getObjectFromGUID(deckGUID)
+		if mainDeck ~= nil then
+				mainDeck.deal(1, playerColor)
+				printToAll(playerColor .. " drew a card!", playerColor)
+		else
+				printToAll("Deck with GUID " .. deckGUID .. " not found!", {1, 0, 0})
+		end
 end
 
 function placeCathedralMarker(cathedralHexId, playerColor)
-    local hexEntry = HexData[cathedralHexId]
-    if hexEntry == nil then return end
+		local hexEntry = HexData[cathedralHexId]
+		if hexEntry == nil then return end
 
-    local bag = getCathedralBag(playerColor)
-    if bag == nil then
-        printToAll("Cathedral bag not found for " .. playerColor, {1, 0, 0})
-        return
-    end
+		local bag = getCathedralBag(playerColor)
+		if bag == nil then
+				printToAll("Cathedral bag not found for " .. playerColor, {1, 0, 0})
+				return
+		end
 
-    -- Count existing markers to stack them
-    local existingCount = 0
-    if CathedralClaims[cathedralHexId] ~= nil then
-        for _, _ in pairs(CathedralClaims[cathedralHexId]) do
-            existingCount = existingCount + 1
-        end
-    end
+		-- Count existing markers to stack them
+		local existingCount = 0
+		if CathedralClaims[cathedralHexId] ~= nil then
+				for _, _ in pairs(CathedralClaims[cathedralHexId]) do
+						existingCount = existingCount + 1
+				end
+		end
 
-    local targetPos = getHexWorldPosition(hexEntry, 2)
-    local targetRot = {0, 180, 0}
+		local targetPos = getHexWorldPosition(hexEntry, 2)
+		local targetRot = {0, 180, 0}
 
-    bag.takeObject({
-        position = targetPos,
-        rotation = targetRot,
-        smooth = true,
-        callback_function = function(obj)
-            if obj == nil then return end
-            obj.memo = playerColor
-            CathedralClaims[cathedralHexId][playerColor] = obj.getGUID()
-        end
-    })
+		bag.takeObject({
+				position = targetPos,
+				rotation = targetRot,
+				smooth = true,
+				callback_function = function(obj)
+						if obj == nil then return end
+						obj.memo = playerColor
+						CathedralClaims[cathedralHexId][playerColor] = obj.getGUID()
+				end
+		})
 end
 
 function getCathedralBag(playerColor)
-    local guids = PlayerGUIDs[playerColor]
-    if guids == nil or guids.cathedral == nil then return nil end
-    return getObjectFromGUID(guids.cathedral)
+		local guids = PlayerGUIDs[playerColor]
+		if guids == nil or guids.cathedral == nil then return nil end
+		return getObjectFromGUID(guids.cathedral)
 end
