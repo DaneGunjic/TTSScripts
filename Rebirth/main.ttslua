@@ -2,6 +2,8 @@
 #include !\Rebirth\hex_handler.ttslua
 #include !\Rebirth\scoring_system.ttslua
 #include !\Rebirth\castle_handler.ttslua
+#include !\Rebirth\cathedral_handler.ttslua
+#include !\Rebirth\settlements_handler.ttslua
 
 function findMapBoard()
   local hits = Physics.cast({
@@ -19,6 +21,7 @@ function findMapBoard()
       return obj
     end
   end
+  
   return nil
 end
 

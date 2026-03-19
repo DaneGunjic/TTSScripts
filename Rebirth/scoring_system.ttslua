@@ -105,6 +105,36 @@ function addPlayerScore(playerColor, delta)
     current = math.floor(current)
     local nextScore = current + delta
     HexScores[playerColor] = nextScore
+
+    -- Handle score markers (100, 200, 300)
+    local guids = PlayerGUIDs[playerColor]
+    if guids ~= nil then
+        if nextScore >= 100 and current < 100 then
+            local m100 = getObjectFromGUID(guids.marker100)
+            if m100 ~= nil then
+                m100.flip()
+                local p = m100.getPosition()
+                m100.setPositionSmooth({ p[1], p[2] + 2, p[3] }, false, false)
+            end
+        end
+
+        if nextScore >= 200 and current < 200 then
+            local m100 = getObjectFromGUID(guids.marker100)
+            if m100 ~= nil then
+                m100.destruct()
+            end
+        end
+
+        if nextScore >= 300 and current < 300 then
+            local m200 = getObjectFromGUID(guids.marker200)
+            if m200 ~= nil then
+                m200.flip()
+                local p = m200.getPosition()
+                m200.setPositionSmooth({ p[1], p[2] + 2, p[3] }, false, false)
+            end
+        end
+    end
+
     setScoreMarkerPosition(playerColor, nextScore)
     return nextScore
 end

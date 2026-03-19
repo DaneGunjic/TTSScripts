@@ -31,6 +31,7 @@ TAG_TO_TYPE = {
 }
 
 HexPlacementButtons = { indices = {}, fnByHexId = {}, indexByHexId = {} }
+GameEnded = false
 
 function noopHexPlace()
 end
@@ -59,9 +60,9 @@ function getContainerCount(obj)
 end
 
 function areAllHexBagsEmpty()
-    for _, guids in pairs(PlayerGUIDs) do
+    for color, guids in pairs(PlayerGUIDs) do
         local bag = getObjectFromGUID(guids.hex)
-        if getContainerCount(bag) > 0 then
+        if getContainerCount(bag) > 0 and Player[color].seated then
             return false
         end
     end
@@ -80,6 +81,59 @@ function dealOneHexTileToPlayer(playerColor)
     bag.deal(1, playerColor)
 
     return false
+end
+
+function countCastlesOnBoardByPlayer()
+    local counts = {}
+    for color, _ in pairs(PlayerGUIDs) do
+        counts[color] = 0
+    end
+
+    for _, obj in ipairs(getAllObjects()) do
+        if obj.hasTag("Castle") then
+            local owner = inferPlayerColorFromObject(obj)
+            counts[owner] = counts[owner] + 1
+        end
+    end
+
+    return counts
+end
+
+function runEndGameScoring()
+    if GameEnded then
+        return false
+    end
+    GameEnded = true
+
+    printToAll("[Game End] All hex bags are empty.", { 1, 0.3, 0.3 })
+
+    local counts = countCastlesOnBoardByPlayer()
+    local order = { "White", "Red", "Orange", "Blue" }
+    local baseDelay = 0.5
+    local stepDelay = 0.5
+    local step = 0
+
+    for _, color in ipairs(order) do
+        if Player[color] ~= nil and Player[color].seated and counts[color] ~= nil then
+            local castles = tonumber(counts[color])
+            local points = castles * 5
+            if points > 0 then
+                step = step + 1
+                Wait.time(function()
+                    local total = addPlayerScore(color, points)
+                    printToAll(
+                        "[Final Score] " .. tostring(color) .. " castles: " .. tostring(castles)
+                            .. " (+"
+                            .. tostring(points)
+                            .. ") | Total: " .. tostring(total),
+                        color
+                    )
+                end, baseDelay + (step - 1) * stepDelay)
+            end
+        end
+    end
+
+    return true
 end
 
 function handleHexPlacementClick(hexId, playerColor, altClick)
@@ -126,7 +180,7 @@ function handleHexPlacementClick(hexId, playerColor, altClick)
     scoreEnergyFoodGroupForPlacement(playerColor, hexId, tileType)
     dealOneHexTileToPlayer(playerColor)
     if areAllHexBagsEmpty() then
-        printToAll("[Game End] All hex bags are empty.", { 1, 0.3, 0.3 })
+        runEndGameScoring()
     end
 end
 
@@ -360,10 +414,16 @@ end
 function getSingleHandTileObject(playerColor)
     local player = Player[playerColor]
     local handObjects = player.getHandObjects()
+    local tiles = {}
 
-    if #handObjects == 1 then
-        --print("Found single hand object: " .. handObjects[1].guid)
-        return handObjects[1]
+    for _, obj in ipairs(handObjects) do
+        if inferTileTypeFromObject(obj) ~= nil then
+            table.insert(tiles, obj)
+        end
+    end
+
+    if #tiles == 1 then
+        return tiles[1]
     end
 
     return nil
@@ -371,9 +431,13 @@ end
 
 function onHexTilePlaced(playerColor, hexId, hexEntry, tileType, tileObject)
     if hexEntry.port == true then
+        printToAll(playerColor .. " scored 1 point for placing on a port!", playerColor)
         addPlayerScore(playerColor, 1)
     end
+
     updateCastlesAdjacentToHex(hexId)
+    updateCathedralsAdjacentToHex(hexId, playerColor)
+    checkAndScoreSettlement(hexId, playerColor)
 end
 
 function getHexWorldPosition(hexEntry, yOffset)

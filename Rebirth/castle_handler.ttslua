@@ -4,6 +4,7 @@ function isCastle(obj)
     if obj.hasTag("Castle") then
         return true
     end
+
     return false
 end
 
@@ -24,7 +25,6 @@ function updateCastlesAdjacentToHex(hexId)
     end
 end
 
-
 function findCastleObjectAtHex(castleHexId)
     local hexEntry = HexData[castleHexId]
     local pos = getHexWorldPosition(hexEntry, 1)
@@ -36,12 +36,14 @@ function findCastleObjectAtHex(castleHexId)
         max_distance = 6,
         debug = true
     })
+
     for _, hit in ipairs(hits) do
         local obj = hit.hit_object
         if obj ~= nil and obj ~= map and isCastle(obj) then
             return obj
         end
     end
+
     return nil
 end
 
@@ -98,6 +100,9 @@ end
 function getCastleAdjacencyStats(castleHexId)
     local stats = {}
     local castleHex = HexData[castleHexId]
+    if castleHex == nil or type(castleHex.adjacent) ~= "table" then
+        return stats
+    end
 
     for _, neighborId in ipairs(castleHex.adjacent) do
         local neighbor = HexData[neighborId]
@@ -160,20 +165,16 @@ function chooseCastleWinner(stats)
 end
 
 function setCastleControl(castleHexId, winnerColor)
-    if HexData == nil then return false end
     local castleHex = HexData[castleHexId]
-    if type(castleHex) ~= "table" then return false end
-
     local claim = CastleClaims[castleHexId]
-    if type(claim) ~= "table" then
-        local existingObj = findCastleObjectAtHex(castleHexId)
-        if existingObj ~= nil then
-            claim = { owner = inferPlayerColorFromObject(existingObj), guid = existingObj.getGUID() }
-            CastleClaims[castleHexId] = claim
-        end
+    local existingObj = findCastleObjectAtHex(castleHexId)
+
+    if existingObj ~= nil then
+        claim = { owner = inferPlayerColorFromObject(existingObj), guid = existingObj.getGUID() }
+        CastleClaims[castleHexId] = claim
     end
 
-    if type(claim) == "table" and claim.owner == winnerColor then
+    if claim ~= nil and claim.owner == winnerColor then
         return false
     end
 
@@ -188,34 +189,21 @@ function setCastleControl(castleHexId, winnerColor)
     end
 
     local targetPos = getHexWorldPosition(castleHex, 1)
-    if type(targetPos) ~= "table" then return false end
     local targetRot = { 0, 180, 0 }
-
     local bag = findCastleSupplyBag(winnerColor)
-    if bag ~= nil and type(bag.takeObject) == "function" then
-        bag.takeObject({
-            position = targetPos,
-            rotation = targetRot,
-            smooth = false,
-            callback_function = function(obj)
-                if obj == nil then return end
-                obj.memo = winnerColor
-                CastleClaims[castleHexId] = { owner = winnerColor, guid = obj.getGUID() }
-            end
-        })
-        return true
-    end
 
-    local loose = findLooseCastlePieceForPlayer(winnerColor)
-    if loose ~= nil then
-        loose.memo = winnerColor
-        loose.setPositionSmooth(targetPos, false, true)
-        loose.setRotationSmooth(targetRot, false, true)
-        CastleClaims[castleHexId] = { owner = winnerColor, guid = loose.getGUID() }
-        return true
-    end
+    bag.takeObject({
+        position = targetPos,
+        rotation = targetRot,
+        smooth = false,
+        callback_function = function(obj)
+            if obj == nil then return end
+            obj.memo = winnerColor
+            CastleClaims[castleHexId] = { owner = winnerColor, guid = obj.getGUID() }
+        end
+    })
 
-    return false
+    return true
 end
 
 function updateCastleControlForHex(castleHexId)
