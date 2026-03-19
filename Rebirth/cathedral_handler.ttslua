@@ -33,20 +33,17 @@ function handleCathedralPlacement(cathedralHexId, playerColor)
 end
 
 function drawCardForCathedral(playerColor)
-    local decks = getAllObjects()
-    local mainDeck = nil
-    for _, obj in ipairs(decks) do
-        if obj.type == "Deck" then
-            mainDeck = obj
-            break
-        end
+    if deckGUID == nil or deckGUID == "" then
+        printToAll("deckGUID is not defined!", {1, 0, 0})
+        return
     end
 
+    local mainDeck = getObjectFromGUID(deckGUID)
     if mainDeck ~= nil then
         mainDeck.deal(1, playerColor)
         printToAll(playerColor .. " drew a card!", playerColor)
     else
-        printToAll("No deck found to draw a card for " .. playerColor, {1, 0, 0})
+        printToAll("Deck with GUID " .. deckGUID .. " not found!", {1, 0, 0})
     end
 end
 

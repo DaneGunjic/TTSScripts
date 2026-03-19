@@ -2,6 +2,7 @@ recordedHexes = {}
 currentType = "energy"
 hexCounter = 1
 map = nil
+deckGUID = "08e98f"
 
 PlayerGUIDs = {
     White = { castle = "f038e9", hex = "e58602", cathedral = "464501", marker100 = "48ed98", marker200 = "f0d7a5", hand = "d49e15" },
@@ -70,6 +71,27 @@ function areAllHexBagsEmpty()
     return true
 end
 
+function areAllTilesPlayedAndBagsEmpty()
+    if not areAllHexBagsEmpty() then
+        return false
+    end
+
+    for color, _ in pairs(PlayerGUIDs) do
+        if Player[color].seated then
+            local handObjects = Player[color].getHandObjects()
+            if type(handObjects) == "table" then
+                for _, obj in ipairs(handObjects) do
+                    if inferTileTypeFromObject(obj) ~= nil then
+                        return false
+                    end
+                end
+            end
+        end
+    end
+
+    return true
+end
+
 function dealOneHexTileToPlayer(playerColor)
     local bag = getHexBagObjectForPlayer(playerColor)
     if getContainerCount(bag) <= 0 then
@@ -99,13 +121,105 @@ function countCastlesOnBoardByPlayer()
     return counts
 end
 
+function removeExtraTilesFor4PlayerGame(playerColor)
+    local bag = getHexBagObjectForPlayer(playerColor)
+    if bag == nil then return end
+
+    local objects = bag.getObjects()
+    local toRemove = {
+        energy = 3,
+        food = 3,
+        settlement2 = 1,
+        settlement3 = 1,
+        settlement4 = 1
+    }
+
+    local removedCount = 0
+    for i = #objects, 1, -1 do
+        local obj = objects[i]
+        local tags = obj.tags or {}
+        local gm_notes = obj.gm_notes or ""
+        local guid = obj.guid
+
+        local isEnergy = false
+        local isFood = false
+        local isSettlement = false
+
+        for _, tag in ipairs(tags) do
+            local t = string.lower(tag)
+            if t == "energy" then isEnergy = true end
+            if t == "food" then isFood = true end
+            if t == "settlement" then isSettlement = true end
+        end
+
+        local shouldRemove = false
+        if isEnergy and toRemove.energy > 0 then
+            toRemove.energy = toRemove.energy - 1
+            shouldRemove = true
+        elseif isFood and toRemove.food > 0 then
+            toRemove.food = toRemove.food - 1
+            shouldRemove = true
+        elseif isSettlement then
+            local influence = tostring(gm_notes)
+            if influence == "2" and toRemove.settlement2 > 0 then
+                toRemove.settlement2 = toRemove.settlement2 - 1
+                shouldRemove = true
+            elseif influence == "3" and toRemove.settlement3 > 0 then
+                toRemove.settlement3 = toRemove.settlement3 - 1
+                shouldRemove = true
+            elseif influence == "4" and toRemove.settlement4 > 0 then
+                toRemove.settlement4 = toRemove.settlement4 - 1
+                shouldRemove = true
+            end
+        end
+
+        if shouldRemove then
+            bag.takeObject({
+                guid = guid,
+                callback_function = function(taken) taken.destruct() end
+            })
+            removedCount = removedCount + 1
+        end
+    end
+    printToAll("[2-Player Setup] Removed " .. removedCount .. " extra tiles from " .. playerColor .. "'s bag.", {0.8, 0.8, 1})
+end
+
+function setupBlockedHexesFor2Players(unusedColor)
+    local bag = getHexBagObjectForPlayer(unusedColor)
+    if bag == nil then return end
+
+    local count = 0
+    for id, hex in pairs(HexData) do
+        if hex.blocked_2p == true then
+            bag.takeObject({
+                position = getHexWorldPosition(hex, 1),
+                rotation = {0, 180, 0},
+                smooth = false,
+                callback_function = function(obj)
+                    if obj == nil then return end
+                    obj.memo = unusedColor
+                    hex.occupant = {
+                        player_color = unusedColor,
+                        tile_type = "blocked",
+                        object_guid = obj.getGUID(),
+                    }
+                    removeHexPlacementButton(id)
+                end
+            })
+            count = count + 1
+        end
+    end
+    printToAll("[2-Player Setup] Blocked " .. count .. " hexes using " .. unusedColor .. "'s tiles.", {0.8, 0.8, 1})
+end
+
 function runEndGameScoring()
     if GameEnded then
         return false
     end
     GameEnded = true
 
-    printToAll("[Game End] All hex bags are empty.", { 1, 0.3, 0.3 })
+    broadcastToAll("[Game End] All hex bags are empty.", { 1, 0.3, 0.3 })
+    broadcastToAll("[Game End] Manually score your missions.", { 1, 0.3, 0.3 })
 
     local counts = countCastlesOnBoardByPlayer()
     local order = { "White", "Red", "Orange", "Blue" }
@@ -137,6 +251,11 @@ function runEndGameScoring()
 end
 
 function handleHexPlacementClick(hexId, playerColor, altClick)
+    if playerColor ~= Turns.turn_color then
+        printToColor("It is not your turn.", playerColor, {1, 0.6, 0.1})
+        return
+    end
+
     local hex = HexData[hexId]
 
     local tileObj = getSingleHandTileObject(playerColor)
@@ -166,7 +285,7 @@ function handleHexPlacementClick(hexId, playerColor, altClick)
     end
 
     local worldPos = map.positionToWorld({ x = -hex.x, y = 0, z = hex.z })
-    tileObj.setPosition({ -worldPos.x, worldPos.y + 1, worldPos.z })
+    tileObj.setPosition({ -worldPos.x, 1.68, worldPos.z })
     tileObj.setRotation({ 0, 180, 0 })
 
     hex.occupant = {
@@ -175,13 +294,17 @@ function handleHexPlacementClick(hexId, playerColor, altClick)
         object_guid = tileObj.getGUID(),
     }
 
-    onHexTilePlaced(playerColor, hexId, hex, tileType, tileObj)
+    onHexTilePlaced(playerColor, hexId, hex, tileType)
     removeHexPlacementButton(hexId)
     scoreEnergyFoodGroupForPlacement(playerColor, hexId, tileType)
-    dealOneHexTileToPlayer(playerColor)
-    if areAllHexBagsEmpty() then
+
+    if areAllTilesPlayedAndBagsEmpty() then
         runEndGameScoring()
+        return
     end
+
+    dealOneHexTileToPlayer(playerColor)
+    Turns.endTurn()
 end
 
 function buildAdjacencyFromHexData(hexData, hexRadius)
@@ -576,7 +699,7 @@ function createHexPlacementButtonsFromHexData(hexData)
             height = buttonHeight,
             font_size = 200,
             color = { 1, 1, 1, 0 },
-            font_color = { 1, 1, 1, 0 },
+            font_color = { 1, 1, 1, 1 },
             scale = {0.2, 0.2, 0.2},
             --tooltip = tostring(hexId) .. " (" .. tostring(hex.type) .. ")",
         })

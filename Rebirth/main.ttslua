@@ -37,12 +37,52 @@ function StartGame()
 
   setupTurnsClockwiseRandomStart()
 
-  for color, guids in pairs(PlayerGUIDs) do
+  local seatedPlayers = {}
+  local unusedColors = {}
+  local allColors = { "White", "Red", "Orange", "Blue" }
+  
+  for _, color in ipairs(allColors) do
     if Player[color].seated then
-      local bag = getObjectFromGUID(guids.hex)
-      bag.shuffle()
-      bag.deal(1, color)
+      table.insert(seatedPlayers, color)
+    else
+      table.insert(unusedColors, color)
     end
+  end
+
+  if #seatedPlayers <= 2 then
+    local blockerColor = unusedColors[1]
+    setupBlockedHexesFor2Players(blockerColor)
+  end
+
+  if #seatedPlayers == 4 then
+    for _, color in ipairs(seatedPlayers) do
+      removeExtraTilesFor4PlayerGame(color)
+    end
+  end
+
+  for _, color in ipairs(seatedPlayers) do
+    local bag = getObjectFromGUID(PlayerGUIDs[color].hex)
+    bag.shuffle()
+
+    -- Deal 2 tiles below the bag
+    local bagPos = bag.getPosition()
+    local leftPos = { bagPos.x - 1, bagPos.y, bagPos.z - 4 }
+    local rightPos = { bagPos.x + 1, bagPos.y, bagPos.z - 4 }
+
+    bag.takeObject({ 
+      position = leftPos, 
+      rotation = { 0, 180, 0 }, 
+      smooth = true,
+      callback_function = function(obj) obj.setLock(true) end
+    })
+    bag.takeObject({ 
+      position = rightPos, 
+      rotation = { 0, 180, 0 }, 
+      smooth = true,
+      callback_function = function(obj) obj.setLock(true) end
+    })
+
+    bag.deal(1, color)
   end
 end
 
@@ -64,6 +104,7 @@ function onLoad()
     color = { 0, 0, 0, 1 },
     font_color = { 1, 1, 1, 1 },
     scale = {0.2, 0.2, 0.2},
+    tooltip = "Make sure everyone is seated before clicking."
   })
 
   -- Register the hotkey — player must bind it in Options > Game Keys
