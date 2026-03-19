@@ -64,10 +64,12 @@ function areAllHexBagsEmpty()
     for color, guids in pairs(PlayerGUIDs) do
         local bag = getObjectFromGUID(guids.hex)
         if getContainerCount(bag) > 0 and Player[color].seated then
+            --print("Hex bag for " .. color .. " is not empty.")
             return false
         end
     end
 
+    --print("All hex bags are empty.")
     return true
 end
 
@@ -218,7 +220,7 @@ function runEndGameScoring()
     end
     GameEnded = true
 
-    broadcastToAll("[Game End] All hex bags are empty.", { 1, 0.3, 0.3 })
+    broadcastToAll("[Game End] All hex bags and hands are empty.", { 1, 0.3, 0.3 })
     broadcastToAll("[Game End] Manually score your missions.", { 1, 0.3, 0.3 })
 
     local counts = countCastlesOnBoardByPlayer()
@@ -298,13 +300,15 @@ function handleHexPlacementClick(hexId, playerColor, altClick)
     removeHexPlacementButton(hexId)
     scoreEnergyFoodGroupForPlacement(playerColor, hexId, tileType)
 
-    if areAllTilesPlayedAndBagsEmpty() then
-        runEndGameScoring()
-        return
-    end
-
     dealOneHexTileToPlayer(playerColor)
     Turns.endTurn()
+
+    Wait.time(function()
+        if areAllTilesPlayedAndBagsEmpty() then
+            runEndGameScoring()
+            return
+        end
+    end, 0.1)
 end
 
 function buildAdjacencyFromHexData(hexData, hexRadius)
