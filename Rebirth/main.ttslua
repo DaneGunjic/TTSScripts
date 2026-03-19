@@ -37,6 +37,14 @@ function StartGame()
 
 	setupTurnsClockwiseRandomStart()
 
+	-- Shuffle the main deck
+	if type(deckGUID) == "string" and deckGUID ~= "" then
+		local deckObj = getObjectFromGUID(deckGUID)
+		if deckObj ~= nil then
+			deckObj.shuffle()
+		end
+	end
+
 	local seatedPlayers = {}
 	local unusedColors = {}
 	local allColors = { "White", "Red", "Orange", "Blue" }
@@ -51,7 +59,8 @@ function StartGame()
 
 	if #seatedPlayers <= 2 then
 		local blockerColor = unusedColors[1]
-		setupBlockedHexesFor2Players(blockerColor)
+		
+		Wait.time(function() setupBlockedHexesFor2Players(blockerColor) end, 0.5)
 	end
 
 	if #seatedPlayers == 4 then
@@ -108,8 +117,8 @@ function onLoad()
 	})
 
 	-- Register the hotkey — player must bind it in Options > Game Keys
-	addHotkey("Record Hex", onRecordHotkey, false)
-	addHotkey("Print", printAll, false)
+	--addHotkey("Record Hex", onRecordHotkey, false)
+	--addHotkey("Print", printAll, false)
 end
 
 function setupTurnsClockwiseRandomStart()

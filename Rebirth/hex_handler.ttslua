@@ -214,11 +214,24 @@ function setupBlockedHexesFor2Players(unusedColor)
 	printToAll("[2-Player Setup] Blocked " .. count .. " hexes using " .. unusedColor .. "'s tiles.", {0.8, 0.8, 1})
 end
 
+function highlightAllCastlesForPlayer(playerColor)
+	for _, obj in ipairs(getAllObjects()) do
+		if obj.hasTag("Castle") then
+			local owner = inferPlayerColorFromObject(obj)
+			if owner == playerColor then
+				obj.highlightOn(playerColor, 3)
+				Player[playerColor].pingTable(obj.getPosition())
+			end
+		end
+	end
+end
+
 function runEndGameScoring()
 	if GameEnded then
 		return false
 	end
 	GameEnded = true
+	map.clearButtons()
 
 	broadcastToAll("[Game End] All hex bags and hands are empty.", { 1, 0.3, 0.3 })
 	broadcastToAll("[Game End] Manually score your missions.", { 1, 0.3, 0.3 })
@@ -226,7 +239,7 @@ function runEndGameScoring()
 	local counts = countCastlesOnBoardByPlayer()
 	local order = { "White", "Red", "Orange", "Blue" }
 	local baseDelay = 0.5
-	local stepDelay = 0.5
+	local stepDelay = 3
 	local step = 0
 
 	for _, color in ipairs(order) do
@@ -236,6 +249,7 @@ function runEndGameScoring()
 			if points > 0 then
 				step = step + 1
 				Wait.time(function()
+					highlightAllCastlesForPlayer(color)
 					local total = addPlayerScore(color, points)
 					printToAll(
 						"[Final Score] " .. tostring(color) .. " castles: " .. tostring(castles)
@@ -459,20 +473,33 @@ function inferTileTypeFromObject(obj)
 	return nil
 end
 
+-- Scans all buttons on the map and rebuilds the lookup table that maps Hex IDs to their TTS button indices.
+-- This is necessary because button indices can change when other buttons are removed or created.
 function rebuildHexPlacementButtonIndexCache()
+	-- Ensure the global table structure exists
 	if type(HexPlacementButtons) ~= "table" then
 		HexPlacementButtons = { indices = {}, fnByHexId = {}, indexByHexId = {} }
 	end
+	
+	-- Reset the index cache
 	HexPlacementButtons.indexByHexId = {}
 
+	-- Get current buttons from the map object
 	local buttons = map.getButtons() or {}
 	local foundCount = 0
+	
+	-- Iterate through all existing buttons
 	for buttonIndex, buttonData in ipairs(buttons) do
 		local clickFunction = buttonData.click_function
-		if type(clickFunction) == "string" then
+		
+		-- Check if the button is a hex placement button (matches our naming convention)
+		if clickFunction then
 			local hexId = string.match(clickFunction, "^onHexPlace_(hex_%d+)$")
+			
+			-- If it's a match, save the index for this hexId
 			if hexId ~= nil then
 				local index = buttonData.index
+				-- Fallback if the index property isn't directly on the table
 				if type(index) ~= "number" then
 					index = buttonIndex - 1
 				end
@@ -485,20 +512,32 @@ function rebuildHexPlacementButtonIndexCache()
 	return foundCount
 end
 
+-- Hides a hex placement button by setting its size to zero and disabling its function.
+-- This effectively "removes" the button from the player's view and interaction.
+-- 
+-- Example of data structures used here:
+-- HexPlacementButtons.fnByHexId = { ["hex_01"] = "onHexPlace_hex_01", ["hex_02"] = "onHexPlace_hex_02" }
+-- HexPlacementButtons.indexByHexId = { ["hex_01"] = 0, ["hex_02"] = 5 } (Indices are dynamic TTS button IDs)
+-- map.getButtons() returns = { {index=0, click_function="onHexPlace_hex_01"}, {index=1, click_function="..."}, ... }
 function removeHexPlacementButton(hexId)
+	-- Determine the name of the function associated with this hex's button
 	local expectedFn = nil
 	if type(HexPlacementButtons.fnByHexId) == "table" then
 		expectedFn = HexPlacementButtons.fnByHexId[hexId]
 	end
+	
+	-- Fallback to the default naming convention if not found in the lookup table
 	if type(expectedFn) ~= "string" or expectedFn == "" then
 		expectedFn = "onHexPlace_" .. tostring(hexId)
 	end
 
+	-- Scan current buttons on the map to find those matching the expected function
 	local buttons = map.getButtons() or {}
 	local indicesToHide = {}
 	for buttonIndex, buttonData in ipairs(buttons) do
 		if type(buttonData) == "table" and buttonData.click_function == expectedFn then
 			local index = buttonData.index
+			-- Ensure we have a valid numeric index for the button
 			if type(index) ~= "number" then
 				index = buttonIndex - 1
 			end
@@ -506,22 +545,28 @@ function removeHexPlacementButton(hexId)
 		end
 	end
 
+	-- If not found by scanning, try using the cached index
 	if #indicesToHide == 0 then
 		local cachedIndex = HexPlacementButtons.indexByHexId[hexId]
+		-- If the cache is invalid, rebuild it and try again
 		if type(cachedIndex) ~= "number" then
 			rebuildHexPlacementButtonIndexCache()
 			cachedIndex = HexPlacementButtons.indexByHexId[hexId]
 		end
+		-- Add the cached index if it's now valid
 		if type(cachedIndex) == "number" then
 			table.insert(indicesToHide, cachedIndex)
 		end
 	end
 
+	-- Error handling if no button index could be identified
 	if #indicesToHide == 0 then
 		print("Warning: Could not find button index for hex " .. tostring(hexId))
 		return false
 	end
 
+	-- "Remove" the button(s) by making them invisible and non-functional
+	--log("Removing hex placement button for hex " .. tostring(hexId) .. " at indices " .. table.concat(indicesToHide, ", "))
 	for _, indexToHide in ipairs(indicesToHide) do
 		map.editButton({
 			index = indexToHide,
@@ -533,6 +578,7 @@ function removeHexPlacementButton(hexId)
 		})
 	end
 
+	-- Clear the index from the cache as it's no longer a valid placement target
 	HexPlacementButtons.indexByHexId[hexId] = nil
 	return true
 end
@@ -699,7 +745,7 @@ function createHexPlacementButtonsFromHexData(hexData)
 			width = buttonWidth,
 			height = buttonHeight,
 			font_size = 200,
-			color = { 1, 1, 1, 0.5 },
+			color = { 1, 1, 1, 0 },
 			font_color = { 1, 1, 1, 1 },
 			scale = {0.2, 0.2, 0.2},
 			--tooltip = tostring(hexId) .. " (" .. tostring(hex.type) .. ")",

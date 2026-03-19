@@ -200,6 +200,7 @@ function setCastleControl(castleHexId, winnerColor)
 						if obj == nil then return end
 						obj.memo = winnerColor
 						CastleClaims[castleHexId] = { owner = winnerColor, guid = obj.getGUID() }
+						obj.highlightOn(winnerColor, 2)
 				end
 		})
 
@@ -212,5 +213,7 @@ function updateCastleControlForHex(castleHexId)
 		if winner == nil then
 				return false
 		end
+
+		--log("Castle " .. tostring(castleHexId) .. " is now controlled by " .. winner)
 		return setCastleControl(castleHexId, winner)
 end
