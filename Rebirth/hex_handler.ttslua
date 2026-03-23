@@ -246,6 +246,9 @@ function runEndGameScoring()
 		if Player[color] ~= nil and Player[color].seated and counts[color] ~= nil then
 			local castles = tonumber(counts[color])
 			local points = castles * 5
+			
+			createManualScoreButtonsOnBag(color)
+
 			if points > 0 then
 				step = step + 1
 				Wait.time(function()
@@ -264,6 +267,39 @@ function runEndGameScoring()
 	end
 
 	return true
+end
+
+function createManualScoreButtonsOnBag(playerColor)
+	local bag = getHexBagObjectForPlayer(playerColor)
+	if bag == nil then return end
+
+	local offsets = {
+		{ label = "-1", amount = -1, pos = { -0.25, 0.5, 0.2 } },
+		{ label = "-5", amount = -5, pos = { -0.25, 0.5, -0.2 } },
+		{ label = "+5", amount = 5,  pos = { 0.25, 0.5, -0.2 } },
+		{ label = "+1", amount = 1,  pos = { 0.25, 0.5, 0.2 } },
+	}
+
+	for _, data in ipairs(offsets) do
+		local funcName = "adjScore_" .. playerColor .. "_" .. data.label:gsub("[+-]", function(s) return s == "+" and "p" or "m" end)
+		_G[funcName] = function()
+			addPlayerScore(playerColor, data.amount)
+			printToAll("[Manual Score] " .. playerColor .. " adjusted score by " .. data.label, playerColor)
+		end
+
+		bag.createButton({
+			click_function = funcName,
+			label          = data.label,
+			position       = data.pos,
+			rotation       = { 0, 0, 0 },
+			width          = 800,
+			height         = 800,
+			font_size      = 400,
+			color          = { 0, 0, 0, 1 },
+			font_color     = { 1, 1, 1, 1 },
+			scale          = {0.2, 0.2, 0.2},
+		})
+	end
 end
 
 function handleHexPlacementClick(hexId, playerColor, altClick)

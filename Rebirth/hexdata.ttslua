@@ -1,4 +1,4 @@
-HexData = {
+HexDataScotland = {
 ["hex_01"] = { type = "settlement", x = 1.093, z = -1.893, adjacent = {}, port = false, settlement_group = "", castle_id = nil, cathedral_id = nil, occupant = nil, blocked_2p = true},
 ["hex_02"] = { type = "settlement", x = 0.853, z = -1.891, adjacent = {}, port = true, settlement_group = nil, castle_id = nil, cathedral_id = nil, occupant = nil, blocked_2p = true },
 ["hex_03"] = { type = "energy", x = 0.374, z = -1.890, adjacent = {}, port = false, settlement_group = nil, castle_id = nil, cathedral_id = nil, occupant = nil, blocked_2p = true },
@@ -143,3 +143,6 @@ HexData = {
 ["hex_142"] = { type = "settlement", x = 0.117, z = 1.810, adjacent = {}, port = true, settlement_group = nil, castle_id = nil, cathedral_id = nil, occupant = nil, blocked_2p = true },
 ["hex_143"] = { type = "blank", x = -0.123, z = 1.809, adjacent = {}, port = false, settlement_group = nil, castle_id = nil, cathedral_id = nil, occupant = nil }
 }
+
+HexDataIreland = HexDataScotland
+HexData = HexDataScotland

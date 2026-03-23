@@ -5,6 +5,12 @@
 #include !\Rebirth\cathedral_handler.ttslua
 #include !\Rebirth\settlements_handler.ttslua
 
+MapState = MapState or 1
+MissionDeckByMapState = MissionDeckByMapState or {
+	[1] = { guid = deckGUID, position = nil },
+	[2] = { guid = "", position = nil },
+}
+
 function findMapBoard()
 	local hits = Physics.cast({
 		origin = {0, 5, 0},
@@ -25,11 +31,52 @@ function findMapBoard()
 	return nil
 end
 
-function StartGame()
-	local buttons = map.getButtons()
+function clearMapButtons()
+	local buttons = map.getButtons() or {}
 	for i = #buttons - 1, 0, -1 do
 		map.removeButton(i)
 	end
+end
+
+function applyMissionDeckConfig()
+	local cfg = MissionDeckByMapState[MapState]
+	if type(cfg) ~= "table" then
+		return
+	end
+
+	local guid = cfg.guid
+	if type(guid) == "string" and guid ~= "" then
+		deckGUID = guid
+	end
+
+	if type(deckGUID) ~= "string" or deckGUID == "" then
+		return
+	end
+
+	local deckObj = getObjectFromGUID(deckGUID)
+	if deckObj ~= nil and type(cfg.position) == "table" then
+		deckObj.setPositionSmooth(cfg.position, false, false)
+	end
+end
+
+function selectMapState(nextState)
+	MapState = tonumber(nextState) or 1
+
+	if MapState == 2 then
+		if type(HexDataIreland) == "table" and next(HexDataIreland) ~= nil then
+			HexData = HexDataIreland
+		else
+			HexData = HexDataScotland
+		end
+	else
+		HexData = HexDataScotland
+	end
+
+	applyMissionDeckConfig()
+end
+
+function StartGameInternal()
+	clearMapButtons()
 
 	autoBuildAdjacencyFromHexData(HexData)
 	assignSettlementGroupsFromHexData(HexData)
@@ -52,6 +99,7 @@ function StartGame()
 	for _, color in ipairs(allColors) do
 		if Player[color].seated then
 			table.insert(seatedPlayers, color)
+			--createManualScoreButtonsOnBag(color)
 		else
 			table.insert(unusedColors, color)
 		end
@@ -73,26 +121,39 @@ function StartGame()
 		local bag = getObjectFromGUID(PlayerGUIDs[color].hex)
 		bag.shuffle()
 
-		-- Deal 2 tiles below the bag
 		local bagPos = bag.getPosition()
-		local leftPos = { bagPos.x - 1, bagPos.y, bagPos.z - 4 }
-		local rightPos = { bagPos.x + 1, bagPos.y, bagPos.z - 4 }
+		local previewPositions = {
+			{ bagPos.x - 1, bagPos.y, bagPos.z - 4 },
+			{ bagPos.x + 1, bagPos.y, bagPos.z - 4 },
+			{ bagPos.x - 1, bagPos.y, bagPos.z - 5 },
+			{ bagPos.x + 1, bagPos.y, bagPos.z - 5 },
+		}
 
-		bag.takeObject({ 
-			position = leftPos, 
-			rotation = { 0, 180, 0 }, 
-			smooth = true,
-			callback_function = function(obj) obj.setLock(true) end
-		})
-		bag.takeObject({ 
-			position = rightPos, 
-			rotation = { 0, 180, 0 }, 
-			smooth = true,
-			callback_function = function(obj) obj.setLock(true) end
-		})
+		for _, pos in ipairs(previewPositions) do
+			bag.takeObject({
+				position = pos,
+				rotation = { 0, 180, 0 },
+				smooth = true,
+				callback_function = function(obj) obj.setLock(true) end
+			})
+		end
 
 		bag.deal(1, color)
 	end
+end
+
+function StartGameScotland()
+	selectMapState(1)
+	StartGameInternal()
+end
+
+function StartGameIreland()
+	selectMapState(2)
+	StartGameInternal()
+end
+
+function StartGame()
+	StartGameScotland()
 end
 
 function onLoad()
@@ -103,11 +164,25 @@ function onLoad()
 	math.randomseed(os.time())
 
 	map.createButton({
-		click_function = "StartGame",
-		label = "Start Game",
-		position = { 0, 0.1, 0 },
+		click_function = "StartGameScotland",
+		label = "Scotland",
+		position = { -1.5, 0.1, 0 },
 		rotation = { 0, 0, 0 },
-		width = 3000,
+		width = 2400,
+		height = 1000,
+		font_size = 500,
+		color = { 0, 0, 0, 1 },
+		font_color = { 1, 1, 1, 1 },
+		scale = {0.2, 0.2, 0.2},
+		tooltip = "Make sure everyone is seated before clicking."
+	})
+
+	map.createButton({
+		click_function = "StartGameIreland",
+		label = "Ireland",
+		position = { 1.5, 0.1, 0 },
+		rotation = { 0, 0, 0 },
+		width = 2400,
 		height = 1000,
 		font_size = 500,
 		color = { 0, 0, 0, 1 },
