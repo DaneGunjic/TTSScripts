@@ -27,7 +27,23 @@ ScoringPositions = {
 		[99] = {-11.34, 1.70, 15.75}
 }
 
+ScoringPostionIreland = {
+	[0] = {-10.84, 1.70, 16.87},
+	[1] = {-9.70, 1.70, 17.13},
+	[19] = {9.87, 1.67, 17.03},
+	[20] = {10.88, 1.67, 16.71},
+	[21] = {11.23, 1.67, 15.69},
+	[49] = {11.06, 1.66, -15.57},
+	[50] = {10.71, 1.66, -16.58},
+	[51] = {9.68, 1.66, -16.91},
+	[69] = {-9.87, 1.69, -16.93},
+	[70] = {-10.92, 1.69, -16.62},
+	[71] = {-11.24, 1.69, -15.58},
+	[99] = {-11.08, 1.70, 15.81}
+}
+
 ScoringTrackPositions = {}
+ScoringTrackMapState = nil
 HexScores = {}
 
 function initScoringSystem()
@@ -39,8 +55,14 @@ function initScoringSystem()
 end
 
 function buildScoringTrackPositions()
+		local mapState = tonumber(MapState) or 1
+		local scoringPositions = ScoringPositions
+		if mapState == 2 and type(ScoringPostionIreland) == "table" then
+				scoringPositions = ScoringPostionIreland
+		end
+
 		local keys = {}
-		for k in pairs(ScoringPositions) do
+		for k in pairs(scoringPositions) do
 			table.insert(keys, k)
 		end
 		table.sort(keys)
@@ -50,8 +72,8 @@ function buildScoringTrackPositions()
 		for i = 1, #keys - 1 do
 				local startScore = keys[i]
 				local endScore = keys[i + 1]
-				local startPos = ScoringPositions[startScore]
-				local endPos = ScoringPositions[endScore]
+				local startPos = scoringPositions[startScore]
+				local endPos = scoringPositions[endScore]
 
 				if type(startPos) == "table" and type(endPos) == "table" then
 						local scoreSpan = endScore - startScore
@@ -71,6 +93,7 @@ function buildScoringTrackPositions()
 		end
 
 		ScoringTrackPositions = interpolatedPositions
+		ScoringTrackMapState = mapState
 		return interpolatedPositions
 end
 
@@ -85,11 +108,20 @@ function getScoreMarkerObject(playerColor)
 end
 
 function setScoreMarkerPosition(playerColor, score)
+		local mapState = tonumber(MapState) or 1
+		if ScoringTrackMapState ~= mapState then
+				buildScoringTrackPositions()
+		end
+
 		local trackIndex = normalizeTrackIndex(score)
 		if type(ScoringTrackPositions) ~= "table" or ScoringTrackPositions[trackIndex] == nil then
 				buildScoringTrackPositions()
 		end
-		local pos = ScoringTrackPositions[trackIndex] or ScoringPositions[trackIndex]
+		local scoringPositions = ScoringPositions
+		if mapState == 2 and type(ScoringPostionIreland) == "table" then
+				scoringPositions = ScoringPostionIreland
+		end
+		local pos = ScoringTrackPositions[trackIndex] or scoringPositions[trackIndex]
 		if type(pos) ~= "table" then return false end
 
 		local marker = getScoreMarkerObject(playerColor)
@@ -112,9 +144,10 @@ function addPlayerScore(playerColor, delta)
 				if nextScore >= 100 and current < 100 then
 						local m100 = getObjectFromGUID(guids.marker100)
 						if m100 ~= nil then
-								m100.flip()
+								local r = m100.getRotation()
+								m100.setRotationSmooth({ r[1], r[2], r[3] + 180 }, false, false)
 								local p = m100.getPosition()
-								m100.setPositionSmooth({ p[1], p[2] + 2, p[3] }, false, false)
+								--m100.setPositionSmooth({ p[1], p[2] + 2, p[3] }, false, false)
 						end
 				end
 
@@ -128,9 +161,10 @@ function addPlayerScore(playerColor, delta)
 				if nextScore >= 300 and current < 300 then
 						local m200 = getObjectFromGUID(guids.marker200)
 						if m200 ~= nil then
-								m200.flip()
+								local r = m200.getRotation()
+								m200.setRotationSmooth({ r[1], r[2], r[3] + 180 }, false, false)
 								local p = m200.getPosition()
-								m200.setPositionSmooth({ p[1], p[2] + 2, p[3] }, false, false)
+								--m200.setPositionSmooth({ p[1], p[2] + 2, p[3] }, false, false)
 						end
 				end
 		end

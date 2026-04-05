@@ -5,10 +5,19 @@
 #include !\Rebirth\cathedral_handler.ttslua
 #include !\Rebirth\settlements_handler.ttslua
 
-MapState = MapState or 1
-MissionDeckByMapState = MissionDeckByMapState or {
-	[1] = { guid = deckGUID, position = nil },
-	[2] = { guid = "", position = nil },
+MapState = 1
+MissionDeckByMapState = {
+	[1] = { guid = "08e98f", position = {-8.72, 1.76, -14.03} },
+	[2] = { guid = "f5df05", position = {-8.21, 1.77, 11.59} },
+}
+
+IrelandTowerTokenBagGUID = "518787"
+
+SetAsideTokenBags = {
+	Red = "9abaff",
+	White = "7e6ea3",
+	Blue = "a05f97",
+	Orange = "6986b1",
 }
 
 function findMapBoard()
@@ -18,7 +27,7 @@ function findMapBoard()
 		type = 3,
 		size = {1, 1, 1},
 		max_distance = 20,
-		debug = true
+		debug = false
 	})
 
 	for _, hit in ipairs(hits) do
@@ -27,12 +36,17 @@ function findMapBoard()
 			return obj
 		end
 	end
-	
+
 	return nil
 end
 
 function clearMapButtons()
-	local buttons = map.getButtons() or {}
+	local buttons = map.getButtons()
+
+	if buttons == nil then
+		return
+	end
+
 	for i = #buttons - 1, 0, -1 do
 		map.removeButton(i)
 	end
@@ -40,34 +54,81 @@ end
 
 function applyMissionDeckConfig()
 	local cfg = MissionDeckByMapState[MapState]
-	if type(cfg) ~= "table" then
-		return
+	deckGUID = cfg.guid
+
+	for otherState, otherCfg in pairs(MissionDeckByMapState) do
+		if otherState ~= MapState then
+			local otherGuid = otherCfg.guid
+			if otherGuid ~= cfg.guid then
+				local otherDeck = getObjectFromGUID(otherGuid)
+				if otherDeck ~= nil then
+					otherDeck.destruct()
+				end
+			end
+		end
 	end
 
-	local guid = cfg.guid
-	if type(guid) == "string" and guid ~= "" then
-		deckGUID = guid
-	end
-
-	if type(deckGUID) ~= "string" or deckGUID == "" then
-		return
-	end
-
-	local deckObj = getObjectFromGUID(deckGUID)
-	if deckObj ~= nil and type(cfg.position) == "table" then
+	local deckObj = getObjectFromGUID(cfg.guid)
+	if deckObj ~= nil then
 		deckObj.setPositionSmooth(cfg.position, false, false)
+		deckObj.shuffle()
+	end
+end
+
+function getSnapPointsWithTag(tag)
+	local snapPoints = Global.getSnapPoints()
+	local matches = {}
+	for _, sp in ipairs(snapPoints) do
+		for _, t in ipairs(sp.tags) do
+			if t == tag then
+				table.insert(matches, sp)
+				break
+			end
+		end
+	end
+
+	return matches
+end
+
+function dealIrelandMissionCards()
+	if MapState ~= 2 then return end
+
+	local deck = nil
+	if type(deckGUID) == "string" and deckGUID ~= "" then
+		deck = getObjectFromGUID(deckGUID)
+	end
+	if deck == nil then
+		deck = getObjectFromGUID(MissionDeckByMapState[2].guid)
+	end
+	if deck == nil then return end
+
+	local points = getSnapPointsWithTag("IrelandMission")
+	--log(points)
+	local count = math.min(8, #points)
+
+	for i = 1, count do
+		local sp = points[i]
+		local wp = sp.position
+		local wr = { 0, 180, 0 }
+		deck.takeObject({
+			position = { wp.x, wp.y + 2, wp.z },
+			rotation = wr,
+			smooth = false,
+		})
 	end
 end
 
 function selectMapState(nextState)
-	MapState = tonumber(nextState) or 1
+	if nextState == 1 then
+		applyMissionDeckConfig()
+		return
+	end
+
+	MapState = nextState
+	map = map.setState(MapState)
 
 	if MapState == 2 then
-		if type(HexDataIreland) == "table" and next(HexDataIreland) ~= nil then
-			HexData = HexDataIreland
-		else
-			HexData = HexDataScotland
-		end
+		HexData = HexDataIreland
 	else
 		HexData = HexDataScotland
 	end
@@ -82,24 +143,53 @@ function StartGameInternal()
 	assignSettlementGroupsFromHexData(HexData)
 	createHexPlacementButtonsFromHexData(HexData)
 
-	setupTurnsClockwiseRandomStart()
+	if MapState == 2 then
+		Wait.time(dealIrelandMissionCards, 0.5)
+	end
 
-	-- Shuffle the main deck
-	if type(deckGUID) == "string" and deckGUID ~= "" then
-		local deckObj = getObjectFromGUID(deckGUID)
-		if deckObj ~= nil then
-			deckObj.shuffle()
+	if MapState == 2 and type(IrelandTowerTokenBagGUID) == "string" and IrelandTowerTokenBagGUID ~= "" then
+		local bag = getObjectFromGUID(IrelandTowerTokenBagGUID)
+		if bag ~= nil then
+			bag.shuffle()
+
+			local towerHexes = {}
+			for id, h in pairs(HexData) do
+				if type(h) == "table" and h.type == "tower" then
+					table.insert(towerHexes, { id = id, hex = h })
+				end
+			end
+
+			table.sort(towerHexes, function(a, b)
+				local na = tonumber(string.match(tostring(a.id), "^hex_(%d+)$")) or math.huge
+				local nb = tonumber(string.match(tostring(b.id), "^hex_(%d+)$")) or math.huge
+				if na == nb then
+					return tostring(a.id) < tostring(b.id)
+				end
+				return na < nb
+			end)
+
+			for _, entry in ipairs(towerHexes) do
+				bag.takeObject({
+					position = getHexWorldPosition(entry.hex, 1),
+					rotation = { 0, 180, 0 },
+					smooth = false,
+				})
+			end
 		end
 	end
+
+	setupTurnsClockwiseRandomStart()
 
 	local seatedPlayers = {}
 	local unusedColors = {}
 	local allColors = { "White", "Red", "Orange", "Blue" }
-	
+
 	for _, color in ipairs(allColors) do
 		if Player[color].seated then
 			table.insert(seatedPlayers, color)
-			--createManualScoreButtonsOnBag(color)
+			if MapState == 2 then
+				createManualScoreButtonsOnBag(color)
+			end
 		else
 			table.insert(unusedColors, color)
 		end
@@ -107,7 +197,7 @@ function StartGameInternal()
 
 	if #seatedPlayers <= 2 then
 		local blockerColor = unusedColors[1]
-		
+
 		Wait.time(function() setupBlockedHexesFor2Players(blockerColor) end, 0.5)
 	end
 
@@ -121,20 +211,28 @@ function StartGameInternal()
 		local bag = getObjectFromGUID(PlayerGUIDs[color].hex)
 		bag.shuffle()
 
-		local bagPos = bag.getPosition()
-		local previewPositions = {
-			{ bagPos.x - 1, bagPos.y, bagPos.z - 4 },
-			{ bagPos.x + 1, bagPos.y, bagPos.z - 4 },
-			{ bagPos.x - 1, bagPos.y, bagPos.z - 5 },
-			{ bagPos.x + 1, bagPos.y, bagPos.z - 5 },
-		}
+		local setAside = nil
+		if type(SetAsideTokenBags) == "table" and type(SetAsideTokenBags[color]) == "string" then
+			setAside = getObjectFromGUID(SetAsideTokenBags[color])
+		end
 
-		for _, pos in ipairs(previewPositions) do
+		local bagPos = bag.getPosition()
+		local setAsideCount = 2
+		if MapState == 2 then
+			setAsideCount = 4
+		end
+
+		for i = 1, setAsideCount do
 			bag.takeObject({
-				position = pos,
+				position = { bagPos.x, bagPos.y + 2, bagPos.z },
 				rotation = { 0, 180, 0 },
-				smooth = true,
-				callback_function = function(obj) obj.setLock(true) end
+				smooth = false,
+				callback_function = function(obj)
+					if obj == nil then return end
+					if setAside ~= nil and type(setAside.putObject) == "function" then
+						setAside.putObject(obj)
+					end
+				end
 			})
 		end
 
@@ -152,10 +250,6 @@ function StartGameIreland()
 	StartGameInternal()
 end
 
-function StartGame()
-	StartGameScotland()
-end
-
 function onLoad()
 	map = findMapBoard()
 	map.interactable = false
@@ -166,7 +260,7 @@ function onLoad()
 	map.createButton({
 		click_function = "StartGameScotland",
 		label = "Scotland",
-		position = { -1.5, 0.1, 0 },
+		position = { -0.5, 0.1, 0 },
 		rotation = { 0, 0, 0 },
 		width = 2400,
 		height = 1000,
@@ -180,7 +274,7 @@ function onLoad()
 	map.createButton({
 		click_function = "StartGameIreland",
 		label = "Ireland",
-		position = { 1.5, 0.1, 0 },
+		position = { 0.5, 0.1, 0 },
 		rotation = { 0, 0, 0 },
 		width = 2400,
 		height = 1000,
@@ -192,8 +286,8 @@ function onLoad()
 	})
 
 	-- Register the hotkey — player must bind it in Options > Game Keys
-	--addHotkey("Record Hex", onRecordHotkey, false)
-	--addHotkey("Print", printAll, false)
+	addHotkey("Record Hex", onRecordHotkey, false)
+	addHotkey("Print", printAll, false)
 end
 
 function setupTurnsClockwiseRandomStart()
@@ -233,5 +327,3 @@ function setupTurnsClockwiseRandomStart()
 	Turns.turn_color = startColor
 	Turns.enable = true
 end
-
-

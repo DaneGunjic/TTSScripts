@@ -2,7 +2,6 @@ recordedHexes = {}
 currentType = "energy"
 hexCounter = 1
 map = nil
-deckGUID = "08e98f"
 
 PlayerGUIDs = {
 	White = { castle = "f038e9", hex = "e58602", cathedral = "464501", marker100 = "48ed98", marker200 = "f0d7a5", hand = "d49e15" },
@@ -26,9 +25,10 @@ TAG_TO_TYPE = {
 	energy = "energy",
 	food = "food",
 	settlement = "settlement",
-	blank = "blank",
+	empty = "blank",
 	castle = "castle",
-	cathedral = "cathedral"
+	cathedral = "cathedral",
+	tower = "tower"
 }
 
 HexPlacementButtons = { indices = {}, fnByHexId = {}, indexByHexId = {} }
@@ -246,7 +246,7 @@ function runEndGameScoring()
 		if Player[color] ~= nil and Player[color].seated and counts[color] ~= nil then
 			local castles = tonumber(counts[color])
 			local points = castles * 5
-			
+
 			createManualScoreButtonsOnBag(color)
 
 			if points > 0 then
@@ -303,11 +303,6 @@ function createManualScoreButtonsOnBag(playerColor)
 end
 
 function handleHexPlacementClick(hexId, playerColor, altClick)
-	if playerColor ~= Turns.turn_color then
-		printToColor("It is not your turn.", playerColor, {1, 0.6, 0.1})
-		return
-	end
-
 	local hex = HexData[hexId]
 
 	local tileObj = getSingleHandTileObject(playerColor)
@@ -358,18 +353,13 @@ function handleHexPlacementClick(hexId, playerColor, altClick)
 			runEndGameScoring()
 			return
 		end
-	end, 0.1)
+	end, 1)
 end
 
 function buildAdjacencyFromHexData(hexData, hexRadius)
-	if hexData == nil or hexRadius == nil then return end
-
 	local ids = {}
-	for id, hex in pairs(hexData) do
-		if type(hex) == "table" and type(hex.x) == "number" and type(hex.z) == "number" then
-			--log(type(hex) .. " " .. hex.x .. " " .. hex.z)
-			table.insert(ids, id)
-		end
+	for id, _ in pairs(hexData) do
+		table.insert(ids, id)
 	end
 	table.sort(ids)
 
@@ -408,7 +398,6 @@ function autoBuildAdjacencyFromHexData(hexData)
 end
 
 function settlementGroupLetters(index)
-	if type(index) ~= "number" or index < 1 then return "A" end
 	index = math.floor(index)
 	local letters = ""
 	while index > 0 do
@@ -421,8 +410,6 @@ function settlementGroupLetters(index)
 end
 
 function assignSettlementGroupsFromHexData(hexData)
-	if type(hexData) ~= "table" then return 0 end
-
 	local debug = false
 	local debugMsgCount = 0
 	local function dbg(msg)
@@ -439,7 +426,7 @@ function assignSettlementGroupsFromHexData(hexData)
 
 	local settlementIds = {}
 	for id, hex in pairs(hexData) do
-		if type(hex) == "table" and hex.type == "settlement" then
+		if hex.type == "settlement" then
 			hex.settlement_group = nil
 			table.insert(settlementIds, id)
 		end
@@ -470,20 +457,18 @@ function assignSettlementGroupsFromHexData(hexData)
 			while #stack > 0 do
 				local id = table.remove(stack)
 				local hex = hexData[id]
-				if type(hex) == "table" and hex.type == "settlement" then
+				if hex.type == "settlement" then
 					hex.settlement_group = groupName
 					dbg("Assign " .. tostring(id) .. " -> " .. groupName .. " (stack=" .. tostring(#stack) .. ")")
 					local adjacent = hex.adjacent
-					if type(adjacent) == "table" then
-						dbg("Neighbors of " .. tostring(id) .. ": " .. tostring(#adjacent))
-						for _, neighborId in ipairs(adjacent) do
-							if not visited[neighborId] then
-								local neighbor = hexData[neighborId]
-								if type(neighbor) == "table" and neighbor.type == "settlement" then
-									visited[neighborId] = true
-									table.insert(stack, neighborId)
-									dbg("  push settlement neighbor " .. tostring(neighborId) .. " (stack=" .. tostring(#stack) .. ")")
-								end
+					dbg("Neighbors of " .. tostring(id) .. ": " .. tostring(#adjacent))
+					for _, neighborId in ipairs(adjacent) do
+						if not visited[neighborId] then
+							local neighbor = hexData[neighborId]
+							if neighbor.type == "settlement" then
+								visited[neighborId] = true
+								table.insert(stack, neighborId)
+								dbg("  push settlement neighbor " .. tostring(neighborId) .. " (stack=" .. tostring(#stack) .. ")")
 							end
 						end
 					end
@@ -512,26 +497,21 @@ end
 -- Scans all buttons on the map and rebuilds the lookup table that maps Hex IDs to their TTS button indices.
 -- This is necessary because button indices can change when other buttons are removed or created.
 function rebuildHexPlacementButtonIndexCache()
-	-- Ensure the global table structure exists
-	if type(HexPlacementButtons) ~= "table" then
-		HexPlacementButtons = { indices = {}, fnByHexId = {}, indexByHexId = {} }
-	end
-	
 	-- Reset the index cache
 	HexPlacementButtons.indexByHexId = {}
 
 	-- Get current buttons from the map object
 	local buttons = map.getButtons() or {}
 	local foundCount = 0
-	
+
 	-- Iterate through all existing buttons
 	for buttonIndex, buttonData in ipairs(buttons) do
 		local clickFunction = buttonData.click_function
-		
+
 		-- Check if the button is a hex placement button (matches our naming convention)
 		if clickFunction then
 			local hexId = string.match(clickFunction, "^onHexPlace_(hex_%d+)$")
-			
+
 			-- If it's a match, save the index for this hexId
 			if hexId ~= nil then
 				local index = buttonData.index
@@ -550,7 +530,7 @@ end
 
 -- Hides a hex placement button by setting its size to zero and disabling its function.
 -- This effectively "removes" the button from the player's view and interaction.
--- 
+--
 -- Example of data structures used here:
 -- HexPlacementButtons.fnByHexId = { ["hex_01"] = "onHexPlace_hex_01", ["hex_02"] = "onHexPlace_hex_02" }
 -- HexPlacementButtons.indexByHexId = { ["hex_01"] = 0, ["hex_02"] = 5 } (Indices are dynamic TTS button IDs)
@@ -561,7 +541,7 @@ function removeHexPlacementButton(hexId)
 	if type(HexPlacementButtons.fnByHexId) == "table" then
 		expectedFn = HexPlacementButtons.fnByHexId[hexId]
 	end
-	
+
 	-- Fallback to the default naming convention if not found in the lookup table
 	if type(expectedFn) ~= "string" or expectedFn == "" then
 		expectedFn = "onHexPlace_" .. tostring(hexId)
@@ -768,7 +748,7 @@ function createHexPlacementButtonsFromHexData(hexData)
 
 		local buttonWidth = 300
 		local buttonHeight = 300
-		if hex.type == "castle" or hex.type == "cathedral" then
+		if hex.type == "castle" or hex.type == "cathedral"  or hex.type == "tower" then
 			buttonWidth = 0
 			buttonHeight = 0
 		end
@@ -812,7 +792,7 @@ function inferTypeAtWorldPos(worldPos)
 	for _, hit in ipairs(hits) do
 		local obj = hit.hit_object
 		if obj ~= nil and obj ~= map then
-			local inferred = inferTypeFromObject(obj)
+			local inferred = inferTileTypeFromObject(obj)
 			if inferred ~= nil then
 				return inferred
 			end
@@ -911,7 +891,7 @@ function onRecordHotkey(playerColor, hoveredObject, pointerPosition, isKeyUp)
 
 	-- Convert world position to map-local position
 	if map == nil then return end
-	local inferredType = inferTypeFromObject(hoveredObject)
+	local inferredType = inferTileTypeFromObject(hoveredObject)
 	if inferredType == nil then
 		inferredType = inferTypeAtWorldPos(pointerPosition)
 	end

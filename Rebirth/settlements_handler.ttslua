@@ -1,7 +1,7 @@
 function checkAndScoreSettlement(hexId, playerColor)
 		local hex = HexData[hexId]
-		if hex == nil or hex.type ~= "settlement" or hex.settlement_group == nil or hex.settlement_group == "" then
-				return
+		if hex.type ~= "settlement" then
+			return
 		end
 
 		local groupName = hex.settlement_group
@@ -10,12 +10,12 @@ function checkAndScoreSettlement(hexId, playerColor)
 
 		-- Find all hexes in the same group and check occupancy
 		for id, h in pairs(HexData) do
-				if h.settlement_group == groupName then
-						table.insert(groupHexes, { id = id, hex = h })
-						if h.occupant == nil or h.occupant.object_guid == nil then
-								allOccupied = false
-						end
+			if h.settlement_group == groupName then
+				table.insert(groupHexes, { id = id, hex = h })
+				if h.occupant == nil or h.occupant.object_guid == nil then
+						allOccupied = false
 				end
+			end
 		end
 
 		if not allOccupied then
@@ -24,8 +24,31 @@ function checkAndScoreSettlement(hexId, playerColor)
 
 		-- Settlement is complete, calculate scoring
 		local settlementSize = #groupHexes
+		local seatedCount = 0
+		for _, c in ipairs({ "White", "Red", "Orange", "Blue" }) do
+			if Player[c].seated then
+				seatedCount = seatedCount + 1
+			end
+		end
+
+		local ownerSet = {}
+		local singleOwner = nil
+		for _, entry in ipairs(groupHexes) do
+			local occ = entry.hex.occupant
+			ownerSet[occ.player_color] = true
+		end
+
+		for c in pairs(ownerSet) do
+			if singleOwner ~= nil then
+				singleOwner = false
+				break
+			end
+				singleOwner = c
+		end
+
 		local playerInfluence = {} -- { [color] = influence }
 		local colors = { "White", "Red", "Orange", "Blue" }
+
 		for _, color in ipairs(colors) do
 				playerInfluence[color] = 0
 		end
@@ -93,7 +116,42 @@ function checkAndScoreSettlement(hexId, playerColor)
 								broadcastToAll("[Settlement] " .. p2.color .. " scored 3 points (2nd) for a size 2 settlement!", p2.color)
 						end
 				end
-		elseif settlementSize >= 3 then
+		elseif settlementSize == 4 then
+				if type(singleOwner) == "string" then
+						addPlayerScore(singleOwner, 25)
+						broadcastToAll(
+								"[Settlement] " .. singleOwner .. " scored 25 points for fully controlling a size 4 settlement!",
+								singleOwner
+						)
+				elseif seatedCount == 2 then
+						local p1 = ranking[1]
+						local p2 = ranking[2]
+						if p1 then
+								addPlayerScore(p1.color, 17)
+								broadcastToAll("[Settlement] " .. p1.color .. " scored 17 points (1st) for a size 4 settlement!", p1.color)
+						end
+						if p2 then
+								addPlayerScore(p2.color, 8)
+								broadcastToAll("[Settlement] " .. p2.color .. " scored 8 points (2nd) for a size 4 settlement!", p2.color)
+						end
+				else
+						local p1 = ranking[1]
+						local p2 = ranking[2]
+						local p3 = ranking[3]
+						if p1 then
+								addPlayerScore(p1.color, 12)
+								broadcastToAll("[Settlement] " .. p1.color .. " scored 12 points (1st) for a size 4 settlement!", p1.color)
+						end
+						if p2 then
+								addPlayerScore(p2.color, 8)
+								broadcastToAll("[Settlement] " .. p2.color .. " scored 8 points (2nd) for a size 4 settlement!", p2.color)
+						end
+						if p3 then
+								addPlayerScore(p3.color, 5)
+								broadcastToAll("[Settlement] " .. p3.color .. " scored 5 points (3rd) for a size 4 settlement!", p3.color)
+						end
+				end
+		elseif settlementSize == 3 then
 				if #ranking == 1 then
 						local p1 = ranking[1]
 						addPlayerScore(p1.color, 13)

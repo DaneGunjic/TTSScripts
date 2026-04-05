@@ -2,13 +2,10 @@ CathedralClaims = {} -- { [hexId] = { [playerColor] = guid } }
 
 function updateCathedralsAdjacentToHex(hexId, playerColor)
 		local hex = HexData[hexId]
-		if hex == nil or type(hex.adjacent) ~= "table" then
-				return
-		end
 
 		for _, neighborId in ipairs(hex.adjacent) do
 				local neighbor = HexData[neighborId]
-				if neighbor ~= nil and neighbor.type == "cathedral" then
+				if neighbor.type == "cathedral" then
 						handleCathedralPlacement(neighborId, playerColor)
 				end
 		end
@@ -49,7 +46,6 @@ end
 
 function placeCathedralMarker(cathedralHexId, playerColor)
 		local hexEntry = HexData[cathedralHexId]
-		if hexEntry == nil then return end
 
 		local bag = getCathedralBag(playerColor)
 		if bag == nil then
@@ -81,7 +77,5 @@ function placeCathedralMarker(cathedralHexId, playerColor)
 end
 
 function getCathedralBag(playerColor)
-		local guids = PlayerGUIDs[playerColor]
-		if guids == nil or guids.cathedral == nil then return nil end
-		return getObjectFromGUID(guids.cathedral)
+		return getObjectFromGUID(PlayerGUIDs[playerColor].cathedral)
 end

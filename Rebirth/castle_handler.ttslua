@@ -34,12 +34,12 @@ function findCastleObjectAtHex(castleHexId)
 				type = 3,
 				size = { 0.6, 0.6, 0.6 },
 				max_distance = 6,
-				debug = true
+				debug = false
 		})
 
 		for _, hit in ipairs(hits) do
 				local obj = hit.hit_object
-				if obj ~= nil and obj ~= map and isCastle(obj) then
+				if obj ~= map and isCastle(obj) then
 						return obj
 				end
 		end
@@ -50,21 +50,19 @@ end
 function findLooseCastlePieceForPlayer(playerColor)
 		local used = {}
 		for _, claim in pairs(CastleClaims) do
-				if type(claim) == "table" and type(claim.guid) == "string" then
-						used[claim.guid] = true
-				end
+				used[claim.guid] = true
 		end
 
 		local colorLower = string.lower(tostring(playerColor))
 		for _, obj in ipairs(getAllObjects()) do
-				if obj ~= nil and isCastle(obj) then
+				if isCastle(obj) then
 						local guid = obj.getGUID()
 						if not used[guid] then
 								if obj.memo == playerColor then
 										return obj
 								end
 								local name = string.lower(tostring(obj.getName() or ""))
-								if (type(obj.hasTag) == "function" and obj.hasTag(playerColor)) or string.find(name, colorLower, 1, true) ~= nil then
+								if obj.hasTag(playerColor) or string.find(name, colorLower, 1, true) ~= nil then
 										return obj
 								end
 						end
@@ -100,20 +98,18 @@ end
 function getCastleAdjacencyStats(castleHexId)
 		local stats = {}
 		local castleHex = HexData[castleHexId]
-		if castleHex == nil or type(castleHex.adjacent) ~= "table" then
-				return stats
-		end
 
 		for _, neighborId in ipairs(castleHex.adjacent) do
 				local neighbor = HexData[neighborId]
-				if type(neighbor) == "table" and type(neighbor.occupant) == "table" then
-						local owner = neighbor.occupant.player_color
-						if (type(owner) ~= "string" or owner == "") and type(neighbor.occupant.object_guid) == "string" then
-								local obj = getObjectFromGUID(neighbor.occupant.object_guid)
+				local occupant = neighbor.occupant
+				if occupant ~= nil then
+						local owner = occupant.player_color
+						if owner == "" and occupant.object_guid ~= "" then
+								local obj = getObjectFromGUID(occupant.object_guid)
 								owner = inferPlayerColorFromObject(obj)
 						end
 
-						if type(owner) == "string" and owner ~= "" then
+						if owner ~= "" then
 								local entry = stats[owner]
 								if type(entry) ~= "table" then
 										entry = { total = 0, foodEnergy = 0 }
