@@ -1,6 +1,3 @@
--- Concordia Game Setup
--- All functions related to board setup, player setup, and deck management
-
 CLOCKWISE_ORDER = { "White", "Red", "Green", "Yellow", "Blue", "Brown" }
 
 function getSortedSeatedPlayers()
@@ -31,9 +28,9 @@ end
 
 -- Cleanup function for setup buttons
 function DestroySetupButtons()
+    hideSetupButtons()
     hideExpansionButtons()
     hideMapButtons()
-    hideSetupButtons()
 end
 
 function SelectBoardBritannia() setBoard(1) end
@@ -384,47 +381,35 @@ function shufflestuff()
     end
 end
 
-function stuffDeck(target, source, count)
-    for _ = 1, count do
-        source.takeObject({
-            position = target.getPosition(),
-            rotation = {0, 90, 180},
-            smooth = false
-        })
-    end
-end
-
 function setMainDeck()
-    local p1, p2, p3, p4, p5
-    if teamsEnabled then
-        p1 = Personality1Deck_Teams
-        p2 = Personality2Deck_Teams
-        p3 = Personality3Deck_Teams
-        p4 = Personality4Deck_Teams
-        p5 = Personality5Deck_Teams
-    else
-        p1 = Personality1Deck_NoTeams
-        p2 = Personality2Deck_NoTeams
-        p3 = Personality3Deck_NoTeams
-        p4 = Personality4Deck_NoTeams
-        p5 = Personality5Deck_NoTeams
-    end
+	local p1, p2, p3, p4, p5
+	if teamsEnabled then
+			p1 = Personality1Deck_Teams
+			p2 = Personality2Deck_Teams
+			p3 = Personality3Deck_Teams
+			p4 = Personality4Deck_Teams
+			p5 = Personality5Deck_Teams
+	else
+			p1 = Personality1Deck_NoTeams
+			p2 = Personality2Deck_NoTeams
+			p3 = Personality3Deck_NoTeams
+			p4 = Personality4Deck_NoTeams
+			p5 = Personality5Deck_NoTeams
+	end
 
-    --need to accomodate for venus count of 32 cards in deck
-	p1.setPosition(mainDeckLocation)
-    p1.setRotation({0, 90, 180})
+	local decks = {p1, p2, p3, p4, p5}
+	local maxDeck = math.min(numberOfPlayers or 0, #decks)
+	local stackIndex = 0
 
-    --print("venusMode is off, setting up main deck for " .. numberOfPlayers .. " players")
-    stuffDeck(p1, p2, #p2.getObjects())
-    if(numberOfPlayers > 2 ) then
-        stuffDeck(p1,p3, #p3.getObjects())
-        if(numberOfPlayers > 3 ) then
-            stuffDeck(p1,p4, #p4.getObjects())
-            if(numberOfPlayers > 4 ) then
-                stuffDeck(p1,p5, #p5.getObjects())
-            end
-        end
-    end
+	for playerCount = maxDeck, 1, -1 do
+		local deck = decks[playerCount]
+		if deck then
+			deck.shuffle()
+			deck.setPosition({mainDeckLocation[1], mainDeckLocation[2] + (stackIndex * 2), mainDeckLocation[3]})
+			deck.setRotation({0, 90, 180})
+			stackIndex = stackIndex + 1
+		end
+	end
 
     Wait.time(restockSenatorBoard, 1)
 end

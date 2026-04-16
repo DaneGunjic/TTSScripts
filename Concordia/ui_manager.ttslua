@@ -26,7 +26,7 @@ local MapButtonDefs = {
 
 function CreateButtons()
     --print('CreateButtons')
-    
+
     for _, btn in ipairs(MapButtonDefs) do
         local obj = createButton('4ee1f2', btn.label, btn.func, 0, 0, btn.color, btn.x, 5)
         table.insert(MapButtonObjects, {obj=obj, func=btn.func})
@@ -348,7 +348,7 @@ function sellItems(obj, color, alt_click)
     for key, value in pairs(goodsSold) do
         printToAll(key .. ': ' .. value, color)
     end
-    
+
     addMoney(color, totalValue)
 end
 
@@ -397,26 +397,19 @@ function hideSetupButtons()
 end
 
 function hideMapButtons()
-    for _, item in ipairs(MapButtonObjects) do
-        local obj = item.obj
-        local func = item.func
-        if obj then
-            local idx = findButtonIndex(obj, func)
-            if idx then obj.removeButton(idx) end
-        end
-    end
+	for i = #MapButtonObjects, 1, -1 do
+		local item = MapButtonObjects[i]
+		local obj = item.obj
+		local func = item.func
+		if obj then
+			local idx = findButtonIndex(obj, func)
+			if idx then obj.removeButton(idx) end
+		end
+	end
     MapButtonObjects = {}
 end
 
 function hideExpansionButtons()
-    if btnSalsa then
-        local idx = findButtonIndex(btnSalsa, 'ToggleSalsa')
-        if idx then btnSalsa.removeButton(idx) end
-    end
-    if btnForum then
-        local idx = findButtonIndex(btnForum, 'ToggleForum')
-        if idx then btnForum.removeButton(idx) end
-    end
     if btnTeams then
         local idx = findButtonIndex(btnTeams, 'ToggleTeams')
         if idx then btnTeams.removeButton(idx) end
@@ -424,6 +417,14 @@ function hideExpansionButtons()
     if btnDisplay then
         local idx = findButtonIndex(btnDisplay, 'turnSwapDisplay')
         if idx then btnDisplay.removeButton(idx) end
+    end
+    if btnForum then
+        local idx = findButtonIndex(btnForum, 'ToggleForum')
+        if idx then btnForum.removeButton(idx) end
+    end
+    if btnSalsa then
+        local idx = findButtonIndex(btnSalsa, 'ToggleSalsa')
+        if idx then btnSalsa.removeButton(idx) end
     end
 end
 
@@ -570,5 +571,3 @@ function initMoneyCounters()
 end
 
 function doNothing() end
-
-
