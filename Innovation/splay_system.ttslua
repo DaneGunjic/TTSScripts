@@ -126,7 +126,7 @@ end
 function getColorCards(player, color)
 	local zone = getZoneCached(zone_zones[player])
 	if not zone then return {} end
-	
+
 	local cards = zone.getObjects()
 	local list = {}
 	for i, obj in pairs(cards) do
@@ -239,7 +239,7 @@ function anchored_splay(zone, player, color, dir)
 		local anchor_z = anchor.getPosition().z
 		local anchor_y = anchor.getPosition().y
 		local zone_pos = zone.getPosition()
-		
+
 		local cards = getColorCards(player, color)
 		local sorted = {}
 
@@ -252,7 +252,7 @@ function anchored_splay(zone, player, color, dir)
 		for i, obj in pairs(sorted) do
 			if obj ~= nil then
 				local success, pos = pcall(function() return obj.getPosition() end)
-				
+
 				if success then
 					-- Base position on anchor
 					pos.x = anchor_x + ((i - 1) * stepX)
@@ -308,7 +308,7 @@ function shift_selected_color(player, delta_x, delta_z)
 
 	local anchor, anchor_is_deck = getBottomAnchor(player, color, get_splay_state(player, color))
 	if anchor == nil then return end
-	
+
 	for i, obj in pairs(getColorCards(player, color)) do
 		local pos = obj.getPosition()
 		pos.x = pos.x + delta_x

@@ -283,8 +283,8 @@ function createManualScoreButtonsOnBag(playerColor)
 	for _, data in ipairs(offsets) do
 		local funcName = "adjScore_" .. playerColor .. "_" .. data.label:gsub("[+-]", function(s) return s == "+" and "p" or "m" end)
 		_G[funcName] = function()
-			addPlayerScore(playerColor, data.amount)
-			printToAll("[Manual Score] " .. playerColor .. " adjusted score by " .. data.label, playerColor)
+			local total = addPlayerScore(playerColor, data.amount)
+			printToAll("[Manual Score] " .. playerColor .. " adjusted score by " .. data.label .. " | Total: " .. tostring(total), playerColor)
 		end
 
 		bag.createButton({
@@ -305,10 +305,33 @@ end
 function handleHexPlacementClick(hexId, playerColor, altClick)
 	local hex = HexData[hexId]
 
+	local irelandExtraTiles = nil
 	local tileObj = getSingleHandTileObject(playerColor)
 	if tileObj == nil then
-		printToColor("Hold exactly one valid tile in your hand.", playerColor, {1, 0.6, 0.1})
-		return
+		if MapState == 2 then
+			local player = Player[playerColor]
+			local handObjects = player.getHandObjects()
+			local tiles = {}
+			for _, obj in ipairs(handObjects) do
+				if inferTileTypeFromObject(obj) ~= nil then
+					table.insert(tiles, obj)
+				end
+			end
+			if #tiles == 0 then
+				printToColor("Hold at least one valid tile in your hand.", playerColor, {1, 0.6, 0.1})
+				return
+			end
+			tileObj = tiles[1]
+			if #tiles > 1 then
+				irelandExtraTiles = {}
+				for i = 2, #tiles do
+					table.insert(irelandExtraTiles, tiles[i])
+				end
+			end
+		else
+			printToColor("Hold exactly one valid tile in your hand.", playerColor, {1, 0.6, 0.1})
+			return
+		end
 	end
 
 	local tileType = inferTileTypeFromObject(tileObj)
@@ -319,16 +342,32 @@ function handleHexPlacementClick(hexId, playerColor, altClick)
 
 	local blankOverrideAllowed = (hex.type == "blank") and (tileType == "energy" or tileType == "food")
 
-	if tileType ~= hex.type and not blankOverrideAllowed then
+	local farmFallbackAllowed = false
+	if tileType == "energy" and hex.type == "food" then
+		farmFallbackAllowed = not hasUnoccupiedHexOfTypes({ "energy", "blank" })
+	elseif tileType == "food" and hex.type == "energy" then
+		farmFallbackAllowed = not hasUnoccupiedHexOfTypes({ "food", "blank" })
+	end
+
+	if tileType ~= hex.type and not blankOverrideAllowed and not farmFallbackAllowed then
 		printToColor("Type mismatch. Hex expects " .. tostring(hex.type) .. ", but tile is " .. tostring(tileType) .. ".", playerColor, {1, 0.6, 0.1})
 		return
 	end
 
-	if blankOverrideAllowed then
+	if blankOverrideAllowed or farmFallbackAllowed then
 		if hex.base_type == nil then
 			hex.base_type = hex.type
 		end
 		hex.type = tileType
+	end
+
+	if irelandExtraTiles ~= nil then
+		local bag = getHexBagObjectForPlayer(playerColor)
+		if bag ~= nil and type(bag.putObject) == "function" then
+			for _, extra in ipairs(irelandExtraTiles) do
+				bag.putObject(extra)
+			end
+		end
 	end
 
 	local worldPos = map.positionToWorld({ x = -hex.x, y = 0, z = hex.z })
@@ -345,8 +384,10 @@ function handleHexPlacementClick(hexId, playerColor, altClick)
 	removeHexPlacementButton(hexId)
 	scoreEnergyFoodGroupForPlacement(playerColor, hexId, tileType)
 
-	dealOneHexTileToPlayer(playerColor)
-	Turns.endTurn()
+	if MapState ~= 2 then
+		dealOneHexTileToPlayer(playerColor)
+		Turns.endTurn()
+	end
 
 	Wait.time(function()
 		if areAllTilesPlayedAndBagsEmpty() then
@@ -615,6 +656,20 @@ function getSingleHandTileObject(playerColor)
 	end
 
 	return nil
+end
+
+function hasUnoccupiedHexOfTypes(types)
+	if type(HexData) ~= "table" then return false end
+	for _, hex in pairs(HexData) do
+		if hex.occupant == nil then
+			for _, t in ipairs(types) do
+				if hex.type == t then
+					return true
+				end
+			end
+		end
+	end
+	return false
 end
 
 function onHexTilePlaced(playerColor, hexId, hexEntry, tileType, tileObject)
